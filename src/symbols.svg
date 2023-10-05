@@ -1,0 +1,1096 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<svg
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:ci="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 ../xmlSchema/metadataSchema.xsd"
+>
+	<defs>
+	 <symbol id="node_ground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="ground"
+					groupName="Grounds and supply voltages"
+					refX="8.46839"
+					refY="4.04544"
+					viewBox="0 0 16.93673 25.74207"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="12.871035" rx="6.774692000000001" ry="10.296828" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M8.46839 4.04544v15.8739" />
+				<path stroke-width="1.06267" d="M.53135 19.91933h15.87407m-13.22826 2.64563h10.58245m-8.59829 2.6458h6.61413" />
+			</g>
+		</symbol>
+		<symbol id="node_tlground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="tlground"
+					groupName="Grounds and supply voltages"
+					refX="8.46839"
+					refY="4.04544"
+					viewBox="0 0 16.93673 9.86798"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="4.93399" rx="6.774692000000001" ry="3.947192" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M.53135 4.04544h15.87407m-13.22826 2.64561h10.58245m-8.59829 2.64561h6.61413" />
+			</g>
+		</symbol>
+		<symbol id="node_rground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="rground"
+					groupName="Grounds and supply voltages"
+					refX="8.46839"
+					refY="4.04543"
+					viewBox="0 0 16.93673 17.80503"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="8.902515" rx="6.774692000000001" ry="7.122012" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M8.46839 4.04543v13.22829" />
+				<path stroke-linecap="round" stroke-width="1.06267" d="M.53135 17.27372h15.87407" />
+			</g>
+		</symbol>
+		<symbol id="node_sground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="sground"
+					groupName="Grounds and supply voltages"
+					refX="8.46839"
+					refY="4.04543"
+					viewBox="0 0 16.93673 28.38768"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="14.19384" rx="6.774692000000001" ry="11.355072" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M8.46839 4.04543v13.22829" />
+				<path stroke-width="1.06267" d="M.53135 17.27372h15.87407l-7.93703 10.58264Z" />
+			</g>
+		</symbol>
+		<symbol id="node_tground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="tground"
+					groupName="Grounds and supply voltages"
+					refX="8.73405"
+					refY="4.04544"
+					viewBox="0 0 17.46807 4.84241"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.734035" cy="2.421205" rx="6.987228000000001" ry="1.9369640000000001" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.59399" d="M.79702 4.04544h15.87407" />
+			</g>
+		</symbol>
+		<symbol id="node_nground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="nground"
+					groupName="Grounds and supply voltages"
+					refX="8.65698"
+					refY="0.2657"
+					viewBox="0 0 24.87339 25.74207"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="12.436695" cy="12.871035" rx="9.949356000000002" ry="10.296828" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M12.43672 4.04544v15.8739" />
+				<path
+					stroke-width="1.06267"
+					d="M4.49969 19.91933h15.87406m-13.22825 2.64563h10.58244m-8.59828 2.6458h6.61412m8.59831 0c0-6.57524-5.33013-11.90537-11.90537-11.90537s-11.90536 5.33013-11.90536 11.90537"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_pground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="pground"
+					groupName="Grounds and supply voltages"
+					refX="8.65698"
+					refY="0.2657"
+					viewBox="0 0 24.87339 28.38748"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="12.436695" cy="14.19374" rx="9.949356000000002" ry="11.354992000000001" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path
+						stroke-width="1.06267"
+						d="M24.34209 15.9508c0-6.57523-5.33013-11.90536-11.90537-11.90536s-11.90536 5.33013-11.90536 11.90536 5.33013 11.90537 11.90536 11.90537 11.90537-5.33013 11.90537-11.90537Zm-11.90537 0"
+					/>
+					<g stroke-width=".4">
+						<path stroke-width=".53134" d="M12.43672 4.04544v13.22828" />
+						<path stroke-width="1.06267" d="M4.49969 17.27372h15.87406m-13.22825 2.64561h10.58244m-8.59828 2.64563h6.61412" />
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_cground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="cground"
+					groupName="Grounds and supply voltages"
+					refX="9.9799"
+					refY="0.2657"
+					viewBox="0 0 24.21216 32.35622"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="12.10608" cy="16.17811" rx="9.684864000000001" ry="12.942488" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M13.75964 4.04544v19.84241" />
+				<path
+					stroke-width="1.06267"
+					d="m.53136 31.8249 3.30707-7.93705h19.84242l-3.30708 7.93705m-6.61413-7.93705-3.30706 7.93705"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_eground">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="eground"
+					groupName="Grounds and supply voltages"
+					refX="14.81687"
+					refY="4.04544"
+					viewBox="0 0 28.84213 26.79912"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M14.81687 4.04544v13.22828" />
+				<g stroke-width="1.19998">
+					<path stroke-width="1.59399" d="M1.58859 17.27372h26.45657" />
+					<path
+						stroke-width=".53134"
+						d="m.26568 26.53347 6.61416-9.25975m0 9.25975 6.61413-9.25975m0 9.25975 6.61413-9.25975m0 9.25975 6.61414-9.25975"
+					/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_eground2">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="eground2"
+					groupName="Grounds and supply voltages"
+					refX="14.81687"
+					refY="4.04544"
+					viewBox="0 0 28.84213 26.79912"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M14.81687 4.04544v13.22828" />
+				<g stroke-width="1.19998">
+					<path stroke-width="1.59399" d="M1.58859 17.27372h26.45657" />
+					<path
+						stroke-width=".53134"
+						d="m.26568 26.53347 9.25997-9.25975m-.66145 9.25975 9.25974-9.25975m-.66146 9.25975 9.25976-9.25975"
+					/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_vcc">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="vcc"
+					groupName="Grounds and supply voltages"
+					refX="5.82259"
+					refY="21.16495"
+					viewBox="0 0 11.64513 21.4306"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.7153" rx="4.6580520000000005" ry="8.572239999999999" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path stroke-width="1.06267" d="m.53137 12.69896 5.29122-7.4077 5.29122 7.4077" />
+					<path stroke-width=".53134" d="M5.82259 21.16495v-15.8737" />
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_vee">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="vee"
+					groupName="Grounds and supply voltages"
+					refX="5.82259"
+					refY="4.04544"
+					viewBox="0 0 11.64513 25.21035"
+				>
+					<ci:pins>
+						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:pins>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.605175" rx="4.6580520000000005" ry="10.08414" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path stroke-width="1.06267" d="m.53137 12.51143 5.29122 7.4077 5.29122-7.4077" />
+					<path stroke-width=".53134" d="M5.82259 4.04544v15.8737" />
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_jump-crossing">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="jump crossing"
+					refX="1.77718"
+					refY="1.77718"
+					viewBox="0 0 11.1138 11.1138"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path
+					stroke-linejoin="bevel"
+					d="M.2657 5.55693h3.17477c0-1.1689.94756-2.11645 2.11645-2.11645s2.11645.94755 2.11645 2.11645h3.17478m-5.29123-5.29123v2.64561m0 1.05825v6.87859"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_plain-crossing">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="plain crossing"
+					refX="1.77718"
+					refY="1.77718"
+					viewBox="0 0 11.1138 11.1138"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M.2657 5.55693h10.58245m-5.29123-5.29123v4.76208m0 1.0583v4.76207" />
+			</g>
+		</symbol>
+		<symbol id="node_circ">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="circ" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path
+					d="M6.16161 4.04545c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_currarrow">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="currarrow" refX="4.04544" refY="4.04543" viewBox="0 0 8.09083 6.95671">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.478355" rx="3.2363320000000004" ry="2.782684" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M1.73052 4.04543v2.64564l5.62198-2.64564-5.62198-2.64564Z" />
+			</g>
+		</symbol>
+		<symbol id="node_inputarrow">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="inputarrow" refX="1.84226" refY="0.2657" viewBox="0 0 9.6674 6.69106">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.8337" cy="3.34553" rx="3.8669600000000006" ry="2.6764240000000004" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke="none" d="M.00002 4.04544v2.64564l5.62199-2.64564-5.62199-2.64564Z" />
+			</g>
+		</symbol>
+		<symbol id="node_trarrow">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="trarrow" refX="4.04544" refY="4.04544" viewBox="0 0 8.27857 7.09449">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.139285" cy="3.547245" rx="3.3114280000000003" ry="2.8377960000000004" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke="none" d="M1.46485 4.04544v-3.04907l6.81374 3.04907-6.81374 3.04907Z" />
+			</g>
+		</symbol>
+		<symbol id="node_flowarrow">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="flowarrow" refX="9.71423" refY="0.26569" viewBox="0 0 26.9879 6.95671">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="13.49395" cy="3.478355" rx="10.795160000000001" ry="2.782684" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="none" d="M.26569 4.04543h26.45657" />
+				<path d="M21.10027 4.04543v2.64564l5.62199-2.64564-5.62199-2.64564Z" />
+			</g>
+		</symbol>
+		<symbol id="node_ocirc">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="ocirc" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path
+					fill="#fff"
+					d="M6.16161 4.04545c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_diamondpole">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="diamondpole" refX="4.04544" refY="4.04544" viewBox="0 0 8.09083 7.30377">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="m4.04544 1.05276-2.99268 2.99268 2.99268 2.99269 2.99268-2.99269Zm0 5.98537" />
+			</g>
+		</symbol>
+		<symbol id="node_odiamondpole">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="odiamondpole"
+					refX="4.04544"
+					refY="4.04544"
+					viewBox="0 0 8.09083 7.30377"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="#fff" d="m4.04544 1.05276-2.99268 2.99268 2.99268 2.99269 2.99268-2.99269Zm0 5.98537" />
+			</g>
+		</symbol>
+		<symbol id="node_squarepole">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="squarepole" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M1.92927 6.16162h4.23234v-4.23234h-4.23234Z" />
+			</g>
+		</symbol>
+		<symbol id="node_osquarepole">
+			<metadata>
+				<ci:componentInformation type="node" tikzName="osquarepole" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="#fff" d="M1.92927 6.16162h4.23234v-4.23234h-4.23234Z" />
+			</g>
+		</symbol>
+		<symbol id="node_bnc">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="bnc"
+					groupName="Connectors"
+					refX="12.09154"
+					refY="6.80113"
+					viewBox="0 0 21.1617 21.1617"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="10.58085" cy="10.58085" rx="8.46468" ry="8.46468" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<g fill-rule="evenodd" transform="matrix(1.32835 0 0 -1.32835 15.87129 10.58087)">
+						<clipPath id="a">
+							<path d="M-11.94809-7.9654h15.93079v15.93079h-15.93079Zm6.37231 6.37232h9.55847v3.18616h-9.55847Z" />
+						</clipPath>
+						<g clip-path="url(#a)">
+							<path
+								fill="none"
+								d="M0 0c0 2.1996-1.7831 3.9827-3.9827 3.9827s-3.9827-1.7831-3.9827-3.9827 1.7831-3.9827 3.9827-3.9827 3.9827 1.7831 3.9827 3.9827Zm-3.9827 0"
+							/>
+						</g>
+					</g>
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="M12.69703 10.58087c0-1.16873-.94743-2.11617-2.11617-2.11617-1.16872 0-2.11617.94744-2.11617 2.11617s.94745 2.11617 2.11617 2.11617c1.16874 0 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"
+					/>
+					<path fill="none" stroke-width=".53134" d="M12.69703 10.58087h3.17426" />
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_iecconnshape">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="iecconnshape"
+					groupName="Connectors"
+					refX="4.68856"
+					refY="2.04284"
+					viewBox="0 0 16.93665 11.64513"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="8.468325" cy="5.822565" rx="6.774660000000001" ry="4.6580520000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path fill="none" d="M5.82263.53136c-2.92231 0-5.29128 2.36893-5.29128 5.29123s2.36897 5.29122 5.29128 5.29122" />
+					<path d="M5.82263 3.17698h10.58271v5.29122h-10.58271Z" />
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_iecsocketL">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="iecsocketL"
+					groupName="Connectors"
+					refX="4.04544"
+					refY="5.82259"
+					viewBox="0 0 9.8681 11.64513"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path
+					stroke-width="1.06267"
+					d="M9.3368.53136c-2.92238 0-5.29136 2.36893-5.29136 5.29123s2.36898 5.29122 5.29136 5.29122"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_iecplugR">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="iecplugR"
+					groupName="Connectors"
+					refX="4.04544"
+					refY="4.04544"
+					viewBox="0 0 15.15946 7.22237"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z" />
+			</g>
+		</symbol>
+		<symbol id="node_iecplugL">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="iecplugL"
+					groupName="Connectors"
+					refX="4.04544"
+					refY="4.04544"
+					viewBox="0 0 15.15946 7.22237"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z" />
+			</g>
+		</symbol>
+		<symbol id="node_iecsocketR">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="iecsocketR"
+					groupName="Connectors"
+					refX="4.04544"
+					refY="5.82259"
+					viewBox="0 0 9.8681 11.64513"
+				>
+					<ci:pins>
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path
+					stroke-width="1.06267"
+					d="M4.04544.53136c2.92237 0 5.29136 2.36893 5.29136 5.29123s-2.36899 5.29122-5.29136 5.29122"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_npn">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="npn"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m21.99668 36.56154 1.27031-2.77167 4.92354 5.61043-7.46418-.06708Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+			</g>
+		</symbol>
+		<symbol id="node_pnp">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="pnp"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m26.68832 20.55564 1.27033 2.77166-7.46418.06709 4.92354-5.61043Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+			</g>
+		</symbol>
+		<symbol id="node_npn_schottky-base">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="npn"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path
+					fill="none"
+					stroke-width="1.06267"
+					d="M16.40546 17.99298v23.28149m0-23.28149v-2.64581h2.6458v2.64581m-2.6458 23.28149v2.64581h-2.6458v-2.64581"
+				/>
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m21.99668 36.56154 1.27031-2.77167 4.92354 5.61043-7.46418-.06708Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+			</g>
+		</symbol>
+		<symbol id="node_pnp_schottky-base">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="pnp"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path
+					fill="none"
+					stroke-width="1.06267"
+					d="M16.40546 17.99298v23.28149m0-23.28149v-2.64581h2.6458v2.64581m-2.6458 23.28149v2.64581h-2.6458v-2.64581"
+				/>
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m26.68832 20.55564 1.27033 2.77166-7.46418.06709 4.92354-5.61043Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+			</g>
+		</symbol>
+		<symbol id="node_npn_bodydiode">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="npn"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 46.30392 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m21.99668 36.56154 1.27031-2.77167 4.92354 5.61043-7.46418-.06708Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+				<path fill="none" stroke-width="1.06267" d="m41.80409 26.45895-3.96852 6.34954h7.93704Zm3.96851.00001h-7.93703" />
+				<path fill="none" stroke-width=".53134" d="M32.27954 12.17213h9.52455v14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 12.17213c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+				<path fill="none" stroke-width=".53134" d="M32.27954 47.09532h9.52455v-14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 47.09532c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_pnp_bodydiode">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="pnp"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 46.30392 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 7.27558v17.72729" />
+				<path stroke="none" d="m26.68832 20.55564 1.27033 2.77166-7.46418.06709 4.92354-5.61043Z" />
+				<path fill="none" stroke-width=".53134" d="M16.40546 29.63372h-16.13977" />
+				<path fill="none" stroke-width="1.06267" d="m41.80409 26.45895-3.96852 6.34954h7.93704Zm3.96851.00001h-7.93703" />
+				<path fill="none" stroke-width=".53134" d="M32.27954 12.17213h9.52455v14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 12.17213c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+				<path fill="none" stroke-width=".53134" d="M32.27954 47.09532h9.52455v-14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 47.09532c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_npn_photo">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="npn"
+					groupName="Transistors"
+					refX="32.01387"
+					refY="29.63372"
+					viewBox="0 0 36.05927 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.01387.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.1398 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.1398 33.99889 15.87407 7.27558v17.72729" />
+				<path stroke="none" d="m21.73101 36.56154 1.27032-2.77167 4.92353 5.61043-7.46418-.06708Z" />
+				<path fill="none" stroke-width=".53134" d="m.26568 20.90293 11.3343 4.6177" />
+				<path
+					stroke="none"
+					d="M14.55228 26.72332c-1.1299-.74716-3.14368-2.14123-4.16883-3.8497.6789 1.85426.278 2.83838-1.50337 3.69038 1.92716-.50576 4.34185-.09578 5.6722.15932Z"
+				/>
+				<path fill="none" stroke-width=".53134" d="m.26568 26.7233 11.33435 4.61809" />
+				<path
+					stroke="none"
+					d="M14.55229 32.54412c-1.12988-.74716-3.14364-2.14126-4.16875-3.84972.67887 1.85425.27795 2.83836-1.50342 3.69032 1.92716-.50572 4.34183-.09571 5.67217.1594Z"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_pnp_photo">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="pnp"
+					groupName="Transistors"
+					refX="32.01387"
+					refY="29.63372"
+					viewBox="0 0 36.05927 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.01387.26569v17.72729l-15.87408 7.27558" />
+				<path fill="none" stroke-width="1.06267" d="M16.1398 17.99298v23.28149" />
+				<path fill="none" stroke-width=".53134" d="m16.1398 33.99889 15.87407 7.27558v17.72729" />
+				<path stroke="none" d="m26.42266 20.55564 1.27033 2.77166-7.46419.06709 4.92354-5.61043Z" />
+				<path fill="none" stroke-width=".53134" d="m.26568 20.90293 11.3343 4.6177" />
+				<path
+					stroke="none"
+					d="M14.55228 26.72332c-1.1299-.74716-3.14368-2.14123-4.16883-3.8497.6789 1.85426.278 2.83838-1.50337 3.69038 1.92716-.50576 4.34185-.09578 5.6722.15932Z"
+				/>
+				<path fill="none" stroke-width=".53134" d="m.26568 26.7233 11.33435 4.61809" />
+				<path
+					stroke="none"
+					d="M14.55229 32.54412c-1.12988-.74716-3.14364-2.14126-4.16875-3.84972.67887 1.85425.27795 2.83836-1.50342 3.69032 1.92716-.50572 4.34183-.09571 5.67217.1594Z"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_nigbt">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="nigbt"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
+				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 8.7308v16.27207" />
+				<path stroke="none" d="m22.08145 37.1207 1.46936-2.6715 4.50065 5.95504-7.43935-.61204Z" />
+				<path fill="none" stroke-width=".53134" d="M12.59583 29.63372h-12.33014" />
+			</g>
+		</symbol>
+		<symbol id="node_Lnigbt">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="Lnigbt"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="11.64075" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
+				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 8.7308v16.27207" />
+				<path stroke="none" d="m22.08145 37.1207 1.46936-2.6715 4.50065 5.95504-7.43935-.61204Z" />
+				<path fill="none" stroke-width=".53134" d="M12.59583 41.27447h-12.33014" />
+			</g>
+		</symbol>
+		<symbol id="node_Lpigbt">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="Lpigbt"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 36.32494 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="-11.640739999999997" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
+				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 8.7308v16.27207" />
+				<path stroke="none" d="m26.60355 19.65957 1.46934 2.6715-7.43935.61205 4.50066-5.95504Z" />
+				<path fill="none" stroke-width=".53134" d="M12.59583 17.99298h-12.33014" />
+			</g>
+		</symbol>
+		<symbol id="node_Lpigbt_bodydiode">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="Lpigbt"
+					groupName="Transistors"
+					refX="32.27954"
+					refY="29.63372"
+					viewBox="0 0 46.30392 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="B" x="-31.74819" y="-11.640739999999997" isDefault="false" />
+						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
+						<ci:pin anchorName="E" x="0" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
+				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
+				<path fill="none" stroke-width=".53134" d="m16.40546 33.99889 15.87408 8.7308v16.27207" />
+				<path stroke="none" d="m26.60355 19.65957 1.46934 2.6715-7.43935.61205 4.50066-5.95504Z" />
+				<path fill="none" stroke-width=".53134" d="M12.59583 17.99298h-12.33014" />
+				<path fill="none" stroke-width="1.06267" d="m41.80409 26.45895-3.96852 6.34954h7.93704Zm3.96851.00001h-7.93703" />
+				<path fill="none" stroke-width=".53134" d="M32.27954 12.17213h9.52455v14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 12.17213c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+				<path fill="none" stroke-width=".53134" d="M32.27954 47.09532h9.52455v-14.28683" />
+				<path
+					stroke-width=".53134"
+					d="M33.76084 47.09532c0-.8181-.6632-1.4813-1.4813-1.4813s-1.4813.6632-1.4813 1.4813.6632 1.4813 1.4813 1.4813 1.4813-.6632 1.4813-1.4813Zm-1.4813 0"
+				/>
+			</g>
+		</symbol>
+		<symbol id="node_nigfete">
+			<metadata>
+				<ci:componentInformation
+					type="node"
+					tikzName="nigfete"
+					groupName="Transistors"
+					refX="37.57039"
+					refY="29.63372"
+					viewBox="0 0 41.61579 59.26741"
+				>
+					<ci:pins>
+						<ci:pin anchorName="D" x="0" y="-29.10236" isDefault="false" />
+						<ci:pin anchorName="G" x="-37.03903" y="10.186000000000003" isDefault="false" />
+						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+		<ellipse fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M37.57039.26569v19.18203h-18.51952" />
+				<path fill="none" stroke-width="1.06267" d="M19.05087 15.08254v8.0032m0 2.9102v7.27557m0 2.9102v8.0032" />
+				<path fill="none" stroke-width=".53134" d="M19.05087 29.63372h18.78519m-18.7852 10.186h18.51953v19.18204" />
+				<path fill="none" stroke-width="1.06267" d="M14.60638 19.18205v20.90334" />
+				<path stroke="none" d="M29.03917 29.63372v3.04908l-6.81374-3.04908 6.81374-3.04907Z" />
+				<path fill="none" stroke-width=".53134" d="M14.60638 39.81972h-14.34069m37.3047-10.186v29.10237" />
+			</g>
+		</symbol>
+
+	</defs>
+</svg>

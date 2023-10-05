@@ -1,0 +1,43 @@
+{
+	"name": "circutikz-pwa",
+	"version": "0.0.1",
+	"private": "true",
+	"description": "",
+	"license": "UNLICENSED",
+	"author": "Manuel Kirzinger",
+	"source": "src/index.html",
+	"scripts": {
+		"build": "parcel build --no-content-hash",
+		"prettier-lint": "prettier --check --config .prettierrc --log-level log '**/*.{js,ts,mjs,cjs,json,jsonc,html,htm,css,scss,xml,xsd,svg}'",
+		"start": "parcel serve --lazy",
+		"html-lint": "scripts/validateHTML.mjs",
+		"lint": "npm run html-lint "
+	},
+	"browserslist": "> 0.5%, last 2 versions, not dead",
+	"dependencies": {
+		"@svgdotjs/svg.draggable.js": "^3.0.3",
+		"@svgdotjs/svg.js": "^3.2.0",
+		"@svgdotjs/svg.panzoom.js": "^2.1.2",
+		"bootstrap": "^5.3.2",
+		"material-symbols": "^0.12.0"
+	},
+	"devDependencies": {
+		"@parcel/config-default": "^2.9.3",
+		"@parcel/plugin": "^2.9.3",
+		"@parcel/transformer-css": "^2.9.3",
+		"@parcel/transformer-html": "^2.9.3",
+		"@parcel/transformer-js": "^2.9.3",
+		"@parcel/transformer-posthtml": "^2.9.3",
+		"@parcel/transformer-sass": "^2.9.3",
+		"@parcel/transformer-svg": "^2.9.3",
+		"@parcel/transformer-xml": "^2.9.3",
+		"@prettier/plugin-xml": "^3.1.1",
+		"@xml-tools/validation": "^1.0.16",
+		"html-validator": "^6.0.1",
+		"npm-run-all": "^4.1.5",
+		"parcel": "^2.9.3",
+		"posthtml-include": "^1.7.4",
+		"prettier": "^3.0.0",
+		"sass": "^1.68.0"
+	}
+}

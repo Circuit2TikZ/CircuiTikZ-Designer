@@ -1,0 +1,62 @@
+<xs:schema
+	attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
+	xmlns="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:svg="http://www.w3.org/2000/svg"
+>
+	<xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg.xsd" />
+	<xs:complexType name="anchor">
+		<xs:attribute type="xs:string" name="anchorName" use="required" />
+		<xs:attribute type="svg:CoordinateType" name="x" use="required" />
+		<xs:attribute type="svg:CoordinateType" name="y" use="required" />
+		<xs:attribute type="xs:boolean" name="isDefault" use="optional" default="false" />
+	</xs:complexType>
+	<xs:element name="componentInformation">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="tikzOptions" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute type="xs:string" name="key" use="required" />
+									<xs:attribute type="xs:string" name="value" use="optional" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="pins" minOccurs="1" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element type="anchor" name="pin" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="additionalAnchors" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element type="anchor" name="anchor" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element type="anchor" name="textPosition" minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+			<xs:attribute name="type">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="path" />
+						<xs:enumeration value="node" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="tikzName" use="optional" />
+			<xs:attribute type="xs:string" name="groupName" use="optional" />
+			<xs:attribute type="svg:CoordinateType" name="refX" use="optional" default="0" />
+			<xs:attribute type="svg:CoordinateType" name="refY" use="optional" default="0" />
+			<xs:attribute type="svg:ViewBoxSpecType" name="viewBox" use="optional" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

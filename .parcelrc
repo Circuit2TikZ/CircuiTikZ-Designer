@@ -1,0 +1,25 @@
+{
+	"extends": "@parcel/config-default",
+	"transformers": {
+		"*.{cjs,js,mjs}": [
+			"@parcel/transformer-js"
+		],
+		"*.css": [
+			"@parcel/transformer-css"
+		],
+		"*.{htm,html}": [
+			"@parcel/transformer-posthtml",
+			"@parcel/transformer-html",
+			"./scripts/inlineSVG.mjs"
+		],
+		"*.svg": [
+			"@parcel/transformer-svg"
+		],
+		"*.xml": [
+			"@parcel/transformer-xml"
+		],
+		"*.{sass,scss}": [
+			"@parcel/transformer-sass"
+		]
+	}
+}

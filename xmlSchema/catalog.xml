@@ -1,0 +1,26 @@
+<catalog
+	xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:entity:xmlns:xml:catalog
+		http://www.oasis-open.org/committees/entity/release/1.1/catalog.xsd"
+	prefer="public"
+>
+	<public publicId="http://www.w3.org/XML/1998/namespace" uri="http://www.w3.org/2001/xml.xsd" />
+	<!-- <public publicId="http://www.w3.org/XML/1998/namespace" uri="https://github.com/dumistoklus/svg-xsd-schema/raw/master/namespace.xsd" /> -->
+
+	<public publicId="http://www.w3.org/2001/XMLSchema" uri="http://www.w3.org/2001/XMLSchema.xsd" />
+	<!-- <public publicId="http://www.w3.org/2001/XMLSchema-instance" uri="https://www.w3.org/2001/XMLSchema-instance.xsd" /> -->
+	
+	<public
+		publicId="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+		uri="http://www.oasis-open.org/committees/entity/release/1.1/catalog.xsd"
+	/>
+
+	<public publicId="http://www.w3.org/1999/xlink" uri="http://www.w3.org/1999/xlink.xsd" />
+	<!-- <public publicId="http://www.w3.org/1999/xlink" uri="https://github.com/dumistoklus/svg-xsd-schema/raw/master/xlink.xsd"/> -->
+
+	<!-- <public publicId="http://www.w3.org/2000/svg" uri="http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" /> -->
+	<!-- <public publicId="http://www.w3.org/2000/svg" uri="https://github.com/dumistoklus/svg-xsd-schema/raw/master/svg.xsd" /> -->
+	<public publicId="http://www.w3.org/2000/svg" uri="../xmlSchema/svg.xsd" />
+	<public publicId="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3" uri="../xmlSchema/metadataSchema.xsd" />
+</catalog>

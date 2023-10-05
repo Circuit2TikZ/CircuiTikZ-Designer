@@ -1,0 +1,51 @@
+{
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.detectIndentation": true,
+	"editor.indentSize": "tabSize",
+	"editor.insertSpaces": false,
+	"editor.rulers": [120],
+	"editor.tabSize": 4,
+	"files.associations": {
+		".parcelrc": "json",
+		".posthtmlrc": "json"
+	},
+	"prettier.documentSelectors": ["**/*.{svg,xsd,xml}", ".parcelrc", ".posthtmlrc"],
+	"prettier.prettierPath": "./node_modules/prettier/index.cjs",
+	"terminal.integrated.env.linux": {
+		"PATH": "${env:PATH}:${workspaceFolder}/node_modules/.bin"
+	},
+	"terminal.integrated.profiles.linux": {
+		"bash": {
+			"args": ["--init-file", "${workspaceFolder}/.vscode/.bashrc", "-i"],
+			"icon": "terminal-bash",
+			"path": "bash"
+		}
+	},
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#0A360B",
+		"titleBar.activeBackground": "#0E4B10",
+		"titleBar.activeForeground": "#F4FDF4"
+	},
+	"xml.catalogs": ["xmlSchema/catalog.xml"],
+	"xml.codeLens.enabled": true,
+	"xml.fileAssociations": [
+		{
+			"pattern": "**/*.svg",
+			"systemId": "xmlSchema/svg.xsd"
+		}
+	],
+	"xml.format.maxLineWidth": 120,
+	"xml.validation.filters": [
+		{
+			"noGrammar": "ignore",
+			"pattern": "**.exsd",
+			"schema": {
+				"enabled": "never"
+			}
+		},
+		{
+			"noGrammar": "ignore",
+			"pattern": "**{.project,.classpath,plugin.xml,feature.xml,category.xml,.target,.product}"
+		}
+	]
+}

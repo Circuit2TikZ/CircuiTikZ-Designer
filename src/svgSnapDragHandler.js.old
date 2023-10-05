@@ -1,0 +1,155 @@
+/**
+ * @module svgSnapDragHandler
+ */
+
+import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
+import "@svgdotjs/svg.draggable.js/dist/svg.draggable.esm";
+
+/**
+ * @typedef {object} DragHandler
+ * @property {SVG.Shape} el
+ * @property {SVG.Box} box
+ * @property {SVG.Point} lastClick
+ *
+ * @property {function(Event): void} drag
+ * @property {function(Event): void} startDrag
+ * @property {function(Event): void} endDrag
+ * @property {function (number, number): SVG.Element} move
+ */
+
+/**
+ * @typedef {object} DragMoveEventDetail
+ * @property {SVG.Box} box
+ * @property {MouseEvent} event
+ * @property {DragHandler} handler - the instance of the svg.draggable.js handler
+ * @see CustomEvent
+ */
+
+/**
+ * @typedef {CustomEvent<DragMoveEventDetail>} DragMoveEvent
+ */
+
+export default class svgSnapDragHandler {
+	/** @type {SVG.Element} */
+	element;
+
+	/**
+	 * Do use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler.
+	 *
+	 * @private
+	 * @hideconstructor
+	 * @see svgSnapDragHandler.snapDrag - use this instead
+	 * @param {SVG.Element} element - the element to enable snap-dragging
+	 * @param {function(boolean): void} element.draggable
+	 */
+	constructor(element) {
+		this.element = element;
+		this.element.remember("_snapDragHandler", this);
+		this.element.draggable(true);
+
+		this.element.on("dragmove.namespace", this.#dragMove, this);
+	}
+
+	/**
+	 * Activate, deactivate or query the svgSnapDragHandler of an element.
+	 *
+	 * @static
+	 * @public
+	 * @param {SVG.Element} element - the element to modify/query
+	 * @param {boolean} [enable] - `true` --> activate, `false` --> deactivate, `undefined` --> query
+	 * @returns {svgSnapDragHandler|null} the handler, if activated
+	 */
+	static snapDrag(element, enable) {
+		/** @type {svgSnapDragHandler|null} */
+		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new svgSnapDragHandler(element) : null);
+		if (enable === false && snapDragHandler) {
+			// enable === false --> not undefined
+			snapDragHandler.removeHandler();
+			return null;
+		}
+		return snapDragHandler;
+	}
+
+	/**
+	 * Remove the handler and deactivate `draggable` feature.
+	 */
+	removeHandler() {
+		this.element.off("dragmove.namespace", this.dragMove);
+		this.draggable(false);
+		this.element.forget("_snapDragHandler");
+	}
+
+	/**
+	 * Handler for the dragging event.
+	 *
+	 * @private
+	 *
+	 * @param {DragMoveEvent} event
+	 */
+	#dragMove(event) {
+		if (event.detail.event?.shiftKey) return; // do not snap to grid if shift is pressed
+		event.preventDefault();
+
+		const pitch = 4;
+
+		/** @type {SVG.Point[]} */
+		const snapPoints = this.element.snappingPoints ? this.element.snappingPoints : [new SVG.Point(0, 0)];
+
+		/**
+		 * @typedef {object} minDistStruct
+		 * @prop {number} dist
+		 * @prop {SVG.Number} x
+		 * @prop {SVG.Number} y
+		 */
+
+		/** @type {minDistStruct} */
+		const result = snapPoints.reduce(
+			/**
+			 *
+			 * @param {minDistStruct} prevVal
+			 * @param {SVG.Point} point
+			 * @returns {minDistStruct}
+			 */
+			(prevVal, point) => {
+				// Coordinates near grid
+				/** @type {SVG.Number} */
+				const oriX = new SVG.Number(event.detail.box.x + point.x);
+				/** @type {SVG.Number} */
+				const oriY = new SVG.Number(event.detail.box.y + point.y);
+
+				// calculate snapped coordinates (grid crossing)
+				/** @type {SVG.Number} */
+				let x = oriX.convertToUnit("cm");
+				/** @type {SVG.Number} */
+				let y = oriY.convertToUnit("cm");
+
+				const scaledX = x.value * pitch;
+				let snappedX = Math.trunc(scaledX);
+				if (Math.abs(scaledX - snappedX) >= 0.5) snappedX += Math.sign(scaledX);
+
+				const scaledY = y.value * pitch;
+				let snappedY = Math.trunc(scaledY);
+				if (Math.abs(scaledY - snappedY) >= 0.5) snappedY += Math.sign(scaledY);
+
+				x.value = snappedX / pitch;
+				y.value = snappedY / pitch;
+
+				x = x.convertToUnit("px");
+				y = y.convertToUnit("px");
+
+				// squared distance snapped <--> mouse (px^2)
+				const squaredDistance = (oriX.value - x.value) ** 2 + (oriX.value - y.value) ** 2;
+
+				// calculate "box" coordinates
+				x = x.minus(point.x);
+				y = y.minus(point.y);
+
+				if (squaredDistance < prevVal.dist) return { dist: squaredDistance, x: x, y: y };
+				else return prevVal;
+			},
+			/** @type {minDistStruct} */ { dist: Number.MAX_VALUE, x: null, y: null }
+		);
+
+		event.detail.handler.move(result.x, result.y);
+	}
+}

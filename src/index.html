@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<title>TEST</title>
+		<meta
+			name="viewport"
+			content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+		/>
+		<!-- <script src="node_modules/@svgdotjs/svg.js/dist/svg.js"></script>
+	<script src="node_modules/@svgdotjs/svg.draggable.js/dist/svg.draggable.js"></script> -->
+		<!-- <script src="https://cdn.jsdelivr.net/npm/svg.js@2.7.1/dist/svg.min.js"
+	        integrity="sha256-DSAVgUuz6YXM7pUOvn+Lc40Ek6cWvBgCBU1jsx72Dqg=" crossorigin="anonymous" defer></script>
+	<script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js@3.0.3/dist/svg.draggable.min.js"
+	        integrity="sha256-hdPfVO4bIzqgb9KOtdT5l3KN3FYniDFKAh7smh0ihFQ=" crossorigin="anonymous" defer></script> -->
+		<script type="module" src="index.js"></script>
+		<link rel="stylesheet" href="styles.scss" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+		/>
+		<link rel="preload" href="symbols.svg" type="image/svg+xml" as="image" id="symbolDBlink" />
+	</head>
+
+	<body>
+		<a
+			id="addButton"
+			class="material-symbols-outlined"
+			data-bs-toggle="offcanvas"
+			href="#leftToolbar"
+			role="button"
+			aria-controls="leftToolbar"
+		>
+			add
+		</a>
+
+		<div id="leftToolbar" class="offcanvas offcanvas-start show" tabindex="-1">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title" id="offcanvasLabel">Offcanvas</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body" id="leftToolbar-body">
+				<div class="accordion" id="leftToolbarAccordion"></div>
+			</div>
+
+			<!-- <button title="click me" id="nigfete_addButton">Add nigfete</button> -->
+		</div>
+		<include src="canvas.svg"></include>
+		<!-- <object type="image/svg+xml" data="template.svg" id="canvasObj"></object> -->
+	</body>
+</html>

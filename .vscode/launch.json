@@ -1,0 +1,15 @@
+{
+	"configurations": [
+		{
+			"name": "http://localhost:1234/",
+			"preLaunchTask": "npm: start",
+			"request": "launch",
+			"sourceMapPathOverrides": {
+				"/__parcel_source_root/*": "${webRoot}/*"
+			},
+			"type": "chrome",
+			"url": "http://localhost:1234/",
+			"webRoot": "${workspaceFolder}"
+		}
+	]
+}

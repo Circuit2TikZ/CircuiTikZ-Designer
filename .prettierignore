@@ -1,0 +1,4 @@
+# Slightly modified xsd files from https://github.com/dumistoklus/svg-xsd-schema
+/xmlSchema/namespace.xsd
+/xmlSchema/svg.xsd
+/xmlSchema/xlink.xsd

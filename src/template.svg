@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<svg
+	version="1.1"
+	id="canvas"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:ci="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 metadataSchema.xsd"
+>
+	<defs>
+		<symbol id="nigfete_template">
+			<metadata>
+				<ci:componentInformation type="node">
+					<ci:pins>
+						<ci:pin anchorName="D" x="0.98cm" y="0cm" isDefault="false" />
+						<ci:pin anchorName="G" x="0cm" y="1.0395cm" isDefault="false" />
+						<ci:pin anchorName="S" x="0.98cm" y="1.54cm" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="B" x="0.98cm" y="0.77cm" isDefault="true" />
+					</ci:additionalAnchors>
+					<ci:textPosition anchorName="text" x="0cm" y="0cm" />
+				</ci:componentInformation>
+			</metadata>
+			<path
+				d="M0 22.026V7.64h-13.89"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-13.89 10.914V4.91m0-2.183v-5.456m0-2.183v-6.003"
+				style="fill:none;stroke:#000;stroke-width:.797;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-13.89 0H.2m-14.09-7.64H0v-14.386"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-17.223 7.839V-7.84"
+				style="fill:none;stroke:#000;stroke-width:.797;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-6.398 0v-2.287L-11.508 0l5.11 2.287Z"
+				style="fill:#000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-17.223-7.64H-27.98M0 0v-21.827"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+		</symbol>
+		<pattern id="smallGridPattern" width=".25cm" height=".25cm" patternUnits="userSpaceOnUse">
+			<path d="M 9.44882 0 L 0 0 0 9.44882" fill="none" stroke="gray" stroke-width="0.5" />
+			</pattern>
+		<pattern id="gridPattern" width="1cm" height="1cm" patternUnits="userSpaceOnUse">
+			<rect width="1cm" height="1cm" fill="url(#smallGridPattern)" />
+			<path d="M 37.79528 0 L 0 0 0 37.79528" fill="none" stroke="gray" stroke-width="1" />
+		</pattern>
+	</defs>
+	<desc>Four separate rectangles</desc>
+
+	<rect id="grid" width="100%" height="100%" fill="url(#gridPattern)" />
+
+	<rect id="rect1" x="0.5cm" y="0.5cm" width="2cm" height="1cm" />
+	<rect id="rect2" x="0.5cm" y="2cm" width="1cm" height="1.5cm" />
+	<rect id="rect3" x="3cm" y="0.5cm" width="1.5cm" height="2cm" />
+	<rect id="rect4" x="3.5cm" y="3cm" width="1cm" height="0.5cm" />
+
+	<use id="nigfete_001" xlink:href="#nigfete_template" x="5cm" y="5cm" />
+	<use id="nigfete_002" xlink:href="#nigfete_template" x="7cm" y="5cm" />
+
+	<!-- Show outline of viewport using 'rect' element -->
+	<rect x=".01cm" y=".01cm" width="9.98cm" height="9.98cm" fill="none" stroke="blue" stroke-width=".02cm" />
+</svg>

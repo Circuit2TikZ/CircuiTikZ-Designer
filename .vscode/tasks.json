@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"group": "build",
+			"label": "npm: start",
+			"detail": "parcel Build, watch & serve",
+			"isBackground": true,
+			"promptOnClose": true,
+			"runOptions": { "instanceLimit": 1 },
+			"problemMatcher": {
+				"owner": "JavaScript",
+				"fileLocation": "absolute",
+				"pattern": [
+					{
+						"regexp": "Build failed.",
+						"message": 0
+					},
+					{
+						"regexp": "(^@[^:\\r\\n]+: ?[^\\r\\n]+)[\r\n \t]*^  ([a-zA-Z0-9\\-\\_\\./]+):([\\d+]):([\\d+])(([\\r\\n]+  [^\\r\\n])+)",
+						"message": 1,
+						"file": 2,
+						"line": 3,
+						"column": 4,
+						"code": 5
+					}
+				]
+			}
+		}
+	]
+}

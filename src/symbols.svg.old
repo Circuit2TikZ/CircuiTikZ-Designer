@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<svg
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:ci="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 metadataSchema.xsd"
+>
+	<defs>
+		<symbol id="nigfete_template">
+			<metadata>
+				<ci:componentInformation type="node" refX="36.77746" refY="29.10236">
+					<ci:pins>
+						<ci:pin anchorName="D" x="0" y="0.77cm" isDefault="false" />
+						<ci:pin anchorName="G" x="-0.98cm" y="-0.2695cm" isDefault="false" />
+						<ci:pin anchorName="S" x="0" y="-0.77cm" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="B" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+					<ci:textPosition anchorName="text" x="0cm" y="0cm" /> <!-- nonsense ATM -->
+				</ci:componentInformation>
+			</metadata>
+			<circle cx="23" cy="29.10236" r="13" fill="transparent" /> <!-- touch target -->
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" d="M0 22.109V7.669h-13.942" transform="matrix(1.30958 0 0 -1.31633 36.777 29.102)" />
+				<path
+					fill="none"
+					stroke-width=".8"
+					d="M-13.942 10.954V4.93m0-2.19V-2.74m0-2.19v-6.025"
+					transform="matrix(1.30958 0 0 -1.31633 36.777 29.102)"
+				/>
+				<path fill="none" d="M-13.942 0H.2m-14.142-7.668H0v-14.44" transform="matrix(1.30958 0 0 -1.31633 36.777 29.102)" />
+				<path fill="none" stroke-width=".8" d="M-17.288 7.868V-7.868" transform="matrix(1.30958 0 0 -1.31633 36.777 29.102)" />
+				<path stroke="none" d="M28.367 29.102v3.022l-6.718-3.022 6.718-3.021Z" />
+				<path fill="none" d="M-17.288-7.668h-10.795M0 0v-21.909" transform="matrix(1.30958 0 0 -1.31633 36.777 29.102)" />
+			</g>
+		</symbol>
+		<symbol id="nigfete_template_old">
+			<metadata>
+				<ci:componentInformation type="node" refX="37.305" refY="29.368">
+					<ci:pins>
+						<ci:pin anchorName="D" x="0.98cm" y="0cm" isDefault="false" />
+						<ci:pin anchorName="G" x="0cm" y="1.0395cm" isDefault="false" />
+						<ci:pin anchorName="S" x="0.98cm" y="1.54cm" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="B" x="0.98cm" y="0.77cm" isDefault="true" />
+					</ci:additionalAnchors>
+					<ci:textPosition anchorName="text" x="0cm" y="0cm" />
+				</ci:componentInformation>
+			</metadata>
+			<path
+				d="M0 22.026V7.64h-13.89"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-13.89 10.914V4.91m0-2.183v-5.456m0-2.183v-6.003"
+				style="fill:none;stroke:#000;stroke-width:.797;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-13.89 0H.2m-14.09-7.64H0v-14.386"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-17.223 7.839V-7.84"
+				style="fill:none;stroke:#000;stroke-width:.797;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-6.398 0v-2.287L-11.508 0l5.11 2.287Z"
+				style="fill:#000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+			<path
+				d="M-17.223-7.64H-27.98M0 0v-21.827"
+				style="fill:none;stroke:#000;stroke-width:.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+				transform="matrix(1.33333 0 0 -1.33333 37.305 29.368)"
+			/>
+		</symbol>
+	</defs>
+</svg>
