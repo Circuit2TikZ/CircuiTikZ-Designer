@@ -1,0 +1,11 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"allowJs": true,
+		"module": "NodeNext",
+		"noEmit": true,
+		"strictNullChecks": false
+	},
+	"exclude": [],
+	"include": ["src/**/*"]
+}
