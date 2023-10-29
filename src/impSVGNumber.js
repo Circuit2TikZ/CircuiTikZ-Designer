@@ -16,7 +16,8 @@ import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
 
 /**
  * @readonly
- * @enum {ToUnit} */
+ * @enum {ToUnit}
+ */
 const unitConvertMap = {
 	px: {
 		px: 1,
@@ -86,7 +87,7 @@ function toSameUnit(thisNumber, otherNumber) {
 	const thisNumberUnit = thisNumber.unit || "px"; // Empty == "px"
 	const otherNumberUnit = otherNumber.unit || "px";
 
-	if (!otherNumber instanceof SVG.Number) {
+	if (!(otherNumber instanceof SVG.Number)) {
 		thisNumber = new SVG.Number(thisNumber); // clone
 		otherNumber = new SVG.Number(otherNumber, thisNumberUnit); // assume same unit
 	} else if (thisNumberUnit !== otherNumberUnit) {
@@ -131,7 +132,7 @@ SVG.extend(SVG.Number, {
 	 */
 	divide(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value /= otherNumber;
+		thisNumber.value /= otherNumber.value;
 		return thisNumber;
 	},
 
@@ -145,7 +146,7 @@ SVG.extend(SVG.Number, {
 	 */
 	minus(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value -= otherNumber;
+		thisNumber.value -= otherNumber.value;
 		return thisNumber;
 	},
 
@@ -159,7 +160,7 @@ SVG.extend(SVG.Number, {
 	 */
 	plus(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value += otherNumber;
+		thisNumber.value += otherNumber.value;
 		return thisNumber;
 	},
 
@@ -173,7 +174,7 @@ SVG.extend(SVG.Number, {
 	 */
 	times(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value *= otherNumber;
+		thisNumber.value *= otherNumber.value;
 		return thisNumber;
 	},
 
@@ -214,7 +215,7 @@ SVG.extend(SVG.Number, {
 	 */
 	gt(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber > otherNumber;
+		return thisNumber.value > otherNumber.value;
 	},
 
 	/**
@@ -226,7 +227,7 @@ SVG.extend(SVG.Number, {
 	 */
 	gte(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber >= otherNumber;
+		return thisNumber.value >= otherNumber.value;
 	},
 
 	/**
@@ -238,7 +239,7 @@ SVG.extend(SVG.Number, {
 	 */
 	lt(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber < otherNumber;
+		return thisNumber.value < otherNumber.value;
 	},
 
 	/**
@@ -250,7 +251,7 @@ SVG.extend(SVG.Number, {
 	 */
 	lte(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber <= otherNumber;
+		return thisNumber.value <= otherNumber.value;
 	},
 
 	/**
@@ -262,7 +263,7 @@ SVG.extend(SVG.Number, {
 	 */
 	eq(number) {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber == otherNumber;
+		return thisNumber.value == otherNumber.value;
 	},
 });
 
