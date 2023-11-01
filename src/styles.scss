@@ -1,4 +1,6 @@
 @import "../node_modules/bootstrap/scss/bootstrap";
+//@import "../node_modules/mdb-ui-kit/css/mdb.min.css";
+@import "floatingActionButton.scss";
 
 html,
 body {
@@ -16,11 +18,10 @@ svg.mainCanvas {
 	height: calc(100% - 16px);
 }
 
-#addButton {
+.floatingButton {
 	display: block;
 	position: absolute;
 	top: 8px;
-	left: 8px;
 	padding: 0px;
 	margin: 0px;
 	width: 40px;
@@ -32,10 +33,27 @@ svg.mainCanvas {
 	color: #000;
 	font-size: 32px;
 	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+	// should not be selectable text
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
-#addButton:hover {
+.floatingButton:hover {
 	text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.95);
+}
+
+#addButton {
+	@extend .floatingButton;
+	left: 8px;
+}
+
+#drawLineButton {
+	@extend .floatingButton;
+	left: 52px;
 }
 
 #leftToolbar {
@@ -59,3 +77,56 @@ div.libComponent {
 div.libComponent:hover {
 	box-shadow: 3px 3px 7px 1px #cccc;
 }
+
+/*.fabs {
+	--_viewport-margin: 2.5vmin;
+
+	position: fixed;
+	z-index: var(--layer-1);
+	display: flex;
+	flex-direction: column-reverse;
+	place-items: center;
+	gap: var(--_viewport-margin);
+
+	inset-block: auto var(--_viewport-margin);
+	inset-inline: auto var(--_viewport-margin);
+}
+
+$fabSize: 56px;
+$fabRadius: 16px;
+.fab {
+	width: $fabSize;
+	height: $fabSize;
+	border: none;
+	border-radius: $fabRadius;
+
+	background: #009999;
+	color: #000;
+	box-shadow:
+		0 3px 5px -1px rgba(0, 0, 0, 0.2),
+		0 6px 10px 0 rgba(0, 0, 0, 0.14),
+		0 1px 18px 0 rgba(0, 0, 0, 0.12);
+
+	transition:
+		box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 15ms linear 30ms,
+		transform 0.27s cubic-bezier(0, 0, 0.2, 1) 0ms,
+		-webkit-box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+		-webkit-transform 0.27s cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+	&:hover,
+	&:focus {
+		box-shadow:
+			0 5px 5px -3px rgba(0, 0, 0, 0.2),
+			0 8px 10px 1px rgba(0, 0, 0, 0.14),
+			0 3px 14px 2px rgba(0, 0, 0, 0.12);
+	}
+
+	&:active {
+		box-shadow:
+			0 7px 8px -4px rgba(0, 0, 0, 0.2),
+			0 12px 17px 2px rgba(0, 0, 0, 0.14),
+			0 5px 22px 4px rgba(0, 0, 0, 0.12);
+		background: #009f9f;
+	}
+}*/

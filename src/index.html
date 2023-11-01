@@ -32,7 +32,17 @@
 		>
 			add
 		</a>
+		<a id="drawLineButton" class="material-symbols-outlined" role="button"> shape_line </a>
 
+		<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
+			<a class="btn btn-floating" id="mainFAB">
+				<span class="material-symbols-outlined">done</span>
+			</a>
+
+			<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
+		</div>
+
+		<div id="leftToolbar" class="offcanvas offcanvas-start" tabindex="-1">
 			<div class="offcanvas-header">
 				<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

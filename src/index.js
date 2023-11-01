@@ -1,6 +1,9 @@
 import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
 /// <reference types="@svgdotjs/svg.js" />
-import "bootstrap";
+// import * as bootstrap from "bootstrap";
+import { Collapse, Offcanvas } from "bootstrap";
+// import "mdb-ui-kit";
+import { Button } from "mdb-ui-kit";
 
 import "./impSVGNumber.js";
 import { waitForElementLoaded } from "./domWatcher.js";
