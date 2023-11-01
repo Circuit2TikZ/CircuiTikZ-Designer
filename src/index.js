@@ -10,19 +10,31 @@ import { waitForElementLoaded } from "./domWatcher.js";
 
 import componentSymbol from "./componentSymbol.js";
 import CanvasController from "./canvasController.js";
+import LineDrawer from "./lineDrawer.js";
 
 class MainController {
-	/** @type {CanvasController|null} */
+	/** @type {?CanvasController} */
 	canvasController = null;
+	/** @type {?LineDrawer} */
+	lineDrawer = null;
 	/** @type {SVG.Svg} */
 	symbolsSVG;
 	/** @type {componentSymbol[]} */
 	symbols;
+	/** @type {Promise} */
+	initPromise;
+	/** @type {boolean} */
+	isInitDone = false;
 
 	constructor() {
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
-		Promise.all([canvasPromise, symbolsDBPromise]).then(() => this.#initButtons());
+		canvasPromise.then(() => (this.lineDrawer = new LineDrawer(this.canvasController)));
+		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise])
+			.then(() => this.#initButtons())
+			.then(() => {
+				this.isInitDone = true;
+			});
 	}
 
 	async #initCanvas() {
