@@ -31,7 +31,10 @@ class MainController {
 		// Fetch symbol DB
 		/** @type {HTMLLinkElement} */
 		const symbolDBlink = await waitForElementLoaded("symbolDBlink");
-		const response = await fetch(symbolDBlink.href);
+		const response = await fetch(symbolDBlink.href, {
+			method: "GET",
+			mode: "no-cors", // "no-cors" needed to actually use the preloaded file
+		});
 		const textContent = await response.text();
 
 		// Parse & add to DOM
@@ -53,7 +56,10 @@ class MainController {
 
 	async #initButtons() {
 		/** @type {HTMLDivElement} */
-		const leftToolbar = document.getElementById("leftToolbar-body");
+		const leftToolbar = document.getElementById("leftToolbar");
+		const leftToolbarOC = new Offcanvas(leftToolbar);
+		/** @type {HTMLDivElement} */
+		//const leftToolbarBody = document.getElementById("leftToolbar-body");
 		/** @type {HTMLDivElement} */
 		const leftToolbarAccordion = document.getElementById("leftToolbarAccordion");
 
@@ -74,6 +80,7 @@ class MainController {
 			new Map()
 		);
 
+		/** @type {SVGSVGElement[]} */
 		let iconsWithoutViewBox = [];
 		let firstGroup = true;
 		for (const [groupName, symbols] of groupedSymbols.entries()) {
@@ -110,6 +117,7 @@ class MainController {
 				const listener = (ev) => {
 					let newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
 					// todo: add instance to list etc
+					leftToolbarOC.hide();
 				};
 
 				addButton.addEventListener("mousedown", listener);
@@ -165,16 +173,6 @@ class MainController {
 			svgIcon.setAttributeNS(null, "width", box.width);
 			svgIcon.setAttributeNS(null, "height", box.height);
 		});
-
-		// /** @type {HTMLButtonElement} */
-		// const nigfete_addButton = document.getElementById("nigfete_addButton");
-		// const nigfete_template = this.symbols[0];
-
-		// const listener = (ev) => {
-		// 	let newInstance = nigfete_template.addInstanceToContainer(this.canvasController.canvas, ev);
-		// };
-		// nigfete_addButton.addEventListener("mousedown", listener);
-		// nigfete_addButton.addEventListener("touchstart", listener, { passive: false });
 	}
 }
 
