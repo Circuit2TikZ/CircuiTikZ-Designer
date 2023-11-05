@@ -2,8 +2,8 @@
  * @module svgSnapDragHandler
  */
 
-import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
-import "@svgdotjs/svg.draggable.js/dist/svg.draggable.esm";
+import * as SVG from "@svgdotjs/svg.js";
+import "@svgdotjs/svg.draggable.js";
 
 /**
  * @typedef {object} DragHandler

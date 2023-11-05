@@ -5,8 +5,8 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import FABcontroller from "./fabController";
-import CanvasController from "./canvasController";
+import FABcontroller from "../controllers/fabController";
+import CanvasController from "../controllers/canvasController";
 
 /**
  * @class

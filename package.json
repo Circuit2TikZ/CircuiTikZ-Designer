@@ -5,7 +5,7 @@
 	"description": "",
 	"license": "UNLICENSED",
 	"author": "Manuel Kirzinger",
-	"source": "src/index.html",
+	"source": "src/pages/index.html",
 	"scripts": {
 		"build": "parcel build --no-content-hash",
 		"prettier-lint": "prettier --check --config .prettierrc --log-level log '**/*.{js,ts,mjs,cjs,json,jsonc,html,htm,css,scss,xml,xsd,svg}'",

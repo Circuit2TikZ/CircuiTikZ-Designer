@@ -2,9 +2,9 @@
  * @module componentInstance
  */
 
-import { getNamedTag, getNamedTags } from "./xmlHelper";
-import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
-import svgSnapDragHandler from "./svgSnapDragHandler";
+import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
+import * as SVG from "@svgdotjs/svg.js";
+import svgSnapDragHandler from "../snapDrag/svgSnapDragHandler";
 import ComponentSymbol from "./componentSymbol";
 
 export default class componentInstance extends SVG.Use {

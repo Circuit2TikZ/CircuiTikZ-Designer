@@ -2,7 +2,7 @@
  * @module impSVGNumber
  */
 
-import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
+import * as SVG from "@svgdotjs/svg.js";
 
 /**
  * @typedef {object} ToUnit

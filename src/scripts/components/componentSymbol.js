@@ -2,8 +2,8 @@
  * @module componentSymbol
  */
 
-import { getNamedTag, getNamedTags } from "./xmlHelper";
-import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
+import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
+import * as SVG from "@svgdotjs/svg.js";
 import componentInstance from "./componentInstance";
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";

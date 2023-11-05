@@ -5,7 +5,7 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:ci="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 ../xmlSchema/metadataSchema.xsd"
+	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 ../../xmlSchema/metadataSchema.xsd"
 >
 	<defs>
 		<symbol id="node_ground">

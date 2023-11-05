@@ -1,17 +1,17 @@
-import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
+import * as SVG from "@svgdotjs/svg.js";
 /// <reference types="@svgdotjs/svg.js" />
 // import * as bootstrap from "bootstrap";
 import { Collapse, Offcanvas } from "bootstrap";
 // import "mdb-ui-kit";
 import { Button } from "mdb-ui-kit";
 
-import "./impSVGNumber.js";
-import { waitForElementLoaded } from "./domWatcher.js";
+import "./utils/impSVGNumber.js";
+import { waitForElementLoaded } from "./utils/domWatcher.js";
 
-import ComponentSymbol from "./componentSymbol.js";
-import PathComponentSymbol from "./pathComponentSymbol.js";
-import CanvasController from "./canvasController.js";
-import LineDrawer from "./lineDrawer.js";
+import ComponentSymbol from "./components/componentSymbol.js";
+import PathComponentSymbol from "./components/pathComponentSymbol.js";
+import CanvasController from "./controllers/canvasController.js";
+import LineDrawer from "./lines/lineDrawer.js";
 
 class MainController {
 	/** @type {?CanvasController} */
