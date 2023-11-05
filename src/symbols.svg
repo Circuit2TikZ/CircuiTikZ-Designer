@@ -8,7 +8,7 @@
 	xsi:schemaLocation="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3 ../xmlSchema/metadataSchema.xsd"
 >
 	<defs>
-	 <symbol id="node_ground">
+		<symbol id="node_ground">
 			<metadata>
 				<ci:componentInformation
 					type="node"
@@ -23,10 +23,39 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="12.871035" rx="6.774692000000001" ry="10.296828" />
+			<ellipse stroke="none" fill="transparent" cx="8.468365" cy="12.871035" rx="6.774692000000001" ry="10.296828" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M8.46839 4.04544v15.8739" />
 				<path stroke-width="1.06267" d="M.53135 19.91933h15.87407m-13.22826 2.64563h10.58245m-8.59829 2.6458h6.61413" />
+			</g>
+		</symbol>
+		<symbol id="path_american-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="american resistor"
+					shapeName="resistorshape"
+					groupName="Resistive bipoles"
+					refX="22.228"
+					refY="8.46838"
+					viewBox="0 0 44.45597 16.93673"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="22.227985" cy="8.468365" rx="17.782388" ry="6.774692000000001" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path
+					stroke-linejoin="bevel"
+					stroke-width="1.06267"
+					d="m.53136 8.46838 4.10316-7.93703 7.14366 15.87407 7.14366-15.87407 7.14367 15.87407 7.14364-15.87407 7.14367 15.87407 3.57183-7.93704"
+				/>
 			</g>
 		</symbol>
 		<symbol id="node_tlground">
@@ -44,9 +73,44 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="4.93399" rx="6.774692000000001" ry="3.947192" />
+			<ellipse stroke="none" fill="transparent" cx="8.468365" cy="4.93399" rx="6.774692000000001" ry="3.947192" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135 4.04544h15.87407m-13.22826 2.64561h10.58245m-8.59829 2.64561h6.61413" />
+			</g>
+		</symbol>
+		<symbol id="path_variable-american-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="variable american resistor"
+					shapeName="vresistorshape"
+					groupName="Resistive bipoles"
+					refX="22.228"
+					refY="16.40544"
+					viewBox="0 0 44.45597 32.81084"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="22.227985" cy="16.40542" rx="17.782388" ry="13.124336" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-linejoin="bevel" stroke-width=".79999">
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="m.53136 16.40544 4.10316-7.93703 7.14366 15.87406 7.14366-15.87406 7.14367 15.87406 7.14364-15.87406 7.14367 15.87406 3.57183-7.93703m-30.16263 15.87408 14.98179-28.09149"
+					/>
+					<path
+						stroke="none"
+						d="M30.694.53138c-1.1173 1.36108-3.1894 3.77854-5.53575 4.87555 2.48855-.62977 3.70744.0203 4.5708 2.43776-.39613-2.55966.4571-5.62719.96496-7.31331Z"
+					/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="node_rground">
@@ -64,10 +128,46 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="8.902515" rx="6.774692000000001" ry="7.122012" />
+			<ellipse stroke="none" fill="transparent" cx="8.468365" cy="8.902515" rx="6.774692000000001" ry="7.122012" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M8.46839 4.04543v13.22829" />
 				<path stroke-linecap="round" stroke-width="1.06267" d="M.53135 17.27372h15.87407" />
+			</g>
+		</symbol>
+		<symbol id="path_american-potentiometer">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="american potentiometer"
+					shapeName="potentiometershape"
+					groupName="Resistive bipoles"
+					refX="22.228"
+					refY="21.69667"
+					viewBox="0 0 44.45597 30.16502"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="wiper" x="0" y="-21.16532" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="22.227985" cy="15.08251" rx="17.782388" ry="12.066008" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-linejoin="bevel" stroke-width=".79999">
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="m.53136 21.69667 4.10316-7.93704 7.14366 15.87407 7.14366-15.87407 7.14367 15.87407 7.14364-15.87407 7.14367 15.87407 3.57183-7.93703m-21.69665-21.16532v9.08392"
+					/>
+					<path
+						stroke="none"
+						d="M22.228 13.75963c.34537-1.72682 1.0361-4.8351 2.59022-6.90728-1.89949 1.72683-3.28095 1.72683-5.18044 0 1.55414 2.07219 2.24485 5.18046 2.59022 6.90728Z"
+					/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="node_sground">
@@ -85,10 +185,40 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.468365" cy="14.19384" rx="6.774692000000001" ry="11.355072" />
+			<ellipse stroke="none" fill="transparent" cx="8.468365" cy="14.19384" rx="6.774692000000001" ry="11.355072" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M8.46839 4.04543v13.22829" />
 				<path stroke-width="1.06267" d="M.53135 17.27372h15.87407l-7.93703 10.58264Z" />
+			</g>
+		</symbol>
+		<symbol id="path_american-resistive-sensor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="american resistive sensor"
+					shapeName="resistivesensshape"
+					groupName="Resistive bipoles"
+					refX="22.228"
+					refY="16.40544"
+					viewBox="0 0 44.45597 32.81084"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="22.227985" cy="16.40542" rx="17.782388" ry="13.124336" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-linejoin="bevel" stroke-width="1.06267">
+					<path
+						d="m.53136 16.40544 4.10316-7.93703 7.14366 15.87406 7.14366-15.87406 7.14367 15.87406 7.14364-15.87406 7.14367 15.87406 3.57183-7.93703"
+					/>
+					<path d="m30.69399.53136-16.93197 31.74816h-10.58266" />
+				</g>
 			</g>
 		</symbol>
 		<symbol id="node_tground">
@@ -106,9 +236,55 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.734035" cy="2.421205" rx="6.987228000000001" ry="1.9369640000000001" />
+			<ellipse stroke="none" fill="transparent" cx="8.734035" cy="2.421205" rx="6.987228000000001" ry="1.9369640000000001" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.59399" d="M.79702 4.04544h15.87407" />
+			</g>
+		</symbol>
+		<symbol id="path_american-light-dependent-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="american light dependent resistor"
+					shapeName="ldresistorshape"
+					groupName="Resistive bipoles"
+					refX="22.12283"
+					refY="30.16266"
+					viewBox="0 0 56.51876 51.8593"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="28.25938" cy="25.92965" rx="22.607504000000002" ry="20.74372" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="M22.12283 8.99735c-11.68942 0-21.16532 9.4759-21.16532 21.16531s9.4759 21.16532 21.16532 21.16532 21.16532-9.4759 21.16532-21.16532-9.4759-21.16531-21.16532-21.16531Zm29.6313-8.46599-9.7685 9.7685"
+					/>
+					<path
+						stroke="none"
+						d="M39.05518 13.23032c1.46524-.97682 4.1515-2.68628 6.71568-3.0526-2.56417-.12209-3.541-1.09892-3.66309-3.66309-.36632 2.56417-2.07577 5.25044-3.0526 6.71569Z"
+					/>
+					<path fill="none" stroke-width="1.06267" d="m55.98744 4.76437-9.7688 9.76862" />
+					<path
+						stroke="none"
+						d="M43.28818 17.46338c1.46524-.97678 4.1515-2.68618 6.71563-3.05245-2.56413-.12213-3.54093-1.09895-3.66298-3.6631-.36635 2.56414-2.07582 5.25034-3.05265 6.71555Z"
+					/>
+					<path
+						fill="none"
+						stroke-linejoin="bevel"
+						stroke-width="1.06267"
+						d="M.53136 30.16266h4.2341m38.94883 0h-4.2341m-34.82103 0 3.39769-6.7728 5.73267 13.54562 5.73265-13.54563 5.73263 13.54563 5.73265-13.54563 5.73267 13.54563 2.86633-6.77282"
+					/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="node_nground">
@@ -126,13 +302,38 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="12.436695" cy="12.871035" rx="9.949356000000002" ry="10.296828" />
+			<ellipse stroke="none" fill="transparent" cx="12.436695" cy="12.871035" rx="9.949356000000002" ry="10.296828" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M12.43672 4.04544v15.8739" />
 				<path
 					stroke-width="1.06267"
 					d="M4.49969 19.91933h15.87406m-13.22825 2.64563h10.58244m-8.59828 2.6458h6.61412m8.59831 0c0-6.57524-5.33013-11.90537-11.90537-11.90537s-11.90536 5.33013-11.90536 11.90537"
 				/>
+			</g>
+		</symbol>
+		<symbol id="path_european-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="european resistor"
+					shapeName="genericshape"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="8.46838"
+					viewBox="0 0 43.3933 16.93673"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="8.468365" rx="17.35732" ry="6.774692000000001" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M.53135.53135h42.33062v15.87407h-42.33062Z" />
 			</g>
 		</symbol>
 		<symbol id="node_pground">
@@ -150,7 +351,7 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="12.436695" cy="14.19374" rx="9.949356000000002" ry="11.354992000000001" />
+			<ellipse stroke="none" fill="transparent" cx="12.436695" cy="14.19374" rx="9.949356000000002" ry="11.354992000000001" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
 					<path
@@ -161,6 +362,41 @@
 						<path stroke-width=".53134" d="M12.43672 4.04544v13.22828" />
 						<path stroke-width="1.06267" d="M4.49969 17.27372h15.87406m-13.22825 2.64561h10.58244m-8.59828 2.64563h6.61412" />
 					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_variable-european-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="variable european resistor"
+					shapeName="tgenericshape"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="19.05087"
+					viewBox="0 0 43.3933 38.10171"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="19.050855" rx="17.35732" ry="15.240684" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="M.53135 11.64319h42.33062v14.81537h-42.33062Zm10.58267 25.92721 19.10925-33.44093"
+					/>
+					<path
+						stroke="none"
+						d="M32.2793.53133c-1.15654 1.32788-3.29827 3.68382-5.6756 4.71187 2.50584-.55688 3.70522.12848 4.49766 2.57007-.32127-2.5701.6211-5.61137 1.17794-7.28194Z"
+					/>
 				</g>
 			</g>
 		</symbol>
@@ -179,12 +415,43 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="12.10608" cy="16.17811" rx="9.684864000000001" ry="12.942488" />
+			<ellipse stroke="none" fill="transparent" cx="12.10608" cy="16.17811" rx="9.684864000000001" ry="12.942488" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M13.75964 4.04544v19.84241" />
 				<path
 					stroke-width="1.06267"
 					d="m.53136 31.8249 3.30707-7.93705h19.84242l-3.30708 7.93705m-6.61413-7.93705-3.30706 7.93705"
+				/>
+			</g>
+		</symbol>
+		<symbol id="path_european-potentiometer">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="european potentiometer"
+					shapeName="genericpotentiometershape"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="21.431"
+					viewBox="0 0 43.3933 29.89934"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+						<ci:pin anchorName="wiper" x="0" y="-21.16532" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="14.94967" rx="17.35732" ry="11.959736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M.53135 13.49396h42.33062v15.87407h-42.33062Z" />
+				<path fill="none" stroke-width=".53134" d="M21.69667.26568v10.0403" />
+				<path
+					stroke="none"
+					d="M21.69667 13.49396c.26567-1.32832.797-3.71933 1.99249-5.31333-1.46115 1.32834-2.52383 1.32834-3.98498 0 1.1955 1.594 1.72682 3.985 1.99249 5.31333Z"
 				/>
 			</g>
 		</symbol>
@@ -203,7 +470,7 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
+			<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M14.81687 4.04544v13.22828" />
 				<g stroke-width="1.19998">
@@ -212,6 +479,34 @@
 						stroke-width=".53134"
 						d="m.26568 26.53347 6.61416-9.25975m0 9.25975 6.61413-9.25975m0 9.25975 6.61413-9.25975m0 9.25975 6.61414-9.25975"
 					/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_european-resistive-sensor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="european resistive sensor"
+					shapeName="thermistorshape"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="11.8546"
+					viewBox="0 0 43.3933 25.97375"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="12.986875" rx="17.35732" ry="10.3895" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path d="M.53135 3.92837h42.33062v15.85246h-42.33062Z" />
+					<path d="m42.86199.53135-29.6313 24.91108h-12.69934" />
 				</g>
 			</g>
 		</symbol>
@@ -230,7 +525,7 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
+			<ellipse stroke="none" fill="transparent" cx="14.421065" cy="13.39956" rx="11.536852000000001" ry="10.719648" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width=".53134" d="M14.81687 4.04544v13.22828" />
 				<g stroke-width="1.19998">
@@ -238,6 +533,51 @@
 					<path
 						stroke-width=".53134"
 						d="m.26568 26.53347 9.25997-9.25975m-.66145 9.25975 9.25974-9.25975m-.66146 9.25975 9.25976-9.25975"
+					/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_european-light-dependent-resistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="european light dependent resistor"
+					shapeName="ldgenericshape"
+					groupName="Resistive bipoles"
+					refX="22.12283"
+					refY="30.16266"
+					viewBox="0 0 56.51876 51.8593"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.16532" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="28.25938" cy="25.92965" rx="22.607504000000002" ry="20.74372" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="M22.12283 8.99735c-11.68942 0-21.16532 9.4759-21.16532 21.16531s9.4759 21.16532 21.16532 21.16532 21.16532-9.4759 21.16532-21.16532-9.4759-21.16531-21.16532-21.16531Zm29.6313-8.46599-9.7685 9.7685"
+					/>
+					<path
+						stroke="none"
+						d="M39.05518 13.23032c1.46524-.97682 4.1515-2.68628 6.71568-3.0526-2.56417-.12209-3.541-1.09892-3.66309-3.66309-.36632 2.56417-2.07577 5.25044-3.0526 6.71569Z"
+					/>
+					<path fill="none" stroke-width="1.06267" d="m55.98744 4.76437-9.7688 9.76862" />
+					<path
+						stroke="none"
+						d="M43.28818 17.46338c1.46524-.97678 4.1515-2.68618 6.71563-3.05245-2.56413-.12213-3.54093-1.09895-3.66298-3.6631-.36635 2.56414-2.07582 5.25034-3.05265 6.71555Z"
+					/>
+					<path
+						fill="none"
+						stroke-width="1.06267"
+						d="M.53136 30.16266h4.2341m38.94883 0h-4.2341m-.42505 6.34964h-33.86463v-12.69928h33.86463Zm-33.86463-12.69928"
 					/>
 				</g>
 			</g>
@@ -257,12 +597,48 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.7153" rx="4.6580520000000005" ry="8.572239999999999" />
+			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.7153" rx="4.6580520000000005" ry="8.572239999999999" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
 					<path stroke-width="1.06267" d="m.53137 12.69896 5.29122-7.4077 5.29122 7.4077" />
 					<path stroke-width=".53134" d="M5.82259 21.16495v-15.8737" />
 				</g>
+			</g>
+		</symbol>
+		<symbol id="path_varistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="varistor"
+					shapeName="undefined"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="11.8546"
+					viewBox="0 0 43.3933 29.91232"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="14.95616" rx="17.35732" ry="11.964928" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g fill="none" stroke-width="1.06267">
+					<path d="M.53135 3.92837h42.33062v15.85246h-42.33062Z" />
+					<path d="m42.86199.53135-29.6313 22.64648h-12.69934" />
+				</g>
+				<text
+					x="-55.72751"
+					y="-63.10907"
+					stroke="none"
+					class="f0"
+					style="font-family:nf0;font-size:4.98132px"
+					transform="translate(79.82178 114.19723) scale(1.33333)"
+				>U</text>
 			</g>
 		</symbol>
 		<symbol id="node_vee">
@@ -280,12 +656,47 @@
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.605175" rx="4.6580520000000005" ry="10.08414" />
+			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.605175" rx="4.6580520000000005" ry="10.08414" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
 					<path stroke-width="1.06267" d="m.53137 12.51143 5.29122 7.4077 5.29122-7.4077" />
 					<path stroke-width=".53134" d="M5.82259 4.04544v15.8737" />
 				</g>
+			</g>
+		</symbol>
+		<symbol id="path_photoresistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="photoresistor"
+					shapeName="undefined"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="16.13977"
+					viewBox="0 0 43.3933 24.60812"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="12.30406" rx="17.35732" ry="9.843248" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M.53135 24.0768h42.33062v-15.87406h-42.33062Z" />
+				<path fill="none" stroke-width=".53134" d="m36.51232.2657-5.91572 4.43693" />
+				<path
+					stroke="none"
+					d="M28.04633 6.61536c1.22202-.58445 3.45354-1.59399 5.44597-1.59401-1.9393-.37188-2.5769-1.222-2.39094-3.18786-.55787 1.91274-2.15181 3.77236-3.05503 4.78187Z"
+				/>
+				<path fill="none" stroke-width=".53134" d="m31.221.2657-5.91572 4.43693" />
+				<path
+					stroke="none"
+					d="M22.75501 6.61536c1.22202-.58445 3.45355-1.59399 5.44598-1.59401-1.9393-.37188-2.5769-1.222-2.39095-3.18786-.55786 1.91274-2.1518 3.77236-3.05503 4.78187Z"
+				/>
 			</g>
 		</symbol>
 		<symbol id="node_jump-crossing">
@@ -304,12 +715,40 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
+			<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path
 					stroke-linejoin="bevel"
 					d="M.2657 5.55693h3.17477c0-1.1689.94756-2.11645 2.11645-2.11645s2.11645.94755 2.11645 2.11645h3.17478m-5.29123-5.29123v2.64561m0 1.05825v6.87859"
 				/>
+			</g>
+		</symbol>
+		<symbol id="path_thermistor">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="thermistor"
+					shapeName="undefined"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="11.8546"
+					viewBox="0 0 43.3933 25.97375"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="12.986875" rx="17.35732" ry="10.3895" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path d="M.53135 3.92837h42.33062v15.85246h-42.33062Z" />
+					<path d="m42.86199.53135-29.6313 24.91108h-12.69934" />
+				</g>
 			</g>
 		</symbol>
 		<symbol id="node_plain-crossing">
@@ -328,9 +767,55 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
+			<ellipse stroke="none" fill="transparent" cx="5.5569" cy="5.5569" rx="4.44552" ry="4.44552" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path d="M.2657 5.55693h10.58245m-5.29123-5.29123v4.76208m0 1.0583v4.76207" />
+			</g>
+		</symbol>
+		<symbol id="path_thermistor-ptc">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="thermistor ptc"
+					shapeName="undefined"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="11.8546"
+					viewBox="0 0 43.3933 31.96266"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="15.98133" rx="17.35732" ry="12.785064" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g fill="none" stroke-width="1.06267">
+					<path d="M.53135 3.92837h42.33062v15.85246h-42.33062Z" />
+					<path d="m42.86199.53135-29.6313 22.64649h-12.69934" />
+				</g>
+				<path fill="none" stroke-width=".53134" d="M8.57428 31.697v-2.76478" />
+				<path
+					stroke="none"
+					d="M8.57428 25.74422c-.26567 1.32833-.797 3.71934-1.99249 5.31333 1.46115-1.32834 2.52383-1.32834 3.98498 0-1.19549-1.594-1.72682-3.985-1.99249-5.31333Z"
+				/>
+				<path fill="none" stroke-width=".53134" d="M12.17235 31.697v-2.76478" />
+				<path
+					stroke="none"
+					d="M12.17235 25.74422c-.26567 1.32833-.797 3.71934-1.99249 5.31333 1.46115-1.32834 2.52383-1.32834 3.98498 0-1.1955-1.594-1.72682-3.985-1.9925-5.31333Z"
+				/>
+				<text
+					x="-55.72751"
+					y="-63.10907"
+					stroke="none"
+					class="f0"
+					style="font-family:cmmi5;font-size:4.98132px"
+					transform="translate(75.1689 115.49414) scale(1.33333)"
+				>ϑ</text>
 			</g>
 		</symbol>
 		<symbol id="node_circ">
@@ -343,11 +828,57 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path
 					d="M6.16161 4.04545c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"
 				/>
+			</g>
+		</symbol>
+		<symbol id="path_thermistor-ntc">
+			<metadata>
+				<ci:componentInformation
+					type="path"
+					tikzName="thermistor ntc"
+					shapeName="undefined"
+					groupName="Resistive bipoles"
+					refX="21.69667"
+					refY="11.8546"
+					viewBox="0 0 43.3933 31.96266"
+				>
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="15.98133" rx="17.35732" ry="12.785064" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g fill="none" stroke-width="1.06267">
+					<path d="M.53135 3.92837h42.33062v15.85246h-42.33062Z" />
+					<path d="m42.86199.53135-29.6313 22.64649h-12.69934" />
+				</g>
+				<path fill="none" stroke-width=".53134" d="M8.57428 31.697v-2.76478" />
+				<path
+					stroke="none"
+					d="M8.57428 25.74422c-.26567 1.32833-.797 3.71934-1.99249 5.31333 1.46115-1.32834 2.52383-1.32834 3.98498 0-1.19549-1.594-1.72682-3.985-1.99249-5.31333Z"
+				/>
+				<path fill="none" stroke-width=".53134" d="M12.17235 25.74421v2.7648" />
+				<path
+					stroke="none"
+					d="M12.17235 31.697c.26567-1.32832.797-3.71932 1.99249-5.31332-1.46115 1.32834-2.52383 1.32834-3.98498 0 1.1955 1.594 1.72682 3.985 1.99249 5.31333Z"
+				/>
+				<text
+					x="-55.72751"
+					y="-63.10907"
+					stroke="none"
+					class="f0"
+					style="font-family:cmmi5;font-size:4.98132px"
+					transform="translate(75.1689 115.49414) scale(1.33333)"
+				>ϑ</text>
 			</g>
 		</symbol>
 		<symbol id="node_currarrow">
@@ -360,7 +891,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.478355" rx="3.2363320000000004" ry="2.782684" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.478355" rx="3.2363320000000004" ry="2.782684" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path d="M1.73052 4.04543v2.64564l5.62198-2.64564-5.62198-2.64564Z" />
 			</g>
@@ -375,7 +906,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.8337" cy="3.34553" rx="3.8669600000000006" ry="2.6764240000000004" />
+			<ellipse stroke="none" fill="transparent" cx="4.8337" cy="3.34553" rx="3.8669600000000006" ry="2.6764240000000004" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke="none" d="M.00002 4.04544v2.64564l5.62199-2.64564-5.62199-2.64564Z" />
 			</g>
@@ -390,7 +921,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.139285" cy="3.547245" rx="3.3114280000000003" ry="2.8377960000000004" />
+			<ellipse stroke="none" fill="transparent" cx="4.139285" cy="3.547245" rx="3.3114280000000003" ry="2.8377960000000004" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke="none" d="M1.46485 4.04544v-3.04907l6.81374 3.04907-6.81374 3.04907Z" />
 			</g>
@@ -405,7 +936,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="13.49395" cy="3.478355" rx="10.795160000000001" ry="2.782684" />
+			<ellipse stroke="none" fill="transparent" cx="13.49395" cy="3.478355" rx="10.795160000000001" ry="2.782684" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path fill="none" d="M.26569 4.04543h26.45657" />
 				<path d="M21.10027 4.04543v2.64564l5.62199-2.64564-5.62199-2.64564Z" />
@@ -421,7 +952,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path
 					fill="#fff"
@@ -439,7 +970,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path d="m4.04544 1.05276-2.99268 2.99268 2.99268 2.99269 2.99268-2.99269Zm0 5.98537" />
 			</g>
@@ -460,7 +991,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.651885" rx="3.2363320000000004" ry="2.921508" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path fill="#fff" d="m4.04544 1.05276-2.99268 2.99268 2.99268 2.99269 2.99268-2.99269Zm0 5.98537" />
 			</g>
@@ -475,7 +1006,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path d="M1.92927 6.16162h4.23234v-4.23234h-4.23234Z" />
 			</g>
@@ -490,7 +1021,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.21363" rx="3.2363320000000004" ry="2.5709040000000005" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
 				<path fill="#fff" d="M1.92927 6.16162h4.23234v-4.23234h-4.23234Z" />
 			</g>
@@ -512,7 +1043,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="10.58085" cy="10.58085" rx="8.46468" ry="8.46468" />
+			<ellipse stroke="none" fill="transparent" cx="10.58085" cy="10.58085" rx="8.46468" ry="8.46468" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
 					<g fill-rule="evenodd" transform="matrix(1.32835 0 0 -1.32835 15.87129 10.58087)">
@@ -552,7 +1083,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="8.468325" cy="5.822565" rx="6.774660000000001" ry="4.6580520000000005" />
+			<ellipse stroke="none" fill="transparent" cx="8.468325" cy="5.822565" rx="6.774660000000001" ry="4.6580520000000005" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path fill="none" d="M5.82263.53136c-2.92231 0-5.29128 2.36893-5.29128 5.29123s2.36897 5.29122 5.29128 5.29122" />
@@ -577,7 +1108,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path
 					stroke-width="1.06267"
@@ -602,7 +1133,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z" />
 			</g>
@@ -624,7 +1155,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z" />
 			</g>
@@ -646,7 +1177,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
+			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path
 					stroke-width="1.06267"
@@ -674,7 +1205,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
@@ -703,7 +1234,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
@@ -732,7 +1263,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path
@@ -765,7 +1296,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path
@@ -798,7 +1329,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
@@ -838,7 +1369,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.40546 17.99298v23.28149" />
@@ -878,7 +1409,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.01387.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.1398 17.99298v23.28149" />
@@ -916,7 +1447,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.01387.26569v17.72729l-15.87408 7.27558" />
 				<path fill="none" stroke-width="1.06267" d="M16.1398 17.99298v23.28149" />
@@ -954,7 +1485,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
 				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
@@ -983,7 +1514,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
 				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
@@ -1012,7 +1543,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
 				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
@@ -1041,7 +1572,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v16.27207l-15.87408 8.7308" />
 				<path fill="none" stroke-width="1.06267" d="M12.59583 17.72731v23.81283m3.80963-23.81283v23.81283" />
@@ -1081,7 +1612,7 @@
 					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
-		<ellipse fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M37.57039.26569v19.18203h-18.51952" />
 				<path fill="none" stroke-width="1.06267" d="M19.05087 15.08254v8.0032m0 2.9102v7.27557m0 2.9102v8.0032" />
@@ -1091,6 +1622,5 @@
 				<path fill="none" stroke-width=".53134" d="M14.60638 39.81972h-14.34069m37.3047-10.186v29.10237" />
 			</g>
 		</symbol>
-
 	</defs>
 </svg>

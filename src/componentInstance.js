@@ -5,10 +5,10 @@
 import { getNamedTag, getNamedTags } from "./xmlHelper";
 import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
 import svgSnapDragHandler from "./svgSnapDragHandler";
-import componentSymbol from "./componentSymbol";
+import ComponentSymbol from "./componentSymbol";
 
 export default class componentInstance extends SVG.Use {
-	/** @type {componentSymbol} */
+	/** @type {ComponentSymbol} */
 	symbol;
 
 	/** @type {svgSnapDragHandler} */
@@ -25,7 +25,7 @@ export default class componentInstance extends SVG.Use {
 	 */
 
 	/**
-	 * @param {componentSymbol} symbol
+	 * @param {ComponentSymbol} symbol
 	 * @param {SVG.Container} container
 	 * @param {MouseEvent} [event]
 	 */
@@ -57,7 +57,22 @@ export default class componentInstance extends SVG.Use {
 			// 2nd: start dragging
 			/** @type {DragHandler} */
 			let dh = this.remember("_draggable");
+
 			dh.startDrag(event);
+			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
+			const endEventNameScoped = endEventName + ".drag";
+			SVG.off(window, endEventNameScoped, dh.endDrag);
+
+			let timeout = null;
+			const addDragEndHandler = (/** @type {MouseEvent|undefined} */ event) => {
+				if (event?.stopImmediatePropagation) event.stopImmediatePropagation();
+				window.clearTimeout(timeout);
+				window.removeEventListener(endEventName, addDragEndHandler);
+				SVG.on(window, endEventNameScoped, dh.endDrag, dh, { passive: false });
+			};
+
+			timeout = window.setTimeout(addDragEndHandler, 200);
+			window.addEventListener(endEventName, addDragEndHandler, { passive: false });
 		}
 	}
 

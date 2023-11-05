@@ -1,6 +1,7 @@
 /**
  * @module componentSymbol
  */
+
 import { getNamedTag, getNamedTags } from "./xmlHelper";
 import * as SVG from "@svgdotjs/svg.js/dist/svg.esm";
 import componentInstance from "./componentInstance";
@@ -16,80 +17,140 @@ const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
  * @property {boolean} isDefault - true, if the anchor is the default one for placing the node
  */
 
-export default class componentSymbol extends SVG.Symbol {
+/**
+ * @typedef {object} SymbolBaseInformation
+ * @property {?SVGMetadataElement} svgMetadataElement -
+ * @property {?Element} componentInformation -
+ * @property {boolean} isNode - `true`, if type=="node"
+ * @property {boolean} isPath - `true`, if type=="path"
+ * @property {?string} displayName - the name to show in the UI
+ * @property {?string} tikzName - the tikz name used to draw, if found
+ * @property {?string} shapeName - the shape name for path-style components, if found
+ * @property {?string} groupName - the group the component belongs to, if set
+ * @property {SVG.Point} mid - the point of the SVG Symbol, which corresponds to TikZs (0|0); anchors and pins are relative to this point
+ * @property {?SVG.Box} viewBox - the viewBox/boundingBox, if set
+ */
+
+export default class ComponentSymbol extends SVG.Symbol {
 	/** @type {SVGMetadataElement|null} */
 	svgMetadataElement;
 
-	/** @type {string|null} */
+	/** @type {string} */
+	displayName;
+	/** @type {string} */
+	tikzName;
+	/** @type {?string} */
 	groupName;
 
 	/** @type {SVG.Point} */
 	mid;
-
-	/** @type {SVG.Box | null} */
+	/** @type {?SVG.Box} */
 	viewBox;
 
 	/** @type {TikZAnchor[]} */
-	pins = [];
-
+	_pins = [];
 	/** @type {TikZAnchor[]} */
-	additionalAnchors = [];
-
-	/** @type {TikZAnchor|null} */
-	textAnchor = null;
-
-	/** @type {TikZAnchor|null} */
-	defaultAnchor = null;
+	_additionalAnchors = [];
+	/** @type {?TikZAnchor} */
+	_textAnchor = null;
+	/** @type {?TikZAnchor} */
+	_defaultAnchor = null;
 
 	/**
 	 *
 	 * @param {SVGSymbolElement} symbolElement
+	 * @param {SymbolBaseInformation} [baseInformation]
+	 * @throws {Error} if the XML structure lacks the required metadata
 	 */
-	constructor(symbolElement) {
+	constructor(symbolElement, baseInformation) {
 		super(symbolElement);
 		// this.node.instance = this; // Overwrite node circular reference of SVG.Symbol
 
-		this.svgMetadataElement =
-			Array.prototype.find.call(this.node.children, (e) => e instanceof SVGMetadataElement) ?? null;
+		// parse information in componentInformation attributes, if not done already
+		if (!baseInformation) baseInformation = ComponentSymbol.getBaseInformation(symbolElement);
+		if (!baseInformation.svgMetadataElement || !baseInformation.displayName || !baseInformation.tikzName)
+			throw new Error("Missing metadata for creating the component");
 
-		// parse symbol
-		let componentInformation =
-			this.svgMetadataElement &&
-			getNamedTag(this.svgMetadataElement, "componentinformation", METADATA_NAMESPACE_URI);
-
-		// parse information in componentInformation attributes
-		this.mid = new SVG.Point(
-			SVG.Number.ensureInPx(componentInformation.getAttribute("refX") || 0),
-			SVG.Number.ensureInPx(componentInformation.getAttribute("refY") || 0)
-		);
-
-		if (componentInformation?.hasAttribute("viewBox"))
-			this.viewBox = new SVG.Box(componentInformation.getAttribute("viewBox"));
-		else if (symbolElement.hasAttribute("viewBox"))
-			this.viewBox = new SVG.Box(symbolElement.getAttribute("viewBox"));
-		else this.viewBox = null;
-
-		this.groupName = componentInformation.getAttribute("groupName") || null;
+		this.svgMetadataElement = baseInformation.svgMetadataElement;
+		this.displayName = baseInformation.displayName;
+		this.tikzName = baseInformation.tikzName;
+		this.groupName = baseInformation.groupName;
+		this.mid = baseInformation.mid;
+		this.viewBox = baseInformation.viewBox;
 
 		// parse pins & anchors
-		let pins = componentInformation && getNamedTag(componentInformation, "pins", METADATA_NAMESPACE_URI);
+		let pins =
+			baseInformation.componentInformation &&
+			getNamedTag(baseInformation.componentInformation, "pins", METADATA_NAMESPACE_URI);
 		let pinArray = pins ? getNamedTags(pins, "pin", METADATA_NAMESPACE_URI) : [];
-		this.pins = pinArray.map(this.#parseAnchor, this);
+		this._pins = pinArray.map(this.#parseAnchor, this);
 
 		let additionalAnchors =
-			componentInformation && getNamedTag(componentInformation, "additionalAnchors", METADATA_NAMESPACE_URI);
+			baseInformation.componentInformation &&
+			getNamedTag(baseInformation.componentInformation, "additionalAnchors", METADATA_NAMESPACE_URI);
 		let additionalAnchorArray = additionalAnchors
 			? getNamedTags(additionalAnchors, "anchor", METADATA_NAMESPACE_URI)
 			: [];
-		this.additionalAnchors = additionalAnchorArray.map(this.#parseAnchor, this);
+		this._additionalAnchors = additionalAnchorArray.map(this.#parseAnchor, this);
 
 		let textPosition =
-			componentInformation && getNamedTag(componentInformation, "textPosition", METADATA_NAMESPACE_URI);
-		this.textAnchor = textPosition ? this.#parseAnchor(textPosition, this) : null;
+			baseInformation.componentInformation &&
+			getNamedTag(baseInformation.componentInformation, "textPosition", METADATA_NAMESPACE_URI);
+		this._textAnchor = textPosition ? this.#parseAnchor(textPosition, this) : null;
 	}
 
 	/**
-	 * Parses an anchor taf (pin, anchor and textPosition). If `isDefault` is set, `this.defaultAnchor` will be set.
+	 *
+	 * @param {SVGSymbolElement} symbolElement
+	 * @returns {SymbolBaseInformation}
+	 */
+	static getBaseInformation(symbolElement) {
+		/** @type {?SVGMetadataElement} */
+		const svgMetadataElement =
+			Array.prototype.find.call(symbolElement.children, (e) => e instanceof SVGMetadataElement) ?? null;
+
+		// parse symbol
+		const componentInformation =
+			svgMetadataElement && getNamedTag(svgMetadataElement, "componentinformation", METADATA_NAMESPACE_URI);
+
+		// parse information in componentInformation attributes
+		const isNode = componentInformation?.getAttribute("type") === "node";
+		const isPath = componentInformation?.getAttribute("type") === "path";
+
+		const tikzName = componentInformation?.getAttribute("tikzName") ?? null;
+		const displayName = componentInformation?.getAttribute("displayName") ?? tikzName;
+		const shapeName = componentInformation?.getAttribute("shapeName") ?? null;
+		const groupName = componentInformation?.getAttribute("groupName") ?? null;
+
+		/** @type {SVG.Point} */
+		const mid = new SVG.Point(
+			SVG.Number.ensureInPx(componentInformation?.getAttribute("refX") || 0),
+			SVG.Number.ensureInPx(componentInformation?.getAttribute("refY") || 0)
+		);
+
+		/** @type {?SVG.Box} */
+		let viewBox;
+		if (componentInformation?.hasAttribute("viewBox"))
+			viewBox = new SVG.Box(componentInformation.getAttribute("viewBox"));
+		else if (symbolElement.hasAttribute("viewBox")) viewBox = new SVG.Box(symbolElement.getAttribute("viewBox"));
+		else viewBox = null;
+
+		return {
+			svgMetadataElement: svgMetadataElement,
+			componentInformation: componentInformation,
+			isNode: isNode,
+			isPath: isPath,
+			displayName: displayName,
+			tikzName: tikzName,
+			shapeName: shapeName,
+			groupName: groupName,
+			mid: mid,
+			viewBox: viewBox,
+		};
+	}
+
+	/**
+	 * Parses an anchor (pin, anchor and textPosition). If `isDefault` is set, `this.defaultAnchor` will be set.
 	 *
 	 * @private
 	 *
@@ -114,7 +175,7 @@ export default class componentSymbol extends SVG.Symbol {
 			this.mid.y - SVG.Number.ensureInPx(anchor.y) // tikz y direction != svg y direction
 		);
 
-		if (anchor.isDefault) this.defaultAnchor = anchor;
+		if (anchor.isDefault) this._defaultAnchor = anchor;
 
 		return anchor;
 	}
@@ -126,7 +187,7 @@ export default class componentSymbol extends SVG.Symbol {
 	 * @returns {TikZAnchor[]} all anchors for snapping to the grid
 	 */
 	get snappingAnchors() {
-		return [...this.pins, ...this.additionalAnchors];
+		return [...this._pins, ...this._additionalAnchors];
 	}
 
 	/**
@@ -140,13 +201,13 @@ export default class componentSymbol extends SVG.Symbol {
 		return this.snappingAnchors.map((anchor) => anchor.point);
 	}
 
-	/**
+	/*
 	 *
 	 * @returns {SVG.Use}
-	 */
+	 *
 	createInstance() {
 		return new SVG.Use(this);
-	}
+	}*/
 
 	/**
 	 * @typedef {object} DragHandler
@@ -161,6 +222,7 @@ export default class componentSymbol extends SVG.Symbol {
 	/**
 	 * @param {SVG.Container} container
 	 * @param {MouseEvent} event
+	 * @returns {componentInstance}
 	 */
 	addInstanceToContainer(container, event) {
 		return new componentInstance(this, container, event);

@@ -347,4 +347,34 @@ SVG.extend(SVG.Point, {
 	plus(other) {
 		return new SVG.Point(this.x + other.x, this.y + other.y);
 	},
+
+	/**
+	 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
+	 * rotation.
+	 *
+	 * @this {SVG.Point}
+	 * @param {number} angle - rotation angle in degrees or radians
+	 * @param {SVG.Point} [centerCoord] - center of rotation
+	 * @param {boolean} [inRad=false] - set to `true`, if the angle is in radians
+	 * @returns {SVG.Point} the result
+	 */
+	rotate(angle, centerCoord, inRad = false) {
+		let result = centerCoord ? this.minus(centerCoord) : this.clone();
+
+		const oldX = result.x;
+		const oldY = result.y;
+		const radians = inRad ? angle : (Math.PI / 180) * angle,
+			cos = Math.cos(radians),
+			sin = Math.sin(radians);
+
+		result.x = cos * oldX + sin * oldY;
+		result.y = -sin * oldX + cos * oldY;
+
+		if (!!centerCoord) {
+			result.x += centerCoord.x;
+			result.y += centerCoord.y;
+		}
+
+		return result;
+	},
 });

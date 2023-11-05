@@ -52,7 +52,9 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
+			<xs:attribute type="xs:string" name="displayName" use="optional" />
 			<xs:attribute type="xs:string" name="tikzName" use="optional" />
+			<xs:attribute type="xs:string" name="shapeName" use="optional" />
 			<xs:attribute type="xs:string" name="groupName" use="optional" />
 			<xs:attribute type="svg:CoordinateType" name="refX" use="optional" default="0" />
 			<xs:attribute type="svg:CoordinateType" name="refY" use="optional" default="0" />

@@ -8,7 +8,8 @@ import { Button } from "mdb-ui-kit";
 import "./impSVGNumber.js";
 import { waitForElementLoaded } from "./domWatcher.js";
 
-import componentSymbol from "./componentSymbol.js";
+import ComponentSymbol from "./componentSymbol.js";
+import PathComponentSymbol from "./pathComponentSymbol.js";
 import CanvasController from "./canvasController.js";
 import LineDrawer from "./lineDrawer.js";
 
@@ -19,7 +20,7 @@ class MainController {
 	lineDrawer = null;
 	/** @type {SVG.Svg} */
 	symbolsSVG;
-	/** @type {componentSymbol[]} */
+	/** @type {ComponentSymbol[]} */
 	symbols;
 	/** @type {Promise} */
 	initPromise;
@@ -64,9 +65,20 @@ class MainController {
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement);
 		/** @type {SVG.Defs} */
 		const defs = this.symbolsSVG.defs();
+		/** @type {SVGSymbolElement[]} */
 		const symbols = Array.prototype.filter.call(defs.node.children, (def) => def instanceof SVGSymbolElement);
 		// let symbols = defs.children().filter((/** @type {SVG.Element} */def) => def instanceof SVG.Symbol);
-		this.symbols = symbols.map((symbol) => new componentSymbol(symbol));
+		this.symbols = symbols.flatMap((symbol) => {
+			const baseInfo = ComponentSymbol.getBaseInformation(symbol);
+			if (baseInfo.isNode === baseInfo.isPath) return []; // type not correctly set
+			try {
+				if (baseInfo.isNode) return new ComponentSymbol(symbol, baseInfo);
+				else return new PathComponentSymbol(symbol, baseInfo);
+			} catch (/** @type {Error} */ e) {
+				console.log(e);
+				return [];
+			}
+		});
 	}
 
 	async #initButtons() {
@@ -78,12 +90,12 @@ class MainController {
 		/** @type {HTMLDivElement} */
 		const leftToolbarAccordion = document.getElementById("leftToolbarAccordion");
 
-		/** @type {Map<string, componentSymbol[]>} */
+		/** @type {Map<string, ComponentSymbol[]>} */
 		const groupedSymbols = this.symbols.reduce(
 			/**
-			 * @param {Map<string, componentSymbol[]>} groupedSymbols
-			 * @param {componentSymbol} symbol
-			 * @returns {Map<string, componentSymbol[]>}
+			 * @param {Map<string, ComponentSymbol[]>} groupedSymbols
+			 * @param {ComponentSymbol} symbol
+			 * @returns {Map<string, ComponentSymbol[]>}
 			 */
 			(groupedSymbols, symbol) => {
 				const key = symbol.groupName || "Unsorted components";
@@ -128,7 +140,9 @@ class MainController {
 				/** @type {HTMLDivElement} */
 				const addButton = accordionItemBody.appendChild(document.createElement("div"));
 				addButton.classList.add("libComponent");
-				addButton.ariaRoleDescription;
+				addButton.ariaRoleDescription = "button";
+				if (symbol.displayName) addButton.title = symbol.displayName;
+
 				const listener = (ev) => {
 					let newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
 					// todo: add instance to list etc
