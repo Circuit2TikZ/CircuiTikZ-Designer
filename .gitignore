@@ -98,3 +98,6 @@
 
 ### WebStorm ###
 /.idea/
+
+### Backups/Old versions
+*.old

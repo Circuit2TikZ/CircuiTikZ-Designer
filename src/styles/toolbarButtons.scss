@@ -1,0 +1,61 @@
+// Styles for the top floating buttons / mode buttons
+
+%floatingToolbarButton {
+	@extend .user-select-none;
+	display: block;
+	padding: 0px;
+	margin: 0px;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	text-align: center;
+	line-height: 40px;
+	text-decoration: none;
+	color: #000;
+	font-size: 32px;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+%floatingToolbarButton:hover,
+%floatingToolbarButton.selected {
+	text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.95);
+}
+
+%floatingToolbarButton.selected {
+	text-decoration: underline;
+}
+
+%floatingToolbarButtonAbsolute {
+	@extend %floatingToolbarButton;
+	position: absolute;
+	top: 8px;
+}
+
+#addComponentButton {
+	@extend %floatingToolbarButtonAbsolute;
+	left: 8px;
+}
+
+#modeDragPan {
+	@extend %floatingToolbarButtonAbsolute;
+	left: 52px;
+}
+
+#modeDrawLine {
+	@extend %floatingToolbarButtonAbsolute;
+	left: 96px;
+}
+
+#modeEraser {
+	@extend %floatingToolbarButtonAbsolute;
+	left: 140px;
+}
+
+#rightDropdownMenu {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+}
+#rightDropdownMenuToggle {
+	@extend %floatingToolbarButton;
+}

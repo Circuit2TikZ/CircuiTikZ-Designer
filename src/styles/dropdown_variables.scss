@@ -1,0 +1,34 @@
+// Sourced from Bootstrap/_variables.scss
+// Changes the bootstrap dropdown style to match material (m3) style
+// This works in conjunction with dropdown_classes and must be imported before bootstrap
+
+$dropdown-min-width: 112px;
+$dropdown-padding-x: 0;
+$dropdown-padding-y: 8px;
+// $dropdown-spacer:                   .125rem;
+// $dropdown-font-size:                $font-size-base;
+// $dropdown-color:                    var(--#{$prefix}body-color);
+// $dropdown-bg:                       var(--#{$prefix}body-bg);
+// $dropdown-border-color:             var(--#{$prefix}border-color-translucent);
+$dropdown-border-radius: 4px;
+// $dropdown-border-width:             var(--#{$prefix}border-width);
+// $dropdown-inner-border-radius:      calc(#{$dropdown-border-radius} - #{$dropdown-border-width}); // stylelint-disable-line function-disallowed-list
+// $dropdown-divider-bg:               $dropdown-border-color;
+$dropdown-divider-margin-y: 8px;
+// $dropdown-box-shadow:               var(--#{$prefix}box-shadow);
+
+// $dropdown-link-color:               var(--#{$prefix}body-color);
+// $dropdown-link-hover-color:         $dropdown-link-color;
+// $dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg);
+
+// $dropdown-link-active-color:        $component-active-color;
+// $dropdown-link-active-bg:           $component-active-bg;
+
+// $dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color);
+
+$dropdown-item-padding-y: 0px;
+$dropdown-item-padding-x: 12px;
+
+// $dropdown-header-color:             $gray-600;
+// $dropdown-header-padding-x:         $dropdown-item-padding-x;
+// $dropdown-header-padding-y:         $dropdown-padding-y;

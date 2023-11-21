@@ -5,6 +5,8 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
+import SnapController from "./snapController";
+
 /**
  * @typedef {object} DragHandler
  * @property {SVG.Shape} el
@@ -29,12 +31,22 @@ import "@svgdotjs/svg.draggable.js";
  * @typedef {CustomEvent<DragMoveEventDetail>} DragMoveEvent
  */
 
+/**
+ * Handler/controller enabling components to be draggable and snap to the grid and to other components.
+ * @class
+ */
 export default class svgSnapDragHandler {
 	/** @type {SVG.Element} */
 	element;
 
+	/** @type {DragHandler} */
+	#dragHandler;
+
+	/** @type {boolean} */
+	#isTemporaryDisabled = false;
+
 	/**
-	 * Do use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler.
+	 * Do not call directly. Use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler instead.
 	 *
 	 * @private
 	 * @hideconstructor
@@ -46,6 +58,7 @@ export default class svgSnapDragHandler {
 		this.element = element;
 		this.element.remember("_snapDragHandler", this);
 		this.element.draggable(true);
+		this.#dragHandler = this.element.remember("_draggable");
 
 		this.element.on("dragmove.namespace", this.#dragMove, this);
 	}
@@ -75,78 +88,52 @@ export default class svgSnapDragHandler {
 	 */
 	removeHandler() {
 		this.element.off("dragmove.namespace", this.dragMove);
-		this.draggable(false);
+		this.element.draggable(false);
 		this.element.forget("_snapDragHandler");
+		this.element.forget("_draggable");
 	}
 
 	/**
-	 * Handler for the dragging event.
+	 * Temporary disables or reenables the drag feature.
+	 *
+	 * @param {boolean} b - set to `true` to disable
+	 */
+	set temporaryDisabled(b) {
+		if (this.#isTemporaryDisabled !== b) this.#dragHandler.init(!(this.#isTemporaryDisabled = b));
+	}
+
+	/**
+	 * Get the drag state.
+	 *
+	 * @returns {boolean} `true` means disabled
+	 */
+	get temporaryDisabled() {
+		return this.#isTemporaryDisabled;
+	}
+
+	/**
+	 * Handler for the dragging event. Alters the default behavior to enable snapping to grid and to other components.
 	 *
 	 * @private
-	 *
-	 * @param {DragMoveEvent} event
+	 * @param {DragMoveEvent} event - the dragging event.
 	 */
 	#dragMove(event) {
-		if (event.detail.event?.shiftKey) return; // do not snap to grid if shift is pressed
 		event.preventDefault();
 
-		/** @type {SVG.Number} */
-		const gridSpacing = new SVG.Number(0.25, "cm").convertToUnit("px");
-		const xMin = Math.floor(event.detail.box.x / gridSpacing) * gridSpacing;
-		const yMin = Math.floor(event.detail.box.y / gridSpacing) * gridSpacing;
-		const xMax = Math.ceil((event.detail.box.x + event.detail.box.width) / gridSpacing) * gridSpacing;
-		const yMax = Math.ceil((event.detail.box.y + event.detail.box.height) / gridSpacing) * gridSpacing;
-
-		/** @type {SVG.Point[]} */
-		let gridSnapPoints = [];
-
-		for (let x = xMin; x <= xMax; x += gridSpacing) {
-			for (let y = yMin; y <= yMax; y += gridSpacing) {
-				gridSnapPoints.push(new SVG.Point(x, y));
-			}
-		}
-
-		/** @type {SVG.Point[]} */
-		const snapPoints = this.element.snappingPoints ? this.element.snappingPoints : [new SVG.Point(0, 0)];
-
-		/**
-		 * @typedef {object} minDistStruct
-		 * @prop {number} dist
-		 * @prop {SVG.Point} vector
-		 */
-
-		const topLeftDraggedCorner = new SVG.Point(event.detail.box.x, event.detail.box.y);
-
 		/** @type {SVG.Point} */
-		const result = snapPoints.reduce(
-			/**
-			 * @param {minDistStruct} prevVal - helper struct for finding snap point with lowest dist. to a grid point
-			 * @param {SVG.Point} relSnapPoint - snap point / anchor relative to box
-			 * @returns {minDistStruct}
-			 */
-			(prevVal, relSnapPoint) => {
-				// Coordinate near grid
-				const absSnapPoint = topLeftDraggedCorner.plus(relSnapPoint);
+		const relMid = this.element.relMid || this.element.symbol?.relMid || new SVG.Point(0, 0);
 
-				return gridSnapPoints.reduce(
-					/**
-					 * @param {minDistStruct} prevVal - helper struct for finding snap point with lowest dist. to a grid point
-					 * @param {SVG.Point} gridPoint - possible point to snap to (grid)
-					 * @returns {minDistStruct}
-					 */
-					(prevVal, gridPoint) => {
-						const vector = gridPoint.minus(absSnapPoint);
-						const squaredDistance = vector.absSquared();
-						if (squaredDistance > prevVal.dist) return prevVal;
-						else return { dist: squaredDistance, vector: vector };
-					},
-					prevVal
-				);
-			},
-			/** @type {minDistStruct} */ { dist: Number.MAX_VALUE, vector: null }
-		).vector;
+		const draggedPoint = new SVG.Point(event.detail.box.x + relMid.x, event.detail.box.y + relMid.y);
 
-		const destination = topLeftDraggedCorner.plus(result);
+		/** @type {SVG.Point[]} */
+		const snapPoints =
+			this.element.relSnappingPoints && this.element.relSnappingPoints.length > 0
+				? this.element.relSnappingPoints
+				: [new SVG.Point(0, 0)];
+
+		let destination = event.detail.event?.shiftKey
+			? draggedPoint
+			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
 
 		event.detail.handler.move(destination.x, destination.y);
 	}

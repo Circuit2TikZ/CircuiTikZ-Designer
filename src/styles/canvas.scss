@@ -1,0 +1,30 @@
+// Styles for the canvas
+
+svg.mainCanvas {
+	margin: 8px;
+	padding: 0px;
+	width: calc(100% - 16px);
+	height: calc(100% - 16px);
+}
+
+.draggable {
+	cursor: grab;
+}
+
+.draggable.dragging,
+.dragging {
+	cursor: move;
+}
+
+.selectPoint,
+.selectPoint * {
+	cursor: crosshair; // higher prio than .draggable
+}
+
+.eraseCursor,
+.eraseCursor * {
+	cursor:
+		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M18.29 21.176H24V24h-8.115ZM3.26 24 .707 21Q.015 20.188 0 18.988q-.015-1.2.677-2.047L13.9.847Q14.592 0 15.6 0q1.007 0 1.699.812l5.98 7.023q.692.812.692 2.012t-.691 2.012L13.179 24Zm8.897-2.824 9.438-11.364-5.952-6.988L2.36 18.918l1.923 2.258zm-.18-8.47z' style='stroke-width:.0325699'/%3E%3C/svg%3E")
+			0 24,
+		auto;
+}

@@ -1,0 +1,38 @@
+// Styles for the export dialog/modal
+
+#exportedContent {
+	width: 100%;
+	height: auto;
+	max-height: calc(100vh - 190px); // 184.5px
+	white-space: pre;
+	resize: none;
+}
+
+.copyContentIcon {
+	@extend .user-select-none;
+	cursor: pointer;
+	position: absolute;
+	top: 22px;
+	right: 22px;
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	font-size: 24px;
+	text-align: center;
+}
+
+.copyContentIcon:hover,
+.copyContentIcon.selected {
+	text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.95);
+}
+
+#exportModalFileExtension {
+	@extend .user-select-none;
+	background-color: transparent;
+	border-radius: 0;
+	flex-grow: 0;
+	position: relative;
+	width: 60px;
+	--bs-body-color: #{$secondary};
+	--bs-border-color: #{$secondary};
+}

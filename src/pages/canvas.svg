@@ -13,8 +13,11 @@
 		<rect width="1cm" height="1cm" fill="url(#smallGridPattern)" />
 		<path d="M 37.79528 0 L 0 0 0 37.79528" fill="none" stroke="gray" stroke-width="1" />
 	</pattern>
+	<symbol id="snapCursor" viewBox="0 0 14 14">
+		<circle cx="7" cy="7" fill="none" stroke="#000" stroke-width="1.5" r="6" />
+	</symbol>
 </defs>
 	<rect id="grid" x="0" y="0" width="100%" height="100%" fill="url(#gridPattern)" style="translate: -.25px -.25px; " />
-	<line id="yAxis" x1="0" x2="0" y1="0" y2="100%" stroke="#009999" stroke-width="2px" />
-	<line id="xAxis" x1="0" x2="100%" y1="0" y2="0" stroke="#009999" stroke-width="2px" />
+	<line id="yAxis" x1="0" x2="0" y1="0" y2="100%" stroke="#8C9FB1" stroke-width="2px" />
+	<line id="xAxis" x1="0" x2="100%" y1="0" y2="0" stroke="#8C9FB1" stroke-width="2px" />
 </svg>

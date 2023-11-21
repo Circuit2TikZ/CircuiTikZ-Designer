@@ -11,7 +11,7 @@
 		"prettier-lint": "prettier --check --config .prettierrc --log-level log '**/*.{js,ts,mjs,cjs,json,jsonc,html,htm,css,scss,xml,xsd,svg}'",
 		"start": "parcel serve --lazy",
 		"html-lint": "scripts/validateHTML.mjs",
-		"lint": "npm run html-lint "
+		"lint": "npm run html-lint"
 	},
 	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"dependencies": {
@@ -19,10 +19,12 @@
 		"@svgdotjs/svg.js": "^3.2.0",
 		"@svgdotjs/svg.panzoom.js": "^2.1.2",
 		"bootstrap": "^5.3.2",
+		"file-saver": "^2.0.5",
 		"mdb-ui-kit": "^6.4.2"
 	},
 	"devDependencies": {
 		"@parcel/config-default": "^2.9.3",
+		"@parcel/packager-raw-url": "^2.10.3",
 		"@parcel/plugin": "^2.9.3",
 		"@parcel/transformer-css": "^2.9.3",
 		"@parcel/transformer-html": "^2.9.3",
@@ -30,9 +32,11 @@
 		"@parcel/transformer-posthtml": "^2.9.3",
 		"@parcel/transformer-sass": "^2.9.3",
 		"@parcel/transformer-svg": "^2.9.3",
+		"@parcel/transformer-webmanifest": "^2.10.3",
 		"@parcel/transformer-xml": "^2.9.3",
 		"@prettier/plugin-xml": "^3.1.1",
 		"@types/bootstrap": "^5.2.8",
+		"@types/file-saver": "^2.0.7",
 		"@types/html-validator": "^5.0.5",
 		"@xml-tools/validation": "^1.0.16",
 		"html-validator": "^6.0.1",

@@ -1,4 +1,5 @@
 /**
+ * Useful functions for traversing an DOM or XML tree.
  * @module xmlHelper
  */
 

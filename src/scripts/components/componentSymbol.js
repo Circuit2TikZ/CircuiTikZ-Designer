@@ -2,9 +2,11 @@
  * @module componentSymbol
  */
 
-import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
 import * as SVG from "@svgdotjs/svg.js";
-import componentInstance from "./componentInstance";
+
+import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
+
+/** @typedef {import("./componentInstance")} ComponentInstance */
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 
@@ -31,8 +33,12 @@ const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
  * @property {?SVG.Box} viewBox - the viewBox/boundingBox, if set
  */
 
+/**
+ * Representation of a symbol. This class has sub classes describing path- and node-style symbols.
+ * @class
+ */
 export default class ComponentSymbol extends SVG.Symbol {
-	/** @type {SVGMetadataElement|null} */
+	/** @type {?SVGMetadataElement} */
 	svgMetadataElement;
 
 	/** @type {string} */
@@ -43,10 +49,12 @@ export default class ComponentSymbol extends SVG.Symbol {
 	groupName;
 
 	/** @type {SVG.Point} */
-	mid;
+	relMid;
 	/** @type {?SVG.Box} */
 	viewBox;
 
+	/** @type {Map<string,?string>} */
+	_tikzOptions;
 	/** @type {TikZAnchor[]} */
 	_pins = [];
 	/** @type {TikZAnchor[]} */
@@ -57,9 +65,10 @@ export default class ComponentSymbol extends SVG.Symbol {
 	_defaultAnchor = null;
 
 	/**
+	 * Creates a new symbol from a `SVGSymbolElement`.
 	 *
-	 * @param {SVGSymbolElement} symbolElement
-	 * @param {SymbolBaseInformation} [baseInformation]
+	 * @param {SVGSymbolElement} symbolElement - the element containing the symbol & metadata
+	 * @param {SymbolBaseInformation} [baseInformation] - base information if already extracted using {@link getBaseInformation}
 	 * @throws {Error} if the XML structure lacks the required metadata
 	 */
 	constructor(symbolElement, baseInformation) {
@@ -75,8 +84,21 @@ export default class ComponentSymbol extends SVG.Symbol {
 		this.displayName = baseInformation.displayName;
 		this.tikzName = baseInformation.tikzName;
 		this.groupName = baseInformation.groupName;
-		this.mid = baseInformation.mid;
+		this.relMid = baseInformation.mid;
 		this.viewBox = baseInformation.viewBox;
+
+		// parse additional options (key, value or just key)
+		let tikzOptions =
+			baseInformation.componentInformation &&
+			getNamedTag(baseInformation.componentInformation, "tikzOptions", METADATA_NAMESPACE_URI);
+		let tikzOptionArray = tikzOptions ? getNamedTags(tikzOptions, "option", METADATA_NAMESPACE_URI) : [];
+		this._tikzOptions = new Map(
+			tikzOptionArray.map((rawOption) => {
+				const key = rawOption?.getAttribute("key") ?? null;
+				const value = rawOption?.getAttribute("value") ?? null;
+				return [key, value];
+			})
+		);
 
 		// parse pins & anchors
 		let pins =
@@ -100,9 +122,9 @@ export default class ComponentSymbol extends SVG.Symbol {
 	}
 
 	/**
-	 *
-	 * @param {SVGSymbolElement} symbolElement
-	 * @returns {SymbolBaseInformation}
+	 * Extract base information/metadata of a `SVGSymbolElement`.
+	 * @param {SVGSymbolElement} symbolElement - the element to extract the information from
+	 * @returns {SymbolBaseInformation} the extracted information
 	 */
 	static getBaseInformation(symbolElement) {
 		/** @type {?SVGMetadataElement} */
@@ -171,8 +193,8 @@ export default class ComponentSymbol extends SVG.Symbol {
 		if (typeof anchor.isDefault !== "boolean") anchor.isDefault = anchor.isDefault === "true";
 
 		anchor.point = new SVG.Point(
-			this.mid.x + SVG.Number.ensureInPx(anchor.x),
-			this.mid.y - SVG.Number.ensureInPx(anchor.y) // tikz y direction != svg y direction
+			SVG.Number.ensureInPx(anchor.x),
+			-SVG.Number.ensureInPx(anchor.y) // tikz y direction != svg y direction
 		);
 
 		if (anchor.isDefault) this._defaultAnchor = anchor;
@@ -181,50 +203,22 @@ export default class ComponentSymbol extends SVG.Symbol {
 	}
 
 	/**
-	 * Gets all anchors, which make sense for snapping to the grid.
-	 * Does not return the `textAnchor`.
+	 * Generate a instance of a symbol. Call this function on subclasses only.
 	 *
-	 * @returns {TikZAnchor[]} all anchors for snapping to the grid
-	 */
-	get snappingAnchors() {
-		return [...this._pins, ...this._additionalAnchors];
-	}
-
-	/**
-	 * Gets all anchors points, which make sense for snapping to the grid.
-	 * Points are relative to the symbol position.
-	 * Does not return the `textAnchor`.
-	 *
-	 * @returns {SVG.Point} all anchor points for snapping to the grid
-	 */
-	get snappingPoints() {
-		return this.snappingAnchors.map((anchor) => anchor.point);
-	}
-
-	/*
-	 *
-	 * @returns {SVG.Use}
-	 *
-	createInstance() {
-		return new SVG.Use(this);
-	}*/
-
-	/**
-	 * @typedef {object} DragHandler
-	 * @property {SVG.Element} el
-	 * @property {SVG.Box} box
-	 * @property {SVG.Point} lastClick
-	 * @property {(ev: MouseEvent) => void} startDrag
-	 * @property {(ev: MouseEvent) => void} drag
-	 * @property {(ev: MouseEvent) => void} endDrag
-	 */
-
-	/**
-	 * @param {SVG.Container} container
-	 * @param {MouseEvent} event
-	 * @returns {componentInstance}
+	 * @param {SVG.Container} container - the container to add the instance to
+	 * @param {MouseEvent} event - the event which triggered the adding
+	 * @returns {ComponentInstance} the new instance
 	 */
 	addInstanceToContainer(container, event) {
-		return new componentInstance(this, container, event);
+		throw new Error("Not implemented; use subclasses");
+	}
+
+	/**
+	 * Serializes the CircuiTikZ-options in the syntax "keyWithoutValue, keyWith=Value, ...".
+	 *
+	 * @returns {string} - the serialized options
+	 */
+	serializeTikzOptions() {
+		return Array.from(this._tikzOptions.entries(), ([key, value]) => (value ? key + "=" + value : key)).join(", ");
 	}
 }

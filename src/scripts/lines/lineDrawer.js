@@ -6,225 +6,215 @@
 import * as SVG from "@svgdotjs/svg.js";
 
 import FABcontroller from "../controllers/fabController";
-import CanvasController from "../controllers/canvasController";
+import SnapController from "../snapDrag/snapController";
+import SnapCursorController from "../snapDrag/snapCursor";
+import Line from "./line";
+
+/** @typedef {import("../controllers/mainController").default} MainController */
 
 /**
  * @class
  */
 export default class LineDrawer {
-	/** @type {HTMLAnchorElement} */
-	#toggleModeLink;
-	/** @type {boolean} */
-	#lineDrawModeActive = false;
-	/** @type {CanvasController} */
-	#canvasController;
-	/** @type {number} */
-	#clickCount = 0;
+	/** @type {MainController} */
+	#mainController;
+	/** @type {SVG.Svg} */
+	#canvas;
 
-	/** @type {?SVG.PointArray} */
-	#pointsArray;
-	/** @type {?SVG.Polyline} */
-	#polyline;
-
-	/** @type {number[]} */
+	/** @type {?Line} */
+	#newLine;
+	/** @type {SVG.Point} */
 	#lastPoint;
-	/** @type {number[]} */
-	#cornerPoint;
-	/** @type {number[]} */
-	#mousePoint;
 
 	/** @type {boolean} */
-	#holdX = false;
+	#horizontalFirst = false;
 	/** @type {boolean} */
 	#holdDirectionSet = false;
 	/** @type {{up: boolean, right: boolean, down: boolean, left: boolean}} */
-	#lineDirection = { up: false, right: false, down: false, left: false };
+	#lastLineDirection = { up: false, right: false, down: false, left: false };
+	/** @type {boolean} */
+	#wasAboveXAxis;
+	/** @type {boolean} */
+	#wasRightOfYAxis;
 
 	/**
 	 *
-	 * @param {CanvasController} canvasController
+	 * @param {MainController} mainController
 	 */
-	constructor(canvasController) {
-		/** @type {HTMLAnchorElement} */ // @ts-ignore
-		this.#toggleModeLink = document.getElementById("drawLineButton");
-		this.#toggleModeLink.addEventListener("click", this.#toggleMode.bind(this));
-
-		this.#canvasController = canvasController;
+	constructor(mainController) {
+		this.#mainController = mainController;
+		this.#canvas = this.#mainController.canvasController.canvas;
 	}
 
-	#toggleMode() {
-		this.#lineDrawModeActive = !this.#lineDrawModeActive;
-		this.#toggleModeLink.textContent = this.#lineDrawModeActive ? "drag_pan" : "shape_line";
+	/**
+	 * Deactivate the line drawing feature temporary.
+	 *
+	 * Removes listeners from the canvas.
+	 */
+	deactivate() {
+		this.#onCancel();
+		// unregister move listener
+		this.#canvas.off("mousemove", this.#moveListener);
+		this.#canvas.off("click", this.#clickListener);
+		SnapCursorController.controller.visible = false;
+		this.#canvas.node.classList.remove("selectPoint");
+	}
 
-		if (this.#lineDrawModeActive) {
-			// activate
-			this.#resetVars();
-			this.#canvasController.canvas.on("click", this.#clickListener, this);
+	/**
+	 * Activate the line drawing feature.
+	 *
+	 * Adds listeners to the canvas.
+	 */
+	activate() {
+		this.#resetVars();
+		this.#canvas.on("click", this.#clickListener, this);
+		this.#canvas.on("mousemove", this.#moveListener, this);
+		this.#canvas.node.classList.add("selectPoint");
+		SnapCursorController.controller.visible = true;
 
-			// init FAB
-			FABcontroller.controller.setButtons(
+		// init FAB
+		FABcontroller.controller.setButtons(
+			{
+				icon: "done",
+				buttonClass: "btn-success",
+				onclick: this.#onOK.bind(this),
+			},
+			[
 				{
-					icon: "done",
-					buttonClass: "btn-success",
-					onclick: this.#onOK.bind(this),
+					icon: "close",
+					buttonClass: "btn-danger",
+					onclick: this.#onCancel.bind(this),
 				},
-				[
-					{
-						icon: "close",
-						buttonClass: "btn-danger",
-						onclick: this.#onCancel.bind(this),
-					},
-				]
-			);
-		} else {
-			// deactivate
-			this.#onCancel();
-			this.#canvasController.canvas.off("click", this.#clickListener);
-		}
+			]
+		);
 	}
 
 	/**
-	 * @param {MouseEvent} event
-	 * @returns {SVG.Point}
-	 */
-	#mouseEventToPoint(event) {
-		const pt = new SVG.Point(event.clientX, event.clientY);
-		return pt.transform(this.#canvasController.canvas.screenCTM().inverse());
-	}
-
-	/**
+	 * Listener for clicks to add new Lines or add points to lines.
 	 *
 	 * @param {MouseEvent} event
 	 */
 	#clickListener(event) {
-		this.#clickCount++;
-		let pt = this.#mouseEventToPoint(event);
-		console.log(event, pt);
-		const ptArray = pt.toArray();
+		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
+		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 
-		if (this.#clickCount === 1) {
-			this.#pointsArray = new SVG.PointArray([ptArray, ptArray, ptArray]);
-			this.#lastPoint = this.#pointsArray[0];
-			this.#cornerPoint = this.#pointsArray[1];
-			this.#mousePoint = this.#pointsArray[2];
-			this.#polyline = this.#canvasController.canvas.polyline(this.#pointsArray).fill("none").stroke("#000");
-			this.#canvasController.canvas.on("mousemove", this.#moveListener, this);
+		if (!this.#lastPoint) {
+			SnapCursorController.controller.visible = false;
+			this.#newLine = new Line(snappedPoint);
+			this.#lastPoint = snappedPoint;
+			this.#canvas.add(this.#newLine);
 		} else {
-			this.#recalcPoints(pt);
-			this.#pointsArray.push(ptArray, [...ptArray]);
-			let index = this.#pointsArray.length;
-			this.#mousePoint = this.#pointsArray[--index];
-			this.#cornerPoint = this.#pointsArray[--index];
-			this.#lastPoint = this.#pointsArray[--index];
-			const secondLastPoint = this.#pointsArray[--index];
-			this.#holdDirectionSet = false;
+			if (this.#lastPoint.x === snappedPoint.x && this.#lastPoint.y === snappedPoint.y) return;
+			this.#newLine.pushPoint(this.#horizontalFirst, snappedPoint);
+			const secondLastPoint = this.#lastPoint;
+			this.#lastPoint = snappedPoint;
 
-			this.#lineDirection.up = this.#lastPoint[1] < secondLastPoint[1];
-			this.#lineDirection.right = this.#lastPoint[0] > secondLastPoint[0];
-			this.#lineDirection.down = this.#lastPoint[1] > secondLastPoint[1];
-			this.#lineDirection.left = this.#lastPoint[0] < secondLastPoint[0];
+			if (
+				(this.#horizontalFirst || this.#lastPoint.x === secondLastPoint.x) &&
+				this.#lastPoint.y !== secondLastPoint.y
+			) {
+				// up or down
+				this.#lastLineDirection.up = this.#lastPoint.y < secondLastPoint.y;
+				this.#lastLineDirection.down = this.#lastPoint.y > secondLastPoint.y;
+				this.#lastLineDirection.left = false;
+				this.#lastLineDirection.right = false;
+			} else {
+				// left or right
+				this.#lastLineDirection.left = this.#lastPoint.x < secondLastPoint.x;
+				this.#lastLineDirection.right = this.#lastPoint.x > secondLastPoint.x;
+				this.#lastLineDirection.up = false;
+				this.#lastLineDirection.down = false;
+			}
+
+			FABcontroller.controller.visible = true;
 		}
-		this.#polyline.plot(this.#pointsArray);
-
-		if (this.#clickCount > 1) FABcontroller.controller.visible = true;
 	}
 
+	/**
+	 * Listener for the ok button. Ends the currently created line using {@link "#lineEnd"}.
+	 */
 	#onOK() {
 		this.#lineEnd();
 	}
 
-	#lineEnd() {
-		// remove last (non confirmed) corner and mouse points
-		this.#pointsArray.splice(this.#pointsArray.length - (this.#cornerPoint ? 1 : 0) - (this.#mousePoint ? 1 : 0));
-		this.#polyline.plot(this.#pointsArray);
-
-		// unregister move listener
-		this.#canvasController.canvas.off("mousemove", this.#moveListener);
-
-		// todo: save line to list
-
-		this.#resetVars();
-		FABcontroller.controller.visible = false;
-	}
-
+	/**
+	 * Listener for the cancel button. Removes the current line in creation.
+	 *
+	 */
 	#onCancel() {
-		if (this.#polyline) this.#polyline.remove();
+		if (this.#newLine) this.#newLine.remove();
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
-	}
-
-	#resetVars() {
-		this.#mousePoint = null;
-		this.#cornerPoint = null;
-		this.#lastPoint = null;
-		this.#clickCount = 0;
-		this.#pointsArray = null;
-		this.#polyline = null;
-		this.#holdDirectionSet = false;
-
-		this.#lineDirection.up = false;
-		this.#lineDirection.right = false;
-		this.#lineDirection.down = false;
-		this.#lineDirection.left = false;
+		SnapCursorController.controller.visible = true;
 	}
 
 	/**
-	 *
+	 * Marks the line in creation as done. Prepares the class for adding the next line.
+	 */
+	#lineEnd() {
+		this.#newLine.removeMousePoint();
+
+		this.#mainController.addLine(this.#newLine);
+
+		this.#resetVars();
+		FABcontroller.controller.visible = false;
+		SnapCursorController.controller.visible = true;
+	}
+
+	/**
+	 * Resets all variables between line draws and on init.
+	 */
+	#resetVars() {
+		this.#newLine = null;
+		this.#lastPoint = null;
+		this.#holdDirectionSet = false;
+
+		this.#lastLineDirection.up = false;
+		this.#lastLineDirection.right = false;
+		this.#lastLineDirection.down = false;
+		this.#lastLineDirection.left = false;
+	}
+
+	/**
+	 * Listener for mouse movements. Does update the "SnapCursor" or the currently drawn line.
 	 * @param {MouseEvent} event
 	 */
 	#moveListener(event) {
-		if (this.#mousePoint) {
-			let pt = this.#mouseEventToPoint(event);
-			this.#recalcPoints(pt);
-			this.#polyline.plot(this.#pointsArray);
-		}
-	}
+		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
+		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
+		if (!this.#newLine) {
+			SnapCursorController.controller.move(snappedPoint);
+		} else {
+			// try to get quadrant change
+			const isAboveXAxis = snappedPoint.y < this.#lastPoint.y;
+			const isRightOfYAxis = snappedPoint.x > this.#lastPoint.x;
 
-	/**
-	 *
-	 * @param {SVG.Point} newPoint
-	 */
-	#recalcPoints(newPoint) {
-		// TODO snap new point here
+			if (this.#holdDirectionSet) {
+				// change direction if mouse position crosses the horizontal or vertical position of the last point
 
-		// try to get quadrant change
-		const isAboveXAxis = newPoint.y < this.#lastPoint[1];
-		const isRightOfYAxis = newPoint.x > this.#lastPoint[0];
-
-		if (this.#holdDirectionSet) {
-			// change direction if mouse position crosses the horizontal or vertical position of the last point
-			const wasAboveXAxis = this.#mousePoint[1] < this.#lastPoint[1];
-			const wasRightOfYAxis = this.#mousePoint[0] > this.#lastPoint[0];
-
-			if (wasAboveXAxis !== isAboveXAxis) {
-				this.#holdX = false;
-			} else if (wasRightOfYAxis !== isRightOfYAxis) {
-				this.#holdX = true;
+				if (this.#wasAboveXAxis !== isAboveXAxis) {
+					this.#horizontalFirst = true;
+				} else if (this.#wasRightOfYAxis !== isRightOfYAxis) {
+					this.#horizontalFirst = false;
+				}
+			} else {
+				// no initial direction set --> evaluate delta to last point
+				const deltaX = snappedPoint.x - this.#lastPoint.x;
+				const deltaY = snappedPoint.y - this.#lastPoint.y;
+				this.#horizontalFirst = deltaX > deltaY;
+				this.#holdDirectionSet = true;
 			}
-		} else {
-			// no initial direction set --> evaluate delta to last point
-			const deltaX = this.#mousePoint[0] - this.#lastPoint[0];
-			const deltaY = this.#mousePoint[1] - this.#lastPoint[1];
-			this.#holdX = deltaX > deltaY;
-			this.#holdDirectionSet = true;
+
+			this.#wasAboveXAxis = isAboveXAxis;
+			this.#wasRightOfYAxis = isRightOfYAxis;
+
+			// no parallel line to the old one, if any
+			if ((this.#lastLineDirection.left && isRightOfYAxis) || (this.#lastLineDirection.right && !isRightOfYAxis))
+				this.#horizontalFirst = false;
+			else if ((this.#lastLineDirection.down && isAboveXAxis) || (this.#lastLineDirection.up && !isAboveXAxis))
+				this.#horizontalFirst = true;
+
+			this.#newLine.updateMousePoint(this.#horizontalFirst, snappedPoint);
 		}
-
-		// no parallel line to the old one, if any
-		if ((this.#lineDirection.left && isRightOfYAxis) || (this.#lineDirection.right && !isRightOfYAxis))
-			this.#holdX = true;
-		else if ((this.#lineDirection.down && isAboveXAxis) || (this.#lineDirection.up && !isAboveXAxis))
-			this.#holdX = false;
-
-		// actually calculate the corner point
-		if (this.#holdX) {
-			this.#cornerPoint[0] = this.#lastPoint[0];
-			this.#cornerPoint[1] = newPoint.y;
-		} else {
-			this.#cornerPoint[0] = newPoint.x;
-			this.#cornerPoint[1] = this.#lastPoint[1];
-		}
-
-		this.#mousePoint[0] = newPoint.x;
-		this.#mousePoint[1] = newPoint.y;
 	}
 }

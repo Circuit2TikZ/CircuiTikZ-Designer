@@ -52,8 +52,8 @@ const customErrorFilters = [
 (async () => {
 	/** @type {HtmlValidator.OptionsForHtmlFileAsValidationTargetAndObjectAsResult} */
 	const options = {
-		url: "http://localhost:1234/",
-		data: readFileSync("src/index.html", "utf8"),
+		// url: "http://localhost:1234/",
+		data: readFileSync("dist/index.html", "utf8"),
 		format: "json",
 		validator: "WHATWG",
 		isLocal: true,

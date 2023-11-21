@@ -1,26 +1,20 @@
 /**
- * @module pathComponentSymbol
+ * @module nodeComponentSymbol
  */
 
 import ComponentSymbol from "./componentSymbol";
-import PathComponentInstance from "./pathComponentInstance";
+import NodeComponentInstance from "./nodeComponentInstance";
 
 /** @typedef {import("@svgdotjs/svg.js").Container} SVG.Container */
-/** @typedef {import("./componentSymbol").TikZAnchor} TikZAnchor */
 
 /**
- * Class representing a path-style component.
+ * Class representing a node-style component.
  * @class
  * @extends ComponentSymbol
  */
-export default class PathComponentSymbol extends ComponentSymbol {
-	/** @type {TikZAnchor} */
-	startPin;
-	/** @type {TikZAnchor} */
-	endPin;
-
+export default class NodeComponentSymbol extends ComponentSymbol {
 	/**
-	 * Creates a new path-style symbol from a `SVGSymbolElement`.
+	 * Creates a new node-style symbol from a `SVGSymbolElement`.
 	 *
 	 * @param {SVGSymbolElement} symbolElement - the element containing the symbol & metadata
 	 * @param {SymbolBaseInformation} [baseInformation] - base information if already extracted using {@link ComponentSymbol.getBaseInformation}
@@ -28,13 +22,6 @@ export default class PathComponentSymbol extends ComponentSymbol {
 	 */
 	constructor(symbolElement, baseInformation) {
 		super(symbolElement, baseInformation);
-
-		this._pins = this._pins.filter((pin) => {
-			if (pin.name === "START") this.startPin = pin;
-			else if (pin.name === "END") this.endPin = pin;
-			else return true;
-			return false;
-		});
 	}
 
 	/**
@@ -42,8 +29,9 @@ export default class PathComponentSymbol extends ComponentSymbol {
 	 * @override
 	 * @param {SVG.Container} container - the container to add the instance to
 	 * @param {MouseEvent} event - the event which triggered the adding
+	 * @returns {NodeComponentInstance} the new instance
 	 */
 	addInstanceToContainer(container, event) {
-		return PathComponentInstance.createInstance(this, container, event);
+		return NodeComponentInstance.createInstance(this, container, event);
 	}
 }

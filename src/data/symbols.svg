@@ -13,6 +13,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="ground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.46839"
 					refY="4.04544"
@@ -33,8 +34,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="resistor"
 					tikzName="american resistor"
-					shapeName="resistorshape"
 					groupName="Resistive bipoles"
 					refX="22.228"
 					refY="8.46838"
@@ -63,6 +64,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="tlground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.46839"
 					refY="4.04544"
@@ -82,8 +84,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="variable resistor"
 					tikzName="variable american resistor"
-					shapeName="vresistorshape"
 					groupName="Resistive bipoles"
 					refX="22.228"
 					refY="16.40544"
@@ -118,6 +120,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="rground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.46839"
 					refY="4.04543"
@@ -138,8 +141,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="potentiometer"
 					tikzName="american potentiometer"
-					shapeName="potentiometershape"
 					groupName="Resistive bipoles"
 					refX="22.228"
 					refY="21.69667"
@@ -175,6 +178,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="sground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.46839"
 					refY="4.04543"
@@ -195,8 +199,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="resistive sensor"
 					tikzName="american resistive sensor"
-					shapeName="resistivesensshape"
 					groupName="Resistive bipoles"
 					refX="22.228"
 					refY="16.40544"
@@ -226,6 +230,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="tground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.73405"
 					refY="4.04544"
@@ -245,8 +250,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="ligth-dependent resistor"
 					tikzName="american light dependent resistor"
-					shapeName="ldresistorshape"
 					groupName="Resistive bipoles"
 					refX="22.12283"
 					refY="30.16266"
@@ -292,6 +297,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="nground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.65698"
 					refY="0.2657"
@@ -315,8 +321,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="resistor"
 					tikzName="european resistor"
-					shapeName="genericshape"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="8.46838"
@@ -341,6 +347,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="pground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="8.65698"
 					refY="0.2657"
@@ -369,8 +376,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="variable resistor"
 					tikzName="variable european resistor"
-					shapeName="tgenericshape"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="19.05087"
@@ -405,6 +412,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="cground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="9.9799"
 					refY="0.2657"
@@ -428,8 +436,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="potentiometer"
 					tikzName="european potentiometer"
-					shapeName="genericpotentiometershape"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="21.431"
@@ -460,6 +468,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="eground"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="14.81687"
 					refY="4.04544"
@@ -486,8 +495,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="resistive sensor"
 					tikzName="european resistive sensor"
-					shapeName="thermistorshape"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="11.8546"
@@ -515,6 +524,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="eground2"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="14.81687"
 					refY="4.04544"
@@ -541,8 +551,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="ligth-dependent resistor"
 					tikzName="european light dependent resistor"
-					shapeName="ldgenericshape"
 					groupName="Resistive bipoles"
 					refX="22.12283"
 					refY="30.16266"
@@ -587,6 +597,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="vcc"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="5.82259"
 					refY="21.16495"
@@ -609,8 +620,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="varistor"
 					tikzName="varistor"
-					shapeName="undefined"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="11.8546"
@@ -646,6 +657,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="vee"
+					shapeName="null"
 					groupName="Grounds and supply voltages"
 					refX="5.82259"
 					refY="4.04544"
@@ -668,8 +680,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="photoresistor"
 					tikzName="photoresistor"
-					shapeName="undefined"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="16.13977"
@@ -704,6 +716,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="jump crossing"
+					shapeName="null"
 					refX="1.77718"
 					refY="1.77718"
 					viewBox="0 0 11.1138 11.1138"
@@ -727,8 +740,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="thermistor"
 					tikzName="thermistor"
-					shapeName="undefined"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="11.8546"
@@ -756,6 +769,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="plain crossing"
+					shapeName="null"
 					refX="1.77718"
 					refY="1.77718"
 					viewBox="0 0 11.1138 11.1138"
@@ -776,8 +790,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="thermistor ptc"
 					tikzName="thermistor ptc"
-					shapeName="undefined"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="11.8546"
@@ -820,7 +834,14 @@
 		</symbol>
 		<symbol id="node_circ">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="circ" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+				<ci:componentInformation
+					type="node"
+					tikzName="circ"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04545"
+					viewBox="0 0 8.09083 6.42726"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -839,8 +860,8 @@
 			<metadata>
 				<ci:componentInformation
 					type="path"
+					displayName="thermistor ntc"
 					tikzName="thermistor ntc"
-					shapeName="undefined"
 					groupName="Resistive bipoles"
 					refX="21.69667"
 					refY="11.8546"
@@ -883,7 +904,14 @@
 		</symbol>
 		<symbol id="node_currarrow">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="currarrow" refX="4.04544" refY="4.04543" viewBox="0 0 8.09083 6.95671">
+				<ci:componentInformation
+					type="node"
+					tikzName="currarrow"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04543"
+					viewBox="0 0 8.09083 6.95671"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -898,7 +926,14 @@
 		</symbol>
 		<symbol id="node_inputarrow">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="inputarrow" refX="1.84226" refY="0.2657" viewBox="0 0 9.6674 6.69106">
+				<ci:componentInformation
+					type="node"
+					tikzName="inputarrow"
+					shapeName="null"
+					refX="1.84226"
+					refY="0.2657"
+					viewBox="0 0 9.6674 6.69106"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -913,7 +948,14 @@
 		</symbol>
 		<symbol id="node_trarrow">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="trarrow" refX="4.04544" refY="4.04544" viewBox="0 0 8.27857 7.09449">
+				<ci:componentInformation
+					type="node"
+					tikzName="trarrow"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04544"
+					viewBox="0 0 8.27857 7.09449"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -928,7 +970,14 @@
 		</symbol>
 		<symbol id="node_flowarrow">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="flowarrow" refX="9.71423" refY="0.26569" viewBox="0 0 26.9879 6.95671">
+				<ci:componentInformation
+					type="node"
+					tikzName="flowarrow"
+					shapeName="null"
+					refX="9.71423"
+					refY="0.26569"
+					viewBox="0 0 26.9879 6.95671"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -944,7 +993,14 @@
 		</symbol>
 		<symbol id="node_ocirc">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="ocirc" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+				<ci:componentInformation
+					type="node"
+					tikzName="ocirc"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04545"
+					viewBox="0 0 8.09083 6.42726"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -962,7 +1018,14 @@
 		</symbol>
 		<symbol id="node_diamondpole">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="diamondpole" refX="4.04544" refY="4.04544" viewBox="0 0 8.09083 7.30377">
+				<ci:componentInformation
+					type="node"
+					tikzName="diamondpole"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04544"
+					viewBox="0 0 8.09083 7.30377"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -980,6 +1043,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="odiamondpole"
+					shapeName="null"
 					refX="4.04544"
 					refY="4.04544"
 					viewBox="0 0 8.09083 7.30377"
@@ -998,7 +1062,14 @@
 		</symbol>
 		<symbol id="node_squarepole">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="squarepole" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+				<ci:componentInformation
+					type="node"
+					tikzName="squarepole"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04545"
+					viewBox="0 0 8.09083 6.42726"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -1013,7 +1084,14 @@
 		</symbol>
 		<symbol id="node_osquarepole">
 			<metadata>
-				<ci:componentInformation type="node" tikzName="osquarepole" refX="4.04544" refY="4.04545" viewBox="0 0 8.09083 6.42726">
+				<ci:componentInformation
+					type="node"
+					tikzName="osquarepole"
+					shapeName="null"
+					refX="4.04544"
+					refY="4.04545"
+					viewBox="0 0 8.09083 6.42726"
+				>
 					<ci:pins>
 					</ci:pins>
 					<ci:additionalAnchors>
@@ -1031,6 +1109,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="bnc"
+					shapeName="null"
 					groupName="Connectors"
 					refX="12.09154"
 					refY="6.80113"
@@ -1071,6 +1150,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="iecconnshape"
+					shapeName="null"
 					groupName="Connectors"
 					refX="4.68856"
 					refY="2.04284"
@@ -1096,6 +1176,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="iecsocketL"
+					shapeName="null"
 					groupName="Connectors"
 					refX="4.04544"
 					refY="5.82259"
@@ -1121,6 +1202,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="iecplugR"
+					shapeName="null"
 					groupName="Connectors"
 					refX="4.04544"
 					refY="4.04544"
@@ -1143,6 +1225,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="iecplugL"
+					shapeName="null"
 					groupName="Connectors"
 					refX="4.04544"
 					refY="4.04544"
@@ -1165,6 +1248,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="iecsocketR"
+					shapeName="null"
 					groupName="Connectors"
 					refX="4.04544"
 					refY="5.82259"
@@ -1190,6 +1274,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="npn"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
@@ -1219,6 +1304,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="pnp"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
@@ -1248,11 +1334,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="npn"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
 					viewBox="0 0 36.32494 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="schottky base" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
@@ -1281,11 +1371,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="pnp"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
 					viewBox="0 0 36.32494 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="schottky base" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
@@ -1314,11 +1408,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="npn"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
 					viewBox="0 0 46.30392 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="bodydiode" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
@@ -1354,11 +1452,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="pnp"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
 					viewBox="0 0 46.30392 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="bodydiode" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
@@ -1394,11 +1496,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="npn"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.01387"
 					refY="29.63372"
 					viewBox="0 0 36.05927 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="photo" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="-29.10236" isDefault="false" />
@@ -1432,11 +1538,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="pnp"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.01387"
 					refY="29.63372"
 					viewBox="0 0 36.05927 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="photo" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="0" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
@@ -1470,6 +1580,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="nigbt"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
@@ -1499,6 +1610,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="Lnigbt"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
@@ -1528,6 +1640,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="Lpigbt"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
@@ -1557,11 +1670,15 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="Lpigbt"
+					shapeName="null"
 					groupName="Transistors"
 					refX="32.27954"
 					refY="29.63372"
 					viewBox="0 0 46.30392 59.26741"
 				>
+					<ci:tikzOptions>
+						<ci:option key="bodydiode" />
+					</ci:tikzOptions>
 					<ci:pins>
 						<ci:pin anchorName="B" x="-31.74819" y="-11.640739999999997" isDefault="false" />
 						<ci:pin anchorName="C" x="0" y="29.102370000000004" isDefault="false" />
@@ -1597,6 +1714,7 @@
 				<ci:componentInformation
 					type="node"
 					tikzName="nigfete"
+					shapeName="null"
 					groupName="Transistors"
 					refX="37.57039"
 					refY="29.63372"

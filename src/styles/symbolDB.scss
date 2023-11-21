@@ -1,0 +1,23 @@
+// Styles for the left offcanvas resp. the symbol/components DB
+
+#leftOffcanvas {
+	max-width: 400px;
+	min-width: min(100vw, 300px);
+	width: 33.3vw;
+}
+
+.iconLibAccordionBody {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+}
+
+div.libComponent {
+	padding: 2px;
+}
+
+div.libComponent:hover {
+	box-shadow: 3px 3px 7px 1px #cccc;
+}

@@ -14,7 +14,7 @@
  */
 
 /**
- * Internal class for managing individual FABs.
+ * Internal class for managing individual FABs (floating action button).
  *
  * Used by {@link FABcontroller}
  */
@@ -31,11 +31,13 @@ class FloatingActionButton {
 	#additionalButtonClass;
 	/** @type {?function} */
 	#onclick;
+
 	/**
+	 * Create a new floating action button (FAB) or wrap an existing FAB DOM.
 	 *
-	 * @param {HTMLElement|HTMLAnchorElement} instance
-	 * @param {boolean} [isSubButton=true]
-	 * @param {ButtonDescription} [desc]
+	 * @param {HTMLElement|HTMLAnchorElement} instance - the existing FAB (HTMLAnchorElement) or the container used to create a new FAB
+	 * @param {boolean} [isSubButton=true] - `true` creates a small/sub FAB
+	 * @param {ButtonDescription} [desc] - optionally set the button parameters using {@link buttonDescription}
 	 */
 	constructor(instance, isSubButton = true, desc) {
 		if (instance instanceof HTMLAnchorElement && instance.classList.contains("btn-floating")) {
@@ -66,6 +68,8 @@ class FloatingActionButton {
 	}
 
 	/**
+	 * Set the button parameters
+	 *
 	 * @param {ButtonDescription} desc
 	 */
 	set buttonDescription(desc) {
@@ -77,22 +81,25 @@ class FloatingActionButton {
 
 		this.#instance.style.color = desc.color || null;
 		this.#instance.style.backgroundColor = desc.backgroundColor || null;
+		this.#instance.title = desc.tooltip || "";
 
 		this.onclick = desc.onclick;
-
-		// TODO implement tooltip
 	}
 
+	/**
+	 * Remove this FAB from its container.
+	 */
 	removeButton() {
 		this.#container.removeChild(this.#wrapperElement || this.#instance);
 	}
 
 	/**
-	 * @param {?function} callback
+	 * Set or reset the click listener.
+	 * @param {?(this: HTMLAnchorElement, ev: MouseEvent) => *} callback - the new callback
 	 */
 	set onclick(callback) {
 		if (this.#onclick !== callback) {
-			if (this.#onclick) this.#instance.removeEventListener(this.#onclick);
+			if (this.#onclick) this.#instance.removeEventListener("click", this.#onclick);
 			this.#onclick = callback || null;
 			if (this.#onclick) this.#instance.addEventListener("click", this.#onclick);
 		}
@@ -100,7 +107,8 @@ class FloatingActionButton {
 }
 
 /**
- * Controller for the floating action buttons (FAB)
+ * Controller for the floating action buttons (FAB).
+ * @class
  */
 export default class FABcontroller {
 	/** @type {FABcontroller} */

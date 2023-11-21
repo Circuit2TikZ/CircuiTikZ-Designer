@@ -1,0 +1,16 @@
+// Changes the bootstrap dropdown style to match material (m3) style
+// This works in conjunction with dropdown_variables and must be imported after bootstrap
+
+.dropdown-item {
+	@extend .user-select-none;
+	height: 48px;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	gap: 12px;
+}
+
+.dropdown-item-icon {
+	width: 24px;
+	height: 24px;
+}

@@ -1,4 +1,6 @@
 /**
+ * Adds useful functions both to SVG.Number and SVG.Point.
+ *
  * @module impSVGNumber
  */
 
@@ -15,6 +17,8 @@ import * as SVG from "@svgdotjs/svg.js";
  */
 
 /**
+ * Conversion constants from/to any svg unit.
+ *
  * @readonly
  * @enum {ToUnit}
  */
@@ -71,6 +75,7 @@ const unitConvertMap = {
 
 /**
  * List of unit names. The unit with the lowest index is the most preferred one.
+ *
  * @type {string[]}
  */
 const unitPriority = ["px", "in", "pt", "pc", "cm", "mm"];
@@ -270,6 +275,8 @@ SVG.extend(SVG.Number, {
 /**
  * Converts number alike values to a plain `number` in the unit pixel.
  *
+ * @function ensureInPx
+ * @memberof SVG.Number
  * @static
  * @param {string|Number|number|SVG.Number} number
  * @returns {number} a plain `number` in px
@@ -376,5 +383,23 @@ SVG.extend(SVG.Point, {
 		}
 
 		return result;
+	},
+
+	/**
+	 * Formats the point for usage with (Circui)TikZ.
+	 *
+	 * Converts from px to cm and rounds to 2 digits after the decimal point.
+	 *
+	 * @this {SVG.Point}
+	 * @returns {string} the TikZ representation, e.g. "(0.1, 1.23)"
+	 */
+	toTikzString() {
+		let x = Number(this.x * unitConvertMap.px.cm)
+			.toFixed(2)
+			.replace(/\.?0+$/, "");
+		let y = Number(-this.y * unitConvertMap.px.cm)
+			.toFixed(2)
+			.replace(/\.?0+$/, "");
+		return `(${x}, ${y})`;
 	},
 });
