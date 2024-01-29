@@ -37,6 +37,7 @@ export default class EraseController {
 	deactivate() {
 		// unregister move listener
 		this.#canvas.off("mousemove", this.#moveListener);
+		this.#canvas.off("touchmove", this.#moveListener);
 		this.#canvas.off("click", this.#clickListener);
 		this.#canvas.node.classList.remove("eraseCursor");
 	}
@@ -48,6 +49,7 @@ export default class EraseController {
 	 */
 	activate() {
 		this.#canvas.on("click", this.#clickListener, this);
+		this.#canvas.on("touchmove", this.#moveListener, this);
 		this.#canvas.on("mousemove", this.#moveListener, this);
 		this.#canvas.node.classList.add("eraseCursor");
 	}
@@ -59,33 +61,51 @@ export default class EraseController {
 	 */
 	#clickListener(event) {
 		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
-		this.#findAndErase(pt, event.target);
+		this.#findAndErase(pt, [event.target]);
 	}
 
 	/**
 	 * Listener for mouse movements. Triggers erasing, if the main button is pressed.
 	 *
-	 * @param {MouseEvent} event
+	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#moveListener(event) {
 		// Drag --> Drag-erase
-		if (event.buttons & 1)
-			this.#findAndErase(this.#mainController.canvasController.pointerEventToPoint(event), event.target);
+		// (Left click || Touch-click) || (mousemove)
+		let clientPt =
+			event instanceof MouseEvent && (event.buttons & 1 || (event.type !== "mousemove" && event.button === 0 ))
+				? event
+				: window.TouchEvent && event instanceof TouchEvent && event.touches.length === 1
+					? event.touches[0]
+					: null;
+
+		if (clientPt) {
+			const hitElements = [
+				clientPt.target || event.target,
+				document.elementFromPoint(clientPt.clientX, clientPt.clientY),
+			];
+			const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
+			this.#findAndErase(pt, hitElements);
+		}
 	}
 
 	/**
 	 * Find instances and lines around the point and removes them. One call only removes one instance/line.
 	 *
 	 * @param {SVG.Point} point - the point used to find a nearby line/instance
-	 * @param {EventTarget} target - the target of the event, which triggered the removal. Maybe the user clicked exactly on a line
+	 * @param {EventTarget[]} targets - the (possible) targets of the event, which triggered the removal. Maybe the user clicked exactly on a line
 	 */
-	#findAndErase(point, target) {
+	#findAndErase(point, targets) {
 		let lowestDist = 10; // ~ 0.27 cm
 		/** @type {?ComponentInstance|Line} */
 		let foundElement = null;
 
+		// uniq, not null & is SVGElement
+		targets = [...new Set(targets.filter((target) => target instanceof SVGElement))];
+
 		// Try to get element by click/touch target
-		if (target && target instanceof SVGElement) {
+		for (const target of targets) {
+			// Traverse DOM upwards to find .instance
 			// @ts-ignore there is no better/more type-safe alternative to parentElement
 			for (let elm = target; elm instanceof SVGElement; elm = elm.parentElement) {
 				if (
@@ -99,6 +119,8 @@ export default class EraseController {
 					break;
 				}
 			}
+
+			if (foundElement) break;
 		}
 
 		if (!foundElement) {

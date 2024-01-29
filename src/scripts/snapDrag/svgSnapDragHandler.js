@@ -22,13 +22,13 @@ import SnapController from "./snapController";
 /**
  * @typedef {object} DragMoveEventDetail
  * @property {SVG.Box} box
- * @property {MouseEvent} event
+ * @property {MouseEvent|TouchEvent} event
  * @property {DragHandler} handler - the instance of the svg.draggable.js handler
  * @see CustomEvent
  */
 
 /**
- * @typedef {CustomEvent<DragMoveEventDetail>} DragMoveEvent
+ * @typedef {CustomEvent<DragMoveEventDetail>} DragEvent
  */
 
 /**
@@ -44,6 +44,8 @@ export default class svgSnapDragHandler {
 
 	/** @type {boolean} */
 	#isTemporaryDisabled = false;
+	/** @type {boolean} */
+	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
 
 	/**
 	 * Do not call directly. Use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler instead.
@@ -60,7 +62,9 @@ export default class svgSnapDragHandler {
 		this.element.draggable(true);
 		this.#dragHandler = this.element.remember("_draggable");
 
+		this.element.on("dragstart", this.#dragStart, this, { passive: true });
 		this.element.on("dragmove.namespace", this.#dragMove, this);
+		this.element.on("dragend", this.#dragEnd, this, { passive: true });
 	}
 
 	/**
@@ -87,7 +91,9 @@ export default class svgSnapDragHandler {
 	 * Remove the handler and deactivate `draggable` feature.
 	 */
 	removeHandler() {
-		this.element.off("dragmove.namespace", this.dragMove);
+		this.element.off("dragstart", this.#dragStart);
+		this.element.off("dragmove.namespace", this.#dragMove);
+		this.element.off("dragend", this.#dragEnd);
 		this.element.draggable(false);
 		this.element.forget("_snapDragHandler");
 		this.element.forget("_draggable");
@@ -111,13 +117,28 @@ export default class svgSnapDragHandler {
 		return this.#isTemporaryDisabled;
 	}
 
+	//- listener -------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Listener for the "dragstart" event. Changes the cursor symbol using the class "dragging".
+	 * @param {DragEvent} event
+	 */
+	#dragStart(event) {
+		this.element.node.classList.add("dragging");
+		this.element.parent().node.classList.add("dragging");
+
+		// is TouchEvent?
+		this.#maybeContextmenu = window.TouchEvent && event.detail?.event instanceof TouchEvent;
+	}
+
 	/**
 	 * Handler for the dragging event. Alters the default behavior to enable snapping to grid and to other components.
 	 *
 	 * @private
-	 * @param {DragMoveEvent} event - the dragging event.
+	 * @param {DragEvent} event - the dragging event.
 	 */
 	#dragMove(event) {
+		this.#maybeContextmenu = false; // no contextmenu after any move
 		event.preventDefault();
 
 		/** @type {SVG.Point} */
@@ -136,5 +157,23 @@ export default class svgSnapDragHandler {
 			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
 
 		event.detail.handler.move(destination.x, destination.y);
+	}
+
+	/**
+	 * Listener for the "dragend" event. Undo the cursor change from {@link "#dragStart"}.
+	 * @param {DragEvent} event
+	 */
+	#dragEnd(event) {
+		this.element.node.classList.remove("dragging");
+		this.element.parent().node.classList.remove("dragging");
+
+		if (this.#maybeContextmenu && event.detail?.event instanceof TouchEvent) {
+			const clientXY = event.detail.event.touches?.[0] ?? event.detail.event.changedTouches?.[0];
+			const contextMenuEvent = new PointerEvent("contextmenu", {
+				clientX: clientXY.clientX,
+				clientY: clientXY.clientY,
+			});
+			Promise.resolve().then(() => this.element.node.dispatchEvent(contextMenuEvent));
+		} else if (this.element.recalculateSnappingPoints) this.element.recalculateSnappingPoints();
 	}
 }

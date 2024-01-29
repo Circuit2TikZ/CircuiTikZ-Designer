@@ -29,6 +29,11 @@ import "@svgdotjs/svg.panzoom.js";
  */
 export default class CanvasController {
 	/**
+	 * Static variable holding the instance.
+	 * @type {CanvasController}
+	 */
+	static controller;
+	/**
 	 * The (root) SVG Element. All lines and components are children of this element.
 	 * @type {SVG.Svg}
 	 */
@@ -63,6 +68,7 @@ export default class CanvasController {
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
 	 */
 	constructor(canvas) {
+		CanvasController.controller = this;
 		this.canvas = canvas;
 		this.paper = SVG.SVG("#grid");
 		this.xAxis = SVG.SVG("#xAxis");
@@ -81,7 +87,7 @@ export default class CanvasController {
 		canvas.on("panning", this.#movePaper, this, { passive: false });
 
 		// Mouse wheel OR pinch zoom
-		// Wheel zoom has no detail & detail.box and is thus ignored. It will be handled by wheel.panZoom.
+		// Wheel zoom is fired before the actual change and has no detail.box and is thus ignored. It will be handled by wheel.panZoom.
 		canvas.on("zoom", this.#movePaper, this, { passive: true });
 
 		// Modify point, viewbox and zoom functions to cache the inverse screen CTM (document -> viewport coords)
@@ -118,7 +124,7 @@ export default class CanvasController {
 		this.canvas.off("wheel.panZoom", this.#movePaper);
 		// re-init pan & zoom
 		this.canvas.panZoom({
-			panning: true, // still enabled for two finger & wheel zoom panning
+			panning: false, // still enabled for two finger & wheel zoom panning
 			pinchZoom: true,
 			wheelZoom: true,
 			panButton: 99, // deactivates panning using any mouse button
@@ -162,11 +168,14 @@ export default class CanvasController {
 	/**
 	 * Converts a point from an event to the SVG coordinate system.
 	 *
-	 * @param {PointerEvent|MouseEvent} event
+	 * @param {PointerEvent|MouseEvent|Touch} event
 	 * @returns {SVG.Point}
 	 */
 	pointerEventToPoint(event) {
-		return this.canvas.point(event.clientX, event.clientY);
+		//                touchstart/-move             touchend             mouse*
+		//               /----------------\    /-----------------------\    /---\
+		const clientXY = event.touches?.[0] ?? event.changedTouches?.[0] ?? event;
+		return this.canvas.point(clientXY.clientX, clientXY.clientY);
 	}
 
 	/**
@@ -187,7 +196,7 @@ export default class CanvasController {
 						this.#canvasBounds.width / oldViewbox.width,
 						this.#canvasBounds.height / oldViewbox.height
 					)
-			  );
+				);
 
 		const newViewbox = new SVG.Box(
 			oldViewbox.x,
@@ -208,6 +217,7 @@ export default class CanvasController {
 	 */
 	#movePaper(evt) {
 		/** @type {SVG.Box} */
+		if (evt?.detail && ! evt.detail.box) return; // is wheel zoom --> fired before actual zoom
 		const box = evt?.detail?.box ?? (evt && typeof evt.x2 === "number" ? evt : this.canvas.viewbox());
 
 		this.paper.move(box.x, box.y);

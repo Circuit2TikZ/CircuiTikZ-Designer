@@ -336,6 +336,10 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 			opacity 0.4s;
 		z-index: -1;
 
+		@media (pointer: coarse) {
+			opacity: 1 !important;
+		}
+
 		li {
 			z-index: 0;
 			display: flex;
@@ -355,6 +359,10 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 			&.btn {
 				opacity: 0;
 				transition: opacity 0.4s ease-in;
+
+				@media (pointer: coarse) {
+					opacity: 1 !important;
+				}
 
 				&.shown {
 					opacity: 1;

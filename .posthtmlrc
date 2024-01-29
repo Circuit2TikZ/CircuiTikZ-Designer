@@ -3,5 +3,9 @@
 		"posthtml-include": {
 			"root": "src"
 		}
+	},
+	"comment": {
+		"recognizeSelfClosing": true,
+		"lowerCaseAttributeNames": false
 	}
 }

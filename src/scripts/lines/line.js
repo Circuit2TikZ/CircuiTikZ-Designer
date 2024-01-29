@@ -220,7 +220,8 @@ export default class Line extends SVG.Polyline {
 		const lambda =
 			(lineVector.x * helpVector.x + lineVector.y * helpVector.y) / (lineVector.x ** 2 + lineVector.y ** 2);
 
-		if (lambda <= 0) return pt.distanceSquared(lineStart); // Point before line
+		if (lambda <= 0)
+			return pt.distanceSquared(lineStart); // Point before line
 		else if (lambda >= 1) return pt.distanceSquared(lineEnd); // Point after line
 
 		// orthogonalProjection: lineVector * lambda + lineStart

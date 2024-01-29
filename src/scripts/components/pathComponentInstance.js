@@ -4,6 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
+import CanvasController from "../controllers/canvasController";
 import PathComponentSymbol from "./pathComponentSymbol";
 import SnapController from "../snapDrag/snapController";
 import SnapCursorController from "../snapDrag/snapCursor";
@@ -18,6 +19,9 @@ export default class PathComponentInstance extends SVG.G {
 	symbol;
 	/** @type {SVG.Use} */
 	symbolUse;
+
+	/** @type {boolean} */
+	static #hasMouse = matchMedia("(pointer:fine)").matches;
 
 	/** @type {SVG.PointArray} */
 	#prePointArray;
@@ -77,9 +81,10 @@ export default class PathComponentInstance extends SVG.G {
 		});
 
 		this.container.node.classList.add("selectPoint");
-		SnapCursorController.controller.visible = true;
-		this.container.on("mousemove", this.#moveListener, this);
-		this.container.on("click", this.#clickListener, this);
+		SnapCursorController.controller.visible = PathComponentInstance.#hasMouse;
+		CanvasController.controller.deactivatePanning();
+		this.container.on(["mousemove", "touchmove"], this.#moveListener, this);
+		this.container.on(["click", "touchstart", "touchend"], this.#clickListener, this);
 
 		// add snap points for other components
 		this.#midAbs = new SVG.Point(0, 0);
@@ -149,42 +154,53 @@ export default class PathComponentInstance extends SVG.G {
 
 	/**
 	 * Listener for the first and second click/touch. Used for initial adding of the component.
-	 * @param {MouseEvent} event
+	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#clickListener(event) {
-		let pt = this.#pointerEventToPoint(event);
+		const isTouchEvent = window.TouchEvent && event instanceof TouchEvent && event.changedTouches.length === 1;
+		const isTouchEnd = isTouchEvent && event.touches.length === 0;
+		const isTouchStart =
+			isTouchEvent &&
+			event.touches.length === 1 &&
+			event.touches[0].identifier === event.changedTouches[0].identifier;
+		if (isTouchEvent && !isTouchStart && !isTouchEnd) return; // invalid; maybe more then one finger on screen
+
+		const pt = CanvasController.controller.pointerEventToPoint(event);
 		const snappedPoint =
 			event.shiftKey || event.detail.event?.shiftKey
 				? pt
 				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 
-		if (this.#pointsSet === 0) {
+		if (this.#pointsSet === 0 && (!isTouchEvent || isTouchStart)) {
 			this.#prePointArray[0][0] = snappedPoint.x;
 			this.#prePointArray[0][1] = snappedPoint.y;
 			this.#pointsSet = 1;
 			this.show();
 			SnapCursorController.controller.visible = false;
-		} else {
-			this.container.off("click", this.#clickListener);
-			this.container.off("mousemove", this.#moveListener);
+		} else if (!isTouchEvent || isTouchEnd) {
+			this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
+			this.container.off(["mousemove", "touchmove"], this.#moveListener);
 			this.container.node.classList.remove("selectPoint");
 			this.#pointsSet = 2;
 			const angle = this.#recalcPointsEnd(snappedPoint);
 			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+
+			event.preventDefault();
+			CanvasController.controller.activatePanning();
 		}
 	}
 
 	/**
 	 * Redraw the component on mouse move. Used for initial adding of the component.
-	 * @param {MouseEvent} event
+	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#moveListener(event) {
-		let pt = this.#pointerEventToPoint(event);
+		let pt = CanvasController.controller.pointerEventToPoint(event);
 		const snappedPoint =
 			event.shiftKey || event.detail.event?.shiftKey
 				? pt
 				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
-		if (this.#pointsSet === 0) {
+		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.move(snappedPoint);
 		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
 	}
@@ -218,15 +234,5 @@ export default class PathComponentInstance extends SVG.G {
 		this.#postLine.plot(this.#postPointArray);
 
 		return angle;
-	}
-
-	/**
-	 * Converts a point from an event to the SVG coordinate system.
-	 *
-	 * @param {PointerEvent|MouseEvent} event
-	 * @returns {SVG.Point}
-	 */
-	#pointerEventToPoint(event) {
-		return this.container.point(event.clientX, event.clientY);
 	}
 }

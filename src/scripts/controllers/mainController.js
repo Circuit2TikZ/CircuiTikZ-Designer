@@ -4,7 +4,6 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas } from "bootstrap";
-import { Button as _mdbButton } from "mdb-ui-kit";
 
 import "../utils/impSVGNumber";
 import CanvasController from "./canvasController";
@@ -263,6 +262,7 @@ export default class MainController {
 				addButton.title = symbol.displayName || symbol.tikzName;
 
 				const listener = (ev) => {
+					ev.preventDefault();
 					let newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
 					this.addInstance(newInstance);
 					leftOffcanvasOC.hide();

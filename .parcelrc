@@ -21,5 +21,8 @@
 		"*.{sass,scss}": [
 			"@parcel/transformer-sass"
 		]
+	},
+	"optimizers": {
+		"*.{jpg,jpeg,png,svg}": []
 	}
 }

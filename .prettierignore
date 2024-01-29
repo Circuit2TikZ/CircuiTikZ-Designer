@@ -2,3 +2,6 @@
 /xmlSchema/namespace.xsd
 /xmlSchema/svg.xsd
 /xmlSchema/xlink.xsd
+
+# don't check icons
+/src/icons/

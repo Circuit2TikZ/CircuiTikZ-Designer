@@ -39,6 +39,8 @@ export default class NodeComponentInstance extends SVG.Use {
 	#angleDeg = 0;
 	/** @type {SnapPoint[]} */
 	snappingPoints;
+	/** @type {SVG.Point[]} */
+	relSnappingPoints;
 
 	/**
 	 * @typedef {object} DragHandler
@@ -56,7 +58,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @param {NodeComponentSymbol} symbol - the symbol to use
 	 * @param {SVG.Container} container - the container to add the instance to
-	 * @param {MouseEvent} [event] - the event which triggered the adding
+	 * @param {MouseEvent|TouchEvent} [event] - the event which triggered the adding
 	 */
 	constructor(symbol, container, event) {
 		super();
@@ -68,15 +70,16 @@ export default class NodeComponentInstance extends SVG.Use {
 		this.container.add(this);
 
 		this.#recalculateBoxDimensions();
+		this.#recalculateRelSnappingPoints();
 
 		this.node.classList.add("draggable");
-		this.on("dragstart", this.#dragStart, this, { passive: true });
 		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, true);
 
-		if (event && event instanceof MouseEvent) {
+		if (event) {
 			//  && event.type.includes("mouse")
 			// 1st: move symbol to curser pos
-			let pt = new SVG.Point(event.clientX, event.clientY);
+			let clientPoint = event instanceof MouseEvent ? event : event?.touches[0] || { clientX: 0, clientY: 0 };
+			let pt = new SVG.Point(clientPoint.clientX, clientPoint.clientY);
 			pt = pt.transform(this.screenCTM().inverseO());
 			this.move(pt.x, pt.y);
 
@@ -85,6 +88,8 @@ export default class NodeComponentInstance extends SVG.Use {
 			let dh = this.remember("_draggable");
 
 			dh.startDrag(event);
+
+			// Prevent immediate dragend --> 200ms delay before recognizing dragend
 			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
 			const endEventNameScoped = endEventName + ".drag";
 			SVG.off(window, endEventNameScoped, dh.endDrag);
@@ -98,13 +103,13 @@ export default class NodeComponentInstance extends SVG.Use {
 			};
 
 			timeout = window.setTimeout(addDragEndHandler, 200);
+			// dragend event occurred? --> listen for next one
 			window.addEventListener(endEventName, addDragEndHandler, { passive: false });
 		}
 
 		this.snappingPoints = this.symbol._pins.map(
 			(pin) => new SnapPoint(this, pin.name, this.#midAbs, pin, this.#angleDeg, true)
 		);
-		this.on("dragend", this.#dragEnd, this, { passive: true });
 
 		// init context menus
 		if (!NodeComponentInstance.#contextMenu) {
@@ -129,7 +134,7 @@ export default class NodeComponentInstance extends SVG.Use {
 
 		this.on(
 			"contextmenu",
-			(/** @type {MouseEvent} */ evt) => {
+			(/** @type {PointerEvent} */ evt) => {
 				evt.preventDefault();
 				let result = NodeComponentInstance.#contextMenu.openForResult(evt.clientX, evt.clientY);
 				result
@@ -148,7 +153,7 @@ export default class NodeComponentInstance extends SVG.Use {
 								console.log("Not implemented: " + res);
 						}
 					})
-					.catch(() => {});
+					.catch(() => {}); // closed without clicking on item
 			},
 			this
 		);
@@ -229,7 +234,7 @@ export default class NodeComponentInstance extends SVG.Use {
 		this.#midAbs.x = x;
 		this.#midAbs.y = y;
 
-		// don't call recalculateRelSnappingPoints here; #dragEnd does call this method instead
+		// don't call recalculateSnappingPoints here; #dragEnd does call this method instead
 
 		if (this.#angleDeg === 0) {
 			super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
@@ -252,6 +257,7 @@ export default class NodeComponentInstance extends SVG.Use {
 		// recalculate box width & height
 		this.#recalculateBoxDimensions();
 		this.#recalculateRelSnappingPoints();
+		this.recalculateSnappingPoints();
 
 		if (this.#angleDeg === 0) {
 			super.attr("transform", null);
@@ -305,9 +311,18 @@ export default class NodeComponentInstance extends SVG.Use {
 	}
 
 	/**
-	 * Recalculate the snapping points, which are used by other symbols.
+	 * Recalculate the snapping points, which are used to snap this symbol to the grid.
 	 */
 	#recalculateRelSnappingPoints() {
+		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point);
+		if (this.#angleDeg !== 0)
+			this.relSnappingPoints = this.relSnappingPoints.map((point) => point.rotate(this.#angleDeg));
+	}
+
+	/**
+	 * Recalculate the snapping points, which are used by other symbols.
+	 */
+	recalculateSnappingPoints() {
 		for (const snapPoint of this.snappingPoints) snapPoint.recalculate(null, this.#angleDeg);
 	}
 
@@ -336,24 +351,5 @@ export default class NodeComponentInstance extends SVG.Use {
 			this.#boxWidth,
 			this.#boxHeight
 		);
-	}
-
-	//- listener -------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Listener for the "dragstart" event. Changes the cursor symbol using the class "dragging".
-	 */
-	#dragStart() {
-		this.node.classList.add("dragging");
-		this.container.node.classList.add("dragging");
-	}
-
-	/**
-	 * Listener for the "dragend" event. Undo the cursor change from {@link "#dragStart"}.
-	 */
-	#dragEnd() {
-		this.node.classList.remove("dragging");
-		this.container.node.classList.remove("dragging");
-		this.#recalculateRelSnappingPoints();
 	}
 }

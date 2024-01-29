@@ -20,6 +20,8 @@ export default class LineDrawer {
 	#mainController;
 	/** @type {SVG.Svg} */
 	#canvas;
+	/** @type {boolean} */
+	#hasMouse;
 
 	/** @type {?Line} */
 	#newLine;
@@ -44,6 +46,7 @@ export default class LineDrawer {
 	constructor(mainController) {
 		this.#mainController = mainController;
 		this.#canvas = this.#mainController.canvasController.canvas;
+		this.#hasMouse = matchMedia("(pointer:fine)").matches;
 	}
 
 	/**
@@ -55,6 +58,8 @@ export default class LineDrawer {
 		this.#onCancel();
 		// unregister move listener
 		this.#canvas.off("mousemove", this.#moveListener);
+		this.#canvas.off("touchmove", this.#moveListener);
+		this.#canvas.off("touchend", this.#clickListener);
 		this.#canvas.off("click", this.#clickListener);
 		SnapCursorController.controller.visible = false;
 		this.#canvas.node.classList.remove("selectPoint");
@@ -68,9 +73,11 @@ export default class LineDrawer {
 	activate() {
 		this.#resetVars();
 		this.#canvas.on("click", this.#clickListener, this);
+		this.#canvas.on("touchend", this.#clickListener, this);
+		this.#canvas.on("touchmove", this.#moveListener, this);
 		this.#canvas.on("mousemove", this.#moveListener, this);
 		this.#canvas.node.classList.add("selectPoint");
-		SnapCursorController.controller.visible = true;
+		SnapCursorController.controller.visible = this.#hasMouse;
 
 		// init FAB
 		FABcontroller.controller.setButtons(
@@ -92,10 +99,22 @@ export default class LineDrawer {
 	/**
 	 * Listener for clicks to add new Lines or add points to lines.
 	 *
-	 * @param {MouseEvent} event
+	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#clickListener(event) {
-		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
+		//
+		let clientPt =
+			event instanceof MouseEvent
+				? event
+				: window.TouchEvent &&
+					  event instanceof TouchEvent &&
+					  event.touches.length === 0 &&
+					  event.changedTouches.length === 1
+					? event.changedTouches[0]
+					: null;
+		if (!clientPt) return;
+		const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
+
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 
 		if (!this.#lastPoint) {
@@ -145,7 +164,7 @@ export default class LineDrawer {
 		if (this.#newLine) this.#newLine.remove();
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
-		SnapCursorController.controller.visible = true;
+		SnapCursorController.controller.visible = this.#hasMouse;
 	}
 
 	/**
@@ -158,7 +177,7 @@ export default class LineDrawer {
 
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
-		SnapCursorController.controller.visible = true;
+		SnapCursorController.controller.visible = this.#hasMouse;
 	}
 
 	/**
@@ -177,10 +196,18 @@ export default class LineDrawer {
 
 	/**
 	 * Listener for mouse movements. Does update the "SnapCursor" or the currently drawn line.
-	 * @param {MouseEvent} event
+	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#moveListener(event) {
-		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
+		// (mousemove) || (TouchMove)
+		let clientPt =
+			event instanceof MouseEvent
+				? event
+				: window.TouchEvent && event instanceof TouchEvent && event.touches.length === 1
+					? event.touches[0]
+					: null;
+		if (!clientPt) return;
+		const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 		if (!this.#newLine) {
 			SnapCursorController.controller.move(snappedPoint);
@@ -199,8 +226,8 @@ export default class LineDrawer {
 				}
 			} else {
 				// no initial direction set --> evaluate delta to last point
-				const deltaX = snappedPoint.x - this.#lastPoint.x;
-				const deltaY = snappedPoint.y - this.#lastPoint.y;
+				const deltaX = Math.abs(snappedPoint.x - this.#lastPoint.x);
+				const deltaY = Math.abs(snappedPoint.y - this.#lastPoint.y);
 				this.#horizontalFirst = deltaX > deltaY;
 				this.#holdDirectionSet = true;
 			}

@@ -60,18 +60,18 @@ export default class ContextMenu {
 
 	/**
 	 *
-	 * @param {MouseEvent} evt
+	 * @param {MouseEvent|TouchEvent} evt
 	 */
 	onMenuEntryClick(evt) {
 		if (evt.target === this.menuElement) return;
-		if (!evt.currentTarget?.value || evt.currentTarget.ariaDisabled) {
+		if (!evt.target?.value || evt.target.ariaDisabled) {
 			this.onCancel();
 			return;
-		}
+		} else if (window.TouchEvent && evt instanceof TouchEvent) evt.preventDefault(); // prevent following click event
 
 		let callback = this.#onSuccessCallback;
 		this.#reset();
-		if (callback) callback(evt.currentTarget.value);
+		if (callback) callback(evt.target.value);
 	}
 
 	onCancel() {
@@ -84,6 +84,7 @@ export default class ContextMenu {
 		this.#onSuccessCallback = null;
 		this.#onCancelCallback = null;
 		document.body.removeEventListener("click", this.onMenuEntryClick);
+		document.body.removeEventListener("touchend", this.onMenuEntryClick);
 		this.menuElement.classList.remove("show");
 	}
 
@@ -105,6 +106,7 @@ export default class ContextMenu {
 
 		// if user clicks anywhere except the contextMenu
 		document.body.addEventListener("click", this.onMenuEntryClick, { passive: true });
+		document.body.addEventListener("touchend", this.onMenuEntryClick, { passive: false }); // needed to recognize touches outside the contextmenu
 
 		this.menuElement.style.left = x + "px";
 		this.menuElement.style.top = y + "px";

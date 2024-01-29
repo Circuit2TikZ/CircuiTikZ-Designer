@@ -5,4 +5,4 @@
 
 import MainController from "./controllers/mainController.js";
 
-window.mainController = new MainController();
+window.mainController = MainController.controller;

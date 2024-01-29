@@ -194,7 +194,7 @@ export default class ComponentSymbol extends SVG.Symbol {
 
 		anchor.point = new SVG.Point(
 			SVG.Number.ensureInPx(anchor.x),
-			-SVG.Number.ensureInPx(anchor.y) // tikz y direction != svg y direction
+			SVG.Number.ensureInPx(anchor.y)
 		);
 
 		if (anchor.isDefault) this._defaultAnchor = anchor;

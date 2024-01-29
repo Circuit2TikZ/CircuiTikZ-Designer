@@ -2,6 +2,10 @@
  * @module FABcontroller
  */
 
+import { Button as _mdbButton, Ripple as _ripple } from "mdb-ui-kit";
+
+// initMDB({ mdbButton, Ripple });
+
 /**
  * @typedef {object} ButtonDescription
  * @property {string} icon

@@ -7,11 +7,12 @@
 	"author": "Manuel Kirzinger",
 	"source": "src/pages/index.html",
 	"scripts": {
-		"build": "parcel build --no-content-hash",
-		"prettier-lint": "prettier --check --config .prettierrc --log-level log '**/*.{js,ts,mjs,cjs,json,jsonc,html,htm,css,scss,xml,xsd,svg}'",
-		"start": "parcel serve --lazy",
+		"build": "parcel build --public-url ./",
 		"html-lint": "scripts/validateHTML.mjs",
-		"lint": "npm run html-lint"
+		"lint": "npm run prettier-lint && npm run html-lint",
+		"prepack": "npm run build",
+		"prettier-lint": "prettier --check --config .prettierrc --log-level log '**/*.{js,ts,mjs,cjs,json,jsonc,html,htm,css,scss,xml,xsd,svg}'",
+		"start": "parcel serve --lazy"
 	},
 	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"dependencies": {
@@ -20,6 +21,7 @@
 		"@svgdotjs/svg.panzoom.js": "^2.1.2",
 		"bootstrap": "^5.3.2",
 		"file-saver": "^2.0.5",
+		"material-symbols": "^0.14.5",
 		"mdb-ui-kit": "^6.4.2"
 	},
 	"devDependencies": {
@@ -38,9 +40,7 @@
 		"@types/bootstrap": "^5.2.8",
 		"@types/file-saver": "^2.0.7",
 		"@types/html-validator": "^5.0.5",
-		"@xml-tools/validation": "^1.0.16",
 		"html-validator": "^6.0.1",
-		"npm-run-all": "^4.1.5",
 		"parcel": "^2.9.3",
 		"posthtml-include": "^1.7.4",
 		"prettier": "^3.0.0",
