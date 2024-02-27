@@ -14,7 +14,7 @@ The following features are planed:
 * component search function
 * cancel path command via keyboard
 * cancel path button always visible
-* anchor/snap points of some components not correct (i.e. nground)
+* anchor/snap points of some components not correct (e.g. nground)
 * symbol name / description
 * component settings (e.g. switch angle)
 * change grid size
@@ -23,7 +23,7 @@ The following features are planed:
 * mirror components
 * top banner with logo and name
 
-## How to use locally via VSCode
+## How to use locally in VSCode
 
 * install node.js from http://nodejs.org
 * clone repo
