@@ -3,25 +3,9 @@
 
 PWA GUI for CircuiTikZ available at https://ussi.e-technik.uni-erlangen.de/tikz/
 
-## Feature List
+## Bugs and Features
 
-The following features are planed:
-
-* move path components
-* move wire endpoints
-* implement keyboard shortcuts for basic control and most frequently used components
-* legend/help
-* component search function
-* cancel path command via keyboard
-* cancel path button always visible
-* anchor/snap points of some components not correct (e.g. nground)
-* symbol name / description
-* component settings (e.g. switch angle)
-* change grid size
-* additional anchor points for node components
-* select multiple components and move/rotate
-* mirror components
-* top banner with logo and name
+see under `Issues`
 
 ## How to use locally in VSCode
 
