@@ -330,7 +330,7 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 		margin: 0;
 		margin-bottom: 0;
 		text-align: center;
-		opacity: 0;
+		opacity: 1;
 		transition:
 			transform 0.4s,
 			opacity 0.4s;
@@ -355,23 +355,23 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 			}
 		}
 
-		a {
-			&.btn {
-				opacity: 0;
-				transition: opacity 0.4s ease-in;
+		// a {
+		// 	&.btn {
+		// 		opacity: 0;
+		// 		transition: opacity 0.4s ease-in;
 
-				@media (pointer: coarse) {
-					opacity: 1 !important;
-				}
+		// 		@media (pointer: coarse) {
+		// 			opacity: 1 !important;
+		// 		}
 
-				&.shown {
-					opacity: 1;
-				}
-			}
-		}
+		// 		&.shown {
+		// 			opacity: 1;
+		// 		}
+		// 	}
+		// }
 	}
 
-	&.active ul {
+	& ul {
 		opacity: 1;
 	}
 }
