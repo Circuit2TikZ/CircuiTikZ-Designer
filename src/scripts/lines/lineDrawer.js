@@ -144,9 +144,8 @@ export default class LineDrawer {
 				this.#lastLineDirection.up = false;
 				this.#lastLineDirection.down = false;
 			}
-
-			FABcontroller.controller.visible = true;
 		}
+		FABcontroller.controller.visible = true;
 	}
 
 	/**
@@ -172,8 +171,12 @@ export default class LineDrawer {
 	 */
 	#lineEnd() {
 		this.#newLine.removeMousePoint();
-
-		this.#mainController.addLine(this.#newLine);
+		// only add a new line if it has more than one point (necessary sind cancel and accept button show even at one point)
+		if (this.#newLine.array().length>1) {
+			this.#mainController.addLine(this.#newLine);
+		}else{
+			this.#newLine.remove();
+		}
 
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
