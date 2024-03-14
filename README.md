@@ -7,7 +7,7 @@ PWA GUI for CircuiTikZ available at https://ussi.e-technik.uni-erlangen.de/tikz/
 
 see under `Issues`
 
-## How to use locally in VSCode
+## How to use locally (e.g. in VSCode)
 
 * install node.js from http://nodejs.org
 * clone repo
