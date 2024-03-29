@@ -1,8 +1,10 @@
 
 # CircuiCanvas
 
-PWA GUI for CircuiTikZ available at https://ussi.e-technik.uni-erlangen.de/tikz/
+PWA GUI for CircuiTikZ. A current build is available at [https://ussi.e-technik.uni-erlangen.de/tikz/](https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa) and can be used for your designs.
 
+See the whole project explanation under [https://ussi.e-technik.uni-erlangen.de/
+](https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa)
 ## Bugs and Features
 
 see under `Issues`
