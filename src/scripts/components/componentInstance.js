@@ -42,3 +42,5 @@
  *
  * @returns {string} the serialized instance
  */
+
+// TODO add cancel function with right click/Esc when adding a new component
