@@ -102,6 +102,25 @@ export default class MainController {
 
 		// Prevent "normal" browser menu
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
+		
+		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
+		document.body.addEventListener('keyup', (e) => {
+			// console.log(e.code)
+			switch (e.code) {
+				case 'Escape':
+					this.#switchMode(MainController.modes.DRAG_PAN);
+					break;
+				case 'KeyW':
+					this.#switchMode(MainController.modes.DRAW_LINE);
+					break;
+				case 'Delete':
+				case 'KeyE':
+					this.#switchMode(MainController.modes.ERASE);
+					break;
+				default:
+					break;
+			}
+		}, false);
 	}
 
 	/**

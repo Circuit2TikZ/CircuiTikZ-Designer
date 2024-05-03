@@ -72,6 +72,8 @@ export default class LineDrawer {
 	 */
 	activate() {
 		this.#resetVars();
+		this.#canvas.on("contextmenu", this.#onCancel, this)
+		this.#canvas.on("dblclick", this.#onOK, this)
 		this.#canvas.on("click", this.#clickListener, this);
 		this.#canvas.on("touchend", this.#clickListener, this);
 		this.#canvas.on("touchmove", this.#moveListener, this);
