@@ -57,6 +57,8 @@ export default class LineDrawer {
 	deactivate() {
 		this.#onCancel();
 		// unregister move listener
+		this.#canvas.off("contextmenu", this.#onCancel)
+		this.#canvas.off("dblclick", this.#onOK)
 		this.#canvas.off("mousemove", this.#moveListener);
 		this.#canvas.off("touchmove", this.#moveListener);
 		this.#canvas.off("touchend", this.#clickListener);
