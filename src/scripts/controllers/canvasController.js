@@ -63,6 +63,15 @@ export default class CanvasController {
 	/** @type {?SVG.Matrix} */
 	#invScreenCTM = null;
 
+	/** zoom parameters; small zoomFactor for more granular control
+	 * @type {float}
+	 */
+	zoomFactor = 0.1;
+	/**@type {float} */
+	zoomMin = 0.25;
+	/**@type {float} */
+	zoomMax = 10;
+
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
@@ -129,8 +138,9 @@ export default class CanvasController {
 			wheelZoom: true,
 			panButton: 99, // deactivates panning using any mouse button
 			oneFingerPan: false,
-			zoomMin: 0.25,
-			zoomMax: 10, // dbg; default 5
+			zoomFactor: this.zoomFactor,
+			zoomMin: this.zoomMin,
+			zoomMax: this.zoomMax, // dbg; default 5
 		});
 
 		// Listens for same event as svg.panzoom.js, but is added thereafter. Thus this gets called after panzoom is
@@ -155,8 +165,9 @@ export default class CanvasController {
 			wheelZoom: true,
 			// panButton: 0,
 			oneFingerPan: true,
-			zoomMin: 0.25,
-			zoomMax: 10,
+			zoomFactor: this.zoomFactor,
+			zoomMin: this.zoomMin,
+			zoomMax: this.zoomMax,
 		});
 
 		// Listens for same event as svg.panzoom.js, but is added thereafter. Thus this gets called after panzoom is
