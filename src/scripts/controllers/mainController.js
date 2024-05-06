@@ -123,21 +123,20 @@ export default class MainController {
 		}, false);
 
 		// handle shortcuts for adding components
-		// shortcutDict maps the Shortcut keycode to the title attribute of the html element where the callback can be found
+		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
 		var shortcutDict = {
-			"KeyG":"ground",
-			"KeyR":"resistor",
-			"KeyC":"capacitor",
-			"KeyL":"inductor (american)",
-			"KeyZ":"jump crossing",
-			"KeyX":"plain crossing",
-			"Period":"circ",
-			"KeyT":"nmos",
+			"g":"ground",
+			"r":"resistor",
+			"c":"capacitor",
+			"l":"inductor (american)",
+			"z":"jump crossing",
+			"x":"plain crossing",
+			".":"circ",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		document.body.addEventListener('keyup', (e) => {
 			if (this.mode == MainController.modes.DRAG_PAN) {
-				var componentTitleName = shortcutDict[e.code]
+				var componentTitleName = shortcutDict[e.key]
 				if(componentTitleName){
 					var componentButton = document.querySelector('[title="'+componentTitleName+'"]')
 					var clickEvent = new MouseEvent('mousedown',{view:window,bubbles:true,cancelable:true,});

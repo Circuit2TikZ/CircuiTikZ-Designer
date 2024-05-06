@@ -1,31 +1,50 @@
 
 # CircuiCanvas
 
-PWA GUI for CircuiTikZ available at https://ussi.e-technik.uni-erlangen.de/tikz/
+PWA GUI for CircuiTikZ. A current build is available at [https://ussi.e-technik.uni-erlangen.de/tikz/](https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa) and can be used for your designs.
 
-## Feature List
+See the whole project explanation under [https://ussi.e-technik.uni-erlangen.de/
+](https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa)
+## Bugs and Features
 
-The following features are planed:
+see under `Issues`
 
-* move path components
-* move wire endpoints
-* implement keyboard shortcuts for basic control and most frequently used components
-* legend/help
-* component search function
-* cancel path command via keyboard
-* cancel path button always visible
-* anchor/snap points of some components not correct (e.g. nground)
-* symbol name / description
-* component settings (e.g. switch angle)
-* change grid size
-* additional anchor points for node components
-* select multiple components and move/rotate
-* mirror components
-* top banner with logo and name
+## Shortcuts
 
-## How to use locally in VSCode
+* Change tool:
+    * Pan and zoom (Esc)
+    * Draw wire (W)
+    * Erase component/wire (E/Del)
+* Draw wire
+    * Cancel drawing (right mouse click)
+    * Finish drawing (double left mouse click)
+* Add components when in Pan/zoom mode:
+    * Ground (G)
+    * Resistor (R)
+    * Capacitor (C)
+    * (American) inductor (L)
+    * Jump crossing (Z)
+    * Plain crossing (X)
+    * Circle crossing (.)
+
+## How to use locally (e.g. in VSCode)
 
 * install node.js from http://nodejs.org
 * clone repo
-* run "npm install" in the terminal in project directory to install dependencies
-* run "npm run start" in the terminal to host the website on localhost
+* run `npm install` in the terminal in project directory to install dependencies
+* run `npm run start` in the terminal to host the website on localhost
+
+## How to build for server
+
+
+* run `npm run build`
+* copy created directory to server  (build/ oder dist/) 
+
+It is possible to test it localy before upload to server by:
+
+* `npm install -g http-server`
+* `cd path/to/your/dist`
+* `run "http-server`
+* open server at `http://localhost:8080`
+
+Detailed explanation: https://chat.openai.com/share/285fc488-fbef-44b4-9c4f-6f40c970f413
