@@ -105,7 +105,10 @@ export default class MainController {
 		
 		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
 		document.body.addEventListener('keyup', (e) => {
-			// console.log(e.code)
+			// shouldn't active if altkey, ctrl or shift is pressed
+			if (e.altKey || e.ctrlKey || e.shiftKey) {
+				return;
+			}
 			switch (e.code) {
 				case 'Escape':
 					this.#switchMode(MainController.modes.DRAG_PAN);
