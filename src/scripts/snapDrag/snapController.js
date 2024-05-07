@@ -3,6 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
+import CanvasController from "../controllers/canvasController";
 
 /** @typedef {SVG.Point|{x: number, y: number}} PointAlike */
 
@@ -63,8 +64,9 @@ export default class SnapController {
 	 */
 	snapPoint(pos, relSnapPoints) {
 		// 1. Calculate grid snap points
+		const canvasController = CanvasController.controller;
 		/** @type {SVG.Number} */
-		const gridSpacing = new SVG.Number(0.25, "cm").convertToUnit("px");
+		const gridSpacing = new SVG.Number(canvasController.majorGridDistance/canvasController.minorToMajorGridPoints, "cm").convertToUnit("px");
 		let relSnapPointsMinX = relSnapPoints[0].x,
 			relSnapPointsMaxX = relSnapPoints[0].x,
 			relSnapPointsMinY = relSnapPoints[0].y,

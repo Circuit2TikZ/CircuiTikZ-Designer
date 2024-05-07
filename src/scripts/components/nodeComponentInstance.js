@@ -154,6 +154,7 @@ export default class NodeComponentInstance extends SVG.Use {
 						}
 					})
 					.catch(() => {}); // closed without clicking on item
+					evt.stopPropagation();
 			},
 			this
 		);

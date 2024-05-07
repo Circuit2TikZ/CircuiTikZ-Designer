@@ -4,6 +4,8 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
+import ContextMenu from "../controllers/contextMenu";
+import MainController from "./mainController";
 
 /**
  * @typedef {object} PanningEventDetail
@@ -54,6 +56,20 @@ export default class CanvasController {
 	 */
 	yAxis;
 
+	/** Context menu for changing the grid
+	 * @type {ContextMenu}
+	 */
+	static #contextMenu = null;
+
+	/** Distance between major grid lines
+	 * @type {float}
+	 */
+	majorGridDistance = 1;
+	/** How many minor grid lines are drawn for every major grid line
+	 * @type {int}
+	 */
+	minorToMajorGridPoints = 4;
+
 	/**
 	 * Needed for window size changes to reconstruct the old zoom level.
 	 * @type {?DOMRect}
@@ -98,6 +114,47 @@ export default class CanvasController {
 		// Mouse wheel OR pinch zoom
 		// Wheel zoom is fired before the actual change and has no detail.box and is thus ignored. It will be handled by wheel.panZoom.
 		canvas.on("zoom", this.#movePaper, this, { passive: true });
+
+	
+		// init context menus
+		if (!CanvasController.#contextMenu) {
+			let gridContextEntries = [];
+			const gridSpacings = [0.2,0.25,0.5,1,2];
+			gridSpacings.forEach(element => {
+				gridContextEntries.push({
+					result: element.toString(),
+					text: `Grid ${element} cm`,
+					iconText:"",
+				})
+			});
+	
+			const gridMul = [1,2,4,5,8,10];
+			gridMul.forEach(element => {
+				gridContextEntries.push({
+					result: (-element).toString(),
+					text: `Grid ratio: ${element}`,
+					iconText:"",
+				})
+			});
+			CanvasController.#contextMenu = new ContextMenu(gridContextEntries);
+		}
+
+		canvas.on('contextmenu', (evt)=>{
+			evt.preventDefault();
+			let result = CanvasController.#contextMenu.openForResult(evt.clientX, evt.clientY)
+			result.then((res) => {
+				let gridNum = parseFloat(res);
+				if (gridNum>0) {
+					// large spacing
+					this.changeGrid(gridNum, this.minorToMajorGridPoints);
+				}else if (gridNum<0) {
+					// grid line ratio
+					this.changeGrid(this.majorGridDistance, -gridNum);
+				}
+			})
+			.catch(() => {}); // closed without clicking on item
+			evt.stopPropagation();
+		});
 
 		// Modify point, viewbox and zoom functions to cache the inverse screen CTM (document -> viewport coords)
 		/**
@@ -187,6 +244,36 @@ export default class CanvasController {
 		//               /----------------\    /-----------------------\    /---\
 		const clientXY = event.touches?.[0] ?? event.changedTouches?.[0] ?? event;
 		return this.canvas.point(clientXY.clientX, clientXY.clientY);
+	}
+
+
+	/** how the grid should be drawn
+	 * @param {number} minorGridDistance the distance between two major grid lines in cm
+	 * @param {int} minorToMajorGridPoints how many minor grid lines are drawn per major grid line (>=1)
+	 */
+	changeGrid(majorGridDistance, minorToMajorGridPoints){
+		minorToMajorGridPoints = minorToMajorGridPoints>0?minorToMajorGridPoints:1;
+		this.minorToMajorGridPoints = minorToMajorGridPoints;
+		this.majorGridDistance = majorGridDistance;
+		let minorGridDistance = majorGridDistance/minorToMajorGridPoints;
+		const snapDistanceNum = new SVG.Number(minorGridDistance, "cm").toString();
+		const snapDistancePx = new SVG.Number(minorGridDistance, "cm").convertToUnit("px").value;
+		const majorDistanceNum = new SVG.Number(majorGridDistance, "cm").toString();
+		const majorDistancePx = new SVG.Number(majorGridDistance, "cm").convertToUnit("px").value;
+
+		// change small grid
+		const minorGrid = document.getElementById("smallGridPattern");
+		minorGrid.setAttribute("width", snapDistanceNum);
+		minorGrid.setAttribute("height", snapDistanceNum);
+		minorGrid.children[0]?.setAttribute("d",`M ${snapDistancePx} 0 L 0 0 0 ${snapDistancePx}`);
+
+		// change large grid
+		const majorGrid = document.getElementById("gridPattern");
+		majorGrid.setAttribute("width", majorDistanceNum);
+		majorGrid.setAttribute("height", majorDistanceNum);
+		majorGrid.children[0]?.setAttribute("width",majorDistanceNum);
+		majorGrid.children[0]?.setAttribute("height",majorDistanceNum);
+		majorGrid.children[1]?.setAttribute("d",`M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`);
 	}
 
 	/**
