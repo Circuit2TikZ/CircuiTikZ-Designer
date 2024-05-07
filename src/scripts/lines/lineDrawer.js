@@ -64,6 +64,7 @@ export default class LineDrawer {
 		this.#canvas.off("touchend", this.#clickListener);
 		this.#canvas.off("click", this.#clickListener);
 		SnapCursorController.controller.visible = false;
+		SnapController.controller.hideSnapPoints();
 		this.#canvas.node.classList.remove("selectPoint");
 	}
 
@@ -82,6 +83,7 @@ export default class LineDrawer {
 		this.#canvas.on("mousemove", this.#moveListener, this);
 		this.#canvas.node.classList.add("selectPoint");
 		SnapCursorController.controller.visible = this.#hasMouse;
+		SnapController.controller.showSnapPoints();
 
 		// init FAB
 		FABcontroller.controller.setButtons(

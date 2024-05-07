@@ -82,6 +82,7 @@ export default class PathComponentInstance extends SVG.G {
 
 		this.container.node.classList.add("selectPoint");
 		SnapCursorController.controller.visible = PathComponentInstance.#hasMouse;
+		SnapController.controller.showSnapPoints();
 		CanvasController.controller.deactivatePanning();
 		this.container.on(["mousemove", "touchmove"], this.#moveListener, this);
 		this.container.on(["click", "touchstart", "touchend"], this.#clickListener, this);
@@ -187,6 +188,7 @@ export default class PathComponentInstance extends SVG.G {
 
 			event.preventDefault();
 			CanvasController.controller.activatePanning();
+			SnapController.controller.hideSnapPoints();
 		}
 	}
 

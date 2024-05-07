@@ -127,6 +127,8 @@ export default class svgSnapDragHandler {
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
 
+		SnapController.controller.showSnapPoints();
+
 		// is TouchEvent?
 		this.#maybeContextmenu = window.TouchEvent && event.detail?.event instanceof TouchEvent;
 	}
@@ -166,6 +168,8 @@ export default class svgSnapDragHandler {
 	#dragEnd(event) {
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");
+
+		SnapController.controller.hideSnapPoints();
 
 		if (this.#maybeContextmenu && event.detail?.event instanceof TouchEvent) {
 			const clientXY = event.detail.event.touches?.[0] ?? event.detail.event.changedTouches?.[0];
