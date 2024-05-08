@@ -6,6 +6,44 @@
 	width: 33.3vw;
 }
 
+.offcanvas-search {
+	position: relative;
+	margin-bottom: 16px;
+
+	span {
+		position:absolute;
+		top: calc(50% - 12px);
+		left:13px;
+	}
+
+	input {
+		display: block;
+		width: 100%;
+		padding-left: 50px;
+	}
+}
+
+// fix style when searching for symbols of first shown group
+.accordion-item:nth-child(1 of :not(.d-none)) {
+	border-top-left-radius: var(--bs-accordion-border-radius);
+    border-top-right-radius: var(--bs-accordion-border-radius);
+	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+	
+	.accordion-header>button {
+		background-color: transparent;
+	}
+}
+
+// fix style when searching for symbols of last shown group
+.accordion-item:nth-last-child(1 of :not(.d-none)) {
+	border-bottom-left-radius: var(--bs-accordion-border-radius);
+    border-bottom-right-radius: var(--bs-accordion-border-radius);
+	
+	.accordion-header>button {
+		background-color: transparent;
+	}
+}
+
 .iconLibAccordionBody {
 	display: flex;
 	flex-flow: row wrap;
