@@ -147,7 +147,6 @@ export default class MainController {
 				}
 			}
 		});
-
 	}
 
 	/**
@@ -241,6 +240,7 @@ export default class MainController {
 		/** @type {HTMLDivElement} */
 		const leftOffcanvas = document.getElementById("leftOffcanvas");
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
+		document.getElementById("componentFilterInput").oninput = this.filterComponents;
 		/** @type {HTMLAnchorElement} */
 		const addComponentButton = document.getElementById("addComponentButton");
 		addComponentButton.addEventListener(
@@ -366,6 +366,54 @@ export default class MainController {
 			svgIcon.setAttributeNS(null, "viewBox", box.x + " " + box.y + " " + box.width + " " + box.height);
 			svgIcon.setAttributeNS(null, "width", box.width);
 			svgIcon.setAttributeNS(null, "height", box.height);
+		});
+	}
+
+	/**
+	 * filter the components in the left OffCanvas to only show what matches the search string (in a new accordeon item)
+	 * @param {Event} evt 
+	 */
+	filterComponents(evt){
+		// todo fix proper event cancelling (not stopping propagation on first entry)
+		evt.preventDefault();
+		evt.stopPropagation();
+
+		let text = document.getElementById('componentFilterInput').value;
+
+		const accordion = document.getElementById("leftOffcanvasAccordion");
+
+		const accordionItems = accordion.getElementsByClassName("accordion-item");
+		Array.prototype.forEach.call(accordionItems,(/**@type {HTMLDivElement} */accordionItem,index)=>{
+			const libComponents = accordionItem.getElementsByClassName("libComponent");
+			let showCount = 0;
+			Array.prototype.forEach.call(libComponents,(/**@type {HTMLDivElement} */libComponent)=>{
+				if (text) {
+					if (libComponent.title.search(text)<0) {
+						libComponent.classList.add("d-none");
+						return;
+					}
+				}
+				libComponent.classList.remove("d-none");
+				showCount++;
+			});
+			if (showCount===0) {
+				accordionItem.classList.add("d-none");
+			}else{
+				accordionItem.classList.remove("d-none");
+			}
+
+			if (text) {
+				accordionItem.children[0]?.children[0]?.classList.remove("collapsed");
+				accordionItem.children[1]?.classList.add("show");
+			}else{
+				accordionItem.children[0]?.children[0]?.classList.add("collapsed");
+				accordionItem.children[1]?.classList.remove("show");
+			}
+
+			if (index===0) {
+				accordionItem.children[0]?.children[0]?.classList.remove("collapsed");
+				accordionItem.children[1]?.classList.add("show");
+			}
 		});
 	}
 
