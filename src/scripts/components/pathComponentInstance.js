@@ -161,28 +161,34 @@ export default class PathComponentInstance extends SVG.G {
 		const isTouchEvent = window.TouchEvent && event instanceof TouchEvent && event.changedTouches.length === 1;
 		const isTouchEnd = isTouchEvent && event.touches.length === 0;
 		const isTouchStart =
-			isTouchEvent &&
-			event.touches.length === 1 &&
-			event.touches[0].identifier === event.changedTouches[0].identifier;
+		isTouchEvent &&
+		event.touches.length === 1 &&
+		event.touches[0].identifier === event.changedTouches[0].identifier;
 		if (isTouchEvent && !isTouchStart && !isTouchEnd) return; // invalid; maybe more then one finger on screen
-
+		
 		const pt = CanvasController.controller.pointerEventToPoint(event);
 		const snappedPoint =
-			event.shiftKey || event.detail.event?.shiftKey
-				? pt
-				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
-
+		event.shiftKey || event.detail.event?.shiftKey
+		? pt
+		: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
+		// console.log("Information for:");
+		// console.log(this.symbol.node);
+		// console.log(this.#pointsSet);
+		
 		if (this.#pointsSet === 0 && (!isTouchEvent || isTouchStart)) {
+			// first click / touch
 			this.#prePointArray[0][0] = snappedPoint.x;
 			this.#prePointArray[0][1] = snappedPoint.y;
 			this.#pointsSet = 1;
 			this.show();
 			SnapCursorController.controller.visible = false;
-		} else if (!isTouchEvent || isTouchEnd) {
+		} else if ((!isTouchEvent || isTouchEnd)) {
+			// second click / touch
 			this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
 			this.container.off(["mousemove", "touchmove"], this.#moveListener);
 			this.container.node.classList.remove("selectPoint");
 			this.#pointsSet = 2;
+			CanvasController.controller.placingComponent=null;
 			const angle = this.#recalcPointsEnd(snappedPoint);
 			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
 
@@ -190,6 +196,38 @@ export default class PathComponentInstance extends SVG.G {
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
 		}
+		// console.log(this.container)
+	}
+
+	getPointsSet(){
+		return this.#pointsSet;
+	}
+
+	getStartPoint(){
+		return new SVG.Point(this.#prePointArray[0][0],this.#prePointArray[0][1]);
+	}
+
+	emulateFirstClick(snappedPoint){
+		this.#prePointArray[0][0] = snappedPoint.x;
+		this.#prePointArray[0][1] = snappedPoint.y;
+		this.#pointsSet = 1;
+		this.show();
+		SnapCursorController.controller.visible = false;
+	}
+
+	emulateSecondClick(){
+		// second click / touch
+		this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
+		this.container.off(["mousemove", "touchmove"], this.#moveListener);
+		this.container.node.classList.remove("selectPoint");
+		this.#pointsSet = 2;
+		CanvasController.controller.placingComponent=null;
+		let snappedPoint = new SVG.Point(0,0);
+		const angle = this.#recalcPointsEnd(snappedPoint);
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+
+		CanvasController.controller.activatePanning();
+		SnapController.controller.hideSnapPoints();
 	}
 
 	/**

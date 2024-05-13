@@ -21,6 +21,10 @@
  */
 
 /**
+ * @function ComponentInstance.remove
+ */
+
+/**
  * @function ComponentInstance.fromJson
  * Create a instance from the (saved) serialized text.
  *

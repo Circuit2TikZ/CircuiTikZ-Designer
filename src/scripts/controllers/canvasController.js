@@ -88,6 +88,11 @@ export default class CanvasController {
 	/**@type {float} */
 	zoomMax = 10;
 
+	/** essentially a flag to know if and which component is currently being placed. useful for shortcut behaviour
+	 * @type {?ComponentInstance}
+	 */
+	placingComponent = null;
+
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element

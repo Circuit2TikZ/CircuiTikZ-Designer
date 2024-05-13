@@ -9,6 +9,7 @@ import SnapPoint from "../snapDrag/snapPoint";
 import svgSnapDragHandler from "../snapDrag/svgSnapDragHandler";
 import ContextMenu from "../controllers/contextMenu";
 import MainController from "../controllers/mainController";
+import CanvasController from "../controllers/canvasController";
 
 /**
  * Instance of a `NodeComponentsSymbol`.
@@ -92,14 +93,20 @@ export default class NodeComponentInstance extends SVG.Use {
 			// Prevent immediate dragend --> 200ms delay before recognizing dragend
 			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
 			const endEventNameScoped = endEventName + ".drag";
-			SVG.off(window, endEventNameScoped, dh.endDrag);
+
+			const dragEndFunction = (evt)=>{
+				dh.endDrag(evt);
+				CanvasController.controller.placingComponent=null;
+			}
+
+			SVG.off(window, endEventNameScoped);
 
 			let timeout = null;
 			const addDragEndHandler = (/** @type {MouseEvent|undefined} */ event) => {
 				if (event?.stopImmediatePropagation) event.stopImmediatePropagation();
 				window.clearTimeout(timeout);
 				window.removeEventListener(endEventName, addDragEndHandler);
-				SVG.on(window, endEventNameScoped, dh.endDrag, dh, { passive: false });
+				SVG.on(window, endEventNameScoped, dragEndFunction, dh, { passive: false });
 			};
 
 			timeout = window.setTimeout(addDragEndHandler, 200);
@@ -333,6 +340,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @returns {this}
 	 */
 	remove() {
+		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
 		super.remove();
 		return this;

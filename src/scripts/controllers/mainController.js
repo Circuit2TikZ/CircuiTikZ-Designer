@@ -16,6 +16,7 @@ import SnapController from "../snapDrag/snapController";
 import SnapCursorController from "../snapDrag/snapCursor";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import ExportController from "./exportController";
+import PathComponentInstance from "../components/pathComponentInstance";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -147,17 +148,17 @@ export default class MainController {
 			"l":"inductor (american)",
 			"z":"jump crossing",
 			"x":"plain crossing",
+			"t":"nmos",
 			".":"circ",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		document.body.addEventListener('keyup', (e) => {
-			if (this.mode == MainController.modes.DRAG_PAN) {
-				var componentTitleName = shortcutDict[e.key]
-				if(componentTitleName){
-					var componentButton = document.querySelector('[title="'+componentTitleName+'"]')
-					var clickEvent = new MouseEvent('mousedown',{view:window,bubbles:true,cancelable:true,});
-					componentButton?.dispatchEvent(clickEvent);
-				}
+			var componentTitleName = shortcutDict[e.key]
+			if(componentTitleName){
+				this.#switchMode(MainController.modes.DRAG_PAN); //switch to standard mode to avoid weird states
+				var componentButton = document.querySelector('[title="'+componentTitleName+'"]')
+				var clickEvent = new MouseEvent('mousedown',{view:window,bubbles:true,cancelable:true,});
+				componentButton?.dispatchEvent(clickEvent);
 			}
 		});
 	}
@@ -327,9 +328,25 @@ export default class MainController {
 
 				const listener = (ev) => {
 					ev.preventDefault();
-					let newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
+					// ev.stopPropagation();
+					const oldComponent = this.canvasController.placingComponent;
+					let lastpoint = null;
+					if (oldComponent) {
+						// if currently placing a component, use the new component instead and remove the old component
+						if ((oldComponent instanceof PathComponentInstance) && oldComponent.getPointsSet()==1) {
+							lastpoint = oldComponent.getStartPoint();
+							oldComponent.emulateSecondClick(); //cleanly finish placing the oldComponent somewhere before deleting it
+						}
+						this.removeInstance(oldComponent);
+					}
+					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
+					if (lastpoint && (newInstance instanceof PathComponentInstance)) {
+						newInstance.emulateFirstClick(lastpoint);
+					}
+					this.canvasController.placingComponent = newInstance;
 					this.addInstance(newInstance);
 					leftOffcanvasOC.hide();
+					
 				};
 
 				addButton.addEventListener("mousedown", listener);
