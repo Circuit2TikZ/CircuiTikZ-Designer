@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas } from "bootstrap";
+import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap";
 
 import "../utils/impSVGNumber";
 import CanvasController from "./canvasController";
@@ -102,7 +102,16 @@ export default class MainController {
 
 		// Prevent "normal" browser menu
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
+
+		this.#initShortcuts();
+
 		
+	}
+
+	/**
+	 * initialises keyboard shortcuts
+	 */
+	#initShortcuts(){
 		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
 		document.body.addEventListener('keyup', (e) => {
 			// shouldn't active if altkey, ctrl or shift is pressed
@@ -240,7 +249,12 @@ export default class MainController {
 		/** @type {HTMLDivElement} */
 		const leftOffcanvas = document.getElementById("leftOffcanvas");
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
-		document.getElementById("componentFilterInput").oninput = this.filterComponents;
+		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
+		document.getElementById("componentFilterInput").addEventListener("keyup",(evt)=>{
+			evt.preventDefault();
+			evt.stopPropagation();
+		});
+
 		/** @type {HTMLAnchorElement} */
 		const addComponentButton = document.getElementById("addComponentButton");
 		addComponentButton.addEventListener(
@@ -374,7 +388,6 @@ export default class MainController {
 	 * @param {Event} evt 
 	 */
 	filterComponents(evt){
-		// todo fix proper event cancelling (not stopping propagation on first entry)
 		evt.preventDefault();
 		evt.stopPropagation();
 
