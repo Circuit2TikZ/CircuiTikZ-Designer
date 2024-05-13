@@ -105,7 +105,11 @@ export default class MainController {
 
 		this.#initShortcuts();
 
-		
+		//enable tooltips globally
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
+			fallbackPlacements:[] //always show them exactly where defined
+		}))
 	}
 
 	/**
