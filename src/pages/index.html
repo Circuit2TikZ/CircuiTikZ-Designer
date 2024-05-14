@@ -84,6 +84,13 @@
 						Export SVG
 					</button>
 				</li>
+				<li><hr class="dropdown-divider" /></li>
+				<li>
+					<button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
+						<span class="dropdown-item-icon material-symbols-outlined">info</span>
+						About Project
+					</button>
+				</li>
 			</ul>
 		</div>
 
@@ -112,7 +119,14 @@
 		</div>
 
 		<!-- Modal (export dialog) -->
-		<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+		<div
+			class="modal fade"
+			id="exportModal"
+			tabindex="-1"
+			aria-labelledby="exportModalLabel"
+			aria-hidden="true"
+			role="dialog"
+		>
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -159,6 +173,68 @@
 						<button type="button" class="btn btn-primary icon-button" id="exportModalSave">
 							<span class="material-symbols-outlined">save</span>Save
 						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal (about dialog) -->
+		<div
+			class="modal fade"
+			id="aboutModal"
+			tabindex="-1"
+			aria-labelledby="aboutModalLabel"
+			aria-hidden="true"
+			role="dialog"
+		>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="aboutModalLabel">About Project</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>
+							The CircuiCanvas-Project was started as a research project at the Institute of Electronics
+							Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was
+							to create a progressive web application for easy and faster drawing of circuits using
+							CircuiTi<i>k</i>Z.
+						</p>
+						<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller</p>
+						<div class="row">
+							<div class="col-sm-4">
+								<a class="icon-link" href="https://ussi.e-technik.uni-erlangen.de/" target="_blank">
+									<svg class="bi" width="32" height="32" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#house" />
+									</svg>
+									Homepage
+								</a>
+							</div>
+							<div class="col-sm-4">
+								<a
+									class="icon-link"
+									href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa"
+									target="_blank"
+								>
+									<svg class="bi" width="32" height="32" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
+									</svg>
+									CircuiCanvas
+								</a>
+							</div>
+							<div class="col-sm-4">
+								<a
+									class="icon-link"
+									href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/SymbolConvert"
+									target="_blank"
+								>
+									<svg class="bi" width="32" height="32" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
+									</svg>
+									SymbolConvert
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
