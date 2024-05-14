@@ -17,6 +17,7 @@ import SnapCursorController from "../snapDrag/snapCursor";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import ExportController from "./exportController";
 import PathComponentInstance from "../components/pathComponentInstance";
+import NodeComponentInstance from "../components/nodeComponentInstance";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -333,20 +334,31 @@ export default class MainController {
 					let lastpoint = null;
 					if (oldComponent) {
 						// if currently placing a component, use the new component instead and remove the old component
-						if ((oldComponent instanceof PathComponentInstance) && oldComponent.getPointsSet()==1) {
-							lastpoint = oldComponent.getStartPoint();
-							oldComponent.emulateSecondClick(); //cleanly finish placing the oldComponent somewhere before deleting it
+						if (oldComponent instanceof PathComponentInstance) {
+							if (oldComponent.getPointsSet()>0) {
+								lastpoint = oldComponent.getStartPoint();
+							}else{
+								oldComponent.emulateFirstClick(CanvasController.controller.lastCanvasPoint);
+							}
+							oldComponent.emulateSecondClick(CanvasController.controller.lastCanvasPoint);//cleanly finish placing the oldComponent somewhere before deleting it
 						}
 						this.removeInstance(oldComponent);
 					}
+
 					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
-					if (lastpoint && (newInstance instanceof PathComponentInstance)) {
-						newInstance.emulateFirstClick(lastpoint);
+					if ((newInstance instanceof PathComponentInstance)) {
+						if (lastpoint) {
+							newInstance.emulateFirstClick(lastpoint);
+							newInstance.move(CanvasController.controller.lastCanvasPoint);
+						}
+					}else{
+						let point = CanvasController.controller.lastCanvasPoint
+						newInstance.move(point.x,point.y)
 					}
 					this.canvasController.placingComponent = newInstance;
 					this.addInstance(newInstance);
-					leftOffcanvasOC.hide();
 					
+					leftOffcanvasOC.hide();
 				};
 
 				addButton.addEventListener("mousedown", listener);

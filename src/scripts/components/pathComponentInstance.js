@@ -167,23 +167,31 @@ export default class PathComponentInstance extends SVG.G {
 		if (isTouchEvent && !isTouchStart && !isTouchEnd) return; // invalid; maybe more then one finger on screen
 		
 		const pt = CanvasController.controller.pointerEventToPoint(event);
-		const snappedPoint =
-		event.shiftKey || event.detail.event?.shiftKey
-		? pt
-		: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
-		// console.log("Information for:");
-		// console.log(this.symbol.node);
-		// console.log(this.#pointsSet);
+		const snappedPoint = this.#conditionalSnap(pt,event);
 		
-		if (this.#pointsSet === 0 && (!isTouchEvent || isTouchStart)) {
+		if (this.#pointsSet===0 && (!isTouchEvent || isTouchStart)) {
 			// first click / touch
+			this.emulateFirstClick(snappedPoint);
+		} else if ((!isTouchEvent || isTouchEnd)) {
+			// second click / touch
+			event.preventDefault();
+			this.emulateSecondClick(snappedPoint);
+		}
+	}
+	
+	emulateFirstClick(snappedPoint){
+		if (this.#pointsSet===0) {
 			this.#prePointArray[0][0] = snappedPoint.x;
 			this.#prePointArray[0][1] = snappedPoint.y;
 			this.#pointsSet = 1;
 			this.show();
 			SnapCursorController.controller.visible = false;
-		} else if ((!isTouchEvent || isTouchEnd)) {
-			// second click / touch
+		}
+	}
+	
+	emulateSecondClick(snappedPoint){
+		// second click / touch
+		if (this.#pointsSet>0) {
 			this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
 			this.container.off(["mousemove", "touchmove"], this.#moveListener);
 			this.container.node.classList.remove("selectPoint");
@@ -191,12 +199,10 @@ export default class PathComponentInstance extends SVG.G {
 			CanvasController.controller.placingComponent=null;
 			const angle = this.#recalcPointsEnd(snappedPoint);
 			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
-
-			event.preventDefault();
+			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
 		}
-		// console.log(this.container)
 	}
 
 	getPointsSet(){
@@ -207,42 +213,26 @@ export default class PathComponentInstance extends SVG.G {
 		return new SVG.Point(this.#prePointArray[0][0],this.#prePointArray[0][1]);
 	}
 
-	emulateFirstClick(snappedPoint){
-		this.#prePointArray[0][0] = snappedPoint.x;
-		this.#prePointArray[0][1] = snappedPoint.y;
-		this.#pointsSet = 1;
-		this.show();
-		SnapCursorController.controller.visible = false;
-	}
-
-	emulateSecondClick(){
-		// second click / touch
-		this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
-		this.container.off(["mousemove", "touchmove"], this.#moveListener);
-		this.container.node.classList.remove("selectPoint");
-		this.#pointsSet = 2;
-		CanvasController.controller.placingComponent=null;
-		let snappedPoint = new SVG.Point(0,0);
-		const angle = this.#recalcPointsEnd(snappedPoint);
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle);
-
-		CanvasController.controller.activatePanning();
-		SnapController.controller.hideSnapPoints();
-	}
-
 	/**
 	 * Redraw the component on mouse move. Used for initial adding of the component.
 	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#moveListener(event) {
 		let pt = CanvasController.controller.pointerEventToPoint(event);
-		const snappedPoint =
-			event.shiftKey || event.detail.event?.shiftKey
-				? pt
-				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
+		const snappedPoint = this.#conditionalSnap(pt,event);
+		this.move(snappedPoint)
+	}
+
+	move(snappedPoint){
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.move(snappedPoint);
 		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
+	}
+
+	#conditionalSnap(pt,event){
+		return event.shiftKey || event.detail.event?.shiftKey
+				? pt
+				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 	}
 
 	/**

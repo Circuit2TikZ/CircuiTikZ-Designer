@@ -5,6 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
 import ContextMenu from "../controllers/contextMenu";
+import SnapController from "../snapDrag/snapController";
 import MainController from "./mainController";
 
 /**
@@ -93,6 +94,8 @@ export default class CanvasController {
 	 */
 	placingComponent = null;
 
+	lastCanvasPoint = new SVG.Point(0,0)
+
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
@@ -120,6 +123,14 @@ export default class CanvasController {
 		// Wheel zoom is fired before the actual change and has no detail.box and is thus ignored. It will be handled by wheel.panZoom.
 		canvas.on("zoom", this.#movePaper, this, { passive: true });
 
+
+		canvas.on(["mousemove", "touchmove"], (evt)=>{
+			let pt = this.pointerEventToPoint(evt);
+			this.lastCanvasPoint =
+			evt.shiftKey || evt.detail.event?.shiftKey
+				? pt
+				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
+		});
 	
 		// init context menus
 		if (!CanvasController.#contextMenu) {
