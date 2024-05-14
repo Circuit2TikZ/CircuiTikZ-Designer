@@ -413,6 +413,7 @@ export default class MainController {
 		evt.stopPropagation();
 
 		let text = document.getElementById('componentFilterInput').value;
+		let regex = new RegExp(text, "i")
 
 		const accordion = document.getElementById("leftOffcanvasAccordion");
 
@@ -422,7 +423,7 @@ export default class MainController {
 			let showCount = 0;
 			Array.prototype.forEach.call(libComponents,(/**@type {HTMLDivElement} */libComponent)=>{
 				if (text) {
-					if (libComponent.title.search(text)<0) {
+					if (!regex.test(libComponent.title)) {
 						libComponent.classList.add("d-none");
 						return;
 					}
