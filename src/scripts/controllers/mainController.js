@@ -17,7 +17,6 @@ import SnapCursorController from "../snapDrag/snapCursor";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import ExportController from "./exportController";
 import PathComponentInstance from "../components/pathComponentInstance";
-import NodeComponentInstance from "../components/nodeComponentInstance";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -257,6 +256,7 @@ export default class MainController {
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
 		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
 		document.getElementById("componentFilterInput").addEventListener("keyup",(evt)=>{
+			// only "input" events should trigger the component filter. otherwise shortcuts are also triggered
 			evt.preventDefault();
 			evt.stopPropagation();
 		});
@@ -329,7 +329,6 @@ export default class MainController {
 
 				const listener = (ev) => {
 					ev.preventDefault();
-					// ev.stopPropagation();
 					const oldComponent = this.canvasController.placingComponent;
 					let lastpoint = null;
 					if (oldComponent) {
@@ -424,8 +423,21 @@ export default class MainController {
 		evt.preventDefault();
 		evt.stopPropagation();
 
-		let text = document.getElementById('componentFilterInput').value;
-		let regex = new RegExp(text, "i")
+		
+		const element = document.getElementById('componentFilterInput');
+		const feedbacktext = document.getElementById('invalid-feedback-text');
+		let text = element.value;
+		let regex = null;
+		try {
+			regex = new RegExp(text, "i");
+			element.classList.remove("is-invalid");
+			feedbacktext.classList.add("d-none");
+		} catch (e) {
+			text = "";
+			regex = new RegExp(text, "i");
+			element.classList.add("is-invalid");
+			feedbacktext.classList.remove("d-none");
+		}
 
 		const accordion = document.getElementById("leftOffcanvasAccordion");
 

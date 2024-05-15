@@ -8,7 +8,6 @@
 
 .offcanvas-search {
 	position: relative;
-	margin-bottom: 16px;
 
 	span {
 		position:absolute;
@@ -21,6 +20,10 @@
 		width: 100%;
 		padding-left: 50px;
 	}
+}
+
+.accordion{
+	margin-top: 16px;
 }
 
 // fix style when searching for symbols of first shown group
