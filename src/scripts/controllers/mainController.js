@@ -80,6 +80,12 @@ export default class MainController {
 
 		this.#initModeButtons();
 
+		//enable tooltips globally
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
+			fallbackPlacements:[] //always show them exactly where defined
+		}))
+
 		this.exportController = new ExportController(this);
 		/** @type {HTMLButtonElement} */
 		const exportCircuiTikZButton = document.getElementById("exportCircuiTikZButton");
@@ -105,12 +111,6 @@ export default class MainController {
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
 
 		this.#initShortcuts();
-
-		//enable tooltips globally
-		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
-			fallbackPlacements:[] //always show them exactly where defined
-		}))
 	}
 
 	/**

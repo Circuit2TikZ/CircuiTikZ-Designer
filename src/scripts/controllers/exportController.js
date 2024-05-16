@@ -2,7 +2,7 @@
  * @module exportController
  */
 
-import { Modal } from "bootstrap";
+import { Modal, Tooltip } from "bootstrap";
 import FileSaver from "file-saver";
 
 /** @typedef {import("./mainController").default} MainController */
@@ -33,6 +33,8 @@ export default class ExportController {
 	/** @type {HTMLButtonElement} */
 	#saveButton;
 
+	#copyTooltip;
+
 	/**
 	 * Init the ExportController
 	 * @param {MainController} mainController - needed for exporting instances & lines
@@ -48,6 +50,15 @@ export default class ExportController {
 		this.#fileExtensionDropdown = document.getElementById("exportModalFileExtensionDropdown");
 		this.#copyButton = document.getElementById("copyExportedContent");
 		this.#saveButton = document.getElementById("exportModalSave");
+
+		this.#copyButton.addEventListener("hidden.bs.tooltip",(evt)=>{
+			this.#copyButton.setAttribute("data-bs-title","Copy to Clipboard!");
+			this.#copyTooltip.dispose();
+			this.#copyTooltip = new Tooltip(this.#copyButton);
+		})
+		this.#copyButton.setAttribute("data-bs-toggle","tooltip");
+		this.#copyButton.setAttribute("data-bs-title","Copy to clipboard!");
+		this.#copyTooltip = new Tooltip(this.#copyButton);
 	}
 
 	/**
@@ -57,8 +68,17 @@ export default class ExportController {
 		/** @type {string} */
 		let textContent;
 
+		// copy text and adjust tooltip for feedback
+		const copyText = () => {
+			navigator.clipboard.writeText(textContent)
+			.then(()=>{
+				this.#copyButton.setAttribute("data-bs-title","Copied!");
+				this.#copyTooltip.dispose();
+				this.#copyTooltip = new Tooltip(this.#copyButton);
+				this.#copyTooltip.show()
+			});
+		}
 		// create listeners
-		const copyText = () => navigator.clipboard.writeText(textContent);
 		const saveFile = (() => {
 			FileSaver.saveAs(
 				new Blob([textContent], { type: "text/x-tex;charset=utf-8" }),

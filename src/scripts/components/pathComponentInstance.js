@@ -158,6 +158,10 @@ export default class PathComponentInstance extends SVG.G {
 	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#clickListener(event) {
+		if (!this) {
+			// the component has already been deleted
+			return;
+		}
 		const isTouchEvent = window.TouchEvent && event instanceof TouchEvent && event.changedTouches.length === 1;
 		const isTouchEnd = isTouchEvent && event.touches.length === 0;
 		const isTouchStart =
