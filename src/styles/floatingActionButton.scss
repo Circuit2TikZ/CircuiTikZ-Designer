@@ -9,134 +9,12 @@
 
 $prefix: "bs" !default;
 
-// ripple
-$ripple-wave-cubicBezier: cubic-bezier(0, 0, 0.15, 1) !default;
-$ripple-wave-border-radius: 50% !default;
-$ripple-wave-opacity: 0.5 !default;
-$ripple-wave-transform: scale(0) !default;
-$ripple-wave-z-index: 999 !default;
-$ripple-wave-active-transform: scale(1) !default;
-// scss-docs-end ripple-variables
-
-// scss-docs-start ripple-colors-map
-$ripple: (
-	"primary": $primary,
-	"secondary": #e3ebf7,
-	"success": $success,
-	"danger": $danger,
-	"warning": $warning,
-	"info": $info,
-	"light": $light,
-	"dark": $dark,
-) !default;
-
-@mixin ripple-variant($color_value) {
-	$gradient:
-		rgba(
-				$color: $color_value,
-				$alpha: 0.2,
-			)
-			0,
-		rgba(
-				$color: $color_value,
-				$alpha: 0.3,
-			)
-			40%,
-		rgba(
-				$color: $color_value,
-				$alpha: 0.4,
-			)
-			50%,
-		rgba(
-				$color: $color_value,
-				$alpha: 0.5,
-			)
-			60%,
-		rgba(
-				$color: $color_value,
-				$alpha: 0,
-			)
-			70%;
-	background-image: radial-gradient(circle, $gradient);
-}
-
-.ripple-surface {
-	position: relative;
-	overflow: hidden;
-	display: inline-block;
-	vertical-align: bottom;
-}
-
-.ripple-surface-unbound {
-	overflow: visible;
-}
-
-.ripple-wave {
-	--#{$prefix}ripple-wave-cubicBezier: #{$ripple-wave-cubicBezier};
-	--#{$prefix}ripple-wave-border-radius: #{$ripple-wave-border-radius};
-	--#{$prefix}ripple-wave-opacity: #{$ripple-wave-opacity};
-	--#{$prefix}ripple-wave-transform: #{$ripple-wave-transform};
-	--#{$prefix}ripple-wave-z-index: #{$ripple-wave-z-index};
-	--#{$prefix}ripple-wave-active-transform: #{$ripple-wave-active-transform};
-
-	@include ripple-variant(black);
-	border-radius: var(--#{$prefix}ripple-wave-border-radius);
-	opacity: var(--#{$prefix}ripple-wave-opacity);
-	pointer-events: none;
-	position: absolute;
-	touch-action: none;
-	transform: var(--#{$prefix}ripple-wave-transform);
-	transition-property: transform, opacity;
-	transition-timing-function: var(--#{$prefix}ripple-wave-cubicBezier), var(--#{$prefix}ripple-wave-cubicBezier);
-	z-index: var(--#{$prefix}ripple-wave-z-index);
-	&.active {
-		transform: var(--#{$prefix}ripple-wave-active-transform);
-		opacity: 0;
-	}
-}
-
-.btn .ripple-wave {
-	@include ripple-variant(white);
-}
-
-.input-wrapper .ripple-wave {
-	@include ripple-variant(white);
-}
-
-@each $color, $value in $ripple {
-	.ripple-surface-#{$color} {
-		.ripple-wave {
-			@include ripple-variant($value);
-		}
-	}
-}
-
-//
-// Rounded option
-//
-
-//.btn-rounded {
-//  --#{$prefix}btn-border-radius: #{$btn-rounded-border-radius};
-
-//  border-radius: var(--#{$prefix}btn-border-radius);
-//}
-
 //
 // Floating option
 //
 $custom-icon-class: "material-symbols-outlined" !default;
 $btn-border-width: 0;
-// From MDB:
-// $btn-box-shadow: 0 4px 9px -4px rgba(0, 0, 0, 0.35);
-// $btn-hover-box-shadow:
-// 	0 8px 9px -4px rgba(0, 0, 0, 0.15),
-// 	0 4px 18px 0 rgba(0, 0, 0, 0.1);
-// $btn-focus-box-shadow:
-// 	0 8px 9px -4px rgba(0, 0, 0, 0.15),
-// 	0 4px 18px 0 rgba(0, 0, 0, 0.1);
-// $btn-active-box-shadow:
-// 	0 8px 9px -4px rgba(0, 0, 0, 0.15),
-// 	0 4px 18px 0 rgba(0, 0, 0, 0.1);
+
 // From google material components v2
 $btn-box-shadow:
 	0 3px 5px -1px rgba(0, 0, 0, 0.2),
@@ -155,40 +33,24 @@ $btn-active-box-shadow:
 	0 12px 17px 2px rgba(0, 0, 0, 0.14),
 	0 5px 22px 4px rgba(0, 0, 0, 0.12);
 
-$btn-floating-width: 56px !default;
-$btn-floating-height: 56px !default;
+$btn-floating-size: 56px !default;
 $btn-floating-border-radius: 16px !default;
-$btn-floating-icon-width: $btn-floating-width !default; // 24px
-$btn-floating-icon-height: $btn-floating-height !default;
+$btn-floating-icon-size: $btn-floating-size !default; // 24px
 $btn-floating-icon-line-height: 1 !default;
 
-$btn-floating-width-sm: 40px !default;
-$btn-floating-height-sm: 40px !default;
+$btn-floating-size-sm: 40px !default;
 $btn-floating-border-radius-sm: 12px !default;
-$btn-floating-icon-width-sm: $btn-floating-width-sm !default; // 24px
-$btn-floating-icon-height-sm: $btn-floating-height-sm !default;
-$btn-floating-icon-line-height-sm: 1 !default;
+$btn-floating-icon-size-sm: $btn-floating-size-sm !default; // 24px
 
-$btn-floating-width-lg: 96px !default;
-$btn-floating-height-lg: 96px !default;
-$btn-floating-border-radius-lg: 28px !default;
-$btn-floating-icon-width-lg: $btn-floating-width-lg !default; // 36px
-$btn-floating-icon-height-lg: $btn-floating-height-lg !default;
-$btn-floating-icon-line-height-lg: 1 !default;
-
-$fixed-action-btn-right: 16px !default;
-$fixed-action-btn-bottom: 16px !default;
+$fixed-action-btn-gap: 16px !default;
 $fixed-action-button-zindex: 100 !default;
-$fixed-action-btn-padding-top: 0px !default; // ???
-$fixed-action-btn-padding-bottom: 0px !default;
-$fixed-action-btn-padding-x: 0px !default; // ???
+$fixed-action-btn-padding: 0px !default; // ???
 $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 
 .btn-floating,
 [class*="btn-outline-"].btn-floating {
 	--#{$prefix}btn-border-radius: #{$btn-floating-border-radius};
 	--#{$prefix}btn-border-radius-sm: #{$btn-floating-border-radius-sm};
-	--#{$prefix}btn-border-radius-lg: #{$btn-floating-border-radius-lg};
 	--#{$prefix}btn-box-shadow: #{$btn-box-shadow};
 	--#{$prefix}btn-hover-box-shadow: #{$btn-hover-box-shadow};
 	--#{$prefix}btn-focus-box-shadow: #{$btn-focus-box-shadow};
@@ -236,21 +98,13 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 }
 
 .btn-floating {
-	--#{$prefix}btn-width: #{$btn-floating-width};
-	--#{$prefix}btn-height: #{$btn-floating-height};
-	--#{$prefix}btn-icon-width: #{$btn-floating-icon-width};
+	--#{$prefix}btn-size: #{$btn-floating-size};
 	--#{$prefix}btn-icon-line-height: #{$btn-floating-icon-line-height};
-	--#{$prefix}btn-width-lg: #{$btn-floating-width-lg};
-	--#{$prefix}btn-height-lg: #{$btn-floating-height-lg};
-	--#{$prefix}btn-icon-width-lg: #{$btn-floating-icon-width-lg};
-	--#{$prefix}btn-icon-line-height-lg: #{$btn-floating-icon-line-height-lg};
-	--#{$prefix}btn-width-sm: #{$btn-floating-width-sm};
-	--#{$prefix}btn-height-sm: #{$btn-floating-height-sm};
-	--#{$prefix}btn-icon-width-sm: #{$btn-floating-icon-width-sm};
-	--#{$prefix}btn-icon-line-height-sm: #{$btn-floating-icon-line-height-sm};
+	--#{$prefix}btn-size-sm: #{$btn-floating-size-sm};
+	--#{$prefix}btn-icon-size-sm: #{$btn-floating-icon-size-sm};
 
-	width: var(--#{$prefix}btn-width);
-	height: var(--#{$prefix}btn-height);
+	width: var(--#{$prefix}btn-size);
+	height: var(--#{$prefix}btn-size);
 
 	.#{$custom-icon-class},
 	.fas,
@@ -260,31 +114,16 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 		line-height: var(--#{$prefix}btn-icon-line-height);
 	}
 
-	&.btn-lg {
-		width: var(--#{$prefix}btn-width-lg);
-		height: var(--#{$prefix}btn-height-lg);
-		border-radius: var(--#{$prefix}btn-border-radius-lg);
-
-		.#{$custom-icon-class},
-		.fas,
-		.far,
-		.fab {
-			width: var(--#{$prefix}btn-icon-width-lg);
-			line-height: var(--#{$prefix}btn-icon-line-height-lg);
-		}
-	}
-
 	&.btn-sm {
-		width: var(--#{$prefix}btn-width-sm);
-		height: var(--#{$prefix}btn-height-sm);
+		width: var(--#{$prefix}btn-size-sm);
+		height: var(--#{$prefix}btn-size-sm);
 		border-radius: var(--#{$prefix}btn-border-radius-sm);
 
 		.#{$custom-icon-class},
 		.fas,
 		.far,
 		.fab {
-			width: var(--#{$prefix}btn-icon-width-sm);
-			line-height: var(--#{$prefix}btn-icon-line-height-sm);
+			width: var(--#{$prefix}btn-icon-size-sm);
 		}
 	}
 }
@@ -294,25 +133,27 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 //
 
 .fixed-action-btn {
-	--#{$prefix}btn-right: #{$fixed-action-btn-right};
-	--#{$prefix}btn-bottom: #{$fixed-action-btn-bottom};
+	--#{$prefix}btn-gap: #{$fixed-action-btn-gap};
 	--#{$prefix}btn-zindex: #{$fixed-action-button-zindex};
-	--#{$prefix}btn-padding-top: #{$fixed-action-btn-padding-top};
-	--#{$prefix}btn-padding-bottom: #{$fixed-action-btn-padding-bottom};
-	--#{$prefix}btn-padding-x: #{$fixed-action-btn-padding-x};
+	--#{$prefix}btn-padding: #{$fixed-action-btn-padding};
 	--#{$prefix}btn-margin-bottom: #{$fixed-action-btn-li-margin-bottom};
 
 	position: fixed;
-	right: var(--#{$prefix}btn-right);
-	bottom: var(--#{$prefix}btn-bottom);
+	right: var(--#{$prefix}btn-gap);
+	bottom: var(--#{$prefix}btn-gap);
 	z-index: var(--#{$prefix}btn-zindex);
 	display: flex;
 	flex-flow: column-reverse nowrap;
 	align-items: center;
-	padding: var(--#{$prefix}btn-padding-top) var(--#{$prefix}btn-padding-x) var(--#{$prefix}btn-padding-bottom);
+	padding: var(--#{$prefix}btn-padding);
 	margin-bottom: 0;
 	height: auto;
 	overflow: visible; // show shadows of children
+
+	@media (pointer: fine) {
+		opacity: 0 !important;
+		display: none !important;
+	}
 
 	& > .btn-floating {
 		position: relative;
@@ -371,7 +212,7 @@ $fixed-action-btn-li-margin-bottom: 16px !default; // ???
 		// }
 	}
 
-	& ul {
-		opacity: 1;
-	}
+	// & ul {
+	// 	opacity: 1;
+	// }
 }

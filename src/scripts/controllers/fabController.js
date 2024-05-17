@@ -60,7 +60,7 @@ class FloatingActionButton {
 			this.#instance.classList.add("btn", "btn-floating");
 			this.#iconInstance = this.#instance.appendChild(document.createElement("i"));
 			if (isSubButton) {
-				this.#instance.classList.add("btn-sm"); // small
+				// this.#instance.classList.add("btn-sm"); // small
 				this.#wrapperElement = this.#container.appendChild(document.createElement("li"));
 				this.#wrapperElement.appendChild(this.#instance);
 			} else {
