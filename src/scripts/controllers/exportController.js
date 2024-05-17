@@ -51,13 +51,14 @@ export default class ExportController {
 		this.#copyButton = document.getElementById("copyExportedContent");
 		this.#saveButton = document.getElementById("exportModalSave");
 
+		let copyButtonDefaultTooltipText = "Copy to clipboard!"
 		this.#copyButton.addEventListener("hidden.bs.tooltip",(evt)=>{
-			this.#copyButton.setAttribute("data-bs-title","Copy to Clipboard!");
+			this.#copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
 			this.#copyTooltip.dispose();
 			this.#copyTooltip = new Tooltip(this.#copyButton);
 		})
 		this.#copyButton.setAttribute("data-bs-toggle","tooltip");
-		this.#copyButton.setAttribute("data-bs-title","Copy to clipboard!");
+		this.#copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
 		this.#copyTooltip = new Tooltip(this.#copyButton);
 	}
 
