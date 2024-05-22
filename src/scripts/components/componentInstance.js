@@ -21,6 +21,20 @@
  */
 
 /**
+ * @function ComponentInstance.isInsideSelectionRectangle
+ * @param {SVG.Box} selectionRectangle
+ * @returns {boolean}
+ */
+
+/**
+ * @function ComponentInstance.showBoundingBox
+ */
+
+/**
+ * @function ComponentInstance.hideBoundingBox
+ */
+
+/**
  * @function ComponentInstance.remove
  */
 

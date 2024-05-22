@@ -44,6 +44,11 @@ export default class NodeComponentInstance extends SVG.Use {
 	relSnappingPoints;
 
 	/**
+	 * @type {?SVG.Rect}
+	 */
+	#selectionRectangle = null;
+
+	/**
 	 * @typedef {object} DragHandler
 	 * @property {SVG.Element} el
 	 * @property {SVG.Box} box
@@ -167,6 +172,47 @@ export default class NodeComponentInstance extends SVG.Use {
 		);
 	}
 
+	isInsideSelectionRectangle(selectionRectangle){
+		let l1 = new SVG.Point(selectionRectangle.x,selectionRectangle.y)
+		let r1 = new SVG.Point(selectionRectangle.x2,selectionRectangle.y2)
+		let box = this.bbox()
+		let l2 = new SVG.Point(box.x,box.y)
+		let r2 = new SVG.Point(box.x2,box.y2)
+		
+		// if rectangle has area 0, no overlap
+		if (l1.x == r1.x || l1.y == r1.y || r2.x == l2.x || l2.y == r2.y)
+            return false;
+		
+		// If one rectangle is on left side of other
+        if (l1.x > r2.x || l2.x > r1.x) {
+			return false;
+        }
+		
+        // If one rectangle is above other
+        if (r1.y < l2.y || r2.y < l1.y) {
+			return false;
+        }
+ 
+        return true;
+	}
+
+	showBoundingBox(){
+		if (!this.#selectionRectangle) {
+			let box = this.bbox();
+			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
+			this.#selectionRectangle.attr("stroke-width",1)
+			this.#selectionRectangle.attr("stroke","grey")
+			this.#selectionRectangle.attr("fill","none")
+		}
+	}
+
+	hideBoundingBox(){
+		if (this.#selectionRectangle) {
+			this.#selectionRectangle.remove();
+			this.#selectionRectangle = null
+		}
+	}
+
 	/**
 	 * Re-enable the dragging feature of this instance.
 	 */
@@ -249,7 +295,20 @@ export default class NodeComponentInstance extends SVG.Use {
 		} else {
 			super.attr("transform", `translate(${x}, ${y}) rotate(${-this.#angleDeg})`);
 		}
+
+		//also move the selection rectangle
+		this.#recalculateSelectionRect();
+
 		return this;
+	}
+
+	#recalculateSelectionRect(){
+		if (this.#selectionRectangle) {
+			let box = this.bbox();
+			this.#selectionRectangle.move(box.x,box.y);
+			this.#selectionRectangle.attr("width",box.w);
+			this.#selectionRectangle.attr("height",box.h);
+		}
 	}
 
 	/**
@@ -266,6 +325,7 @@ export default class NodeComponentInstance extends SVG.Use {
 		this.#recalculateBoxDimensions();
 		this.#recalculateRelSnappingPoints();
 		this.recalculateSnappingPoints();
+		this.#recalculateSelectionRect();
 
 		if (this.#angleDeg === 0) {
 			super.attr("transform", null);
@@ -342,6 +402,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	remove() {
 		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
+		this.#selectionRectangle?.remove();
 		super.remove();
 		return this;
 	}

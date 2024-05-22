@@ -40,6 +40,11 @@ export default class PathComponentInstance extends SVG.G {
 	snappingPoints;
 
 	/**
+	 * @type {?SVG.Rect}
+	 */
+	#selectionRectangle = null;
+
+	/**
 	 * Add a instance of an (path) symbol to an container.
 	 *
 	 * @param {PathComponentSymbol} symbol - the symbol to use
@@ -107,6 +112,51 @@ export default class PathComponentInstance extends SVG.G {
 		return new PathComponentInstance(symbol, container);
 	}
 
+	//TODO improve this (check two line elements and rotated node element: line-rect and rect-rotatedRect intersections)
+	isInsideSelectionRectangle(selectionRectangle){
+		if (this.#pointsSet<2) {
+			return false;
+		}
+		let l1 = new SVG.Point(selectionRectangle.x,selectionRectangle.y)
+		let r1 = new SVG.Point(selectionRectangle.x2,selectionRectangle.y2)
+		let box = this.bbox()
+		let l2 = new SVG.Point(box.x,box.y)
+		let r2 = new SVG.Point(box.x2,box.y2)
+		
+		// if rectangle has area 0, no overlap
+		if (l1.x == r1.x || l1.y == r1.y || r2.x == l2.x || l2.y == r2.y)
+            return false;
+		
+		// If one rectangle is on left side of other
+        if (l1.x > r2.x || l2.x > r1.x) {
+			return false;
+        }
+		
+        // If one rectangle is above other
+        if (r1.y < l2.y || r2.y < l1.y) {
+			return false;
+        }
+ 
+        return true;
+	}
+	
+	showBoundingBox(){
+		if (!this.#selectionRectangle) {
+			let box = this.bbox();
+			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
+			this.#selectionRectangle.attr("stroke-width",1)
+			this.#selectionRectangle.attr("stroke","grey")
+			this.#selectionRectangle.attr("fill","none")
+		}
+	}
+
+	hideBoundingBox(){
+		if (this.#selectionRectangle) {
+			this.#selectionRectangle.remove();
+			this.#selectionRectangle = null
+		}
+	}
+
 	/**
 	 * Create a instance from the (saved) serialized text.
 	 *
@@ -149,6 +199,7 @@ export default class PathComponentInstance extends SVG.G {
 	 */
 	remove() {
 		for (const point of this.snappingPoints) point.removeInstance();
+		this.#selectionRectangle?.remove();
 		super.remove();
 		return this;
 	}
@@ -170,8 +221,7 @@ export default class PathComponentInstance extends SVG.G {
 		event.touches[0].identifier === event.changedTouches[0].identifier;
 		if (isTouchEvent && !isTouchStart && !isTouchEnd) return; // invalid; maybe more then one finger on screen
 		
-		const pt = CanvasController.controller.pointerEventToPoint(event);
-		const snappedPoint = this.#conditionalSnap(pt,event);
+		const snappedPoint = CanvasController.controller.pointerEventToPoint(event);
 		
 		if (this.#pointsSet===0 && (!isTouchEvent || isTouchStart)) {
 			// first click / touch
@@ -222,8 +272,7 @@ export default class PathComponentInstance extends SVG.G {
 	 * @param {MouseEvent|TouchEvent} event
 	 */
 	#moveListener(event) {
-		let pt = CanvasController.controller.pointerEventToPoint(event);
-		const snappedPoint = this.#conditionalSnap(pt,event);
+		const snappedPoint = CanvasController.controller.pointerEventToPoint(event);
 		this.move(snappedPoint)
 	}
 
@@ -231,12 +280,6 @@ export default class PathComponentInstance extends SVG.G {
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.move(snappedPoint);
 		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
-	}
-
-	#conditionalSnap(pt,event){
-		return event.shiftKey || event.detail.event?.shiftKey
-				? pt
-				: SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 	}
 
 	/**

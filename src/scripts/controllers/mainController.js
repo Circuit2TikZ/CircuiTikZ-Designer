@@ -40,6 +40,15 @@ export default class MainController {
 	symbols;
 
 	/**
+	 * COMMENT/TODO: should probably add a "component placing" mode:
+	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
+	 * component placing mode returns to DRAG_PAN as soon as the component has been successfully placed
+	 * Therefore: all kinds of behaviour can be checked and activated/deactivated more easily with this mode
+	 * 
+	 * This mode will not be shown to the user (show drag_pan instead)
+	 */
+	
+	/**
 	 * @readonly
 	 * @enum {number}
 	 */
@@ -176,7 +185,7 @@ export default class MainController {
 	 */
 	async #initCanvas() {
 		let canvasElement = await waitForElementLoaded("canvas");
-		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement));
+		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement), MainController.controller);
 	}
 
 	/**
@@ -488,6 +497,7 @@ export default class MainController {
 			case MainController.modes.DRAG_PAN:
 				this.#modeSwitchButtons.modeDragPan.classList.remove("selected");
 				this.canvasController.deactivatePanning();
+				this.canvasController.deactivateSelection();
 				for (const instance of this.instances) {
 					if (instance.disableDrag) instance.disableDrag();
 				}
@@ -508,6 +518,7 @@ export default class MainController {
 			case MainController.modes.DRAG_PAN:
 				this.#modeSwitchButtons.modeDragPan.classList.add("selected");
 				this.canvasController.activatePanning();
+				this.canvasController.activateSelection();
 				for (const instance of this.instances) {
 					if (instance.enableDrag) instance.enableDrag();
 				}
