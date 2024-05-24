@@ -29,9 +29,10 @@ export default class NodeComponentSymbol extends ComponentSymbol {
 	 * @override
 	 * @param {SVG.Container} container - the container to add the instance to
 	 * @param {MouseEvent} event - the event which triggered the adding
+	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 * @returns {NodeComponentInstance} the new instance
 	 */
-	addInstanceToContainer(container, event) {
-		return NodeComponentInstance.createInstance(this, container, event);
+	addInstanceToContainer(container, event, finishedPlacingCallback) {
+		return NodeComponentInstance.createInstance(this, container, event, finishedPlacingCallback);
 	}
 }

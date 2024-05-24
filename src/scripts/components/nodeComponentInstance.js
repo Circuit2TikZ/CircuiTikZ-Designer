@@ -10,6 +10,7 @@ import svgSnapDragHandler from "../snapDrag/svgSnapDragHandler";
 import ContextMenu from "../controllers/contextMenu";
 import MainController from "../controllers/mainController";
 import CanvasController from "../controllers/canvasController";
+import { rectRectIntersection, selectedBoxWidth } from "../utils/selectionHelper";
 
 /**
  * Instance of a `NodeComponentsSymbol`.
@@ -49,6 +50,11 @@ export default class NodeComponentInstance extends SVG.Use {
 	#selectionRectangle = null;
 
 	/**
+	 * @type {function():void}
+	 */
+	#finishedPlacingCallback  = ()=>{};
+
+	/**
 	 * @typedef {object} DragHandler
 	 * @property {SVG.Element} el
 	 * @property {SVG.Box} box
@@ -65,9 +71,11 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @param {NodeComponentSymbol} symbol - the symbol to use
 	 * @param {SVG.Container} container - the container to add the instance to
 	 * @param {MouseEvent|TouchEvent} [event] - the event which triggered the adding
+ 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	constructor(symbol, container, event) {
+	constructor(symbol, container, event, finishedPlacingCallback) {
 		super();
+		this.#finishedPlacingCallback = finishedPlacingCallback;
 
 		this.symbol = symbol;
 		this.container = container;
@@ -102,6 +110,7 @@ export default class NodeComponentInstance extends SVG.Use {
 			const dragEndFunction = (evt)=>{
 				dh.endDrag(evt);
 				CanvasController.controller.placingComponent=null;
+				this.#finishedPlacingCallback()
 			}
 
 			SVG.off(window, endEventNameScoped);
@@ -173,36 +182,18 @@ export default class NodeComponentInstance extends SVG.Use {
 	}
 
 	isInsideSelectionRectangle(selectionRectangle){
-		let l1 = new SVG.Point(selectionRectangle.x,selectionRectangle.y)
-		let r1 = new SVG.Point(selectionRectangle.x2,selectionRectangle.y2)
-		let box = this.bbox()
-		let l2 = new SVG.Point(box.x,box.y)
-		let r2 = new SVG.Point(box.x2,box.y2)
-		
-		// if rectangle has area 0, no overlap
-		if (l1.x == r1.x || l1.y == r1.y || r2.x == l2.x || l2.y == r2.y)
-            return false;
-		
-		// If one rectangle is on left side of other
-        if (l1.x > r2.x || l2.x > r1.x) {
-			return false;
-        }
-		
-        // If one rectangle is above other
-        if (r1.y < l2.y || r2.y < l1.y) {
-			return false;
-        }
- 
-        return true;
+		return rectRectIntersection(selectionRectangle,this.bbox());
 	}
 
 	showBoundingBox(){
 		if (!this.#selectionRectangle) {
 			let box = this.bbox();
 			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
-			this.#selectionRectangle.attr("stroke-width",1)
-			this.#selectionRectangle.attr("stroke","grey")
-			this.#selectionRectangle.attr("fill","none")
+			this.#selectionRectangle.attr({
+				"stroke-width":selectedBoxWidth,
+				"stroke":"grey",
+				"fill":"none"
+			});
 		}
 	}
 
@@ -233,9 +224,10 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @param {NodeComponentSymbol} symbol - the symbol to use
 	 * @param {SVG.Container} container - the container/canvas to add the symbol to
 	 * @param {MouseEvent} [event] - an optional (mouse/touch) event, which caused the element to be added
+	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	static createInstance(symbol, container, event) {
-		return new NodeComponentInstance(symbol, container, event);
+	static createInstance(symbol, container, event, finishedPlacingCallback) {
+		return new NodeComponentInstance(symbol, container, event, finishedPlacingCallback);
 	}
 
 	/**

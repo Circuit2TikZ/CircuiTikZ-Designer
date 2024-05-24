@@ -42,8 +42,9 @@ export default class PathComponentSymbol extends ComponentSymbol {
 	 * @override
 	 * @param {SVG.Container} container - the container to add the instance to
 	 * @param {MouseEvent} event - the event which triggered the adding
+ 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	addInstanceToContainer(container, event) {
-		return PathComponentInstance.createInstance(this, container, event);
+	addInstanceToContainer(container, event, finishedPlacingCallback) {
+		return PathComponentInstance.createInstance(this, container, event, finishedPlacingCallback);
 	}
 }

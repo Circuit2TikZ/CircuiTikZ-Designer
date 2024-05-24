@@ -56,6 +56,7 @@ export default class MainController {
 		DRAG_PAN: 1,
 		DRAW_LINE: 2,
 		ERASE: 3,
+		COMPONENT: 4,
 	};
 
 	mode = MainController.modes.DRAG_PAN;
@@ -113,13 +114,13 @@ export default class MainController {
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
+			this.#initShortcuts();
 			this.isInitDone = true;
 		});
 
 		// Prevent "normal" browser menu
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
 
-		this.#initShortcuts();
 	}
 
 	/**
@@ -338,6 +339,7 @@ export default class MainController {
 
 				const listener = (ev) => {
 					ev.preventDefault();
+					this.#switchMode(MainController.modes.COMPONENT)
 					const oldComponent = this.canvasController.placingComponent;
 					let lastpoint = null;
 					if (oldComponent) {
@@ -348,12 +350,12 @@ export default class MainController {
 							}else{
 								oldComponent.emulateFirstClick(CanvasController.controller.lastCanvasPoint);
 							}
-							oldComponent.emulateSecondClick(CanvasController.controller.lastCanvasPoint);//cleanly finish placing the oldComponent somewhere before deleting it
+							oldComponent.emulateSecondClick(CanvasController.controller.lastCanvasPoint, false);//cleanly finish placing the oldComponent somewhere before deleting it
 						}
 						this.removeInstance(oldComponent);
 					}
 
-					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev);
+					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN)});
 					if ((newInstance instanceof PathComponentInstance)) {
 						if (lastpoint) {
 							newInstance.emulateFirstClick(lastpoint);
@@ -510,6 +512,10 @@ export default class MainController {
 				this.#modeSwitchButtons.modeEraser.classList.remove("selected");
 				this.eraseController.deactivate();
 				break;
+			case MainController.modes.COMPONENT:
+				this.#modeSwitchButtons.modeDragPan.classList.remove("selected");
+				this.canvasController.deactivatePanning();
+				break;
 			default:
 				break;
 		}
@@ -530,6 +536,10 @@ export default class MainController {
 			case MainController.modes.ERASE:
 				this.#modeSwitchButtons.modeEraser.classList.add("selected");
 				this.eraseController.activate();
+				break;
+			case MainController.modes.COMPONENT:
+				this.#modeSwitchButtons.modeDragPan.classList.add("selected");
+				this.canvasController.activatePanning();
 				break;
 			default:
 				break;

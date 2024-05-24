@@ -9,6 +9,7 @@ import PathComponentSymbol from "./pathComponentSymbol";
 import SnapController from "../snapDrag/snapController";
 import SnapCursorController from "../snapDrag/snapCursor";
 import SnapPoint from "../snapDrag/snapPoint";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectedWireWidth } from "../utils/selectionHelper";
 
 /**
  * Instance of a `PathComponentSymbol`.
@@ -36,6 +37,8 @@ export default class PathComponentInstance extends SVG.G {
 
 	/** @type {SVG.Point} */
 	#midAbs;
+	/** @type {number} */
+	#rotationAngle;
 	/** @type {SnapPoint[]} */
 	snappingPoints;
 
@@ -45,14 +48,21 @@ export default class PathComponentInstance extends SVG.G {
 	#selectionRectangle = null;
 
 	/**
+	 * @type {function():void}
+	 */
+	#finishedPlacingCallback  = ()=>{};
+
+	/**
 	 * Add a instance of an (path) symbol to an container.
 	 *
 	 * @param {PathComponentSymbol} symbol - the symbol to use
 	 * @param {SVG.Container} container - the container/canvas to add the symbol to
+ 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	constructor(symbol, container) {
+	constructor(symbol, container, finishedPlacingCallback) {
 		super();
 		this.hide(); // is shown AFTER first click/touch
+		this.#finishedPlacingCallback = finishedPlacingCallback;
 
 		this.symbol = symbol;
 		this.container = container;
@@ -107,46 +117,68 @@ export default class PathComponentInstance extends SVG.G {
 	 * @param {PathComponentSymbol} symbol - the symbol to use
 	 * @param {SVG.Container} container - the container/canvas to add the symbol to
 	 * @param {MouseEvent} [_event] - an optional (mouse/touch) event, which caused the element to be added
+	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	static createInstance(symbol, container, _event) {
-		return new PathComponentInstance(symbol, container);
+	static createInstance(symbol, container, _event, finishedPlacingCallback) {
+		return new PathComponentInstance(symbol, container, finishedPlacingCallback);
 	}
 
-	//TODO improve this (check two line elements and rotated node element: line-rect and rect-rotatedRect intersections)
+	//TODO improve this: check rotated element instead of current bounding box (use rbox instead of bbox)
 	isInsideSelectionRectangle(selectionRectangle){
 		if (this.#pointsSet<2) {
 			return false;
 		}
-		let l1 = new SVG.Point(selectionRectangle.x,selectionRectangle.y)
-		let r1 = new SVG.Point(selectionRectangle.x2,selectionRectangle.y2)
-		let box = this.bbox()
-		let l2 = new SVG.Point(box.x,box.y)
-		let r2 = new SVG.Point(box.x2,box.y2)
+		// if 1 of the 2 lines hanging of the symbol intersect the selection rect -> should select
+		if (lineRectIntersection(this.#preLine,selectionRectangle)
+			||(lineRectIntersection(this.#postLine,selectionRectangle))) {
+			return true;
+		}
+
+		// get bouding box of the center symbol in the rotated frame but without rotation
+		let bbox = this.symbolUse.bbox();
+		// get the corner points of the bounding box and rotate each of them to their proper positions
+		let transform = { rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y };
+		let boxPoints = [
+			new SVG.Point(bbox.x,bbox.y).transform(transform),
+			new SVG.Point(bbox.x2,bbox.y).transform(transform),
+			new SVG.Point(bbox.x2,bbox.y2).transform(transform),
+			new SVG.Point(bbox.x,bbox.y2).transform(transform)
+		];
 		
-		// if rectangle has area 0, no overlap
-		if (l1.x == r1.x || l1.y == r1.y || r2.x == l2.x || l2.y == r2.y)
-            return false;
-		
-		// If one rectangle is on left side of other
-        if (l1.x > r2.x || l2.x > r1.x) {
-			return false;
-        }
-		
-        // If one rectangle is above other
-        if (r1.y < l2.y || r2.y < l1.y) {
-			return false;
-        }
- 
-        return true;
+		// if all of these points are inside the selection rect -> should select
+		if (boxPoints.map((value)=>pointInsideRect(value,selectionRectangle)).every((value)=>value)) {
+			return true;
+		}
+
+		// if at least one line defined by 2 of the 4 corner points intersects the selection rect -> should select
+		for (let index = 0; index < boxPoints.length; index++) {
+			const p1 = boxPoints[index];
+			const p2 = boxPoints[(index+1)%boxPoints.length];
+			if (lineRectIntersection([[p1.x,p1.y],[p2.x,p2.y]],selectionRectangle)) {
+				return true;
+			}
+		}
+
+		// no intersection between the selection rect and the component
+		return false;
 	}
 	
 	showBoundingBox(){
 		if (!this.#selectionRectangle) {
-			let box = this.bbox();
+			let box = this.symbolUse.bbox();
 			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
-			this.#selectionRectangle.attr("stroke-width",1)
-			this.#selectionRectangle.attr("stroke","grey")
-			this.#selectionRectangle.attr("fill","none")
+									   .transform({ rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y });
+			this.#selectionRectangle.attr({
+				"stroke-width": selectedBoxWidth,
+				"stroke": "grey",
+				"fill": "none"
+			});
+			this.#preLine.attr({
+				"stroke-width": selectedWireWidth,
+			});
+			this.#postLine.attr({
+				"stroke-width": selectedWireWidth,
+			});
 		}
 	}
 
@@ -154,6 +186,12 @@ export default class PathComponentInstance extends SVG.G {
 		if (this.#selectionRectangle) {
 			this.#selectionRectangle.remove();
 			this.#selectionRectangle = null
+			this.#preLine.attr({
+				"stroke-width": "0.4pt",
+			});
+			this.#postLine.attr({
+				"stroke-width": "0.4pt",
+			});
 		}
 	}
 
@@ -243,7 +281,7 @@ export default class PathComponentInstance extends SVG.G {
 		}
 	}
 	
-	emulateSecondClick(snappedPoint){
+	emulateSecondClick(snappedPoint, runCB = true){
 		// second click / touch
 		if (this.#pointsSet>0) {
 			this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
@@ -256,6 +294,9 @@ export default class PathComponentInstance extends SVG.G {
 			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
+			if (runCB) {
+				this.#finishedPlacingCallback()
+			}
 		}
 	}
 
@@ -296,11 +337,11 @@ export default class PathComponentInstance extends SVG.G {
 
 		const tl = this.#midAbs.minus(this.symbol.relMid);
 		const angle = Math.atan2(this.#prePointArray[0][1] - endPoint.y, endPoint.x - this.#prePointArray[0][0]);
-		const angleDeg = (angle * 180) / Math.PI;
+		this.#rotationAngle = (angle * 180) / Math.PI;
 
 		this.symbolUse.move(tl.x, tl.y);
 		// clockwise rotation \__(°o°)__/
-		this.symbolUse.transform({ rotate: -angleDeg, ox: this.#midAbs.x, oy: this.#midAbs.y });
+		this.symbolUse.transform({ rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y });
 
 		// recalc pins
 		this.#prePointArray[1] = this.symbol.startPin.point.rotate(angle, undefined, true).plus(this.#midAbs).toArray();

@@ -17,7 +17,12 @@
  * @param {PathComponentSymbol} symbol - the symbol to use
  * @param {SVG.Container} container - the container/canvas to add the symbol to
  * @param {MouseEvent} [_event] - an optional (mouse/touch) event, which caused the element to be added
+ * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
  * @returns {ComponentInstance}
+ */
+
+/**
+ * @function ComponentInstance.finishedPlacingCallback
  */
 
 /**

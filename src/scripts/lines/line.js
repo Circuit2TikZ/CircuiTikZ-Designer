@@ -3,6 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
+import { lineRectIntersection, pointInsideRect, selectedWireWidth } from "../utils/selectionHelper";
 
 /// <reference path="../utils/impSVGNumber.d.ts" />
 /** @typedef {import("../snapDrag/snapPoint")} SnapPoint */
@@ -100,52 +101,20 @@ export default class Line extends SVG.Polyline {
 
 	/**
 	 * 
-	 * @param {[[number,number], [number,number]]} l1 
-	 * @param {[[number,number], [number,number]]} l2 
-	 */
-	#linelineIntersection(l1, l2){
-		let det = (l1[0][0]-l1[1][0])*(l2[0][1]-l2[1][1])-(l1[0][1]-l1[1][1])*(l2[0][0]-l2[1][0]);
-		if (det==0) return false;
-		let t = ((l1[0][0]-l2[0][0])*(l2[0][1]-l2[1][1])-(l1[0][1]-l2[0][1])*(l2[0][0]-l2[1][0]))/det;
-		let u =-((l1[0][0]-l1[1][0])*(l1[0][1]-l2[0][1])-(l1[0][1]-l1[1][1])*(l1[0][0]-l2[0][0]))/det;
-		return t >= 0 && t <= 1 && u >= 0 && u <= 1
-	}
-
-	/**
-	 * 
-	 * @param {[number,number]} point 
-	 * @param {SVG.Box} rect 
-	 */
-	#pointInsideRect(point, rect){
-		return point[0]>=rect.x && point[0]<= rect.x2 && point[1]>=rect.y && point[1]<= rect.y2
-	}
-
-	/**
-	 * 
 	 * @param {SVG.Box} selectionRectangle 
 	 */
 	isInsideSelectionRectangle(selectionRectangle){
-		let allPointsInside = this.#pointInsideRect(this._array[0],selectionRectangle);
+		let allPointsInside = pointInsideRect(this._array[0],selectionRectangle);
 		for (let idx = 0; idx < this._array.length-1; idx++) {
 			let p2 = this._array[idx+1];
 			let lineSegment = [this._array[idx],p2];
 
 			if (allPointsInside) {
-				allPointsInside = this.#pointInsideRect(p2,selectionRectangle)
+				allPointsInside = pointInsideRect(p2,selectionRectangle)
 			}
 
-			let boxPoints = [
-				[selectionRectangle.x, selectionRectangle.y],
-				[selectionRectangle.x2, selectionRectangle.y],
-				[selectionRectangle.x2, selectionRectangle.y2],
-				[selectionRectangle.x, selectionRectangle.y2],
-				[selectionRectangle.x, selectionRectangle.y],
-			]
-
-			for (let index = 0; index < boxPoints.length-1; index++) {
-				if (this.#linelineIntersection(lineSegment, [boxPoints[index],boxPoints[index+1]])) {
-					return true;
-				}
+			if (lineRectIntersection(lineSegment, selectionRectangle)) {
+				return true;
 			}
 		}
 
@@ -154,7 +123,7 @@ export default class Line extends SVG.Polyline {
 
 	showBoundingBox(){
 		this.attr({
-			"stroke-width": "2pt",
+			"stroke-width": selectedWireWidth,
 		});
 	}
 

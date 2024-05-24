@@ -207,9 +207,10 @@ export default class ComponentSymbol extends SVG.Symbol {
 	 *
 	 * @param {SVG.Container} container - the container to add the instance to
 	 * @param {MouseEvent} event - the event which triggered the adding
+	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 * @returns {ComponentInstance} the new instance
 	 */
-	addInstanceToContainer(container, event) {
+	addInstanceToContainer(container, event, finishedPlacingCallback) {
 		throw new Error("Not implemented; use subclasses");
 	}
 
