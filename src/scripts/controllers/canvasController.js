@@ -190,6 +190,11 @@ export default class CanvasController {
 			if (arguments.length > 0) this.#invScreenCTM = null;
 			return oldZoomFunction.apply(this.canvas, args);
 		};
+				
+		// shift whole canvas down such that the origin is in the bottom left corner
+		let box = this.canvas.viewbox();
+		box.y=box.y-box.h
+		document.getElementById("canvas").setAttribute("viewBox",box.toString())
 	}
 
 	/**
