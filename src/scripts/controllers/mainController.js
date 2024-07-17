@@ -17,6 +17,7 @@ import SnapCursorController from "../snapDrag/snapCursor";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import ExportController from "./exportController";
 import PathComponentInstance from "../components/pathComponentInstance";
+import SelectionController from "./selectionController";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -110,6 +111,7 @@ export default class MainController {
 		canvasPromise.then(() => {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
+			this.selectionController = new SelectionController(this);
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
@@ -128,24 +130,40 @@ export default class MainController {
 	 */
 	#initShortcuts(){
 		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
-		document.body.addEventListener('keyup', (e) => {
-			// shouldn't active if altkey, ctrl or shift is pressed
-			if (e.altKey || e.ctrlKey || e.shiftKey) {
-				return;
+		document.body.addEventListener('keydown', (e) => {
+			if (e.key === "x" && e.shiftKey && !e.ctrlKey && !e.altKey) {
+				e.preventDefault();
+				// flip selection at horizontal axis
+				//TODO
 			}
-			switch (e.code) {
-				case 'Escape':
-					this.#switchMode(MainController.modes.DRAG_PAN);
-					break;
-				case 'KeyW':
-					this.#switchMode(MainController.modes.DRAW_LINE);
-					break;
-				case 'Delete':
-				case 'KeyE':
-					this.#switchMode(MainController.modes.ERASE);
-					break;
-				default:
-					break;
+			if (e.key === "y" && e.shiftKey && !e.ctrlKey && !e.altKey) {
+				e.preventDefault();
+				// flip selection at vertical axis
+				//TODO
+			}
+			if (e.key === "r" && !e.shiftKey && e.ctrlKey && !e.altKey) {
+				e.preventDefault();
+				this.selectionController.rotateSelection(90)
+				// rotate selection counter clockwise
+				//TODO
+			}
+
+			// shouldn't active if altkey, ctrl or shift is pressed
+			if (!(e.altKey || e.ctrlKey || e.shiftKey)) {
+				switch (e.code) {
+					case 'Escape':
+						this.#switchMode(MainController.modes.DRAG_PAN);
+						break;
+					case 'KeyW':
+						this.#switchMode(MainController.modes.DRAW_LINE);
+						break;
+					case 'Delete':
+					case 'KeyE':
+						this.#switchMode(MainController.modes.ERASE);
+						break;
+					default:
+						break;
+				}
 			}
 		}, false);
 
@@ -163,6 +181,9 @@ export default class MainController {
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		document.body.addEventListener('keyup', (e) => {
+			if (e.ctrlKey || e.shiftKey || e.altKey) {
+				return;
+			}
 			var componentTitleName = shortcutDict[e.key]
 			if(componentTitleName){
 				this.#switchMode(MainController.modes.DRAG_PAN); //switch to standard mode to avoid weird states
@@ -348,9 +369,9 @@ export default class MainController {
 							if (oldComponent.getPointsSet()>0) {
 								lastpoint = oldComponent.getStartPoint();
 							}else{
-								oldComponent.emulateFirstClick(CanvasController.controller.lastCanvasPoint);
+								oldComponent.firstClick(CanvasController.controller.lastCanvasPoint);
 							}
-							oldComponent.emulateSecondClick(CanvasController.controller.lastCanvasPoint, false);//cleanly finish placing the oldComponent somewhere before deleting it
+							oldComponent.secondClick(CanvasController.controller.lastCanvasPoint, false);//cleanly finish placing the oldComponent somewhere before deleting it
 						}
 						this.removeInstance(oldComponent);
 					}
@@ -358,7 +379,7 @@ export default class MainController {
 					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN)});
 					if ((newInstance instanceof PathComponentInstance)) {
 						if (lastpoint) {
-							newInstance.emulateFirstClick(lastpoint);
+							newInstance.firstClick(lastpoint);
 							newInstance.move(CanvasController.controller.lastCanvasPoint);
 						}
 					}else{
@@ -499,7 +520,7 @@ export default class MainController {
 			case MainController.modes.DRAG_PAN:
 				this.#modeSwitchButtons.modeDragPan.classList.remove("selected");
 				this.canvasController.deactivatePanning();
-				this.canvasController.deactivateSelection();
+				this.selectionController.deactivateSelection();
 				for (const instance of this.instances) {
 					if (instance.disableDrag) instance.disableDrag();
 				}
@@ -524,7 +545,7 @@ export default class MainController {
 			case MainController.modes.DRAG_PAN:
 				this.#modeSwitchButtons.modeDragPan.classList.add("selected");
 				this.canvasController.activatePanning();
-				this.canvasController.activateSelection();
+				this.selectionController.activateSelection();
 				for (const instance of this.instances) {
 					if (instance.enableDrag) instance.enableDrag();
 				}

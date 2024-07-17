@@ -263,6 +263,55 @@ export default class Line extends SVG.Polyline {
 		return (lineVector.x * lambda + lineStart.x - pt.x) ** 2 + (lineVector.y * lambda + lineStart.y - pt.y) ** 2;
 	}
 
+	rotate(angleDeg){
+		if (Math.abs(angleDeg % 180)>0.1) {
+			for (let index = 1; index < this.#drawCommands.length; index+=2) {
+				let element = this.#drawCommands[index];
+				if (element === Line.Direction.HORIZONTAL_VERTICAL) {
+					this.#drawCommands[index] = Line.Direction.VERTICAL_HORIZONTAL
+				} else if(element === Line.Direction.VERTICAL_HORIZONTAL){
+					this.#drawCommands[index] = Line.Direction.HORIZONTAL_VERTICAL
+				}
+			}
+		}
+		
+		let center = new SVG.Point(this.bbox().cx,this.bbox().cy)
+		for (let index = 0; index < this.#drawCommands.length; index+=2) {
+			let element = this.#drawCommands[index];
+			this.#drawCommands[index] = element.rotate(angleDeg,center,false)
+		}
+		
+		this.#buildArrayFromDrawCommands()
+	}
+
+	#buildArrayFromDrawCommands(){
+		this._array.splice(0,this._array.length)
+
+		for (let index = 0; index < this.#drawCommands.length; index++) {
+			const element = this.#drawCommands[index];
+			if (element instanceof SVG.Point) {
+				this._array.push([element.x,element.y])
+			}else{
+				const last = this.#drawCommands[index-1]
+				const next = this.#drawCommands[index+1]
+				if (element == Line.Direction.HORIZONTAL_VERTICAL) {
+					this._array.push([next.x,last.y])
+				}else if (element == Line.Direction.VERTICAL_HORIZONTAL) {
+					this._array.push([last.x,next.y])					
+				}
+			}
+		}
+		this.#redraw()
+	}
+
+	move(amount){
+		for (let index = 0; index < this.#drawCommands.length; index+=2) {
+			let element = this.#drawCommands[index];
+			this.#drawCommands[index] = new SVG.Point(element.x+amount.x,element.y+amount.y)
+		}
+		this.#buildArrayFromDrawCommands()
+	}
+
 	/**
 	 * Stringifies the Line in TikZ syntax.
 	 * @returns {string}

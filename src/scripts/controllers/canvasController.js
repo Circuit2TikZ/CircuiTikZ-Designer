@@ -6,7 +6,6 @@ import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
 import SnapController from "../snapDrag/snapController";
 import ComponentInstance from "../components/componentInstance";
-import Line from "../lines/line";
 
 /** @typedef {import("../controllers/mainController").default} MainController */
 
@@ -97,36 +96,6 @@ export default class CanvasController {
 	 */
 	lastCanvasPoint = new SVG.Point(0,0)
 
-	//information about the selection
-	/**
-	 * if selection should add or subtract
-	 * @readonly
-	 * @enum {number}
-	 */
-	static SelectionMode = {
-		RESET:1,
-		ADD:2,
-		SUB:3,
-	};
-	/** @type {SelectionMode} */
-	#selectionMode
-	/** @type {ComponentInstance[]} */
-	#instances = [];
-	/** @type {Line[]} */
-	#lines = [];
-	/** @type {SVG.Point} */
-	#selectionStartPosition
-	/** @type {SVG.Rect} */
-	#selectionRectangle
-	/** @type {boolean} */
-	#currentlyDragging
-	/** @type {ComponentInstance[]} */
-	currentlySelectedComponents
-	/** @type {Line[]} */
-	currentlySelectedLines
-	/** @type {boolean} */
-	#selectionEnabled
-
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
@@ -135,8 +104,6 @@ export default class CanvasController {
 	constructor(canvas, mainController) {
 		CanvasController.controller = this;
 		this.canvas = canvas;
-		this.#instances = mainController.instances;
-		this.#lines = mainController.lines;
 		this.paper = SVG.SVG("#grid");
 		this.xAxis = SVG.SVG("#xAxis");
 		this.yAxis = SVG.SVG("#yAxis");
@@ -160,8 +127,6 @@ export default class CanvasController {
 		canvas.on(["mousemove","touchmove"],(/**@type {MouseEvent}*/evt)=>{
 			this.lastCanvasPoint = this.pointerEventToPoint(evt);
 		})
-
-		this.#initSelection();
 	
 		// init context menus
 		// if (!CanvasController.#contextMenu) {
@@ -225,181 +190,6 @@ export default class CanvasController {
 			if (arguments.length > 0) this.#invScreenCTM = null;
 			return oldZoomFunction.apply(this.canvas, args);
 		};
-	}
-
-	#initSelection(){
-		this.#selectionStartPosition = new SVG.Point()
-		this.#selectionRectangle = this.canvas.rect(0,0).move(0,0);
-		this.#selectionRectangle.attr("stroke-width",1)
-		this.#selectionRectangle.attr("stroke","grey")
-		this.#selectionRectangle.attr("fill","none")
-		this.#selectionEnabled = true
-		this.currentlySelectedComponents = []
-		this.currentlySelectedLines = []
-		this.#currentlyDragging = false
-		this.#selectionMode = CanvasController.SelectionMode.RESET
-		
-		this.canvas.on("mousedown",(/**@type {MouseEvent}*/evt)=>{
-			if (evt.button===2&&this.#currentlyDragging) {
-				// currently dragging a selection rectangle but right mouse button clicked -> cancel selection rectangle
-				this.#currentlyDragging = false;
-				this.#selectionRectangle.attr("width",0);
-				this.#selectionRectangle.attr("height",0);
-			}
-
-			if (evt.button===0&&this.#selectionEnabled) {
-				let shift = evt.shiftKey||evt.detail.shiftKey
-				let ctrl = evt.ctrlKey||evt.detail.ctrlKey
-				if (shift) {
-					if (ctrl) {
-						this.resetSelection();
-						this.#selectionMode = CanvasController.SelectionMode.RESET
-					}else{
-						this.#selectionMode = CanvasController.SelectionMode.ADD;
-					}
-				}else{
-					if (ctrl) {
-						this.#selectionMode = CanvasController.SelectionMode.SUB;
-					}else{
-						this.resetSelection();
-						this.#selectionMode = CanvasController.SelectionMode.RESET
-					}
-				}
-				
-				this.#currentlyDragging=true;
-				this.#selectionStartPosition = CanvasController.controller.pointerEventToPoint(evt, false);
-
-				this.#selectionRectangle.move(this.#selectionStartPosition.x,this.#selectionStartPosition.y);
-			}
-		})
-		this.canvas.on("mousemove",(/**@type {MouseEvent}*/evt)=>{
-			if (this.#currentlyDragging) {
-				let pt = CanvasController.controller.pointerEventToPoint(evt, false);
-				let dx = pt.x-this.#selectionStartPosition.x;
-				let dy = pt.y-this.#selectionStartPosition.y;
-				let moveX = this.#selectionStartPosition.x;
-				let moveY = this.#selectionStartPosition.y;
-				if (dx<0) {
-					moveX += dx
-					dx = -dx
-				}
-				if (dy<0) {
-					moveY += dy
-					dy = -dy
-				}
-				this.#selectionRectangle.move(moveX,moveY)
-				this.#selectionRectangle.attr("width",dx);
-				this.#selectionRectangle.attr("height",dy);
-
-				this.#showSelection();
-			}
-
-		})
-		this.canvas.on("mouseup",(/**@type {MouseEvent}*/evt)=>{
-			if (evt.button===0) {
-				if (this.#currentlyDragging) {
-					this.#updateSelection();
-					this.#currentlyDragging=false;
-					this.#selectionRectangle.attr("width",0);
-					this.#selectionRectangle.attr("height",0);
-				}
-
-				let pt = CanvasController.controller.pointerEventToPoint(evt, false);
-				if (pt.x==this.#selectionStartPosition.x&&pt.y==this.#selectionStartPosition.y) {
-					// clicked on canvas
-					// TODO
-				}
-			}
-		})
-	}
-
-	#showSelection(){
-		let selectionBox = this.#selectionRectangle.bbox();
-		for (const instance of this.#instances) {
-			let cond=false;
-			if (this.#selectionMode==CanvasController.SelectionMode.RESET) {
-				cond = instance.isInsideSelectionRectangle(selectionBox)
-			}else if (this.#selectionMode==CanvasController.SelectionMode.ADD) {
-				cond = instance.isInsideSelectionRectangle(selectionBox)||this.currentlySelectedComponents.includes(instance)
-			}else{
-				cond = !instance.isInsideSelectionRectangle(selectionBox)&&this.currentlySelectedComponents.includes(instance)
-			}
-			if (cond) {
-				instance.showBoundingBox()
-			}else{
-				instance.hideBoundingBox()
-			}
-		}
-
-		for (const line of this.#lines) {
-			let cond=false;
-			if (this.#selectionMode==CanvasController.SelectionMode.RESET) {
-				cond = line.isInsideSelectionRectangle(selectionBox)
-			}else if (this.#selectionMode==CanvasController.SelectionMode.ADD) {
-				cond = line.isInsideSelectionRectangle(selectionBox)||this.currentlySelectedLines.includes(line)
-			}else{
-				cond = !line.isInsideSelectionRectangle(selectionBox)&&this.currentlySelectedLines.includes(line)
-			}
-			if (cond) {
-				line.showBoundingBox()
-			}else{
-				line.hideBoundingBox()
-			}
-		}
-	}
-
-	#updateSelection(){
-		let selectionBox = this.#selectionRectangle.bbox();
-		for (const instance of this.#instances) {
-			if (this.#selectionMode==CanvasController.SelectionMode.RESET || this.#selectionMode==CanvasController.SelectionMode.ADD) {
-				if (instance.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedComponents.includes(instance)) {
-						this.currentlySelectedComponents.push(instance)
-					}
-				}
-			}else{
-				if (instance.isInsideSelectionRectangle(selectionBox)) {
-					let idx = this.currentlySelectedComponents.indexOf(instance)
-					if (idx>-1) {
-						this.currentlySelectedComponents.splice(idx,1)
-					}
-				}
-			}
-		}
-
-		for (const line of this.#lines) {
-			if (this.#selectionMode==CanvasController.SelectionMode.RESET || this.#selectionMode==CanvasController.SelectionMode.ADD) {
-				if (line.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedLines.includes(line)) {
-						this.currentlySelectedLines.push(line)
-					}
-				}
-			}else{
-				if (line.isInsideSelectionRectangle(selectionBox)) {
-					let idx = this.currentlySelectedLines.indexOf(line)
-					if (idx>-1) {
-						this.currentlySelectedLines.splice(idx,1)
-					}
-				}
-			}
-		}
-	}
-
-	resetSelection(){
-		this.currentlySelected = []
-	}
-
-	activateSelection(){
-		this.#selectionEnabled = true;
-	}
-
-	deactivateSelection(){
-		this.#selectionEnabled = false;
-		this.#selectionRectangle.attr("width",0);
-		this.#selectionRectangle.attr("height",0);
-		this.#selectionMode = CanvasController.SelectionMode.RESET;
-		this.#showSelection();
-		this.#updateSelection();
 	}
 
 	/**

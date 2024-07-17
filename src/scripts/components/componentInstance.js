@@ -32,6 +32,16 @@
  */
 
 /**
+ * @function ComponentInstance.bbox
+ * @returns {SVG.Box}
+ */
+
+/**
+ * @function ComponentInstance.getAnchorPoint
+ * @returns {SVG.Point}
+ */
+
+/**
  * @function ComponentInstance.showBoundingBox
  */
 
@@ -41,6 +51,23 @@
 
 /**
  * @function ComponentInstance.remove
+ */
+
+/**
+ * Moves the component by its mid point.
+ * @function ComponentInstance.move
+ *
+ * @param {number} x - the new mid x coordinate
+ * @param {number} y - the new mid y coordinate
+ * @returns {ComponentInstance}
+ */
+
+/**
+ * Rotate the instance counter clockwise around its midAbs point.
+ * @function ComponentInstance.rotate
+ *
+ * @param {number} angleDeg
+ * @returns {ComponentInstance}
  */
 
 /**

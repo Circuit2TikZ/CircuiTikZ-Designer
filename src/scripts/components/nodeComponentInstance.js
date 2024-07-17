@@ -44,7 +44,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	/** @type {SVG.Point[]} */
 	relSnappingPoints;
 
-	/**
+	/** the rectangle which is shown when the component is selected
 	 * @type {?SVG.Rect}
 	 */
 	#selectionRectangle = null;
@@ -103,29 +103,25 @@ export default class NodeComponentInstance extends SVG.Use {
 
 			dh.startDrag(event);
 
-			// Prevent immediate dragend --> 200ms delay before recognizing dragend
+			// Prevent immediate dragend --> 10ms delay before recognizing dragend
 			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
 			const endEventNameScoped = endEventName + ".drag";
 
-			const dragEndFunction = (evt)=>{
+			const dragEndFunction = (/** @type {MouseEvent} */evt)=>{
 				dh.endDrag(evt);
 				CanvasController.controller.placingComponent=null;
-				this.#finishedPlacingCallback()
+				this.#finishedPlacingCallback();
 			}
 
 			SVG.off(window, endEventNameScoped);
 
 			let timeout = null;
-			const addDragEndHandler = (/** @type {MouseEvent|undefined} */ event) => {
-				if (event?.stopImmediatePropagation) event.stopImmediatePropagation();
+			const addDragEndHandler = () => {
 				window.clearTimeout(timeout);
-				window.removeEventListener(endEventName, addDragEndHandler);
 				SVG.on(window, endEventNameScoped, dragEndFunction, dh, { passive: false });
 			};
 
-			timeout = window.setTimeout(addDragEndHandler, 200);
-			// dragend event occurred? --> listen for next one
-			window.addEventListener(endEventName, addDragEndHandler, { passive: false });
+			timeout = window.setTimeout(addDragEndHandler, 10);
 		}
 
 		this.snappingPoints = this.symbol._pins.map(
@@ -198,10 +194,8 @@ export default class NodeComponentInstance extends SVG.Use {
 	}
 
 	hideBoundingBox(){
-		if (this.#selectionRectangle) {
-			this.#selectionRectangle.remove();
-			this.#selectionRectangle = null
-		}
+		this.#selectionRectangle?.remove();
+		this.#selectionRectangle = null
 	}
 
 	/**
@@ -292,6 +286,10 @@ export default class NodeComponentInstance extends SVG.Use {
 		this.#recalculateSelectionRect();
 
 		return this;
+	}
+
+	getAnchorPoint(){
+		return this.#midAbs
 	}
 
 	#recalculateSelectionRect(){
@@ -394,7 +392,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	remove() {
 		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
-		this.#selectionRectangle?.remove();
+		this.hideBoundingBox();
 		super.remove();
 		return this;
 	}

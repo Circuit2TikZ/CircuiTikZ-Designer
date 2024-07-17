@@ -81,6 +81,7 @@ export default class svgSnapDragHandler {
 		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new svgSnapDragHandler(element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
+			snapDragHandler.#dragEnd()
 			snapDragHandler.removeHandler();
 			return null;
 		}

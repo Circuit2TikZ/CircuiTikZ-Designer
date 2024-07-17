@@ -10,6 +10,7 @@ import SnapController from "../snapDrag/snapController";
 import SnapCursorController from "../snapDrag/snapCursor";
 import SnapPoint from "../snapDrag/snapPoint";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectedWireWidth } from "../utils/selectionHelper";
+import MainController from "../controllers/mainController";
 
 /**
  * Instance of a `PathComponentSymbol`.
@@ -101,6 +102,9 @@ export default class PathComponentInstance extends SVG.G {
 		CanvasController.controller.deactivatePanning();
 		this.container.on(["mousemove", "touchmove"], this.#moveListener, this);
 		this.container.on(["click", "touchstart", "touchend"], this.#clickListener, this);
+		this.cancelPlacement = this.cancelPlacement.bind(this);
+		document.addEventListener("keydown", this.cancelPlacement)
+		// this.container.on("keydown", this.#cancelPlacement, this)
 
 		// add snap points for other components
 		this.#midAbs = new SVG.Point(0, 0);
@@ -123,7 +127,6 @@ export default class PathComponentInstance extends SVG.G {
 		return new PathComponentInstance(symbol, container, finishedPlacingCallback);
 	}
 
-	//TODO improve this: check rotated element instead of current bounding box (use rbox instead of bbox)
 	isInsideSelectionRectangle(selectionRectangle){
 		if (this.#pointsSet<2) {
 			return false;
@@ -183,16 +186,14 @@ export default class PathComponentInstance extends SVG.G {
 	}
 
 	hideBoundingBox(){
-		if (this.#selectionRectangle) {
-			this.#selectionRectangle.remove();
-			this.#selectionRectangle = null
-			this.#preLine.attr({
-				"stroke-width": "0.4pt",
-			});
-			this.#postLine.attr({
-				"stroke-width": "0.4pt",
-			});
-		}
+		this.#selectionRectangle?.remove();
+		this.#selectionRectangle = null
+		this.#preLine.attr({
+			"stroke-width": "0.4pt",
+		});
+		this.#postLine.attr({
+			"stroke-width": "0.4pt",
+		});
 	}
 
 	/**
@@ -237,7 +238,7 @@ export default class PathComponentInstance extends SVG.G {
 	 */
 	remove() {
 		for (const point of this.snappingPoints) point.removeInstance();
-		this.#selectionRectangle?.remove();
+		this.hideBoundingBox();
 		super.remove();
 		return this;
 	}
@@ -263,15 +264,26 @@ export default class PathComponentInstance extends SVG.G {
 		
 		if (this.#pointsSet===0 && (!isTouchEvent || isTouchStart)) {
 			// first click / touch
-			this.emulateFirstClick(snappedPoint);
+			this.firstClick(snappedPoint);
 		} else if ((!isTouchEvent || isTouchEnd)) {
 			// second click / touch
 			event.preventDefault();
-			this.emulateSecondClick(snappedPoint);
+			this.secondClick(snappedPoint);
+		}
+	}
+
+	cancelPlacement(/**@type {KeyboardEvent} */event){
+		if (this.#pointsSet<2 && event.key=="Escape") {
+			let point = new SVG.Point();
+			if (this.#pointsSet===0) {
+				this.firstClick(point);
+			}
+			this.secondClick(point);
+			MainController.controller.removeInstance(this)
 		}
 	}
 	
-	emulateFirstClick(snappedPoint){
+	firstClick(snappedPoint){
 		if (this.#pointsSet===0) {
 			this.#prePointArray[0][0] = snappedPoint.x;
 			this.#prePointArray[0][1] = snappedPoint.y;
@@ -281,11 +293,12 @@ export default class PathComponentInstance extends SVG.G {
 		}
 	}
 	
-	emulateSecondClick(snappedPoint, runCB = true){
+	secondClick(snappedPoint, runCB = true){
 		// second click / touch
 		if (this.#pointsSet>0) {
 			this.container.off(["click", "touchstart", "touchend"], this.#clickListener);
 			this.container.off(["mousemove", "touchmove"], this.#moveListener);
+			document.removeEventListener("keydown", this.cancelPlacement)
 			this.container.node.classList.remove("selectPoint");
 			this.#pointsSet = 2;
 			CanvasController.controller.placingComponent=null;
@@ -308,6 +321,10 @@ export default class PathComponentInstance extends SVG.G {
 		return new SVG.Point(this.#prePointArray[0][0],this.#prePointArray[0][1]);
 	}
 
+	getEndPoint(){
+		return new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]);
+	}
+
 	/**
 	 * Redraw the component on mouse move. Used for initial adding of the component.
 	 * @param {MouseEvent|TouchEvent} event
@@ -321,6 +338,14 @@ export default class PathComponentInstance extends SVG.G {
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.move(snappedPoint);
 		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
+	}
+
+	getAnchorPoint(){
+		return this.#midAbs
+	}
+
+	rotate(angleDeg){
+		
 	}
 
 	/**
