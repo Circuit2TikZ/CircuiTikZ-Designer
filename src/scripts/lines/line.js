@@ -284,6 +284,20 @@ export default class Line extends SVG.Polyline {
 		this.#buildArrayFromDrawCommands()
 	}
 
+	flip(horizontal){
+		let center = new SVG.Point(this.bbox().cx,this.bbox().cy)
+		let direction = new SVG.Point(horizontal?0:1,horizontal?1:0);
+		for (let index = 0; index < this.#drawCommands.length; index+=2) {
+			let element = this.#drawCommands[index];
+			let diff = center.minus(element)
+			diff.x *= direction.x
+			diff.y *= direction.y
+			this.#drawCommands[index] = diff.plus(diff.plus(element))
+		}
+
+		this.#buildArrayFromDrawCommands()
+	}
+
 	#buildArrayFromDrawCommands(){
 		this._array.splice(0,this._array.length)
 

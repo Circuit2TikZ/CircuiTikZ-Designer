@@ -326,6 +326,10 @@ export default class NodeComponentInstance extends SVG.Use {
 		}
 	}
 
+	flip(horizontal){
+		// TODO flip symbol + change tikz code generation
+	}
+
 	/**
 	 * Internal helper to recalculate the view box/bounding box (BBox) dimensions (with, height) and the vector
 	 * ({@link relMid}) between the top left corner of the BBox and {@link #midAbs}.

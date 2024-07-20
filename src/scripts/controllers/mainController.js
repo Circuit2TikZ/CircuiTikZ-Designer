@@ -131,21 +131,25 @@ export default class MainController {
 	#initShortcuts(){
 		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
 		document.body.addEventListener('keydown', (e) => {
-			if (e.key === "x" && e.shiftKey && !e.ctrlKey && !e.altKey) {
+			console.log(e);
+			if (e.key === "X" && e.shiftKey && !e.ctrlKey && !e.altKey) {
 				e.preventDefault();
 				// flip selection at horizontal axis
-				//TODO
+				this.selectionController.flipSelection(true);
 			}
-			if (e.key === "y" && e.shiftKey && !e.ctrlKey && !e.altKey) {
+			if (e.key === "Y" && e.shiftKey && !e.ctrlKey && !e.altKey) {
 				e.preventDefault();
 				// flip selection at vertical axis
-				//TODO
+				this.selectionController.flipSelection(false);
 			}
-			if (e.key === "r" && !e.shiftKey && e.ctrlKey && !e.altKey) {
-				e.preventDefault();
-				this.selectionController.rotateSelection(90)
-				// rotate selection counter clockwise
-				//TODO
+			if (e.ctrlKey && !e.altKey) {
+				if (e.key === "r" && !e.shiftKey) {
+					e.preventDefault();
+					this.selectionController.rotateSelection(90);
+				}else if(e.key === "R"&& e.shiftKey){
+					e.preventDefault();
+					this.selectionController.rotateSelection(-90);
+				}
 			}
 
 			// shouldn't active if altkey, ctrl or shift is pressed

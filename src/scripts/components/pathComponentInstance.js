@@ -384,6 +384,20 @@ export default class PathComponentInstance extends SVG.G {
 		}
 	}
 
+	flip(horizontal){
+		// TODO change tikz code generation
+		let direction = horizontal?1:0
+		
+		let start = this.getStartPoint()
+		let end = this.getEndPoint()
+		let diffstart = this.#midAbs.minus(start)
+		let diffend = this.#midAbs.minus(end)
+		this.#prePointArray[0][direction] += 2*(horizontal?diffstart.y:diffstart.x)
+		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
+
+		this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
+	}
+
 	/**
 	 * Recalculates the points after an movement
 	 * @param {SVG.Point} endPoint

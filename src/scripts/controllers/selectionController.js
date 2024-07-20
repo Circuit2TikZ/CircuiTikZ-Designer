@@ -298,7 +298,7 @@ export default class SelectionController {
 			let center = new SVG.Point(line.bbox().cx,line.bbox().cy)
 			line.rotate(angleDeg);
 			let move = center.rotate(angleDeg,overallCenter,false).minus(center)
-			line.move(new SVG.Point(move.x,move.y))
+			line.move(move)
 		}
 
 		for (const component of this.currentlySelectedComponents) {
@@ -319,7 +319,6 @@ export default class SelectionController {
 	 * @param {boolean} horizontal if flipping horizontally or vertically
 	 */
 	flipSelection(horizontal){
-		// TODO
 		//get overall center
 		if (!this.hasSelection()) {
 			return
@@ -327,10 +326,36 @@ export default class SelectionController {
 		
 		let overallBBox = this.#getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
+		let direction = new SVG.Point(horizontal?0:1,horizontal?1:0);
 
 		//flip all components/lines individually at their center
 		//get individual center and flip that at overall center
 		//move individual components/lines to new flipped center
+		for (const line of this.currentlySelectedLines) {
+			let center = new SVG.Point(line.bbox().cx,line.bbox().cy);
+			line.flip(horizontal);
+			let diff = overallCenter.minus(center);
+			diff.x *= direction.x;
+			diff.y *= direction.y;
+			let move = diff.plus(diff);
+			line.move(move);
+		}
+
+		for (const component of this.currentlySelectedComponents) {
+			let center = component.getAnchorPoint()
+			component.flip(horizontal);
+			let diff = overallCenter.minus(center)
+			diff.x *= direction.x;
+			diff.y *= direction.y;
+			let move = diff.plus(diff.plus(center));
+
+			if (component instanceof NodeComponentInstance) {
+				component.move(move.x,move.y)
+				component.recalculateSnappingPoints();
+			}else{
+				component.move(move)
+			}
+		}
 	}
 
 	/**

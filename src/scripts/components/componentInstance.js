@@ -54,11 +54,19 @@
  */
 
 /**
+ * TODO this function is not implemented in pathComponentInstance!!!! using move(SVG.Point) instead
  * Moves the component by its mid point.
  * @function ComponentInstance.move
- *
  * @param {number} x - the new mid x coordinate
  * @param {number} y - the new mid y coordinate
+ * @returns {ComponentInstance}
+ */
+
+/**
+ * Flips the component at its center
+ * @function ComponentInstance.flip
+ *
+ * @param {boolean} horizontal - if the flip should be horizontal or vertical
  * @returns {ComponentInstance}
  */
 
