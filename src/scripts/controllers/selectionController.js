@@ -305,9 +305,11 @@ export default class SelectionController {
 			let center = component.getAnchorPoint()
 			component.rotate(angleDeg);
 			let move = center.rotate(angleDeg,overallCenter,false)
-			component.move(move.x,move.y)
 			if (component instanceof NodeComponentInstance) {
+				component.move(move.x,move.y)
 				component.recalculateSnappingPoints();
+			}else{
+				component.move(move)
 			}
 		}
 	}

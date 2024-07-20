@@ -337,7 +337,26 @@ export default class PathComponentInstance extends SVG.G {
 	move(snappedPoint){
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.move(snappedPoint);
-		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
+		} else if (this.#pointsSet === 1) {
+			this.#recalcPointsEnd(snappedPoint);
+		} else {
+			// get relative start and end points
+			let relstart = this.getStartPoint().minus(this.#midAbs);
+			let relend = this.getEndPoint().minus(this.#midAbs);
+
+			// recalc points at new position
+			let newstart = relstart.plus(snappedPoint);
+			this.#prePointArray[0][0] = newstart.x;
+			this.#prePointArray[0][1] = newstart.y;
+			const angle = this.#recalcPointsEnd(relend.plus(snappedPoint));
+			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+			// recalculate bounding box
+			if (this.#selectionRectangle){
+				// only if it was shown before
+				this.hideBoundingBox();
+				this.showBoundingBox();
+			}
+		}
 	}
 
 	getAnchorPoint(){
@@ -345,7 +364,24 @@ export default class PathComponentInstance extends SVG.G {
 	}
 
 	rotate(angleDeg){
-		
+		// rotate start point around midabs
+		let startPoint = this.getStartPoint().rotate(angleDeg,this.getAnchorPoint())
+		this.#prePointArray[0][0] = startPoint.x
+		this.#prePointArray[0][1] = startPoint.y
+
+		// rotate end point around midabs
+		let endPoint = this.getEndPoint().rotate(angleDeg,this.getAnchorPoint())
+
+		// recalculate other points
+		const angle = this.#recalcPointsEnd(endPoint);
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+
+		// recalculate bounding box
+		if (this.#selectionRectangle){
+			// only if it was shown before
+			this.hideBoundingBox()
+			this.showBoundingBox()
+		}
 	}
 
 	/**
