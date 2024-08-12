@@ -19,6 +19,8 @@ import ExportController from "./exportController";
 import PathComponentInstance from "../components/pathComponentInstance";
 import SelectionController from "./selectionController";
 
+import hotkeys from 'hotkeys-js';
+
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
 
@@ -128,44 +130,57 @@ export default class MainController {
 	/**
 	 * initialises keyboard shortcuts
 	 */
-	#initShortcuts(){
-		//handle basic shortcuts for paning (Esc), line drawing (W) and erasing (E, Del)
-		document.body.addEventListener('keydown', (e) => {
-			if (e.key === "x" && e.shiftKey && !e.ctrlKey && !e.altKey) {
-				e.preventDefault();
-				// flip selection at horizontal axis
-				//TODO
-			}
-			if (e.key === "y" && e.shiftKey && !e.ctrlKey && !e.altKey) {
-				e.preventDefault();
-				// flip selection at vertical axis
-				//TODO
-			}
-			if (e.key === "r" && !e.shiftKey && e.ctrlKey && !e.altKey) {
-				e.preventDefault();
-				this.selectionController.rotateSelection(90)
-				// rotate selection counter clockwise
-				//TODO
-			}
+	#initShortcuts(){		
+		// stop reload behaviour
+		hotkeys('f5', () => false);
+		hotkeys('ctrl+r, command+r', ()=>false);
 
-			// shouldn't active if altkey, ctrl or shift is pressed
-			if (!(e.altKey || e.ctrlKey || e.shiftKey)) {
-				switch (e.code) {
-					case 'Escape':
-						this.#switchMode(MainController.modes.DRAG_PAN);
-						break;
-					case 'KeyW':
-						this.#switchMode(MainController.modes.DRAW_LINE);
-						break;
-					case 'Delete':
-					case 'KeyE':
-						this.#switchMode(MainController.modes.ERASE);
-						break;
-					default:
-						break;
+		// rotate selection
+		hotkeys("ctrl+r",()=>{
+			this.selectionController.rotateSelection(90);
+			return false;
+		})
+		hotkeys("ctrl+shift+r",()=>{
+			this.selectionController.rotateSelection(-90);
+			return false;
+		})
+
+		//flip selection
+		hotkeys("shift+x",()=>{
+			//TODO
+			return false;
+		})
+		hotkeys("shift+y",()=>{
+			//TODO
+			return false;
+		})
+
+		// mode change
+		hotkeys("esc",()=>{
+			this.#switchMode(MainController.modes.DRAG_PAN);
+			return false;
+		})
+		hotkeys("w",()=>{
+			this.#switchMode(MainController.modes.DRAW_LINE);
+			return false;
+		})
+		hotkeys("del,e",()=>{
+			if(!SelectionController.controller.hasSelection()){
+				this.#switchMode(MainController.modes.ERASE);
+			}else{
+				if (SelectionController.controller.currentlySelectedComponents.length>0){
+					for (const instance of SelectionController.controller.currentlySelectedComponents) {
+						this.removeInstance(instance)
+					}
+				}
+				if (SelectionController.controller.currentlySelectedLines.length>0){
+					for (const line of SelectionController.controller.currentlySelectedLines) {
+						this.removeLine(line)
+					}
 				}
 			}
-		}, false);
+			return false;
+		})
 
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
@@ -180,18 +195,14 @@ export default class MainController {
 			".":"circ",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
-		document.body.addEventListener('keyup', (e) => {
-			if (e.ctrlKey || e.shiftKey || e.altKey) {
-				return;
-			}
-			var componentTitleName = shortcutDict[e.key]
-			if(componentTitleName){
+		for (const [key, value] of Object.entries(shortcutDict)) {
+			hotkeys(key,()=>{
 				this.#switchMode(MainController.modes.DRAG_PAN); //switch to standard mode to avoid weird states
-				var componentButton = document.querySelector('[title="'+componentTitleName+'"]')
+				var componentButton = document.querySelector('[title="'+value+'"]')
 				var clickEvent = new MouseEvent('mousedown',{view:window,bubbles:true,cancelable:true,});
 				componentButton?.dispatchEvent(clickEvent);
-			}
-		});
+			})
+		}
 	}
 
 	/**
@@ -207,7 +218,7 @@ export default class MainController {
 	 */
 	async #initCanvas() {
 		let canvasElement = await waitForElementLoaded("canvas");
-		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement), MainController.controller);
+		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement));
 	}
 
 	/**

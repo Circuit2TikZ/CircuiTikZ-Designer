@@ -143,6 +143,7 @@ export default class SelectionController {
 				}
 			}
 		})
+		SelectionController.controller = this;
 	}
 
 	#showSelection(){

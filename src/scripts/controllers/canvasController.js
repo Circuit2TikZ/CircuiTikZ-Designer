@@ -99,9 +99,8 @@ export default class CanvasController {
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
-	 * @param {MainController} mainController
 	 */
-	constructor(canvas, mainController) {
+	constructor(canvas) {
 		CanvasController.controller = this;
 		this.canvas = canvas;
 		this.paper = SVG.SVG("#grid");

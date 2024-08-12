@@ -21,6 +21,7 @@
 		"@svgdotjs/svg.panzoom.js": "^2.1.2",
 		"bootstrap": "^5.3.2",
 		"file-saver": "^2.0.5",
+		"hotkeys-js": "^3.13.7",
 		"material-symbols": "^0.14.5",
 		"mdb-ui-kit": "^6.4.2"
 	},
