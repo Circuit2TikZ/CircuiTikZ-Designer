@@ -137,7 +137,7 @@ export default class PathComponentInstance extends SVG.G {
 			return true;
 		}
 
-		// get bouding box of the center symbol in the rotated frame but without rotation
+		// get bounding box of the center symbol in the rotated frame but without rotation
 		let bbox = this.symbolUse.bbox();
 		// get the corner points of the bounding box and rotate each of them to their proper positions
 		let transform = { rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y };
@@ -220,6 +220,7 @@ export default class PathComponentInstance extends SVG.G {
 	 * @returns {string}
 	 */
 	toTikzString() {
+		//TODO properly calculate flip
 		return (
 			"\\draw " +
 			this.snappingPoints[0].toTikzString() +

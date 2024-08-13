@@ -71,6 +71,14 @@
  */
 
 /**
+ * Flip the component horizontally or vertically
+ * @function ComponentInstance.flip
+ *
+ * @param {boolean} horizontal along which axis to flip
+ * @returns {ComponentInstance}
+ */
+
+/**
  * @function ComponentInstance.fromJson
  * Create a instance from the (saved) serialized text.
  *
@@ -92,5 +100,3 @@
  *
  * @returns {string} the serialized instance
  */
-
-// TODO add cancel function with right click/Esc when adding a new component

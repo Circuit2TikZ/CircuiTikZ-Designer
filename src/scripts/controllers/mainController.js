@@ -147,11 +147,11 @@ export default class MainController {
 
 		//flip selection
 		hotkeys("shift+x",()=>{
-			//TODO
+			this.selectionController.flipSelection(true);
 			return false;
 		})
 		hotkeys("shift+y",()=>{
-			//TODO
+			this.selectionController.flipSelection(false);
 			return false;
 		})
 

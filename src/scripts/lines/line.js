@@ -284,6 +284,25 @@ export default class Line extends SVG.Polyline {
 		this.#buildArrayFromDrawCommands()
 	}
 
+	/**
+	 * Flip the component horizontally or vertically
+	 *
+	 * @param {boolean} horizontal along which axis to flip
+	 */
+	flip(horizontal){
+
+		let flipX = horizontal?0:-2;
+		let flipY = horizontal?-2:0;
+		let center = new SVG.Point(this.bbox().cx,this.bbox().cy)
+
+		for (let index = 0; index < this.#drawCommands.length; index+=2) {
+			let element = this.#drawCommands[index];
+			let diffToCenter = element.minus(center);
+			this.#drawCommands[index] = new SVG.Point(element.x+flipX*diffToCenter.x,element.y+flipY*diffToCenter.y)
+		}
+		this.#buildArrayFromDrawCommands()
+	}
+
 	#buildArrayFromDrawCommands(){
 		this._array.splice(0,this._array.length)
 

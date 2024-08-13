@@ -95,7 +95,7 @@ export default class NodeComponentInstance extends SVG.Use {
 			let clientPoint = event instanceof MouseEvent ? event : event?.touches[0] || { clientX: 0, clientY: 0 };
 			let pt = new SVG.Point(clientPoint.clientX, clientPoint.clientY);
 			pt = pt.transform(this.screenCTM().inverseO());
-			this.move(pt.x, pt.y);
+			this.moveTo(pt);
 
 			// 2nd: start dragging
 			/** @type {DragHandler} */
@@ -249,6 +249,7 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @returns {string}
 	 */
 	toTikzString() {
+		//TODO properly calculate flip
 		const optionsString = this.symbol.serializeTikzOptions();
 		return (
 			"\\node[" +
@@ -263,19 +264,26 @@ export default class NodeComponentInstance extends SVG.Use {
 		);
 	}
 
+	moveRel(delta){
+		return this.moveTo(this.#midAbs.plus(delta))
+	}
+
 	/**
-	 * Moves the component by its mid point.
+	 * Moves the component by its anchor point to the new point.
 	 *
-	 * @param {number} x - the new mid x coordinate
-	 * @param {number} y - the new mid y coordinate
-	 * @returns {this}
+	 * @param {SVG.Point} position - the new anchor position
+	 * @returns {NodeComponentInstance}
 	 */
+	moveTo(pos){
+		return this.move(pos.x,pos.y)
+	}
+
 	move(x, y) {
 		this.#midAbs.x = x;
 		this.#midAbs.y = y;
 
 		// don't call recalculateSnappingPoints here; #dragEnd does call this method instead
-
+		
 		if (this.#angleDeg === 0) {
 			super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
 		} else {
@@ -324,6 +332,16 @@ export default class NodeComponentInstance extends SVG.Use {
 			super.attr("transform", `translate(${this.#midAbs.x}, ${this.#midAbs.y}) rotate(${-this.#angleDeg})`);
 			super.move(-this.symbol.relMid.x, -this.symbol.relMid.y);
 		}
+	}
+
+	/**
+	 * Flip the component horizontally or vertically
+	 *
+	 * @param {boolean} horizontal along which axis to flip
+	 * @returns {ComponentInstance}
+	 */
+	flip(horizontal){
+		
 	}
 
 	/**

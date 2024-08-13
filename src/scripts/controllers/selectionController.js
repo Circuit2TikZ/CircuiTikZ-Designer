@@ -318,18 +318,26 @@ export default class SelectionController {
 	 * @param {boolean} horizontal if flipping horizontally or vertically
 	 */
 	flipSelection(horizontal){
-		// TODO
 		//get overall center
+		
 		if (!this.hasSelection()) {
 			return
 		}
 		
 		let overallBBox = this.#getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
+		let flipX = horizontal?0:-2;
+		let flipY = horizontal?-2:0;
 
 		//flip all components/lines individually at their center
 		//get individual center and flip that at overall center
 		//move individual components/lines to new flipped center
+		for (const line of this.currentlySelectedLines) {
+			let center = new SVG.Point(line.bbox().cx,line.bbox().cy)
+			line.flip(horizontal);
+			let diffToCenter = center.minus(overallCenter);
+			line.moveRel(new SVG.Point(diffToCenter.x*flipX,diffToCenter.y*flipY))
+		}
 	}
 
 	/**
