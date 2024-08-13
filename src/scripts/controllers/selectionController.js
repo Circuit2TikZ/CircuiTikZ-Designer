@@ -5,6 +5,8 @@
 import * as SVG from "@svgdotjs/svg.js";
 import Line from "../lines/line";
 import NodeComponentInstance from "../components/nodeComponentInstance";
+import MainController from "./mainController";
+import PathComponentInstance from "../components/pathComponentInstance";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 
@@ -346,13 +348,22 @@ export default class SelectionController {
 
 	/**
 	 * 
-	 * @param {Number} x distance in x direction
-	 * @param {Number} y distance in y direction
+	 * @param {SVG.Point} position the new position
 	 */
-	moveSelection(x,y){
+	moveSelectionTo(position){
 		// TODO
 		//get individual centers 
-		//move all components/lines by x,y
+		//move all components/lines to position
+	}
+
+	removeSelection(){
+		for (const line of this.currentlySelectedLines) {
+			MainController.controller.removeLine(line)
+		}
+
+		for (const component of this.currentlySelectedComponents) {
+			MainController.controller.removeInstance(component)
+		}
 	}
 
 	/**

@@ -169,16 +169,7 @@ export default class MainController {
 			if(!SelectionController.controller.hasSelection()){
 				this.#switchMode(MainController.modes.ERASE);
 			}else{
-				if (SelectionController.controller.currentlySelectedComponents.length>0){
-					for (const instance of SelectionController.controller.currentlySelectedComponents) {
-						this.removeInstance(instance)
-					}
-				}
-				if (SelectionController.controller.currentlySelectedLines.length>0){
-					for (const line of SelectionController.controller.currentlySelectedLines) {
-						this.removeLine(line)
-					}
-				}
+				SelectionController.controller.removeSelection()
 			}
 			return false;
 		})
