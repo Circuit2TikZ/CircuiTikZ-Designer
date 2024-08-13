@@ -46,16 +46,10 @@ export default class SnapCursorController {
 	/**
 	 * Moves the cursor to a new position.
 	 *
-	 * @param {number|{x: number, y: number}} x - the x coordinate or an point instance
-	 * @param {number} [y] - the y coordinate
+	 * @param {SVG.Point} position - the new position
 	 */
-	move(x, y) {
-		if (typeof x === "object") {
-			y = x.y;
-			x = x.x;
-		}
-
-		this.#cursor.move(x - this.#cursorViewBox.cx, y - this.#cursorViewBox.cy);
+	moveTo(position) {
+		this.#cursor.move(position.x - this.#cursorViewBox.cx, position.y - this.#cursorViewBox.cy);
 	}
 
 	/**

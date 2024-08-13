@@ -153,6 +153,8 @@ export default class PathComponentInstance extends SVG.G {
 			return true;
 		}
 
+		//TODO technically, the function will return false if the complete selection rectangle is inside the component bounding box. Should the component be selected in this case? And if yes, is it even important to look at this edge case?
+
 		// if at least one line defined by 2 of the 4 corner points intersects the selection rect -> should select
 		for (let index = 0; index < boxPoints.length; index++) {
 			const p1 = boxPoints[index];
@@ -332,13 +334,29 @@ export default class PathComponentInstance extends SVG.G {
 	 */
 	#moveListener(event) {
 		const snappedPoint = CanvasController.controller.pointerEventToPoint(event);
-		this.move(snappedPoint)
+		this.moveTo(snappedPoint)
 	}
 
-	move(snappedPoint){
+	/**
+	 * Moves the component delta units.
+	 *
+	 * @param {SVG.Point} delta - the relative movement
+	 * @returns {ComponentInstance}
+	 */
+	moveRel(delta){
+		this.moveTo(this.#midAbs.plus(delta))
+	}
+
+	/**
+	 * Moves the component by its anchor point to the new point.
+	 *
+	 * @param {SVG.Point} position - the new anchor position
+	 * @returns {PathComponentInstance}
+	 */
+	moveTo(position){
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
-			SnapCursorController.controller.move(snappedPoint);
-		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(snappedPoint);
+			SnapCursorController.controller.moveTo(position);
+		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(position);
 	}
 
 	getAnchorPoint(){

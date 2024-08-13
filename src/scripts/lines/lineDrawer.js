@@ -219,7 +219,7 @@ export default class LineDrawer {
 		const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 		if (!this.#newLine) {
-			SnapCursorController.controller.move(snappedPoint);
+			SnapCursorController.controller.moveTo(snappedPoint);
 		} else {
 			// try to get quadrant change
 			const isAboveXAxis = snappedPoint.y < this.#lastPoint.y;

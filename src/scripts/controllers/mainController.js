@@ -20,6 +20,7 @@ import PathComponentInstance from "../components/pathComponentInstance";
 import SelectionController from "./selectionController";
 
 import hotkeys from 'hotkeys-js';
+import NodeComponentInstance from "../components/nodeComponentInstance";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -388,14 +389,14 @@ export default class MainController {
 					}
 
 					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN)});
-					if ((newInstance instanceof PathComponentInstance)) {
+					if (newInstance instanceof PathComponentInstance) {
 						if (lastpoint) {
 							newInstance.firstClick(lastpoint);
-							newInstance.move(CanvasController.controller.lastCanvasPoint);
+							newInstance.moveTo(CanvasController.controller.lastCanvasPoint);
 						}
-					}else{
+					}else if(newInstance instanceof NodeComponentInstance){
 						let point = CanvasController.controller.lastCanvasPoint
-						newInstance.move(point.x,point.y)
+						newInstance.moveTo(point)
 					}
 					this.canvasController.placingComponent = newInstance;
 					this.addInstance(newInstance);

@@ -263,7 +263,13 @@ export default class NodeComponentInstance extends SVG.Use {
 			" {};"
 		);
 	}
-
+	
+	/**
+	 * Moves the component delta units.
+	 *
+	 * @param {SVG.Point} delta - the relative movement
+	 * @returns {ComponentInstance}
+	 */
 	moveRel(delta){
 		return this.moveTo(this.#midAbs.plus(delta))
 	}

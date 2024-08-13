@@ -299,16 +299,20 @@ export default class SelectionController {
 			let center = new SVG.Point(line.bbox().cx,line.bbox().cy)
 			line.rotate(angleDeg);
 			let move = center.rotate(angleDeg,overallCenter,false).minus(center)
-			line.move(new SVG.Point(move.x,move.y))
+			line.moveRel(move)
 		}
-
+		
 		for (const component of this.currentlySelectedComponents) {
+			/**@type {SVG.Point} */
 			let center = component.getAnchorPoint()
 			component.rotate(angleDeg);
 			let move = center.rotate(angleDeg,overallCenter,false)
-			component.move(move.x,move.y)
+
 			if (component instanceof NodeComponentInstance) {
+				component.moveTo(move)
 				component.recalculateSnappingPoints();
+			}else if(component instanceof PathComponentInstance){
+				component.moveTo(move)
 			}
 		}
 	}

@@ -22,7 +22,7 @@
  */
 
 /**
- * @function ComponentInstance.finishedPlacingCallback
+ * @function ComponentInstance#finishedPlacingCallback
  */
 
 /**
@@ -54,11 +54,27 @@
  */
 
 /**
- * Moves the component by its mid point.
+ * Moves the component by its anchor point to the new point. Overload for SVG.move
  * @function ComponentInstance.move
  *
- * @param {number} x - the new mid x coordinate
- * @param {number} y - the new mid y coordinate
+ * @param {number} x - the x coordinate
+ * @param {number} y - the y coordinate
+ * @returns {ComponentInstance}
+ */
+
+/**
+ * Moves the component delta units.
+ * @function ComponentInstance.moveRel
+ *
+ * @param {SVG.Point} delta - the relative movement
+ * @returns {ComponentInstance}
+ */
+
+/**
+ * Moves the component by its anchor point to the new point.
+ * @function ComponentInstance.moveTo
+ *
+ * @param {SVG.Point} position - the new anchor position
  * @returns {ComponentInstance}
  */
 

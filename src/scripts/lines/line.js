@@ -323,7 +323,7 @@ export default class Line extends SVG.Polyline {
 		this.#redraw()
 	}
 
-	move(amount){
+	moveRel(amount){
 		for (let index = 0; index < this.#drawCommands.length; index+=2) {
 			let element = this.#drawCommands[index];
 			this.#drawCommands[index] = new SVG.Point(element.x+amount.x,element.y+amount.y)
