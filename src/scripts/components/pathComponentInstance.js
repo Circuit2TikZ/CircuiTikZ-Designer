@@ -364,7 +364,38 @@ export default class PathComponentInstance extends SVG.G {
 	}
 
 	rotate(angleDeg){
+		// rotate start point around midabs
+		let startPoint = this.getStartPoint().rotate(angleDeg,this.getAnchorPoint())
+		this.#prePointArray[0][0] = startPoint.x
+		this.#prePointArray[0][1] = startPoint.y
+
+		// rotate end point around midabs
+		let endPoint = this.getEndPoint().rotate(angleDeg,this.getAnchorPoint())
+
+		// recalculate other points
+		const angle = this.#recalcPointsEnd(endPoint);
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+
+		// recalculate bounding box
+		if (this.#selectionRectangle){
+			// only if it was shown before
+			this.hideBoundingBox()
+			this.showBoundingBox()
+		}
+	}
+
+	flip(horizontal){
+		// TODO change tikz code generation
+		let direction = horizontal?1:0
 		
+		let start = this.getStartPoint()
+		let end = this.getEndPoint()
+		let diffstart = this.#midAbs.minus(start)
+		let diffend = this.#midAbs.minus(end)
+		this.#prePointArray[0][direction] += 2*(horizontal?diffstart.y:diffstart.x)
+		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
+
+		this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
 	}
 
 	/**

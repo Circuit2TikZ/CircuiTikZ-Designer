@@ -79,6 +79,14 @@
  */
 
 /**
+ * Flips the component at its center
+ * @function ComponentInstance.flip
+ *
+ * @param {boolean} horizontal - if the flip should be horizontal or vertical
+ * @returns {ComponentInstance}
+ */
+
+/**
  * Rotate the instance counter clockwise around its midAbs point.
  * @function ComponentInstance.rotate
  *

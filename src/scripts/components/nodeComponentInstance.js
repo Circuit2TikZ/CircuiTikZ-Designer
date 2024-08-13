@@ -340,6 +340,10 @@ export default class NodeComponentInstance extends SVG.Use {
 		}
 	}
 
+	flip(horizontal){
+		// TODO flip symbol + change tikz code generation
+	}
+
 	/**
 	 * Flip the component horizontally or vertically
 	 *
