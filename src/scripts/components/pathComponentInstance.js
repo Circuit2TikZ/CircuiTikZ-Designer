@@ -356,7 +356,21 @@ export default class PathComponentInstance extends SVG.G {
 	moveTo(position){
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
 			SnapCursorController.controller.moveTo(position);
-		} else if (this.#pointsSet === 1) this.#recalcPointsEnd(position);
+		} else if (this.#pointsSet === 1) {
+			this.#recalcPointsEnd(position);
+		} else{
+			let diff = position.minus(this.getAnchorPoint())
+			let startPoint = diff.plus(this.getStartPoint())
+			let endPoint = diff.plus(this.getEndPoint())
+			this.#prePointArray[0][0] = startPoint.x
+			this.#prePointArray[0][1] = startPoint.y
+			let angle = this.#recalcPointsEnd(endPoint)
+			if (this.#selectionRectangle) {
+				this.hideBoundingBox()
+				this.showBoundingBox()
+			}
+			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+		}
 	}
 
 	getAnchorPoint(){
