@@ -138,11 +138,11 @@ export default class MainController {
 
 		// rotate selection
 		hotkeys("ctrl+r",()=>{
-			this.selectionController.rotateSelection(90);
+			this.selectionController.rotateSelection(-90);
 			return false;
 		})
 		hotkeys("ctrl+shift+r",()=>{
-			this.selectionController.rotateSelection(-90);
+			this.selectionController.rotateSelection(90);
 			return false;
 		})
 
@@ -183,7 +183,7 @@ export default class MainController {
 			"l":"inductor (american)",
 			"z":"jump crossing",
 			"x":"plain crossing",
-			"t":"nmos",
+			"t":"npn",
 			".":"circ",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
