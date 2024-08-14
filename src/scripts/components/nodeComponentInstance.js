@@ -317,11 +317,24 @@ export default class NodeComponentInstance extends SVG.Use {
 	rotate(angleDeg) {
 		this.#angleDeg += angleDeg;
 		this.#simplifyAngleDeg()
-
-		// this.#recalculateRelSnappingPoints();
-		// this.recalculateSnappingPoints();
-
+		
 		this.#updateTransform()
+
+		this.#recalculateRelSnappingPoints();
+		this.recalculateSnappingPoints()
+	}
+
+	/**
+	 * calculate the current transformation matrix for this component incorporating rotation and flipping
+	 * @returns {SVG.Matrix}
+	 */
+	#getTransformMatrix(){
+		return new SVG.Matrix({
+			rotate:-this.#angleDeg,
+			origin:[this.#midAbs.x,this.#midAbs.y],
+			scaleX:this.#flip.x,
+			scaleY:this.#flip.y
+		})
 	}
 
 	#updateTransform(){
@@ -333,14 +346,7 @@ export default class NodeComponentInstance extends SVG.Use {
 		}
 
 		// transformation matrix incorporating rotation and flipping
-		let m = new SVG.Matrix({
-			rotate:-this.#angleDeg,
-			origin:[this.#midAbs.x,this.#midAbs.y],
-			// position:[this.#midAbs.x,this.#midAbs.y],
-			scaleX:this.#flip.x,
-			scaleY:this.#flip.y
-		})
-		
+		let m = this.#getTransformMatrix()
 		this.transform(m)
 		
 		// default bounding box
@@ -355,11 +361,8 @@ export default class NodeComponentInstance extends SVG.Use {
 
 		// set relMid for external use
 		this.relMid = this.#midAbs.minus(new SVG.Point(this.boundingBox.x,this.boundingBox.y))
-		// console.log(this.relMid)
 
 		this.#recalculateSelectionRect();
-
-		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point.transform(m));
 	}
 
 	#simplifyAngleDeg(){
@@ -396,22 +399,24 @@ export default class NodeComponentInstance extends SVG.Use {
 		}		
 		
 		this.#updateTransform()
+
+		this.#recalculateRelSnappingPoints()
+		this.recalculateSnappingPoints()
 	}
 
 	/**
 	 * Recalculate the snapping points, which are used to snap this symbol to the grid.
 	 */
 	#recalculateRelSnappingPoints() {
-		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point);
-		if (this.#angleDeg !== 0)
-			this.relSnappingPoints = this.relSnappingPoints.map((point) => point.rotate(this.#angleDeg));
+		let m = this.#getTransformMatrix()
+		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point.transform(m));
 	}
 
 	/**
 	 * Recalculate the snapping points, which are used by other symbols.
 	 */
 	recalculateSnappingPoints() {
-		for (const snapPoint of this.snappingPoints) snapPoint.recalculate(null, this.#angleDeg);
+		for (const snapPoint of this.snappingPoints) snapPoint.recalculate(null, this.#angleDeg, this.#flip);
 	}
 
 	/**

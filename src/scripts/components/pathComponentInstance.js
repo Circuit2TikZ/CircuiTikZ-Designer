@@ -310,7 +310,8 @@ export default class PathComponentInstance extends SVG.G {
 			this.#pointsSet = 2;
 			CanvasController.controller.placingComponent=null;
 			const angle = this.#recalcPointsEnd(snappedPoint);
-			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+			
+			for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
@@ -373,7 +374,7 @@ export default class PathComponentInstance extends SVG.G {
 				this.hideBoundingBox()
 				this.showBoundingBox()
 			}
-			for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+			for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 		}
 	}
 
@@ -392,7 +393,7 @@ export default class PathComponentInstance extends SVG.G {
 
 		// recalculate other points
 		const angle = this.#recalcPointsEnd(endPoint);
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle);
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 
 		// recalculate bounding box
 		if (this.#selectionRectangle){
@@ -416,7 +417,8 @@ export default class PathComponentInstance extends SVG.G {
 		this.#prePointArray[0][direction] += 2*(horizontal?diffstart.y:diffstart.x)
 		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
 
-		this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
+		const angle = this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 	}
 
 	/**

@@ -310,11 +310,9 @@ export default class SelectionController {
 			component.rotate(angleDeg);
 			let move = center.rotate(angleDeg,overallCenter,false)
 
+			component.moveTo(move)
 			if (component instanceof NodeComponentInstance) {
-				component.moveTo(move)
 				component.recalculateSnappingPoints();
-			}else if(component instanceof PathComponentInstance){
-				component.moveTo(move)
 			}
 		}
 	}
@@ -351,6 +349,10 @@ export default class SelectionController {
 			let diffToCenter = center.minus(overallCenter);
 			component.flip(horizontal)
 			component.moveRel(new SVG.Point(diffToCenter.x*flipX,diffToCenter.y*flipY))
+
+			if (component instanceof NodeComponentInstance) {
+				component.recalculateSnappingPoints();
+			}
 		}
 	}
 

@@ -2,7 +2,7 @@
  * @module snapPoint
  */
 
-import { Point } from "@svgdotjs/svg.js";
+import { Point, Matrix } from "@svgdotjs/svg.js";
 
 /** @typedef {Point|{x: number, y: number}|[number, number]} PointAlike */
 
@@ -36,7 +36,9 @@ export default class SnapPoint extends Point {
 
 	/** @type {SnapPointChangeListener[]} */
 	#changeListeners = [];
-
+	
+	// For understanding: mid and relPosition are given by reference: don't have to be updated for recalculate if their references are still valid.
+	// TODO Should change in the future since this could easily cause hard to find bugs
 	/**
 	 * Create a new SnapPoint.
 	 *
@@ -53,45 +55,37 @@ export default class SnapPoint extends Point {
 		this.#anchorName = anchorName;
 		this.#relPosition = relPosition;
 		this.#inDegree = inDegree;
-		this.recalculate(mid || this.#instance.mid, angle);
+		this.recalculate(mid || this.#instance.mid, angle, new Point(1,1));
 	}
 
 	/**
 	 * Recalculate the position if the position or angle of the instance changed.
 	 *
-	 * @param {?PointAlike} [newMid] - the anchor/mid point, if changed; no need to set if the point instance hasn't changed
+	 * @param {?Point} [newMid] - the anchor/mid point, if changed; no need to set if the point instance hasn't changed
 	 * @param {?number} [angle] - the new angle, if changed
+	 * @param {?Point} [flip] - the flip vector
 	 */
-	recalculate(newMid, angle) {
+	recalculate(newMid, angle, flip) {
 		if (newMid) this.#midPoint = newMid;
 		if (angle || angle === 0) this.#angle = angle;
 
-		let /** @type {number} */ sin, /** @type {number} */ cos;
-		let quadrant = this.#inDegree ? this.#angle / 90 : (this.#angle * 180) / Math.PI;
-		if (Number.isInteger(quadrant)) {
-			// quadrant --> 0...3
-			quadrant = quadrant % 4; // --> -3...3
-			if (quadrant < 0) quadrant += 4; // --> 0...3
+		const relPos = Array.isArray(this.#relPosition)? new Point(this.#relPosition[0],this.#relPosition[1]):new Point(this.#relPosition.x,this.#relPosition.y);
+		const mid = Array.isArray(this.#midPoint)? new Point(this.#midPoint[0],this.#midPoint[1]):new Point(this.#midPoint.x,this.#midPoint.y);
+		
+		let angle_deg = this.#inDegree? this.#angle: (this.#angle * 180) / Math.PI
+		let m = new Matrix({
+			rotate:-angle_deg,
+			translate:[mid.x,mid.y],
+			scaleX:flip.x,
+			scaleY:flip.y
+		})
+		
+		const oldX = this.x, oldY = this.y;
 
-			sin = [0, 1, 0, -1][quadrant];
-			cos = [1, 0, -1, 0][quadrant];
-		} else {
-			sin = Math.sin(this.#angle);
-			cos = Math.cos(this.#angle);
-		}
-
-		const relPosX = Array.isArray(this.#relPosition) ? this.#relPosition[0] : this.#relPosition.x;
-		const relPosY = Array.isArray(this.#relPosition) ? this.#relPosition[1] : this.#relPosition.y;
-
-		const anchorPosX = Array.isArray(this.#midPoint) ? this.#midPoint[0] : this.#midPoint.x;
-		const anchorPosY = Array.isArray(this.#midPoint) ? this.#midPoint[1] : this.#midPoint.y;
-
-		const oldX = this.x,
-			oldY = this.y;
-
-		this.x = cos * relPosX + sin * relPosY + anchorPosX;
-		this.y = -sin * relPosX + cos * relPosY + anchorPosY;
-
+		let pt = relPos.transform(m)
+		this.x = pt.x
+		this.y = pt.y
+		
 		for (const listener of this.#changeListeners) listener(this, oldX, oldY, false);
 	}
 
