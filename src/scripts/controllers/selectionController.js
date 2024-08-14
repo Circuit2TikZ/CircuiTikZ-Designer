@@ -340,9 +340,17 @@ export default class SelectionController {
 		//move individual components/lines to new flipped center
 		for (const line of this.currentlySelectedLines) {
 			let center = new SVG.Point(line.bbox().cx,line.bbox().cy)
-			line.flip(horizontal);
 			let diffToCenter = center.minus(overallCenter);
+			line.flip(horizontal);
 			line.moveRel(new SVG.Point(diffToCenter.x*flipX,diffToCenter.y*flipY))
+		}
+
+		for (const component of this.currentlySelectedComponents) {
+			/**@type {SVG.Point} */
+			let center = component.getAnchorPoint()
+			let diffToCenter = center.minus(overallCenter);
+			component.flip(horizontal)
+			component.moveRel(new SVG.Point(diffToCenter.x*flipX,diffToCenter.y*flipY))
 		}
 	}
 

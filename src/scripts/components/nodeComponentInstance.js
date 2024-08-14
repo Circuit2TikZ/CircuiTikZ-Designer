@@ -29,16 +29,16 @@ export default class NodeComponentInstance extends SVG.Use {
 	/** @type {SVG.Container} */
 	container;
 
+	/** @type {number} */
+	#angleDeg = 0;
 	/** @type {SVG.Point} */
 	#midAbs = new SVG.Point();
 	/** @type {SVG.Point} */
+	#flip = new SVG.Point(1,1);
+	/** @type {SVG.Box} */
+	boundingBox = new SVG.Box();
+	/** @type {SVG.Point} */
 	relMid = new SVG.Point();
-	/** @type {number} */
-	#boxWidth;
-	/** @type {number} */
-	#boxHeight;
-	/** @type {number} */
-	#angleDeg = 0;
 	/** @type {SnapPoint[]} */
 	snappingPoints;
 	/** @type {SVG.Point[]} */
@@ -83,8 +83,8 @@ export default class NodeComponentInstance extends SVG.Use {
 		this.use(this.symbol);
 		this.container.add(this);
 
-		this.#recalculateBoxDimensions();
 		this.#recalculateRelSnappingPoints();
+		this.#updateTransform()
 
 		this.node.classList.add("draggable");
 		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, true);
@@ -249,13 +249,15 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @returns {string}
 	 */
 	toTikzString() {
-		//TODO properly calculate flip
+		//don't change the order of flip and angleDeg!!! otherwise tikz render and UI are not the same
 		const optionsString = this.symbol.serializeTikzOptions();
 		return (
 			"\\node[" +
 			this.symbol.tikzName +
 			(optionsString ? ", " + optionsString : "") +
 			(this.#angleDeg !== 0 ? `, rotate=${this.#angleDeg}` : "") +
+			(this.#flip.x < 0 ? `, xscale=-1` : "") +
+			(this.#flip.y < 0 ? `, yscale=-1` : "") +
 			"] " +
 			(this.nodeName ? "(" + this.nodeName + ") " : "") +
 			"at " +
@@ -285,19 +287,11 @@ export default class NodeComponentInstance extends SVG.Use {
 	}
 
 	move(x, y) {
+		// don't call recalculateSnappingPoints here; #dragEnd does call this method instead
 		this.#midAbs.x = x;
 		this.#midAbs.y = y;
-
-		// don't call recalculateSnappingPoints here; #dragEnd does call this method instead
-		
-		if (this.#angleDeg === 0) {
-			super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
-		} else {
-			super.attr("transform", `translate(${x}, ${y}) rotate(${-this.#angleDeg})`);
-		}
-
-		//also move the selection rectangle
-		this.#recalculateSelectionRect();
+		this.#updateTransform()
+		super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
 
 		return this;
 	}
@@ -322,78 +316,86 @@ export default class NodeComponentInstance extends SVG.Use {
 	 */
 	rotate(angleDeg) {
 		this.#angleDeg += angleDeg;
-		while (this.#angleDeg > 180) this.#angleDeg -= 360;
-		while (this.#angleDeg <= -180) this.#angleDeg += 360;
+		this.#simplifyAngleDeg()
 
-		// recalculate box width & height
-		this.#recalculateBoxDimensions();
-		this.#recalculateRelSnappingPoints();
-		this.recalculateSnappingPoints();
+		// this.#recalculateRelSnappingPoints();
+		// this.recalculateSnappingPoints();
+
+		this.#updateTransform()
+	}
+
+	#updateTransform(){
+		// if flip has different x and y signs and 180 degrees turn, simplify to flip only
+		if (this.#angleDeg==180&&this.#flip.x*this.#flip.y<0) {
+			this.#flip.x*=-1;
+			this.#flip.y*=-1;
+			this.#angleDeg=0;
+		}
+
+		// transformation matrix incorporating rotation and flipping
+		let m = new SVG.Matrix({
+			rotate:-this.#angleDeg,
+			origin:[this.#midAbs.x,this.#midAbs.y],
+			// position:[this.#midAbs.x,this.#midAbs.y],
+			scaleX:this.#flip.x,
+			scaleY:this.#flip.y
+		})
+		
+		this.transform(m)
+		
+		// default bounding box
+		this.boundingBox = new SVG.Box(
+			this.#midAbs.x - this.symbol.relMid.x,
+			this.#midAbs.y - this.symbol.relMid.y,
+			this.symbol.viewBox.width,
+			this.symbol.viewBox.height
+		);
+		// transform to proper location
+		this.boundingBox = this.boundingBox.transform(m)
+
+		// set relMid for external use
+		this.relMid = this.#midAbs.minus(new SVG.Point(this.boundingBox.x,this.boundingBox.y))
+		// console.log(this.relMid)
+
 		this.#recalculateSelectionRect();
 
-		if (this.#angleDeg === 0) {
-			super.attr("transform", null);
-			super.move(this.#midAbs.x - this.symbol.relMid.x, this.#midAbs.y - this.symbol.relMid.y);
-		} else {
-			super.attr("transform", `translate(${this.#midAbs.x}, ${this.#midAbs.y}) rotate(${-this.#angleDeg})`);
-			super.move(-this.symbol.relMid.x, -this.symbol.relMid.y);
-		}
+		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point.transform(m));
 	}
 
-	flip(horizontal){
-		// TODO flip symbol + change tikz code generation
+	#simplifyAngleDeg(){
+		while (this.#angleDeg > 180) this.#angleDeg -= 360;
+		while (this.#angleDeg <= -180) this.#angleDeg += 360;
 	}
-
+	
 	/**
 	 * Flip the component horizontally or vertically
-	 *
-	 * @param {boolean} horizontal along which axis to flip
-	 * @returns {ComponentInstance}
-	 */
+	*
+	* @param {boolean} horizontal along which axis to flip
+	* @returns {ComponentInstance}
+	*/
 	flip(horizontal){
+		if (this.#angleDeg%180==0) {
+			if (horizontal) {
+				this.#flip.y*=-1;
+			}else{
+				this.#flip.x*=-1;
+			}
+		}else{
+			if (horizontal) {
+				this.#flip.x*=-1;
+			}else{
+				this.#flip.y*=-1;
+			}
+		}
+
+		// double flipping equals rotation by 180 deg
+		if (this.#flip.x<0&&this.#flip.y<0) {
+			this.#flip = new SVG.Point(1,1);
+			this.#angleDeg+=180;
+			this.#simplifyAngleDeg()
+		}		
 		
-	}
-
-	/**
-	 * Internal helper to recalculate the view box/bounding box (BBox) dimensions (with, height) and the vector
-	 * ({@link relMid}) between the top left corner of the BBox and {@link #midAbs}.
-	 *
-	 * Call this, if the angle/rotation changed.
-	 */
-	#recalculateBoxDimensions() {
-		switch (this.#angleDeg) {
-			case 0:
-			case 180:
-				this.#boxWidth = this.symbol.viewBox.width;
-				this.#boxHeight = this.symbol.viewBox.height;
-				break;
-			case 90:
-			case -90:
-				this.#boxWidth = this.symbol.viewBox.height;
-				this.#boxHeight = this.symbol.viewBox.width;
-				break;
-			default:
-				throw Exception("Not implemented");
-		}
-
-		switch (this.#angleDeg) {
-			case 0:
-				this.relMid.x = this.symbol.relMid.x;
-				this.relMid.y = this.symbol.relMid.y;
-				break;
-			case 90:
-				this.relMid.x = this.symbol.relMid.y;
-				this.relMid.y = -this.symbol.relMid.x + this.#boxHeight;
-				break;
-			case 180:
-				this.relMid.x = -this.symbol.relMid.x + this.#boxWidth;
-				this.relMid.y = -this.symbol.relMid.y + this.#boxHeight;
-				break;
-			case -90:
-				this.relMid.x = -this.symbol.relMid.y + this.#boxWidth;
-				this.relMid.y = this.symbol.relMid.x;
-				break;
-		}
+		this.#updateTransform()
 	}
 
 	/**
@@ -431,13 +433,6 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @returns {SVG.Box}
 	 */
 	bbox() {
-		if (this.#angleDeg === 0) return new SVG.Box(this.x(), this.y(), this.symbol.viewBox.w, this.symbol.viewBox.h);
-
-		return new SVG.Box(
-			this.#midAbs.x - this.relMid.x,
-			this.#midAbs.y - this.relMid.y,
-			this.#boxWidth,
-			this.#boxHeight
-		);
+		return this.boundingBox;
 	}
 }
