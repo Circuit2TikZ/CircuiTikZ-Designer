@@ -6,6 +6,8 @@ import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
 import SnapController from "./snapController";
+import NodeComponentInstance from "../components/nodeComponentInstance";
+import SelectionController from "../controllers/selectionController";
 
 /**
  * @typedef {object} DragHandler
@@ -36,7 +38,7 @@ import SnapController from "./snapController";
  * @class
  */
 export default class svgSnapDragHandler {
-	/** @type {SVG.Element} */
+	/** @type {NodeComponentInstance} */
 	element;
 
 	/** @type {DragHandler} */
@@ -144,6 +146,8 @@ export default class svgSnapDragHandler {
 		this.#maybeContextmenu = false; // no contextmenu after any move
 		event.preventDefault();
 
+		//TODO add selection relSnappingPoints
+
 		/** @type {SVG.Point} */
 		const relMid = this.element.relMid || this.element.symbol?.relMid || new SVG.Point(0, 0);
 
@@ -159,7 +163,18 @@ export default class svgSnapDragHandler {
 			? draggedPoint
 			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
 
-		event.detail.handler.move(destination.x, destination.y);
+		// console.log(event)
+		if (SelectionController.controller.hasSelection()){
+			SelectionController.controller.moveSelectionRel(destination.minus(this.element.getAnchorPoint()))
+			for (const element of SelectionController.controller.currentlySelectedComponents) {
+				if (element instanceof NodeComponentInstance) {
+					element.recalculateSnappingPoints()
+				}
+			}
+		}else{
+			this.element.moveTo(destination)
+		}
+		// event.detail.handler.move(destination.x, destination.y);
 	}
 
 	/**

@@ -357,13 +357,26 @@ export default class SelectionController {
 	}
 
 	/**
-	 * 
+	 * move the selection by delta
+	 * @param {SVG.Point} delta the amount to move the selection by
+	 */
+	moveSelectionRel(delta){
+		for (const element of this.currentlySelectedComponents) {
+			element.moveRel(delta)
+		}
+		for (const element of this.currentlySelectedLines) {
+			element.moveRel(delta)
+		}
+	}
+
+	/**
+	 * move the center of the selection to the new position
 	 * @param {SVG.Point} position the new position
 	 */
 	moveSelectionTo(position){
-		// TODO
-		//get individual centers 
-		//move all components/lines to position
+		let overallBBox = this.#getOverallBoundingBox()
+		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
+		this.moveSelectionRel(position.minus(overallCenter))
 	}
 
 	removeSelection(){
