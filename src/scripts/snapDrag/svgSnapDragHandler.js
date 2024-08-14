@@ -157,18 +157,21 @@ export default class svgSnapDragHandler {
 				? this.element.relSnappingPoints
 				: [new SVG.Point(0, 0)];
 
-		const componentAnchor = this.element.getAnchorPoint()
-		for (const component of SelectionController.controller.currentlySelectedComponents) {
-			if(component!=this.element){
-				for (const snappingPoint of component.snappingPoints) {
-					snapPoints.push(snappingPoint.relToComponentAnchor().plus(component.getAnchorPoint()).minus(componentAnchor))
+		let componentInSelection = SelectionController.controller.currentlySelectedComponents.includes(this.element)
+		if (componentInSelection) {
+			const componentAnchor = this.element.getAnchorPoint()
+			for (const component of SelectionController.controller.currentlySelectedComponents) {
+				if(component!=this.element){
+					for (const snappingPoint of component.snappingPoints) {
+						snapPoints.push(snappingPoint.relToComponentAnchor().plus(component.getAnchorPoint()).minus(componentAnchor))
+					}
 				}
 			}
-		}
-
-		for (const line of SelectionController.controller.currentlySelectedLines) {
-			for(const l of line.getEndPoints()){
-				snapPoints.push(l.minus(componentAnchor))
+	
+			for (const line of SelectionController.controller.currentlySelectedLines) {
+				for(const endPoint of line.getEndPoints()){
+					snapPoints.push(endPoint.minus(componentAnchor))
+				}
 			}
 		}
 
@@ -176,7 +179,7 @@ export default class svgSnapDragHandler {
 			? draggedPoint
 			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
 
-		if (SelectionController.controller.hasSelection()){
+		if (componentInSelection){
 			SelectionController.controller.moveSelectionRel(destination.minus(this.element.getAnchorPoint()))
 			for (const element of SelectionController.controller.currentlySelectedComponents) {
 				if (element instanceof NodeComponentInstance) {
