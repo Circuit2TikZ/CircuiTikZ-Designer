@@ -331,6 +331,11 @@ export default class Line extends SVG.Polyline {
 		this.#buildArrayFromDrawCommands()
 	}
 
+	getEndPoints(){
+		let numPoints = this._array.length
+		return [new SVG.Point(this._array[0][0],this._array[0][1]), new SVG.Point(this._array[numPoints-1][0],this._array[numPoints-1][1])]
+	}
+
 	/**
 	 * Stringifies the Line in TikZ syntax.
 	 * @returns {string}

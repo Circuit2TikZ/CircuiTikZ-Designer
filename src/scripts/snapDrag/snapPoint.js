@@ -69,9 +69,9 @@ export default class SnapPoint extends Point {
 		if (newMid) this.#midPoint = newMid;
 		if (angle || angle === 0) this.#angle = angle;
 
-		const relPos = Array.isArray(this.#relPosition)? new Point(this.#relPosition[0],this.#relPosition[1]):new Point(this.#relPosition.x,this.#relPosition.y);
-		const mid = Array.isArray(this.#midPoint)? new Point(this.#midPoint[0],this.#midPoint[1]):new Point(this.#midPoint.x,this.#midPoint.y);
-		
+		const relPos = this.#asPoint(this.#relPosition)
+		const mid = this.#asPoint(this.#midPoint)
+
 		let angle_deg = this.#inDegree? this.#angle: (this.#angle * 180) / Math.PI
 		let m = new Matrix({
 			rotate:-angle_deg,
@@ -87,6 +87,18 @@ export default class SnapPoint extends Point {
 		this.y = pt.y
 		
 		for (const listener of this.#changeListeners) listener(this, oldX, oldY, false);
+	}
+
+	#asPoint(pointlike){
+		return Array.isArray(pointlike)? new Point(pointlike[0],pointlike[1]):new Point(Number(pointlike.x),Number(pointlike.y));
+	}
+
+	/**
+	 * calculates the delta of this snapPoint from the instance anchor (point-anchor)
+	 * @returns {SVG.Point} 
+	 */
+	relToComponentAnchor(){
+		return this.#asPoint(this.#relPosition).plus(this.#asPoint(this.#midPoint)).minus(this.#instance.getAnchorPoint())
 	}
 
 	/**

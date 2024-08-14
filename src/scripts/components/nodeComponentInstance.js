@@ -408,7 +408,11 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * Recalculate the snapping points, which are used to snap this symbol to the grid.
 	 */
 	#recalculateRelSnappingPoints() {
-		let m = this.#getTransformMatrix()
+		let m = new SVG.Matrix({
+			rotate:-this.#angleDeg,
+			scaleX:this.#flip.x,
+			scaleY:this.#flip.y
+		})
 		this.relSnappingPoints = this.symbol._pins.concat(this.symbol._additionalAnchors).map((anchor) => anchor.point.transform(m));
 	}
 

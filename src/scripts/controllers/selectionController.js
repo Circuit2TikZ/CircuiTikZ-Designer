@@ -387,6 +387,9 @@ export default class SelectionController {
 		for (const component of this.currentlySelectedComponents) {
 			MainController.controller.removeInstance(component)
 		}
+
+		this.currentlySelectedComponents=[]
+		this.currentlySelectedLines=[]
 	}
 
 	/**
