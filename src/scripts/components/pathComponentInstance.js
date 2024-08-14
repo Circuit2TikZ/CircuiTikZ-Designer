@@ -43,6 +43,9 @@ export default class PathComponentInstance extends SVG.G {
 	/** @type {SnapPoint[]} */
 	snappingPoints;
 
+	/**@type {boolean} */
+	#mirror = false;
+
 	/**
 	 * @type {?SVG.Rect}
 	 */
@@ -228,6 +231,7 @@ export default class PathComponentInstance extends SVG.G {
 			this.snappingPoints[0].toTikzString() +
 			" to[" +
 			this.symbol.tikzName +
+			(this.#mirror?", mirror":"") +
 			"] " +
 			this.snappingPoints[1].toTikzString() +
 			";"
@@ -401,6 +405,9 @@ export default class PathComponentInstance extends SVG.G {
 	flip(horizontal){
 		// TODO change tikz code generation
 		let direction = horizontal?1:0
+
+		// every flip makes the mirroring change state
+		this.#mirror ^= true
 		
 		let start = this.getStartPoint()
 		let end = this.getEndPoint()
@@ -430,7 +437,12 @@ export default class PathComponentInstance extends SVG.G {
 
 		this.symbolUse.move(tl.x, tl.y);
 		// clockwise rotation \__(°o°)__/
-		this.symbolUse.transform({ rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y });
+		this.symbolUse.transform({
+			rotate: -this.#rotationAngle, 
+			ox: this.#midAbs.x, 
+			oy: this.#midAbs.y,
+			scaleY: this.#mirror?-1:1
+		});
 
 		// recalc pins
 		this.#prePointArray[1] = this.symbol.startPin.point.rotate(angle, undefined, true).plus(this.#midAbs).toArray();
