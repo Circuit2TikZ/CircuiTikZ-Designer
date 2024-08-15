@@ -8,15 +8,15 @@ See the whole project explanation under [https://ussi.e-technik.uni-erlangen.de/
 
 ## Bugs and Features
 
-see under `Issues`
+see under `Issues` for now
 
-## Shortcuts
+## Hotkeys
 
 * Change tool:
     * Pan and zoom (Esc)
     * Draw wire (W)
     * Erase component/wire (E/Del)
-* Draw wire
+* Draw wire:
     * Cancel drawing (right mouse click)
     * Finish drawing (double left mouse click)
 * Add components when in Pan/zoom mode:
@@ -24,9 +24,15 @@ see under `Issues`
     * Resistor (R)
     * Capacitor (C)
     * (American) inductor (L)
+    * NPN transistor (T)
     * Jump crossing (Z)
     * Plain crossing (X)
     * Circle crossing (.)
+* Manipulate components:
+    * Rotate clockwise (Ctrl+R)
+    * Rotate counter clockwise (Shift+Ctrl+R)
+    * Flip at horizontal axis (Shift+X)
+    * Flip at vertical axis (Shift+Y)
 
 ## How to use locally (e.g. in VSCode)
 
