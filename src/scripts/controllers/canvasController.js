@@ -192,7 +192,11 @@ export default class CanvasController {
 				
 		// shift whole canvas down such that the origin is in the bottom left corner
 		let box = this.canvas.viewbox();
-		box.y=box.y-box.h
+		box.y -= box.h
+		// shift canvas up right to see the axes with the default view
+		let moveAmount = Math.max(0.05*Math.min(box.w,box.h),10)
+		box.x -= moveAmount
+		box.y += moveAmount
 		document.getElementById("canvas").setAttribute("viewBox",box.toString())
 	}
 
