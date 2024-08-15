@@ -3,7 +3,7 @@
 #exportedContent {
 	width: 100%;
 	height: auto;
-	max-height: calc(100vh - 190px); // 184.5px
+	max-height: calc(100vh - 250px); // 184.5px
 	white-space: pre;
 	resize: none;
 }
@@ -13,12 +13,13 @@
 	cursor: pointer;
 	position: absolute;
 	top: 22px;
-	right: 22px;
+	right: 34px;
 	width: 30px;
 	height: 30px;
 	border-radius: 10px;
-	font-size: 24px;
+	font-size: 30px;
 	text-align: center;
+	background-color: white;
 }
 
 .copyContentIcon:hover,
