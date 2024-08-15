@@ -1,0 +1,30 @@
+// Styles for the load/save dialog/modal
+
+.border-dashed {
+	border: dashed;
+}
+
+// .choose-file-button {
+// 	flex-shrink: 0;
+// 	border-radius: 3px;
+// 	padding: 8px 15px;
+// 	margin-right: 10px;
+// 	text-transform: uppercase;
+// }
+  
+// #load-message {
+// 	white-space: nowrap;
+// 	overflow: hidden;
+// 	text-overflow: ellipsis;
+// }
+  
+#file-input {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	cursor: pointer;
+	opacity: 0;
+	
+}

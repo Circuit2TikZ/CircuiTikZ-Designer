@@ -225,22 +225,40 @@ export default class NodeComponentInstance extends SVG.Use {
 	}
 
 	/**
-	 * Create a instance from the (saved) serialized text.
+	 * Create an instance from the (saved) serialized text.
 	 *
-	 * @param {string} serialized - the saved text/instance
+	 * @param {object} serialized - the saved instance
 	 * @returns {NodeComponentInstance} the deserialized instance
 	 */
 	static fromJson(serialized) {
 		// todo: implement
+		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
+		/**@type {NodeComponentInstance} */
+		let nodeComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
+		nodeComponent.moveTo(serialized.position)
+		nodeComponent.rotate(serialized.rotation)
+		nodeComponent.flip(serialized.flip)
+		nodeComponent.nodeName = serialized.nodeName
 	}
 
 	/**
 	 * Serializes the instance for saving
 	 *
-	 * @returns {string} the serialized instance
+	 * @returns {object} the serialized instance
 	 */
 	toJson() {
-		// todo: implement
+		//TODO add additional options!?
+		//necessary information: type,symbol_id,name,position,rotation,flip
+		let data = {
+			type:"node",
+			id:this.symbol.node.id,
+			name:this.nodeName,
+			position:this.getAnchorPoint(),
+			rotation:this.#angleDeg,
+			flip:this.#flip
+		}
+
+		return data
 	}
 
 	/**

@@ -68,13 +68,13 @@
 			>
 			<ul class="dropdown-menu dropdown-menu-end">
 				<li>
-					<button type="button" class="dropdown-item disabled" aria-disabled="true">
+					<button type="button" class="dropdown-item" id="loadButton">
 						<span class="material-symbols-outlined dropdown-item-icon">file_open</span>
 						Open
 					</button>
 				</li>
 				<li>
-					<button type="button" class="dropdown-item disabled" aria-disabled="true">
+					<button type="button" class="dropdown-item" id="saveButton">
 						<span class="material-symbols-outlined dropdown-item-icon">save</span>
 						Save
 					</button>
@@ -126,6 +126,37 @@
 					Please enter a valid (regex) search string!
 				</div>
 				<div class="accordion" id="leftOffcanvasAccordion"></div>
+			</div>
+		</div>
+
+		<!-- Modal (load json) -->
+		<div 
+			class="modal fade" 
+			id="loadModal"
+			aria-labelledby="loadModalLabel"
+			aria-hidden="true"
+			role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Load JSON</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="d-flex justify-content-center align-items-center w-100 h-auto py-5 px-3 border-dashed border-primary border-1 rounded-2">
+							<button class="btn btn-primary me-3">Choose file</button>
+							<span id="load-message">or drag and drop</span>
+							<input id="file-input" type="file">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<div class="input-group w-px-200 flex-grow-1">
+						</div>
+						<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
+							<span class="material-symbols-outlined">file_open</span>Load
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 

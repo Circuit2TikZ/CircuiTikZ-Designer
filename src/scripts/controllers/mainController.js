@@ -21,6 +21,7 @@ import SelectionController from "./selectionController";
 
 import hotkeys from 'hotkeys-js';
 import NodeComponentInstance from "../components/nodeComponentInstance";
+import SaveController from "./saveController";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -37,6 +38,8 @@ export default class MainController {
 	eraseController = null;
 	/** @type {?ExportController} */
 	exportController = null;
+	/** @type {?SaveController} */
+	saveController = null;
 
 	/** @type {SVG.Svg} */
 	symbolsSVG;
@@ -116,6 +119,27 @@ export default class MainController {
 		exportSVGButton.addEventListener(
 			"click",
 			this.exportController.exportSVG.bind(this.exportController),
+			{
+				passive: true,
+			}
+		);
+		
+		this.saveController = new SaveController(this);
+		/** @type {HTMLButtonElement} */
+		const saveButton = document.getElementById("saveButton");
+		saveButton.addEventListener(
+			"click",
+			this.saveController.save.bind(this.saveController),
+			{
+				passive: true,
+			}
+		);
+
+		/** @type {HTMLButtonElement} */
+		const loadButton = document.getElementById("loadButton");
+		loadButton.addEventListener(
+			"click",
+			this.saveController.load.bind(this.saveController),
 			{
 				passive: true,
 			}
