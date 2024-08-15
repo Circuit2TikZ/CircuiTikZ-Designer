@@ -23,7 +23,8 @@
 		"file-saver": "^2.0.5",
 		"hotkeys-js": "^3.13.7",
 		"material-symbols": "^0.14.5",
-		"mdb-ui-kit": "^6.4.2"
+		"mdb-ui-kit": "^6.4.2",
+		"pretty": "^2.0.0"
 	},
 	"devDependencies": {
 		"@parcel/config-default": "^2.9.3",

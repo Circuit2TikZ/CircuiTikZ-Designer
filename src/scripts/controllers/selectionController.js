@@ -68,6 +68,7 @@ export default class SelectionController {
 		this.#selectionRectangle.attr("stroke-width",1)
 		this.#selectionRectangle.attr("stroke","grey")
 		this.#selectionRectangle.attr("fill","none")
+		this.#selectionRectangle.attr("id","selectionRectangle")
 		this.#selectionEnabled = true
 		this.currentlySelectedComponents = []
 		this.currentlySelectedLines = []
@@ -257,11 +258,25 @@ export default class SelectionController {
 		this.#updateSelection();
 	}
 
+	selectAll(){
+		this.currentlySelectedComponents = []
+		for (const instance of this.#instances) {
+			this.currentlySelectedComponents.push(instance)
+		}
+
+		this.currentlySelectedLines = []
+		
+		for (const line of this.#lines) {
+			this.currentlySelectedLines.push(line)
+		}
+		this.#showSelection();
+	}
+
 	/**
 	 * 
 	 * @returns {SVG.Box}
 	 */
-	#getOverallBoundingBox(){
+	getOverallBoundingBox(){
 		let bbox = null
 		for (const line of this.currentlySelectedLines) {
 			if (bbox==null) {
@@ -291,7 +306,7 @@ export default class SelectionController {
 			return
 		}
 		
-		let overallBBox = this.#getOverallBoundingBox()
+		let overallBBox = this.getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
 		
 		//rotate all components/lines individually around their center
@@ -328,7 +343,7 @@ export default class SelectionController {
 			return
 		}
 		
-		let overallBBox = this.#getOverallBoundingBox()
+		let overallBBox = this.getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
 		let flipX = horizontal?0:-2;
 		let flipY = horizontal?-2:0;
@@ -374,7 +389,7 @@ export default class SelectionController {
 	 * @param {SVG.Point} position the new position
 	 */
 	moveSelectionTo(position){
-		let overallBBox = this.#getOverallBoundingBox()
+		let overallBBox = this.getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
 		this.moveSelectionRel(position.minus(overallCenter))
 	}

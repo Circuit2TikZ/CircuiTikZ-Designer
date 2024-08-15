@@ -26,6 +26,7 @@ export default class SnapCursorController {
 
 		const cursorSymbol = new SVG.Symbol(document.getElementById("snapCursor"));
 		this.#cursor = new SVG.Use();
+		this.#cursor.id("snapCursor")
 		this.#cursor.use(cursorSymbol);
 		this.#cursorViewBox = cursorSymbol.viewbox();
 		this.#cursor.width(this.#cursorViewBox.width);

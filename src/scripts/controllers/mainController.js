@@ -111,6 +111,16 @@ export default class MainController {
 			}
 		);
 
+		/** @type {HTMLButtonElement} */
+		const exportSVGButton = document.getElementById("exportSVGButton");
+		exportSVGButton.addEventListener(
+			"click",
+			this.exportController.exportSVG.bind(this.exportController),
+			{
+				passive: true,
+			}
+		);
+
 		canvasPromise.then(() => {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
@@ -234,6 +244,7 @@ export default class MainController {
 		/** @type {SVGSVGElement} */
 		const symbolsSVGSVGElement = document.adoptNode(symbolsDocument.firstElementChild);
 		symbolsSVGSVGElement.style.display = "none";
+		symbolsSVGSVGElement.setAttribute("id","symbolDB")
 		document.body.appendChild(symbolsSVGSVGElement);
 
 		// Extract symbols

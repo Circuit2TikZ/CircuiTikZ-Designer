@@ -47,5 +47,6 @@
 			"noGrammar": "ignore",
 			"pattern": "**{.project,.classpath,plugin.xml,feature.xml,category.xml,.target,.product}"
 		}
-	]
+	],
+	"svg.preview.background": "transparent"
 }
