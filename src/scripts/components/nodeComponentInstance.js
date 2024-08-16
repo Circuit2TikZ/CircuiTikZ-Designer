@@ -231,14 +231,18 @@ export default class NodeComponentInstance extends SVG.Use {
 	 * @returns {NodeComponentInstance} the deserialized instance
 	 */
 	static fromJson(serialized) {
-		// todo: implement
 		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
 		/**@type {NodeComponentInstance} */
 		let nodeComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
-		nodeComponent.moveTo(serialized.position)
-		nodeComponent.rotate(serialized.rotation)
-		nodeComponent.flip(serialized.flip)
+		nodeComponent.moveTo(new SVG.Point(serialized.position))
+		nodeComponent.#angleDeg = serialized.rotation
+		nodeComponent.#flip= new SVG.Point(serialized.flip)
 		nodeComponent.nodeName = serialized.nodeName
+		nodeComponent.#updateTransform()
+		nodeComponent.#recalculateRelSnappingPoints()
+		nodeComponent.recalculateSnappingPoints()
+
+		MainController.controller.addInstance(nodeComponent);
 	}
 
 	/**
@@ -248,9 +252,8 @@ export default class NodeComponentInstance extends SVG.Use {
 	 */
 	toJson() {
 		//TODO add additional options!?
-		//necessary information: type,symbol_id,name,position,rotation,flip
+		//necessary information: symbol_id,name,position,rotation,flip
 		let data = {
-			type:"node",
 			id:this.symbol.node.id,
 			name:this.nodeName,
 			position:this.getAnchorPoint(),

@@ -70,7 +70,7 @@
 				<li>
 					<button type="button" class="dropdown-item" id="loadButton">
 						<span class="material-symbols-outlined dropdown-item-icon">file_open</span>
-						Open
+						Load
 					</button>
 				</li>
 				<li>
@@ -135,23 +135,30 @@
 			id="loadModal"
 			aria-labelledby="loadModalLabel"
 			aria-hidden="true"
-			role="dialog">
+			tabindex="-1"
+			role="dialog"
+		>
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h1 class="modal-title fs-5">Load JSON</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body">
-						<div class="d-flex justify-content-center align-items-center w-100 h-auto py-5 px-3 border-dashed border-primary border-1 rounded-2">
+					<div class="modal-body m-3 p-0 border-dashed border-primary border-1 rounded-2">
+						<div id="dragdroparea" class="d-flex justify-content-center align-items-center w-100 h-auto py-5 px-3">
+							<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
 							<button class="btn btn-primary me-3">Choose file</button>
 							<span id="load-message">or drag and drop</span>
 							<input id="file-input" type="file">
 						</div>
 					</div>
-					<div class="modal-footer">
-						<div class="input-group w-px-200 flex-grow-1">
-						</div>
+					<div class="modal-footer justify-content-between">
+						<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
+							<input class="form-check-input" type="checkbox" value="" id="loadCheckRemove">
+							<label class="form-check-label" for="loadCheckRemove">
+								Remove existing components
+							</label>
+						  </div>
 						<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
 							<span class="material-symbols-outlined">file_open</span>Load
 						</button>

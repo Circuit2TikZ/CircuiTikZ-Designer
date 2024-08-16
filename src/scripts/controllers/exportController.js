@@ -38,6 +38,8 @@ export default class ExportController {
 
 	#copyTooltip;
 
+	#defaultDisplay
+
 	/**
 	 * Init the ExportController
 	 * @param {MainController} mainController - needed for exporting instances & lines
@@ -54,6 +56,9 @@ export default class ExportController {
 		this.#copyButton = document.getElementById("copyExportedContent");
 		this.#saveButton = document.getElementById("exportModalSave");
 
+		
+		this.#defaultDisplay = this.#exportedContent.parentElement.style.display;
+
 		let copyButtonDefaultTooltipText = "Copy to clipboard!"
 		this.#copyButton.addEventListener("hidden.bs.tooltip",(evt)=>{
 			this.#copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
@@ -65,12 +70,27 @@ export default class ExportController {
 		this.#copyTooltip = new Tooltip(this.#copyButton);
 	}
 
+	exportJSON(text){
+		this.#heading.textContent = "Save JSON"
+		// don't show json content. Should this stay like this or can we just show the json?
+		// this.#exportedContent.parentElement.style.display = "none";
+		// create extension select list
+		const extensions = [".json", ".txt"];
+
+		this.#exportedContent.rows = Math.max(text.split("\n").length,2);
+		this.#exportedContent.value = text;
+
+		this.#export(extensions)
+	}
+
 	/**
 	 * Shows the exportModal with the CitcuiTikZ code.
 	 */
 	exportCircuiTikZ() {
+		this.#heading.textContent = "Export CircuiTikZ code"
+		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
 		// create extension select list
-		const extensions = [".pgf", ".tex", ".tikz"];
+		const extensions = [".tikz", ".tex", ".pgf"];
 
 		// actually export/create the string
 		{
@@ -99,6 +119,8 @@ export default class ExportController {
 	 * Shows the exportModal with the SVG code.
 	 */
 	exportSVG() {
+		this.#heading.textContent = "Export SVG"
+		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
 		// prepare selection and bounding box
 		SelectionController.controller.selectAll()
 		let bbox = SelectionController.controller.getOverallBoundingBox()

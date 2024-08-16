@@ -204,7 +204,7 @@ export default class PathComponentInstance extends SVG.G {
 	/**
 	 * Create a instance from the (saved) serialized text.
 	 *
-	 * @param {string} serialized - the saved text/instance
+	 * @param {object} serialized - the saved instance
 	 * @returns {PathComponentInstance} the deserialized instance
 	 */
 	static fromJson(serialized) {
@@ -212,12 +212,12 @@ export default class PathComponentInstance extends SVG.G {
 	}
 
 	/**
-	 * Serializes the instance for saving
+	 * Serialize the component in an object
 	 *
-	 * @returns {string} the serialized instance
+	 * @returns {object} the serialized instance
 	 */
 	toJson() {
-		// todo: implement
+		
 	}
 
 	/**

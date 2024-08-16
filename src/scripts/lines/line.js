@@ -337,6 +337,25 @@ export default class Line extends SVG.Polyline {
 	}
 
 	/**
+	 * Create a instance from the (saved) serialized text.
+	 *
+	 * @param {object} serialized - the saved instance
+	 * @returns {PathComponentInstance} the deserialized instance
+	 */
+	static fromJson(serialized) {
+		// todo: implement
+	}
+
+	/**
+	 * Serialize the component in an object
+	 *
+	 * @returns {object} the serialized instance
+	 */
+	toJson() {
+		
+	}
+
+	/**
 	 * Stringifies the Line in TikZ syntax.
 	 * @returns {string}
 	 */

@@ -106,20 +106,19 @@
  * @function ComponentInstance.fromJson
  * Create a instance from the (saved) serialized text.
  *
- * @param {string} serialized
+ * @param {object} serialized
  * @returns {ComponentInstance}
  */
 
 /**
- * @function ComponentInstance#toJson
- * Create a instance from the (saved) serialized text.
+ * @function ComponentInstance.toJson
+ * Serialize the component in an object
  *
- * @param {string} serialized - the saved text/instance
- * @returns {ComponentInstance} the deserialized instance
+ * @returns {object} the serialized instance
  */
 
 /**
- * @function ComponentInstance#toTikzString
+ * @function ComponentInstance.toTikzString
  * Stringifies the component in TikZ syntax.
  *
  * @returns {string} the serialized instance
