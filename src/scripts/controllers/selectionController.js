@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { Line,NodeComponentInstance,PathComponentInstance,MainController,UndoController } from "../internal";
+import { Line,NodeComponentInstance,PathComponentInstance,MainController } from "../internal";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 
@@ -277,7 +277,6 @@ export class SelectionController {
 
 	selectComponents(components, mode){
 		if (mode === SelectionController.SelectionMode.RESET) {
-			console.log("test")
 			this.currentlySelectedComponents=components
 		}else if(mode === SelectionController.SelectionMode.ADD){
 			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
@@ -391,7 +390,6 @@ export class SelectionController {
 				component.recalculateSnappingPoints();
 			}
 		}
-		UndoController.controller.addState()
 	}
 
 	/**

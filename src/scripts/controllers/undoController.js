@@ -93,6 +93,10 @@ export class UndoController {
 		// load state
 		let state = this.#states[this.#currentIndex]
 
+		let nodes = []
+		let paths = []
+		let lines = []
+
 		for (const node of state.nodes) {
 			let nodeComponent = NodeComponentInstance.fromJson(node)
 			if (node.selected) {

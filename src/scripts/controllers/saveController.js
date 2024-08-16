@@ -3,7 +3,7 @@
  */
 
 import { Modal } from "bootstrap";
-import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController } from "../internal";
+import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,UndoController } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
@@ -142,5 +142,6 @@ export class SaveController {
 		
 		SelectionController.controller.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
 		SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+		UndoController.controller.addState()
 	}
 }

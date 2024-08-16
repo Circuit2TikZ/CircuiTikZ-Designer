@@ -332,6 +332,8 @@ export class PathComponentInstance extends SVG.G {
 			SnapController.controller.hideSnapPoints();
 			if (runCB) {
 				this.#finishedPlacingCallback()
+				// TODO could be problematic here!
+				UndoController.controller.addState()
 			}
 		}
 	}

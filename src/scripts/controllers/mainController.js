@@ -162,20 +162,32 @@ export class MainController {
 		// rotate selection
 		hotkeys("ctrl+r",()=>{
 			this.selectionController.rotateSelection(-90);
+			if (this.selectionController.hasSelection()) {
+				UndoController.controller.addState()
+			}
 			return false;
 		})
 		hotkeys("ctrl+shift+r",()=>{
 			this.selectionController.rotateSelection(90);
+			if (this.selectionController.hasSelection()) {
+				UndoController.controller.addState()
+			}
 			return false;
 		})
 
 		//flip selection
 		hotkeys("shift+x",()=>{
 			this.selectionController.flipSelection(true);
+			if (this.selectionController.hasSelection()) {
+				UndoController.controller.addState()
+			}
 			return false;
 		})
 		hotkeys("shift+y",()=>{
 			this.selectionController.flipSelection(false);
+			if (this.selectionController.hasSelection()) {
+				UndoController.controller.addState()
+			}
 			return false;
 		})
 
@@ -187,11 +199,11 @@ export class MainController {
 
 		//undo/redo
 		hotkeys("ctrl+z",()=>{
-			UndoController.undo();
+			UndoController.controller.undo();
 			return false;
 		})
 		hotkeys("ctrl+y",()=>{
-			UndoController.redo();
+			UndoController.controller.redo();
 			return false;
 		})
 
@@ -209,6 +221,7 @@ export class MainController {
 				this.#switchMode(MainController.modes.ERASE);
 			}else{
 				SelectionController.controller.removeSelection()
+				UndoController.controller.addState()
 			}
 			return false;
 		})
