@@ -258,6 +258,63 @@ export default class SelectionController {
 		this.#updateSelection();
 	}
 
+	selectComponents(components, mode){
+		if (mode === SelectionController.SelectionMode.RESET) {
+			console.log("test")
+			this.currentlySelectedComponents=components
+		}else if(mode === SelectionController.SelectionMode.ADD){
+			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
+			this.currentlySelectedComponents = [...new Set(this.currentlySelectedComponents)]
+		}else{
+			for (const component of components) {
+				let idx = this.currentlySelectedComponents.findIndex((value)=>value===component)
+				if(idx>=0){
+					this.currentlySelectedComponents.splice(idx,1)
+				}
+			}
+		}
+		
+		this.showSelection();
+	}
+
+	showSelection(){
+		for (const component of this.currentlySelectedComponents) {
+			component.showBoundingBox()
+		}
+
+		for (const line of this.currentlySelectedLines) {
+			line.showBoundingBox()
+		}
+	}
+
+	hideSelection(){
+		for (const component of this.currentlySelectedComponents) {
+			component.hideBoundingBox()
+		}
+
+		for (const line of this.currentlySelectedLines) {
+			line.hideBoundingBox()
+		}
+	}
+
+	selectLines(lines, mode){
+		if (mode === SelectionController.SelectionMode.RESET) {
+			this.currentlySelectedLines = lines
+		}else if(mode === SelectionController.SelectionMode.ADD){
+			this.currentlySelectedLines = this.currentlySelectedLines.concat(lines)
+			this.currentlySelectedLines = [...new Set(this.currentlySelectedLines)]
+		}else{
+			for (const line of lines) {
+				let idx = this.currentlySelectedLines.findIndex((value)=>value===line)
+				if(idx>=0){
+					this.currentlySelectedLines.splice(idx,1)
+				}
+			}
+		}
+
+		this.showSelection();
+	}
+
 	selectAll(){
 		this.currentlySelectedComponents = []
 		for (const instance of this.#instances) {
@@ -265,11 +322,10 @@ export default class SelectionController {
 		}
 
 		this.currentlySelectedLines = []
-		
 		for (const line of this.#lines) {
 			this.currentlySelectedLines.push(line)
 		}
-		this.#showSelection();
+		this.showSelection();
 	}
 
 	/**

@@ -221,6 +221,7 @@ export default class PathComponentInstance extends SVG.G {
 		pathComponent.secondClick(new SVG.Point(serialized.end),false)
 
 		MainController.controller.addInstance(pathComponent);
+		return pathComponent
 	}
 
 	/**

@@ -243,6 +243,7 @@ export default class NodeComponentInstance extends SVG.Use {
 		nodeComponent.recalculateSnappingPoints()
 
 		MainController.controller.addInstance(nodeComponent);
+		return nodeComponent;
 	}
 
 	/**

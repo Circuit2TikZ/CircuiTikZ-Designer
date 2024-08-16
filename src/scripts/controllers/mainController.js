@@ -190,6 +190,12 @@ export default class MainController {
 			return false;
 		})
 
+		// select everything
+		hotkeys("ctrl+a",()=>{
+			this.selectionController.selectAll();
+			return false;
+		})
+
 		// mode change
 		hotkeys("esc",()=>{
 			this.#switchMode(MainController.modes.DRAG_PAN);

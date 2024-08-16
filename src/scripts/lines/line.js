@@ -353,6 +353,7 @@ export default class Line extends SVG.Polyline {
 		line.removeMousePoint()
 
 		MainController.controller.addLine(line)
+		return line;
 	}
 
 	/**

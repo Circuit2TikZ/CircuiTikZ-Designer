@@ -128,17 +128,23 @@ export default class SaveController {
 		// load data from json
 		let obj = JSON.parse(text)
 
+		let nodes = []
+		let paths = []
+		let lines = []
+
 		for (const node of obj.nodes) {
-			NodeComponentInstance.fromJson(node)
+			nodes.push(NodeComponentInstance.fromJson(node))
 		}
 		
 		for (const path of obj.paths) {
-			PathComponentInstance.fromJson(path)
+			paths.push(PathComponentInstance.fromJson(path))
 		}
 
 		for (const line of obj.lines) {
-			Line.fromJson(line)
+			lines.push(Line.fromJson(line))
 		}
-
+		
+		SelectionController.controller.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
+		SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
 	}
 }
