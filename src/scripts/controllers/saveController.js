@@ -75,14 +75,30 @@ export default class SaveController {
 		this.#loadModal.show()
 
 		const changeText = (()=>{			
-			this.#loadMessage.textContent = this.#loadInput.value.split("\\").pop()
+			
+			let file = this.#loadInput.files[0];
+			if (file) {
+				this.#loadMessage.textContent = this.#loadInput.value.split("\\").pop()
+			}else{
+				this.#loadMessage.textContent = "No file selected"
+			}
 		}).bind(this);
 
 		const loadFile = (()=>{			
-			let textPromise = this.#loadInput.files[0].text();
+			let file = this.#loadInput.files[0];
 
-			textPromise.then((value)=>this.#loadFromText(value))
-			this.#loadModal.hide()
+			if (file) {
+				var reader = new FileReader();
+				reader.readAsText(file, "UTF-8");
+				reader.onload = (evt) => {
+					this.#loadFromText(evt.target.result);
+					this.#loadModal.hide()
+				}
+				reader.onerror = (evt) => {
+					this.#loadMessage.textContent = "error reading file";
+				}
+			}
+
 		}).bind(this);
 
 		this.#loadInput.addEventListener("change",changeText)
@@ -112,20 +128,15 @@ export default class SaveController {
 		// load data from json
 		let obj = JSON.parse(text)
 
-		let nodes = obj.nodes
-		
-		let paths = obj.paths
-		let lines = obj.lines
-
-		for (const node of nodes) {
+		for (const node of obj.nodes) {
 			NodeComponentInstance.fromJson(node)
 		}
 		
-		for (const path of paths) {
+		for (const path of obj.paths) {
 			PathComponentInstance.fromJson(path)
 		}
 
-		for (const line of lines) {
+		for (const line of obj.lines) {
 			Line.fromJson(line)
 		}
 

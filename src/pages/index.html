@@ -144,13 +144,18 @@
 						<h1 class="modal-title fs-5">Load JSON</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body m-3 p-0 border-dashed border-primary border-1 rounded-2">
-						<div id="dragdroparea" class="d-flex justify-content-center align-items-center w-100 h-auto py-5 px-3">
-							<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
-							<button class="btn btn-primary me-3">Choose file</button>
-							<span id="load-message">or drag and drop</span>
-							<input id="file-input" type="file">
+					<div class="modal-body d-flex flex-column gap-3">
+						<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
+							<div id="dragdroparea" class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
+								<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
+								<span class="material-symbols-outlined" style="font-size: 50px;">place_item</span>
+								<span class="fs-4">Drag&Drop here</span>
+								<span class="fs-6">or</span>
+								<button class="btn btn-primary z-1">Browse file</button>
+								<input id="file-input" type="file">
+							</div>
 						</div>
+						<span id="load-message">No file selected</span>
 					</div>
 					<div class="modal-footer justify-content-between">
 						<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
