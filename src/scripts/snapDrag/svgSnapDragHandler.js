@@ -5,9 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import SnapController from "./snapController";
-import NodeComponentInstance from "../components/nodeComponentInstance";
-import SelectionController from "../controllers/selectionController";
+import {SnapController, NodeComponentInstance, SelectionController} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -37,7 +35,7 @@ import SelectionController from "../controllers/selectionController";
  * Handler/controller enabling components to be draggable and snap to the grid and to other components.
  * @class
  */
-export default class svgSnapDragHandler {
+export class svgSnapDragHandler {
 	/** @type {NodeComponentInstance} */
 	element;
 

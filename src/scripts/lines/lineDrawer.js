@@ -1,21 +1,15 @@
-// @ts-check
 /**
  * @module LineDrawer
  */
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import FABcontroller from "../controllers/fabController";
-import SnapController from "../snapDrag/snapController";
-import SnapCursorController from "../snapDrag/snapCursor";
-import Line from "./line";
-
-/** @typedef {import("../controllers/mainController").default} MainController */
+import { MainController, FABcontroller, SnapController, SnapCursorController, Line } from "../internal";
 
 /**
  * @class
  */
-export default class LineDrawer {
+export class LineDrawer {
 	/** @type {MainController} */
 	#mainController;
 	/** @type {SVG.Svg} */

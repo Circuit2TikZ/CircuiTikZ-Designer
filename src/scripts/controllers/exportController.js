@@ -3,18 +3,14 @@
  */
 
 import { Modal, Tooltip } from "bootstrap";
-import FileSaver from "file-saver";
-import SelectionController from "./selectionController";
-import MainController from "./mainController";
+import { FileSaver, SelectionController, MainController } from "../internal";
 var pretty = require('pretty');
-
-/** @typedef {import("./mainController").default} MainController */
 
 /**
  * Contains export functions and controls the "exportModal" (~dialog).
  * @class
  */
-export default class ExportController {
+export class ExportController {
 	/** @type {MainController} */
 	#mainController;
 	/** @type {HTMLDivElement}  */

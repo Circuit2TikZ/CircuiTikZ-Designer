@@ -3,11 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import Line from "../lines/line";
-import NodeComponentInstance from "../components/nodeComponentInstance";
-import MainController from "./mainController";
-import PathComponentInstance from "../components/pathComponentInstance";
-import UndoController from "./undoController";
+import { Line,NodeComponentInstance,PathComponentInstance,MainController,UndoController } from "../internal";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 
@@ -15,7 +11,7 @@ import UndoController from "./undoController";
  * Controller holding selection information and handling selecting/deselecting
  * @class
  */
-export default class SelectionController {
+export class SelectionController {
 	/**
 	 * Static variable holding the instance.
 	 * @type {SelectionController}

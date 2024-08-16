@@ -3,17 +3,13 @@
  */
 
 import { Modal } from "bootstrap";
-import MainController from "./mainController";
-import NodeComponentInstance from "../components/nodeComponentInstance";
-import PathComponentInstance from "../components/pathComponentInstance";
-import Line from "../lines/line";
-import SelectionController from "./selectionController";
+import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
  * @class
  */
-export default class SaveController {
+export class SaveController {
 	/** @type {Modal} */
 	#loadModal;
 	#modalElement

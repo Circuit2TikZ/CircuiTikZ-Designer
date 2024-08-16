@@ -2,8 +2,7 @@
  * @module nodeComponentSymbol
  */
 
-import ComponentSymbol from "./componentSymbol";
-import NodeComponentInstance from "./nodeComponentInstance";
+import { ComponentSymbol,NodeComponentInstance } from "../internal";
 
 /** @typedef {import("@svgdotjs/svg.js").Container} SVG.Container */
 
@@ -12,7 +11,7 @@ import NodeComponentInstance from "./nodeComponentInstance";
  * @class
  * @extends ComponentSymbol
  */
-export default class NodeComponentSymbol extends ComponentSymbol {
+export class NodeComponentSymbol extends ComponentSymbol {
 	/**
 	 * Creates a new node-style symbol from a `SVGSymbolElement`.
 	 *

@@ -4,30 +4,16 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap";
-
 import "../utils/impSVGNumber";
-import CanvasController from "./canvasController";
-import ComponentSymbol from "../components/componentSymbol";
-import EraseController from "./eraseController";
-import LineDrawer from "../lines/lineDrawer";
-import NodeComponentSymbol from "../components/nodeComponentSymbol";
-import PathComponentSymbol from "../components/pathComponentSymbol";
-import SnapController from "../snapDrag/snapController";
-import SnapCursorController from "../snapDrag/snapCursor";
 import { waitForElementLoaded } from "../utils/domWatcher";
-import ExportController from "./exportController";
-import PathComponentInstance from "../components/pathComponentInstance";
-import SelectionController from "./selectionController";
-
 import hotkeys from 'hotkeys-js';
-import NodeComponentInstance from "../components/nodeComponentInstance";
-import SaveController from "./saveController";
-import UndoController from "./undoController";
 
-/** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
-/** @typedef {import("../lines/line").default} Line */
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, UndoController} from "../internal";
+import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
-export default class MainController {
+/** @typedef {import("../internal").ComponentInstance} ComponentInstance */
+
+export class MainController {
 	/** @type {?MainController} */
 	static #instance = null;
 	// controllers

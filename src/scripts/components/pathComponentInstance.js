@@ -4,19 +4,14 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import CanvasController from "../controllers/canvasController";
-import PathComponentSymbol from "./pathComponentSymbol";
-import SnapController from "../snapDrag/snapController";
-import SnapCursorController from "../snapDrag/snapCursor";
-import SnapPoint from "../snapDrag/snapPoint";
+import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController } from "../internal";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectedWireWidth } from "../utils/selectionHelper";
-import MainController from "../controllers/mainController";
 
 /**
  * Instance of a `PathComponentSymbol`.
  * @implements {import("./componentInstance").ComponentInstance}
  */
-export default class PathComponentInstance extends SVG.G {
+export class PathComponentInstance extends SVG.G {
 	/** @type {PathComponentSymbol} */
 	symbol;
 	/** @type {SVG.Use} */

@@ -20,7 +20,7 @@ import { Point, Matrix } from "@svgdotjs/svg.js";
  * relative to components. This is useful for snap points.
  * @class
  */
-export default class SnapPoint extends Point {
+export class SnapPoint extends Point {
 	/** @type {?{nodeName: string}} */
 	#instance;
 	/** @type {?string} */

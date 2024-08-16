@@ -3,6 +3,6 @@
  * @file index.js
  */
 
-import MainController from "./controllers/mainController.js";
+import {MainController} from "./internal";
 
 window.mainController = MainController.controller;

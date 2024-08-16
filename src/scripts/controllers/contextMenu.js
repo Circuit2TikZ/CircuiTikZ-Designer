@@ -11,7 +11,7 @@
  * @property {boolean} [disabled=false]
  */
 
-export default class ContextMenu {
+export class ContextMenu {
 	/** @type {HTMLUListElement} */
 	menuElement;
 

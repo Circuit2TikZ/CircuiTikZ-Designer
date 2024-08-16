@@ -110,7 +110,7 @@ class FloatingActionButton {
  * Controller for the floating action buttons (FAB).
  * @class
  */
-export default class FABcontroller {
+export class FABcontroller {
 	/** @type {FABcontroller} */
 	static #instance;
 	/** @type {HTMLDivElement} */

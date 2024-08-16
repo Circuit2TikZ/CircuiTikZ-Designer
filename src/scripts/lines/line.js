@@ -4,16 +4,15 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import { lineRectIntersection, pointInsideRect, selectedWireWidth } from "../utils/selectionHelper";
-import MainController from "../controllers/mainController";
-import CanvasController from "../controllers/canvasController";
+import {MainController, CanvasController} from "../internal";
 
 /// <reference path="../utils/impSVGNumber.d.ts" />
-/** @typedef {import("../snapDrag/snapPoint")} SnapPoint */
+import SnapPoint from "../internal";
 
 /**
  * @property {SVG.PointArray} _array
  */
-export default class Line extends SVG.Polyline {
+export class Line extends SVG.Polyline {
 	/**
 	 * @typedef {object} DirectionType
 	 * @property {string} tikzName - the TikZ draw command

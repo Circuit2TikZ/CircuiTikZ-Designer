@@ -3,20 +3,15 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-
-import NodeComponentSymbol from "./componentSymbol";
-import SnapPoint from "../snapDrag/snapPoint";
-import svgSnapDragHandler from "../snapDrag/svgSnapDragHandler";
-import ContextMenu from "../controllers/contextMenu";
-import MainController from "../controllers/mainController";
-import CanvasController from "../controllers/canvasController";
 import { rectRectIntersection, selectedBoxWidth } from "../utils/selectionHelper";
+
+import { NodeComponentSymbol,SnapPoint,svgSnapDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
 
 /**
  * Instance of a `NodeComponentsSymbol`.
  * @implements {import("./componentInstance").ComponentInstance}
  */
-export default class NodeComponentInstance extends SVG.Use {
+export class NodeComponentInstance extends SVG.Use {
 	/** @type {?ContextMenu} */
 	static #contextMenu = null;
 

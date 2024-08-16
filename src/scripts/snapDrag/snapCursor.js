@@ -8,7 +8,7 @@ import * as SVG from "@svgdotjs/svg.js";
  * Realizes an in canvas cursor. Can be used to visualize the point to snap to.
  * @class
  */
-export default class SnapCursorController {
+export class SnapCursorController {
 	/** @type {?SnapCursorController} */
 	static #instance;
 	/** @type {SVG.Box} */

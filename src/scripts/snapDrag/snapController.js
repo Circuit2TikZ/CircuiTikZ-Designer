@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import CanvasController from "../controllers/canvasController";
+import {CanvasController} from "../internal";
 
 /** @typedef {SVG.Point|{x: number, y: number}} PointAlike */
 
@@ -11,7 +11,7 @@ import CanvasController from "../controllers/canvasController";
  * Controller for snapping points, objects, etc. to the grid or other already added components.
  * @class
  */
-export default class SnapController {
+export class SnapController {
 	/** @type {SnapController} */
 	static #instance;
 

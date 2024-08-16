@@ -4,10 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import SnapController from "../snapDrag/snapController";
-import ComponentInstance from "../components/componentInstance";
-
-/** @typedef {import("../controllers/mainController").default} MainController */
+import { SnapController, ComponentInstance, MainController } from "../internal";
 
 /**
  * @typedef {object} PanningEventDetail
@@ -31,7 +28,7 @@ import ComponentInstance from "../components/componentInstance";
  * Controller for the SVG canvas. Enables/disables zooming and panning. Manages selections
  * @class
  */
-export default class CanvasController {
+export class CanvasController {
 	/**
 	 * Static variable holding the instance.
 	 * @type {CanvasController}

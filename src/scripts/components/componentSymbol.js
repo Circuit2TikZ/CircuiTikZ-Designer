@@ -37,7 +37,7 @@ const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
  * Representation of a symbol. This class has sub classes describing path- and node-style symbols.
  * @class
  */
-export default class ComponentSymbol extends SVG.Symbol {
+export class ComponentSymbol extends SVG.Symbol {
 	/** @type {?SVGMetadataElement} */
 	svgMetadataElement;
 

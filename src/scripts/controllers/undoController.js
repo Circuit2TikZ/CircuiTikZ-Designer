@@ -2,17 +2,13 @@
  * @module undoController
  */
 
-import MainController from "./mainController";
-import NodeComponentInstance from "../components/nodeComponentInstance";
-import PathComponentInstance from "../components/pathComponentInstance";
-import Line from "../lines/line";
-import SelectionController from "./selectionController";
+import {MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Line} from "../internal";
 
 /**
  * Controller holding selection information and handling selecting/deselecting
  * @class
  */
-export default class UndoController {
+export class UndoController {
 	/**
 	 * Static variable holding the instance.
 	 * @type {UndoController}

@@ -2,10 +2,9 @@
  * @module pathComponentSymbol
  */
 
-import ComponentSymbol from "./componentSymbol";
-import PathComponentInstance from "./pathComponentInstance";
+import { ComponentSymbol, PathComponentInstance } from "../internal";
+import * as SVG from "@svgdotjs/svg.js";
 
-/** @typedef {import("@svgdotjs/svg.js").Container} SVG.Container */
 /** @typedef {import("./componentSymbol").TikZAnchor} TikZAnchor */
 
 /**
@@ -13,7 +12,7 @@ import PathComponentInstance from "./pathComponentInstance";
  * @class
  * @extends ComponentSymbol
  */
-export default class PathComponentSymbol extends ComponentSymbol {
+export class PathComponentSymbol extends ComponentSymbol {
 	/** @type {TikZAnchor} */
 	startPin;
 	/** @type {TikZAnchor} */

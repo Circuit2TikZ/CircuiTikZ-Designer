@@ -1,11 +1,10 @@
-// @ts-check
 /**
  * @module eraseController
  */
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import Line from "../lines/line";
+import {Line} from "../internal";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("./mainController").default} MainController */
@@ -14,7 +13,7 @@ import Line from "../lines/line";
  * Controller for the erase function/mode.
  * @class
  */
-export default class EraseController {
+export class EraseController {
 	/** @type {MainController} */
 	#mainController;
 	/** @type {SVG.Svg} */
