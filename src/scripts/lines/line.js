@@ -4,6 +4,8 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import { lineRectIntersection, pointInsideRect, selectedWireWidth } from "../utils/selectionHelper";
+import MainController from "../controllers/mainController";
+import CanvasController from "../controllers/canvasController";
 
 /// <reference path="../utils/impSVGNumber.d.ts" />
 /** @typedef {import("../snapDrag/snapPoint")} SnapPoint */
@@ -343,7 +345,14 @@ export default class Line extends SVG.Polyline {
 	 * @returns {PathComponentInstance} the deserialized instance
 	 */
 	static fromJson(serialized) {
-		// todo: implement
+		let line = new Line(new SVG.Point(serialized.start))
+		CanvasController.controller.canvas.add(line);
+		for (const point of serialized.others) {
+			line.pushPoint(point.dir==1,new SVG.Point(point.x,point.y))
+		}
+		line.removeMousePoint()
+
+		MainController.controller.addLine(line)
 	}
 
 	/**
@@ -352,7 +361,23 @@ export default class Line extends SVG.Polyline {
 	 * @returns {object} the serialized instance
 	 */
 	toJson() {
-		
+		let others = []
+		for (let index = 2; index < this.#drawCommands.length; index+=2) {
+			let dir = this.#drawCommands[index-1]
+			let other = {
+				x:this.#drawCommands[index].x,
+				y:this.#drawCommands[index].y,
+				dir:Line.Direction.STRAIGHT===dir?0:Line.Direction.HORIZONTAL_VERTICAL===dir?1:2
+			}
+			others.push(other)
+		}
+
+		let data = {
+			start:{x:this.#drawCommands[0].x,y:this.#drawCommands[0].y},
+			others:others
+		}
+
+		return data
 	}
 
 	/**
