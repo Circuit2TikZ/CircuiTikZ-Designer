@@ -175,7 +175,11 @@ export default class PathComponentInstance extends SVG.G {
 		if (!this.#selectionRectangle) {
 			let box = this.symbolUse.bbox();
 			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
-									   .transform({ rotate: -this.#rotationAngle, ox: this.#midAbs.x, oy: this.#midAbs.y });
+									   .transform({ 
+													rotate: -this.#rotationAngle, 
+													ox: this.#midAbs.x, 
+													oy: this.#midAbs.y, 
+													scaleY: this.#mirror?-1:1 });
 			this.#selectionRectangle.attr({
 				"stroke-width": selectedBoxWidth,
 				"stroke": "grey",
@@ -209,6 +213,14 @@ export default class PathComponentInstance extends SVG.G {
 	 */
 	static fromJson(serialized) {
 		// todo: implement
+		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
+		/**@type {PathComponentInstance} */
+		let pathComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
+		pathComponent.firstClick(new SVG.Point(serialized.start))
+		pathComponent.#mirror = serialized.mirror
+		pathComponent.secondClick(new SVG.Point(serialized.end),false)
+
+		MainController.controller.addInstance(pathComponent);
 	}
 
 	/**
@@ -217,7 +229,14 @@ export default class PathComponentInstance extends SVG.G {
 	 * @returns {object} the serialized instance
 	 */
 	toJson() {
-		
+		let data = {
+			id:this.symbol.node.id,
+			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
+			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},
+			mirror:this.#mirror
+		}
+
+		return data
 	}
 
 	/**
