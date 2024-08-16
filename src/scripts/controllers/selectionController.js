@@ -7,6 +7,7 @@ import Line from "../lines/line";
 import NodeComponentInstance from "../components/nodeComponentInstance";
 import MainController from "./mainController";
 import PathComponentInstance from "../components/pathComponentInstance";
+import UndoController from "./undoController";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 
@@ -258,25 +259,6 @@ export default class SelectionController {
 		this.#updateSelection();
 	}
 
-	selectComponents(components, mode){
-		if (mode === SelectionController.SelectionMode.RESET) {
-			console.log("test")
-			this.currentlySelectedComponents=components
-		}else if(mode === SelectionController.SelectionMode.ADD){
-			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
-			this.currentlySelectedComponents = [...new Set(this.currentlySelectedComponents)]
-		}else{
-			for (const component of components) {
-				let idx = this.currentlySelectedComponents.findIndex((value)=>value===component)
-				if(idx>=0){
-					this.currentlySelectedComponents.splice(idx,1)
-				}
-			}
-		}
-		
-		this.showSelection();
-	}
-
 	showSelection(){
 		for (const component of this.currentlySelectedComponents) {
 			component.showBoundingBox()
@@ -295,6 +277,25 @@ export default class SelectionController {
 		for (const line of this.currentlySelectedLines) {
 			line.hideBoundingBox()
 		}
+	}
+
+	selectComponents(components, mode){
+		if (mode === SelectionController.SelectionMode.RESET) {
+			console.log("test")
+			this.currentlySelectedComponents=components
+		}else if(mode === SelectionController.SelectionMode.ADD){
+			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
+			this.currentlySelectedComponents = [...new Set(this.currentlySelectedComponents)]
+		}else{
+			for (const component of components) {
+				let idx = this.currentlySelectedComponents.findIndex((value)=>value===component)
+				if(idx>=0){
+					this.currentlySelectedComponents.splice(idx,1)
+				}
+			}
+		}
+		
+		this.showSelection();
 	}
 
 	selectLines(lines, mode){
@@ -326,6 +327,14 @@ export default class SelectionController {
 			this.currentlySelectedLines.push(line)
 		}
 		this.showSelection();
+	}
+
+	isComponentSelected(component){
+		return this.currentlySelectedComponents.includes(component)
+	}
+
+	isLineSelected(line){
+		return this.currentlySelectedLines.includes(line)
 	}
 
 	/**
@@ -386,6 +395,7 @@ export default class SelectionController {
 				component.recalculateSnappingPoints();
 			}
 		}
+		UndoController.controller.addState()
 	}
 
 	/**

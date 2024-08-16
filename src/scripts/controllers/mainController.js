@@ -22,6 +22,7 @@ import SelectionController from "./selectionController";
 import hotkeys from 'hotkeys-js';
 import NodeComponentInstance from "../components/nodeComponentInstance";
 import SaveController from "./saveController";
+import UndoController from "./undoController";
 
 /** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
 /** @typedef {import("../lines/line").default} Line */
@@ -149,6 +150,8 @@ export default class MainController {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
 			this.selectionController = new SelectionController(this);
+			new UndoController()
+			UndoController.controller.addState()
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
@@ -193,6 +196,16 @@ export default class MainController {
 		// select everything
 		hotkeys("ctrl+a",()=>{
 			this.selectionController.selectAll();
+			return false;
+		})
+
+		//undo/redo
+		hotkeys("ctrl+z",()=>{
+			UndoController.undo();
+			return false;
+		})
+		hotkeys("ctrl+y",()=>{
+			UndoController.redo();
 			return false;
 		})
 
