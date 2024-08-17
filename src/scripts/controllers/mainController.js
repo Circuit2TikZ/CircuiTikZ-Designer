@@ -8,7 +8,7 @@ import "../utils/impSVGNumber";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
 /** @typedef {import("../internal").ComponentInstance} ComponentInstance */
@@ -203,6 +203,20 @@ export class MainController {
 		})
 		hotkeys("ctrl+y",()=>{
 			Undo.redo();
+			return false;
+		})
+
+		//copy/paste
+		hotkeys("ctrl+c",()=>{
+			CopyPaste.copy()
+			return false;
+		})
+		hotkeys("ctrl+v",()=>{
+			CopyPaste.paste()
+			return false;
+		})
+		hotkeys("ctrl+x",()=>{
+			CopyPaste.cut()
 			return false;
 		})
 

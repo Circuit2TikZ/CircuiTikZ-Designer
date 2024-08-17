@@ -8,6 +8,7 @@ export * from "./controllers/exportController";
 export * from "./controllers/saveController";
 export * from "./controllers/selectionController";
 export * from "./controllers/undoController";
+export * from "./controllers/copyController";
 // components
 export * from "./components/componentSymbol";
 export * from "./components/componentInstance";

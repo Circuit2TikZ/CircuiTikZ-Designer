@@ -45,8 +45,6 @@ export class Undo {
 		Undo.#states = Undo.#states.slice(0,Undo.#currentIndex+1)
 		Undo.#states.push(currentState)
 		Undo.#currentIndex = Undo.#states.length-1
-		console.log("add State");
-		
 	}
 
 	static undo(){
@@ -80,21 +78,20 @@ export class Undo {
 		// load state
 		let state = Undo.#states[Undo.#currentIndex]		
 
-		let nodes = []
-		let paths = []
+		let allComponents = []
 		let lines = []
 
 		for (const node of state.nodes) {
 			let nodeComponent = NodeComponentInstance.fromJson(node)
 			if (node.selected) {
-				nodes.push(nodeComponent)
+				noallComponentsdes.push(nodeComponent)
 			}
 		}
 		
 		for (const path of state.paths) {
 			let pathComponent = PathComponentInstance.fromJson(path)
 			if (path.selected) {
-				paths.push(pathComponent)
+				allComponents.push(pathComponent)
 			}
 		}
 
@@ -105,7 +102,6 @@ export class Undo {
 			}
 		}
 
-		let allComponents = nodes.concat(paths)
 		if (allComponents.length>0) {
 			SelectionController.controller.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
 		}
