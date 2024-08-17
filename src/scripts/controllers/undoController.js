@@ -84,7 +84,7 @@ export class Undo {
 		for (const node of state.nodes) {
 			let nodeComponent = NodeComponentInstance.fromJson(node)
 			if (node.selected) {
-				noallComponentsdes.push(nodeComponent)
+				allComponents.push(nodeComponent)
 			}
 		}
 		
