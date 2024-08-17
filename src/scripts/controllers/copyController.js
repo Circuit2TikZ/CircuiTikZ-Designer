@@ -39,7 +39,7 @@ export class CopyPaste {
 	}
 
 	static paste(){
-		console.log(CopyPaste.#clipboard);
+		//TODO paste should pick up components instantly and move them to the mouse position
 		
 		SelectionController.controller.deactivateSelection()
 		SelectionController.controller.activateSelection()
