@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, NodeComponentInstance, SelectionController} from "../internal";
+import {SnapController, NodeComponentInstance, SelectionController, Undo} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -47,6 +47,8 @@ export class svgSnapDragHandler {
 	/** @type {boolean} */
 	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
 
+	#currentlyDragging = false
+
 	/**
 	 * Do not call directly. Use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler instead.
 	 *
@@ -81,7 +83,8 @@ export class svgSnapDragHandler {
 		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new svgSnapDragHandler(element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
-			snapDragHandler.#dragEnd()
+			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
+			snapDragHandler.#dragEnd(null,false)
 			snapDragHandler.removeHandler();
 			return null;
 		}
@@ -125,6 +128,7 @@ export class svgSnapDragHandler {
 	 * @param {DragEvent} event
 	 */
 	#dragStart(event) {
+		this.#currentlyDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
 
@@ -193,7 +197,12 @@ export class svgSnapDragHandler {
 	 * Listener for the "dragend" event. Undo the cursor change from {@link "#dragStart"}.
 	 * @param {DragEvent} event
 	 */
-	#dragEnd(event) {
+	#dragEnd(event, trackState=true) {
+		if (!this.#currentlyDragging) {
+			return
+		}
+
+		this.#currentlyDragging = false;
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");
 
@@ -207,5 +216,9 @@ export class svgSnapDragHandler {
 			});
 			Promise.resolve().then(() => this.element.node.dispatchEvent(contextMenuEvent));
 		} else if (this.element.recalculateSnappingPoints) this.element.recalculateSnappingPoints();
+
+		if (trackState) {
+			Undo.addState()
+		}
 	}
 }

@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { Line,NodeComponentInstance,PathComponentInstance,MainController } from "../internal";
+import { Line,NodeComponentInstance,MainController } from "../internal";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 

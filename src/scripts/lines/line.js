@@ -13,6 +13,7 @@ import SnapPoint from "../internal";
  * @property {SVG.PointArray} _array
  */
 export class Line extends SVG.Polyline {
+	//TODO make possible to draw straight line
 	/**
 	 * @typedef {object} DirectionType
 	 * @property {string} tikzName - the TikZ draw command

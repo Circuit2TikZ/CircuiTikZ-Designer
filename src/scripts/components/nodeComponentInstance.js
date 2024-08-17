@@ -6,6 +6,7 @@ import * as SVG from "@svgdotjs/svg.js";
 import { rectRectIntersection, selectedBoxWidth } from "../utils/selectionHelper";
 
 import { NodeComponentSymbol,SnapPoint,svgSnapDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
+import hotkeys from "hotkeys-js";
 
 /**
  * Instance of a `NodeComponentsSymbol`.
@@ -106,7 +107,17 @@ export class NodeComponentInstance extends SVG.Use {
 				dh.endDrag(evt);
 				CanvasController.controller.placingComponent=null;
 				this.#finishedPlacingCallback();
+				hotkeys.unbind("esc",dragCancelFunction)				
 			}
+
+			const dragCancelFunction = (/** @type {KeyboardEvent} */evt)=>{
+				svgSnapDragHandler.snapDrag(this,false)
+				CanvasController.controller.placingComponent=null;
+				MainController.controller.removeInstance(this);	
+				hotkeys.unbind("esc",dragCancelFunction)
+			}
+
+			hotkeys("esc",dragCancelFunction)
 
 			SVG.off(window, endEventNameScoped);
 
@@ -252,9 +263,9 @@ export class NodeComponentInstance extends SVG.Use {
 		let data = {
 			id:this.symbol.node.id,
 			name:this.nodeName,
-			position:this.getAnchorPoint(),
+			position:this.getAnchorPoint().clone(),
 			rotation:this.#angleDeg,
-			flip:this.#flip
+			flip:this.#flip.clone()
 		}
 
 		return data

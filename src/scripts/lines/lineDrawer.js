@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import { MainController, FABcontroller, SnapController, SnapCursorController, Line, UndoController } from "../internal";
+import { MainController, FABcontroller, SnapController, SnapCursorController, Line, Undo } from "../internal";
 
 /**
  * @class
@@ -181,7 +181,7 @@ export class LineDrawer {
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
 		SnapCursorController.controller.visible = this.#hasMouse;
-		UndoController.controller.addState()
+		Undo.addState()
 	}
 
 	/**

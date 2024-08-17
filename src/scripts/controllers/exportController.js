@@ -3,7 +3,8 @@
  */
 
 import { Modal, Tooltip } from "bootstrap";
-import { FileSaver, SelectionController, MainController } from "../internal";
+import { SelectionController, MainController } from "../internal";
+import FileSaver from "file-saver";
 var pretty = require('pretty');
 
 /**

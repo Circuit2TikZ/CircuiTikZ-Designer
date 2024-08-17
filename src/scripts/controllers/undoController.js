@@ -1,32 +1,20 @@
 /**
- * @module undoController
+ * @module undo
  */
 
 import {MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Line} from "../internal";
 
 /**
- * Controller holding selection information and handling selecting/deselecting
+ * Class handling undo and redo via save states
  * @class
  */
-export class UndoController {
-	/**
-	 * Static variable holding the instance.
-	 * @type {UndoController}
-	 */
-	static controller;
+export class Undo {
+	static #states = []
 
-	/**
-	 * the 
-	 */
-	#states = []
+	static #currentIndex = -1;
 
-	#currentIndex = -1;
-
-	constructor(){
-		UndoController.controller=this;
-	}
-
-	addState(){
+	//TODO discuss id selections should be remembered or not???
+	static addState(){
 		// get json object
 		let nodes = []
 		let paths = []
@@ -54,44 +42,43 @@ export class UndoController {
 		}
 
 		// push state on stack
-		this.#states = this.#states.slice(0,this.#currentIndex+1)
-		this.#states.push(currentState)
-		this.#currentIndex = this.#states.length-1
-		console.log("add state!");
-	}
-
-	undo(){
-		this.#currentIndex-=1
-		if (this.#currentIndex<0) {
-			this.#currentIndex=0
-			return
-		}
-		this.#loadState()
-		console.log("undo!");
+		Undo.#states = Undo.#states.slice(0,Undo.#currentIndex+1)
+		Undo.#states.push(currentState)
+		Undo.#currentIndex = Undo.#states.length-1
+		console.log("add State");
 		
 	}
 
-	redo(){
-		this.#currentIndex+=1
-		if (this.#currentIndex>=this.#states.length) {
-			this.#currentIndex=this.#states.length-1
+	static undo(){
+		Undo.#currentIndex-=1
+		if (Undo.#currentIndex<0) {
+			Undo.#currentIndex=0
 			return
 		}
-		this.#loadState()
-		console.log("redo!");
+		Undo.#loadState()
+		
 	}
 
-	#loadState(){
+	static redo(){
+		Undo.#currentIndex+=1
+		if (Undo.#currentIndex>=Undo.#states.length) {
+			Undo.#currentIndex=Undo.#states.length-1
+			return
+		}
+		Undo.#loadState()
+	}
+
+	static #loadState(){		
 		// remove all components
 		while (MainController.controller.instances.length>0) {
-			MainController.controller.removeInstance(MainController.controller.instances.pop())
+			MainController.controller.removeInstance(MainController.controller.instances[0])
 		}
 		while (MainController.controller.lines.length>0) {
-			MainController.controller.removeLine(MainController.controller.lines.pop())
+			MainController.controller.removeLine(MainController.controller.lines[0])
 		}
 
 		// load state
-		let state = this.#states[this.#currentIndex]
+		let state = Undo.#states[Undo.#currentIndex]		
 
 		let nodes = []
 		let paths = []
@@ -112,7 +99,7 @@ export class UndoController {
 		}
 
 		for (const line of state.lines) {
-			let lineComponent = PathComponentInstance.fromJson(line)
+			let lineComponent = Line.fromJson(line)
 			if (line.selected) {
 				lines.push(lineComponent)
 			}

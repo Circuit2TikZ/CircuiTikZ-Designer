@@ -8,7 +8,7 @@ import "../utils/impSVGNumber";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, UndoController} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
 /** @typedef {import("../internal").ComponentInstance} ComponentInstance */
@@ -136,8 +136,7 @@ export class MainController {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
 			this.selectionController = new SelectionController(this);
-			new UndoController()
-			UndoController.controller.addState()
+			Undo.addState()
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
@@ -163,14 +162,14 @@ export class MainController {
 		hotkeys("ctrl+r",()=>{
 			this.selectionController.rotateSelection(-90);
 			if (this.selectionController.hasSelection()) {
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 			return false;
 		})
 		hotkeys("ctrl+shift+r",()=>{
 			this.selectionController.rotateSelection(90);
 			if (this.selectionController.hasSelection()) {
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 			return false;
 		})
@@ -179,14 +178,14 @@ export class MainController {
 		hotkeys("shift+x",()=>{
 			this.selectionController.flipSelection(true);
 			if (this.selectionController.hasSelection()) {
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 			return false;
 		})
 		hotkeys("shift+y",()=>{
 			this.selectionController.flipSelection(false);
 			if (this.selectionController.hasSelection()) {
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 			return false;
 		})
@@ -199,11 +198,11 @@ export class MainController {
 
 		//undo/redo
 		hotkeys("ctrl+z",()=>{
-			UndoController.controller.undo();
+			Undo.undo();
 			return false;
 		})
 		hotkeys("ctrl+y",()=>{
-			UndoController.controller.redo();
+			Undo.redo();
 			return false;
 		})
 
@@ -221,7 +220,7 @@ export class MainController {
 				this.#switchMode(MainController.modes.ERASE);
 			}else{
 				SelectionController.controller.removeSelection()
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 			return false;
 		})
@@ -432,7 +431,7 @@ export class MainController {
 						this.removeInstance(oldComponent);
 					}
 
-					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN)});
+					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN);});
 					if (newInstance instanceof PathComponentInstance) {
 						if (lastpoint) {
 							newInstance.firstClick(lastpoint);

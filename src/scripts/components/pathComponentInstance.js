@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController } from "../internal";
+import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo } from "../internal";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectedWireWidth } from "../utils/selectionHelper";
 
 /**
@@ -207,7 +207,6 @@ export class PathComponentInstance extends SVG.G {
 	 * @returns {PathComponentInstance} the deserialized instance
 	 */
 	static fromJson(serialized) {
-		// todo: implement
 		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
 		/**@type {PathComponentInstance} */
 		let pathComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
@@ -225,6 +224,7 @@ export class PathComponentInstance extends SVG.G {
 	 * @returns {object} the serialized instance
 	 */
 	toJson() {
+		//TODO add additional options!?
 		let data = {
 			id:this.symbol.node.id,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
@@ -300,7 +300,8 @@ export class PathComponentInstance extends SVG.G {
 			if (this.#pointsSet===0) {
 				this.firstClick(point);
 			}
-			this.secondClick(point);
+			
+			this.secondClick(point,false);
 			MainController.controller.removeInstance(this)
 		}
 	}
@@ -332,8 +333,7 @@ export class PathComponentInstance extends SVG.G {
 			SnapController.controller.hideSnapPoints();
 			if (runCB) {
 				this.#finishedPlacingCallback()
-				// TODO could be problematic here!
-				UndoController.controller.addState()
+				Undo.addState()
 			}
 		}
 	}
