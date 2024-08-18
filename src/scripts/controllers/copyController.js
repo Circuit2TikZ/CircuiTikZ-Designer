@@ -71,14 +71,16 @@ export class CopyPaste {
 	}
 
 	static cut(){
-		CopyPaste.copy();
-
-		for (const component of SelectionController.controller.currentlySelectedComponents) {
-			MainController.controller.removeInstance(component)
+		if (SelectionController.controller.hasSelection()) {
+			CopyPaste.copy();
+	
+			for (const component of SelectionController.controller.currentlySelectedComponents) {
+				MainController.controller.removeInstance(component)
+			}
+			for (const line of SelectionController.controller.currentlySelectedLines) {
+				MainController.controller.removeLine(line)
+			}
+			Undo.addState()
 		}
-		for (const line of SelectionController.controller.currentlySelectedLines) {
-			MainController.controller.removeLine(line)
-		}
-		Undo.addState()
 	}
 }

@@ -13,7 +13,7 @@ export class Undo {
 
 	static #currentIndex = -1;
 
-	//TODO discuss id selections should be remembered or not???
+	//TODO discuss if selections should be remembered or not???
 	static addState(){
 		// get json object
 		let nodes = []

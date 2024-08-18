@@ -240,7 +240,6 @@ export class PathComponentInstance extends SVG.G {
 	 * @returns {string}
 	 */
 	toTikzString() {
-		//TODO properly calculate flip
 		return (
 			"\\draw " +
 			this.snappingPoints[0].toTikzString() +
@@ -421,7 +420,6 @@ export class PathComponentInstance extends SVG.G {
 	}
 
 	flip(horizontal){
-		// TODO change tikz code generation
 		let direction = horizontal?1:0
 
 		// every flip makes the mirroring change state

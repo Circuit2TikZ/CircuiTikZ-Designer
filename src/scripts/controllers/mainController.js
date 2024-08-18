@@ -2,6 +2,8 @@
  * @module mainController
  */
 
+//TODO big refactor to typescript
+
 import * as SVG from "@svgdotjs/svg.js";
 import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap";
 import "../utils/impSVGNumber";
@@ -34,7 +36,7 @@ export class MainController {
 	symbols;
 
 	/**
-	 * COMMENT/TODO: should probably add a "component placing" mode:
+	 * COMMENT/TODO: properly utilize the "component placing" mode:
 	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
 	 * component placing mode returns to DRAG_PAN as soon as the component has been successfully placed
 	 * Therefore: all kinds of behaviour can be checked and activated/deactivated more easily with this mode
