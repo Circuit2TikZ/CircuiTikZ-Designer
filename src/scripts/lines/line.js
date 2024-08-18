@@ -78,16 +78,17 @@ export class Line extends SVG.Polyline {
 	/**
 	 * Permanently add a new point. This is useful for drawing lines.
 	 *
-	 * @param {boolean} horizontalFirst - set to `true`, if the first line part should be horizontal followed by a vertical line
+	 * @param {Direction} direction - in which direction the line moves first or if its a straight line
 	 * @param {SVG.Point} point - the new (snapped) mouse point
 	 */
-	pushPoint(horizontalFirst = true, point) {
+	pushPoint(direction = Direction.HORIZONTAL_VERTICAL, point) {
 		if (this.#lastPoint.x == point.x && this.#lastPoint.y == point.y) return;
-
+		console.log(point)
+		console.log(direction)
 		// @ts-ignore
 		if (point.addChangeListener) point.addChangeListener(this.onPointChange);
 
-		this.updateMousePoint(horizontalFirst, point);
+		this.updateMousePoint(direction, point);
 		this.#cornerPoint = point.toArray();
 		this.#mousePoint = point.toArray();
 		// @ts-ignore _array not declared in svg.js.d.ts
@@ -95,8 +96,11 @@ export class Line extends SVG.Polyline {
 
 		if (this.#lastPoint.x == point.x || this.#lastPoint.y == point.y) {
 			this.#drawCommands.push(Line.Direction.STRAIGHT, point);
-		} else if (horizontalFirst) this.#drawCommands.push(Line.Direction.HORIZONTAL_VERTICAL, point);
-		else this.#drawCommands.push(Line.Direction.VERTICAL_HORIZONTAL, point);
+		} else{
+			this.#drawCommands.push(direction, point);
+			// if (direction == Line.Direction.HORIZONTAL_VERTICAL) this.#drawCommands.push(Line.Direction.HORIZONTAL_VERTICAL, point);
+			// else this.#drawCommands.push(Line.Direction.VERTICAL_HORIZONTAL, point);
+		} 
 
 		this.#lastPoint = point;
 	}
@@ -138,16 +142,19 @@ export class Line extends SVG.Polyline {
 	/**
 	 * Updates the "mouse point" if the mouse position changed. This is useful for drawing lines.
 	 *
-	 * @param {boolean} horizontalFirst - set to `true`, if the first line part should be horizontal followed by a vertical line
+	 * @param {Direction} direction - in which direction the line moves first or if its a straight line
 	 * @param {SVG.Point} point - the new (snapped) mouse point
 	 */
-	updateMousePoint(horizontalFirst, point) {
+	updateMousePoint(direction, point) {
 		// actually calculate the corner point
-		if (horizontalFirst) {
+		if (direction===Line.Direction.HORIZONTAL_VERTICAL) {
 			this.#cornerPoint[0] = point.x;
 			this.#cornerPoint[1] = this.#lastPoint.y;
-		} else {
+		} else if(direction===Line.Direction.VERTICAL_HORIZONTAL){
 			this.#cornerPoint[0] = this.#lastPoint.x;
+			this.#cornerPoint[1] = point.y;
+		} else{
+			this.#cornerPoint[0] = point.x;
 			this.#cornerPoint[1] = point.y;
 		}
 
@@ -348,7 +355,8 @@ export class Line extends SVG.Polyline {
 		let line = new Line(new SVG.Point(serialized.start))
 		CanvasController.controller.canvas.add(line);
 		for (const point of serialized.others) {
-			line.pushPoint(point.dir==1,new SVG.Point(point.x,point.y))
+			let dir = point.dir==0?Line.Direction.STRAIGHT:point.dir==1?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
+			line.pushPoint(dir,new SVG.Point(point.x,point.y))
 		}
 		line.removeMousePoint()
 
