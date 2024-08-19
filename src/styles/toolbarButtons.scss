@@ -25,37 +25,40 @@
 	text-decoration: underline;
 }
 
-%floatingToolbarButtonAbsolute {
-	@extend %floatingToolbarButton;
-	position: absolute;
-	top: 8px;
-}
+// %floatingToolbarButtonAbsolute {
+// 	@extend %floatingToolbarButton;
+// 	position: absolute;
+// 	top: 8px;
+// }
 
 #addComponentButton {
-	@extend %floatingToolbarButtonAbsolute;
-	left: 8px;
+	@extend %floatingToolbarButton;
+	// @extend %floatingToolbarButtonAbsolute;
+	// left: 8px;
 }
 
 #modeDragPan {
-	@extend %floatingToolbarButtonAbsolute;
-	left: 52px;
+	@extend %floatingToolbarButton;
+	// @extend %floatingToolbarButtonAbsolute;
+	// left: 52px;
 }
 
 #modeDrawLine {
-	@extend %floatingToolbarButtonAbsolute;
-	left: 96px;
+	@extend %floatingToolbarButton;
+	// @extend %floatingToolbarButtonAbsolute;
+	// left: 96px;
 }
 
 #modeEraser {
-	@extend %floatingToolbarButtonAbsolute;
-	left: 140px;
+	@extend %floatingToolbarButton;
+	// @extend %floatingToolbarButtonAbsolute;
+	// left: 140px;
 }
 
-#rightDropdownMenu {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-}
 #rightDropdownMenuToggle {
+	@extend %floatingToolbarButton;
+}
+
+#helpButton{
 	@extend %floatingToolbarButton;
 }

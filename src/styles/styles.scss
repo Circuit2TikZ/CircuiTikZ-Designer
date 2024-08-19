@@ -38,6 +38,15 @@ $danger: #c50f3c;
 	width: 200px !important;
 }
 
+.unselectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 // main content:
 html,
 body {

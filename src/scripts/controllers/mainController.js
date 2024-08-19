@@ -89,7 +89,9 @@ export class MainController {
 
 		MainController.appVersion = version;
 		document.addEventListener('DOMContentLoaded', () => {
-			document.getElementById('version').textContent = "v" + version;
+			for (const element of document.getElementsByClassName('version')) {
+				element.textContent = "v" + version;
+			}
 		  });
 
 		this.#initModeButtons();

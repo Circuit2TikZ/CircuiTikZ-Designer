@@ -49,258 +49,305 @@
 		<script type="module" src="../scripts/index.js"></script>
 	</head>
 
-	<body>
-		<!-- Top left floating buttons -->
-		<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
-		<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
-		<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
-		<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
-
-		<!-- Top right menu -->
-		<div class="btn-group" id="rightDropdownMenu">
-			<a
-				id="rightDropdownMenuToggle"
-				class="material-symbols-outlined"
-				role="button"
-				data-bs-toggle="dropdown"
-				aria-expanded="false"
-				>menu</a
-			>
-			<ul class="dropdown-menu dropdown-menu-end">
-				<li>
-					<button type="button" class="dropdown-item" id="loadButton">
-						<span class="material-symbols-outlined dropdown-item-icon">file_open</span>
-						Load
-					</button>
-				</li>
-				<li>
-					<button type="button" class="dropdown-item" id="saveButton">
-						<span class="material-symbols-outlined dropdown-item-icon">save</span>
-						Save
-					</button>
-				</li>
-				<li><hr class="dropdown-divider" /></li>
-				<li>
-					<button type="button" class="dropdown-item" id="exportCircuiTikZButton">
-						<span class="material-symbols-outlined dropdown-item-icon">code</span>
-						<div>Export CircuiTi<i>k</i>Z code </div>
-					</button>
-				</li>
-				<li>
-					<button type="button" class="dropdown-item" id="exportSVGButton">
-						<span class="material-symbols-outlined dropdown-item-icon">image</span>
-						Export SVG
-					</button>
-				</li>
-				<li><hr class="dropdown-divider" /></li>
-				<li>
-					<button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
-						<span class="dropdown-item-icon material-symbols-outlined">info</span>
-						About Project
-					</button>
-				</li>
-			</ul>
-		</div>
-
-		<!-- Bottom right floating action buttons -->
-		<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
-			<a class="btn btn-floating" id="mainFAB">
-				<span class="material-symbols-outlined">done</span>
-			</a>
-
-			<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
-		</div>
-
-		<!-- Left offcanvas (symbol DB) -->
-		<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
-			<div class="offcanvas-header">
-				<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-			</div>
-			<div class="offcanvas-body">
-				<div class="offcanvas-search">
-					<span class="material-symbols-outlined">search</span>
-					<input type="search" class="form-control" id="componentFilterInput" placeholder="Search" aria-label="Search">
+	<body class="d-flex flex-column">
+		<nav class="navbar navbar-expand-lg bg-body-secondary">
+			<div class="container-fluid">
+				<div class="d-flex flex-row w-auto">
+					<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
+					<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
+					<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
+					<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
 				</div>
-				<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
-					Please enter a valid (regex) search string!
-				</div>
-				<div class="accordion" id="leftOffcanvasAccordion"></div>
-			</div>
-		</div>
-
-		<!-- Modal (load json) -->
-		<div 
-			class="modal fade" 
-			id="loadModal"
-			aria-labelledby="loadModalLabel"
-			aria-hidden="true"
-			tabindex="-1"
-			role="dialog"
-		>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5">Load JSON</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body d-flex flex-column gap-3">
-						<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
-							<div id="dragdroparea" class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
-								<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
-								<span class="material-symbols-outlined" style="font-size: 50px;">place_item</span>
-								<span class="fs-4">Drag&Drop here</span>
-								<span class="fs-6">or</span>
-								<button class="btn btn-primary">Browse file</button>
-								<input id="file-input" type="file">
-							</div>
-						</div>
-						<span id="load-message">No file selected</span>
-					</div>
-					<div class="modal-footer justify-content-between">
-						<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
-							<input class="form-check-input" type="checkbox" value="" id="loadCheckRemove">
-							<label class="form-check-label" for="loadCheckRemove">
-								Remove existing components
-							</label>
-						  </div>
-						<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
-							<span class="material-symbols-outlined">file_open</span>Load
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Modal (export dialog) -->
-		<div
-			class="modal fade"
-			id="exportModal"
-			tabindex="-1"
-			aria-labelledby="exportModalLabel"
-			aria-hidden="true"
-			role="dialog"
-		>
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="exportModalLabel">Export</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div
-							id="copyExportedContent"
-							class="copyContentIcon material-symbols-outlined"
-							aria-label="Copy to clipboard"
+				<a class="navbar-brand unselectable" href=".">
+					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
+					CircuiCanvas
+					<span class="badge text-bg-secondary version unselectable">
+						v0.0.0
+					</span>
+				</a>
+				<div class="w-auto d-flex align-items-center gap-2">
+					<button type="button" class="dropdown-item material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal">
+						help
+					</button>
+					<!-- Top right menu -->
+					<div class="btn-group" id="rightDropdownMenu">
+						<a
+							id="rightDropdownMenuToggle"
+							class="material-symbols-outlined"
 							role="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+							>menu</a
 						>
-							content_copy
-						</div>
-						<textarea id="exportedContent" spellcheck="false"></textarea>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li>
+								<button type="button" class="dropdown-item" id="loadButton">
+									<span class="material-symbols-outlined dropdown-item-icon">file_open</span>
+									Load
+								</button>
+							</li>
+							<li>
+								<button type="button" class="dropdown-item" id="saveButton">
+									<span class="material-symbols-outlined dropdown-item-icon">save</span>
+									Save
+								</button>
+							</li>
+							<li><hr class="dropdown-divider" /></li>
+							<li>
+								<button type="button" class="dropdown-item" id="exportCircuiTikZButton">
+									<span class="material-symbols-outlined dropdown-item-icon">code</span>
+									<div>Export CircuiTi<i>k</i>Z code</div>
+								</button>
+							</li>
+							<li>
+								<button type="button" class="dropdown-item" id="exportSVGButton">
+									<span class="material-symbols-outlined dropdown-item-icon">image</span>
+									Export SVG
+								</button>
+							</li>
+							<li><hr class="dropdown-divider" /></li>
+							<li>
+								<button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
+									<span class="dropdown-item-icon material-symbols-outlined">info</span>
+									About
+								</button>
+							</li>
+						</ul>
 					</div>
-					<div class="modal-footer">
-						<div class="input-group w-px-200 flex-grow-1">
-							<input
-								type="text"
-								class="form-control"
-								aria-label="Filename"
-								id="exportModalFileBasename"
-								placeholder="Circuit"
-							/>
-							<input
-								type="text"
-								disabled
-								id="exportModalFileExtension"
-								class="form-control"
-								aria-label="Filename extension"
-							/>
-							<button
-								type="button"
-								class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
-							>
-								<span class="visually-hidden">Select filename extension</span>
+
+				</div>
+			</div>
+		</nav>
+		<!-- Site content -->
+		<div class="position-relative flex-grow-1">
+			<!-- Top left floating buttons -->
+			<!-- <a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
+			<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
+			<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
+			<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a> -->
+			<!-- Bottom right floating action buttons -->
+			<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
+				<a class="btn btn-floating" id="mainFAB">
+					<span class="material-symbols-outlined">done</span>
+				</a>
+	
+				<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
+			</div>
+	
+			<!-- Left offcanvas (symbol DB) -->
+			<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
+				<div class="offcanvas-header">
+					<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+				</div>
+				<div class="offcanvas-body">
+					<div class="offcanvas-search">
+						<span class="material-symbols-outlined">search</span>
+						<input type="search" class="form-control" id="componentFilterInput" placeholder="Search" aria-label="Search">
+					</div>
+					<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
+						Please enter a valid (regex) search string!
+					</div>
+					<div class="accordion" id="leftOffcanvasAccordion"></div>
+				</div>
+			</div>
+	
+			<!-- Modal (load json) -->
+			<div 
+				class="modal fade" 
+				id="loadModal"
+				aria-labelledby="loadModalLabel"
+				aria-hidden="true"
+				tabindex="-1"
+				role="dialog"
+			>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5">Load JSON</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body d-flex flex-column gap-3">
+							<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
+								<div id="dragdroparea" class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
+									<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
+									<span class="material-symbols-outlined" style="font-size: 50px;">place_item</span>
+									<span class="fs-4">Drag&Drop here</span>
+									<span class="fs-6">or</span>
+									<button class="btn btn-primary">Browse file</button>
+									<input id="file-input" type="file">
+								</div>
+							</div>
+							<span id="load-message">No file selected</span>
+						</div>
+						<div class="modal-footer justify-content-between">
+							<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
+								<input class="form-check-input" type="checkbox" value="" id="loadCheckRemove">
+								<label class="form-check-label" for="loadCheckRemove">
+									Remove existing components
+								</label>
+							  </div>
+							<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
+								<span class="material-symbols-outlined">file_open</span>Load
 							</button>
-							<ul class="dropdown-menu dropdown-menu-end" id="exportModalFileExtensionDropdown"></ul>
-						</div>
-						<button type="button" class="btn btn-primary icon-button" id="exportModalSave">
-							<span class="material-symbols-outlined">save</span>Save
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Modal (about dialog) -->
-		<div
-			class="modal fade"
-			id="aboutModal"
-			tabindex="-1"
-			aria-labelledby="aboutModalLabel"
-			aria-hidden="true"
-			role="dialog"
-		>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="aboutModalLabel">About Project 
-							<span id="version" class="badge text-bg-secondary">
-								v0.0.0
-							</span>
-						</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<p>
-							The CircuiCanvas-Project was started as a research project at the Institute of Electronics
-							Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was
-							to create a progressive web application for easy and faster drawing of circuits using
-							CircuiTi<i>k</i>Z.
-						</p>
-						<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
-						<div class="row">
-							<div class="col-sm-4">
-								<a class="icon-link" href="https://ussi.e-technik.uni-erlangen.de/" target="_blank">
-									<svg class="bi" width="32" height="32" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#house" />
-									</svg>
-									Homepage
-								</a>
-							</div>
-							<div class="col-sm-4">
-								<!-- TODO change Link to git -->
-								<a
-									class="icon-link"
-									href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa"
-									target="_blank"
-								>
-									<svg class="bi" width="32" height="32" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
-									</svg>
-									CircuiCanvas
-								</a>
-							</div>
-							<div class="col-sm-4">
-								<!-- TODO change Link to git -->
-								<a
-									class="icon-link"
-									href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/SymbolConvert"
-									target="_blank"
-								>
-									<svg class="bi" width="32" height="32" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
-									</svg>
-									SymbolConvert
-								</a>
-							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+	
+			<!-- Modal (export dialog) -->
+			<div
+				class="modal fade"
+				id="exportModal"
+				tabindex="-1"
+				aria-labelledby="exportModalLabel"
+				aria-hidden="true"
+				role="dialog"
+			>
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exportModalLabel">Export</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div
+								id="copyExportedContent"
+								class="copyContentIcon material-symbols-outlined"
+								aria-label="Copy to clipboard"
+								role="button"
+							>
+								content_copy
+							</div>
+							<textarea id="exportedContent" spellcheck="false"></textarea>
+						</div>
+						<div class="modal-footer">
+							<div class="input-group w-px-200 flex-grow-1">
+								<input
+									type="text"
+									class="form-control"
+									aria-label="Filename"
+									id="exportModalFileBasename"
+									placeholder="Circuit"
+								/>
+								<input
+									type="text"
+									disabled
+									id="exportModalFileExtension"
+									class="form-control"
+									aria-label="Filename extension"
+								/>
+								<button
+									type="button"
+									class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+								>
+									<span class="visually-hidden">Select filename extension</span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-end" id="exportModalFileExtensionDropdown"></ul>
+							</div>
+							<button type="button" class="btn btn-primary icon-button" id="exportModalSave">
+								<span class="material-symbols-outlined">save</span>Save
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<!-- Modal (about dialog) -->
+			<div
+				class="modal fade"
+				id="aboutModal"
+				tabindex="-1"
+				aria-labelledby="aboutModalLabel"
+				aria-hidden="true"
+				role="dialog"
+			>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="aboutModalLabel">About Project 
+								<span class="badge text-bg-secondary version">
+									v0.0.0
+								</span>
+							</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<p>
+								The CircuiCanvas-Project was started as a research project at the Institute of Electronics
+								Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was
+								to create a progressive web application for easy and faster drawing of circuits using
+								CircuiTi<i>k</i>Z.
+							</p>
+							<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
+							<div class="row">
+								<div class="col-sm-4">
+									<a class="icon-link" href="https://ussi.e-technik.uni-erlangen.de/" target="_blank">
+										<!-- <svg class="bi" width="32" height="32" fill="currentColor">
+											<use xlink:href="../icons/bootstrap-icons.svg#house" />
+										</svg> -->
+										<span class="material-symbols-outlined">home</span>
+										Homepage
+									</a>
+								</div>
+								<div class="col-sm-4">
+									<!-- TODO change Link to git -->
+									<a
+										class="icon-link"
+										href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa"
+										target="_blank"
+									>
+										<svg class="bi" width="32" height="32" fill="currentColor">
+											<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
+										</svg>
+										CircuiCanvas
+									</a>
+								</div>
+								<div class="col-sm-4">
+									<!-- TODO change Link to git -->
+									<a
+										class="icon-link"
+										href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/SymbolConvert"
+										target="_blank"
+									>
+										<svg class="bi" width="32" height="32" fill="currentColor">
+											<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
+										</svg>
+										SymbolConvert
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-		<!-- The actual canvas -->
-		<include src="pages/canvas.svg"></include>
+			<!-- Modal help -->
+			<div
+				class="modal fade"
+				id="helpModal"
+				tabindex="-1"
+				aria-labelledby="helpModalLabel"
+				aria-hidden="true"
+				role="dialog"
+			>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="helpModalLabel">Help</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							TODO
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<!-- The actual canvas -->
+			<include src="pages/canvas.svg"></include>
+		</div>
 	</body>
 </html>
