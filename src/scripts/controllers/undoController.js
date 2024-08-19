@@ -110,5 +110,12 @@ export class Undo {
 		if (lines.length>0) {
 			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
 		}
+
+		let currentState = {
+			nodes:state.nodes,
+			paths:state.paths,
+			lines:state.lines,
+		}
+		localStorage.setItem('currentProgress', JSON.stringify(currentState))
 	}
 }

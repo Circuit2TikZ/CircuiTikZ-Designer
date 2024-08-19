@@ -153,7 +153,6 @@ export class MainController {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
-			console.log("test");
 			let currentProgress = localStorage.getItem('currentProgress')
 			if (currentProgress) {
 				this.saveController.loadFromText(currentProgress)
