@@ -13,11 +13,11 @@ import SnapPoint from "../internal";
  * @property {SVG.PointArray} _array
  */
 export class Line extends SVG.Polyline {
-	//TODO make possible to draw straight line
 	/**
 	 * @typedef {object} DirectionType
 	 * @property {string} tikzName - the TikZ draw command
 	 */
+
 	/**
 	 * Enum for the possible TikZ line draw commands.
 	 * @readonly
@@ -49,15 +49,15 @@ export class Line extends SVG.Polyline {
 		this.onPointChange = this.onPointChange.bind(this);
 
 		// @ts-ignore
-		if (firstPoint.addChangeListener) firstPoint.addChangeListener(this.onPointChange);
+		// if (firstPoint.addChangeListener) firstPoint.addChangeListener(this.onPointChange);
 
 		this.#drawCommands.push((this.#lastPoint = firstPoint));
 
 		const ptArray = firstPoint.toArray();
 		this.plot([ptArray, ptArray, ptArray]);
-		// @ts-ignore _array not declared in svg.js.d.ts
+
 		this.#cornerPoint = this._array[1];
-		// @ts-ignore _array not declared in svg.js.d.ts
+
 		this.#mousePoint = this._array[2];
 
 		this.attr({
@@ -71,35 +71,35 @@ export class Line extends SVG.Polyline {
 	 * Redraw the line using the points array (`_array`). This sets the "points" attribute.
 	 */
 	#redraw() {
-		// @ts-ignore _array not declared in svg.js.d.ts
 		this.attr("points", this._array.toString());
 	}
 
 	/**
 	 * Permanently add a new point. This is useful for drawing lines.
 	 *
-	 * @param {Direction} direction - in which direction the line moves first or if its a straight line
+	 * @param {DirectionType} direction - in which direction the line moves first or if its a straight line
 	 * @param {SVG.Point} point - the new (snapped) mouse point
 	 */
-	pushPoint(direction = Direction.HORIZONTAL_VERTICAL, point) {
+	pushPoint(direction = Line.Direction.HORIZONTAL_VERTICAL, point) {
 		if (this.#lastPoint.x == point.x && this.#lastPoint.y == point.y) return;
-		console.log(point)
-		console.log(direction)
 		// @ts-ignore
-		if (point.addChangeListener) point.addChangeListener(this.onPointChange);
+		// if (point.addChangeListener) point.addChangeListener(this.onPointChange);
 
 		this.updateMousePoint(direction, point);
+		
+		// remove additional corner point if straight line
+		if (direction == Line.Direction.STRAIGHT) {
+			this._array.splice(this._array.length-2,1)
+		}
+		
 		this.#cornerPoint = point.toArray();
 		this.#mousePoint = point.toArray();
-		// @ts-ignore _array not declared in svg.js.d.ts
 		this._array.push(this.#cornerPoint, this.#mousePoint);
 
 		if (this.#lastPoint.x == point.x || this.#lastPoint.y == point.y) {
 			this.#drawCommands.push(Line.Direction.STRAIGHT, point);
 		} else{
 			this.#drawCommands.push(direction, point);
-			// if (direction == Line.Direction.HORIZONTAL_VERTICAL) this.#drawCommands.push(Line.Direction.HORIZONTAL_VERTICAL, point);
-			// else this.#drawCommands.push(Line.Direction.VERTICAL_HORIZONTAL, point);
 		} 
 
 		this.#lastPoint = point;
@@ -142,7 +142,7 @@ export class Line extends SVG.Polyline {
 	/**
 	 * Updates the "mouse point" if the mouse position changed. This is useful for drawing lines.
 	 *
-	 * @param {Direction} direction - in which direction the line moves first or if its a straight line
+	 * @param {DirectionType} direction - in which direction the line moves first or if its a straight line
 	 * @param {SVG.Point} point - the new (snapped) mouse point
 	 */
 	updateMousePoint(direction, point) {

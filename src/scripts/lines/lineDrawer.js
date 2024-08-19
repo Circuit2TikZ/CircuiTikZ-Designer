@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import { MainController, FABcontroller, SnapController, SnapCursorController, Line, Undo } from "../internal";
+import { MainController, FABcontroller, SnapController, SnapCursorController, Line, Undo, CanvasController } from "../internal";
 
 /**
  * @class
@@ -113,8 +113,7 @@ export class LineDrawer {
 					? event.changedTouches[0]
 					: null;
 		if (!clientPt) return;
-		const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
-		console.log(event.altKey);
+		const pt = CanvasController.controller.pointerEventToPoint(clientPt);
 		
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 
