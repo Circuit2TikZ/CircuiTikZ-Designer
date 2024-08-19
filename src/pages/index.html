@@ -53,10 +53,14 @@
 		<nav class="navbar navbar-expand-lg bg-body-secondary">
 			<div class="container-fluid">
 				<div class="d-flex flex-row w-auto">
-					<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
-					<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
-					<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
-					<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
+					<a id="addComponentButton" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
+					<div class="vertical-line mx-2"></div>
+					<a id="modeDragPan" class="material-symbols-outlined mx-1 selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
+					<a id="modeDrawLine" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
+					<a id="modeEraser" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
+					<div class="vertical-line mx-2"></div>
+					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl+Z)">undo</a>
+					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl+Y)">redo</a>
 				</div>
 				<a class="navbar-brand unselectable" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
@@ -66,9 +70,9 @@
 					</span>
 				</a>
 				<div class="w-auto d-flex align-items-center gap-2">
-					<button type="button" class="dropdown-item material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal">
+					<a role="button" class="toolbarButton material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal">
 						help
-					</button>
+					</a>
 					<!-- Top right menu -->
 					<div class="btn-group" id="rightDropdownMenu">
 						<a

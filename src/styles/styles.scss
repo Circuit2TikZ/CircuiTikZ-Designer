@@ -47,6 +47,12 @@ $danger: #c50f3c;
 	user-select: none;
 }
 
+div.vertical-line{
+	width: 1px; /* Line width */
+	background-color: #888; /* Line color */
+	display: inline-block;
+}
+
 // main content:
 html,
 body {

@@ -222,6 +222,8 @@ export class MainController {
 			Undo.redo();
 			return false;
 		})
+		document.getElementById("undoButton").addEventListener("click",()=>Undo.undo())
+		document.getElementById("redoButton").addEventListener("click",()=>Undo.redo())
 
 		//copy/paste
 		hotkeys("ctrl+c",()=>{
