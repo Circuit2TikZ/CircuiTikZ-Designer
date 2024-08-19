@@ -92,7 +92,7 @@ export class MainController {
 			for (const element of document.getElementsByClassName('version')) {
 				element.textContent = "v" + version;
 			}
-		  });
+		});
 
 		this.#initModeButtons();
 
@@ -148,12 +148,18 @@ export class MainController {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
 			this.selectionController = new SelectionController(this);
-			Undo.addState()
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
+			console.log("test");
+			let currentProgress = localStorage.getItem('currentProgress')
+			if (currentProgress) {
+				this.saveController.loadFromText(currentProgress)
+			}else{
+				Undo.addState()
+			}
 			this.isInitDone = true;
 		});
 

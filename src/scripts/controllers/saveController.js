@@ -87,7 +87,7 @@ export class SaveController {
 				var reader = new FileReader();
 				reader.readAsText(file, "UTF-8");
 				reader.onload = (evt) => {
-					this.#loadFromText(evt.target.result);
+					this.loadFromText(evt.target.result, true);
 					this.#loadModal.hide()
 				}
 				reader.onerror = (evt) => {
@@ -114,7 +114,7 @@ export class SaveController {
 		});
 	}
 
-	#loadFromText(text){
+	loadFromText(text, selectComponents=false){
 		//delete current state if necessary		
 		if (document.getElementById("loadCheckRemove").checked) {
 			SelectionController.controller.selectAll()
@@ -140,10 +140,12 @@ export class SaveController {
 			lines.push(Line.fromJson(line))
 		}
 		
-		SelectionController.controller.deactivateSelection()
-		SelectionController.controller.activateSelection()
-		SelectionController.controller.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
-		SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+		if (selectComponents) {
+			SelectionController.controller.deactivateSelection()
+			SelectionController.controller.activateSelection()
+			SelectionController.controller.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
+			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+		}
 		Undo.addState()
 	}
 }
