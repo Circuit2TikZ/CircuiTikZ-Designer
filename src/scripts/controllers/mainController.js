@@ -9,6 +9,7 @@ import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, 
 import "../utils/impSVGNumber";
 import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
+import {version} from '../../../package.json';
 
 import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
@@ -76,6 +77,8 @@ export class MainController {
 	/** @type {Line[]} */
 	lines = [];
 
+	static appVersion = "0.0.0";
+
 	/**
 	 * Init the app.
 	 */
@@ -83,6 +86,11 @@ export class MainController {
 		this.snapController = SnapController.controller;
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
+
+		MainController.appVersion = version;
+		document.addEventListener('DOMContentLoaded', () => {
+			document.getElementById('version').textContent = "v" + version;
+		  });
 
 		this.#initModeButtons();
 
