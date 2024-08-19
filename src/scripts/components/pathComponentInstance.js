@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 
 import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo } from "../internal";
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectedWireWidth } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 /**
  * Instance of a `PathComponentSymbol`.
@@ -177,14 +177,15 @@ export class PathComponentInstance extends SVG.G {
 													scaleY: this.#mirror?-1:1 });
 			this.#selectionRectangle.attr({
 				"stroke-width": selectedBoxWidth,
-				"stroke": "grey",
+				"stroke": selectionColor,
+				"stroke-dasharray":"3,3",
 				"fill": "none"
 			});
 			this.#preLine.attr({
-				"stroke-width": selectedWireWidth,
+				"stroke":selectionColor,
 			});
 			this.#postLine.attr({
-				"stroke-width": selectedWireWidth,
+				"stroke":selectionColor,
 			});
 		}
 	}
@@ -193,10 +194,10 @@ export class PathComponentInstance extends SVG.G {
 		this.#selectionRectangle?.remove();
 		this.#selectionRectangle = null
 		this.#preLine.attr({
-			"stroke-width": "0.4pt",
+			"stroke":"#000",
 		});
 		this.#postLine.attr({
-			"stroke-width": "0.4pt",
+			"stroke":"#000",
 		});
 	}
 

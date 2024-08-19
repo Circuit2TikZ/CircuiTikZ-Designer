@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 
-export const selectedWireWidth = "2pt"
-export const selectedBoxWidth = "1pt"
+export const selectedBoxWidth = "0.4pt"
+export const selectionColor = "#d44"
 
 /**
 	 * 

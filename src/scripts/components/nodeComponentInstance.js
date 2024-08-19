@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { rectRectIntersection, selectedBoxWidth } from "../utils/selectionHelper";
+import { rectRectIntersection, selectionColor, selectedBoxWidth } from "../utils/selectionHelper";
 
 import { NodeComponentSymbol,SnapPoint,svgSnapDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
 import hotkeys from "hotkeys-js";
@@ -193,14 +193,17 @@ export class NodeComponentInstance extends SVG.Use {
 			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
 			this.#selectionRectangle.attr({
 				"stroke-width":selectedBoxWidth,
-				"stroke":"grey",
+				"stroke":selectionColor,
+				"stroke-dasharray":"3,3",
 				"fill":"none"
 			});
+			this.stroke("#f00")
 		}
 	}
 
 	hideBoundingBox(){
 		this.#selectionRectangle?.remove();
+		this.stroke("#000")
 		this.#selectionRectangle = null
 	}
 

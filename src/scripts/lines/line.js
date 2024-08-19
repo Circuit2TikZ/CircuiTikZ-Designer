@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { lineRectIntersection, pointInsideRect, selectedWireWidth } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectionColor } from "../utils/selectionHelper";
 import {MainController, CanvasController} from "../internal";
 
 /// <reference path="../utils/impSVGNumber.d.ts" />
@@ -129,13 +129,15 @@ export class Line extends SVG.Polyline {
 
 	showBoundingBox(){
 		this.attr({
-			"stroke-width": selectedWireWidth,
+			"stroke":selectionColor,
+			// "stroke-width": selectedWireWidth,
 		});
 	}
 
 	hideBoundingBox(){
 		this.attr({
-			"stroke-width": "0.4pt",
+			"stroke":"#000",
+			// "stroke-width": "0.4pt",
 		});
 	}
 
