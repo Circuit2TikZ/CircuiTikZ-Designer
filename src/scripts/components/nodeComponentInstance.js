@@ -120,14 +120,14 @@ export class NodeComponentInstance extends SVG.Use {
 			hotkeys("esc",dragCancelFunction)
 
 			SVG.off(window, endEventNameScoped);
+			SVG.on(window, endEventNameScoped, dragEndFunction, dh, { passive: false });
 
-			let timeout = null;
-			const addDragEndHandler = () => {
-				window.clearTimeout(timeout);
-				SVG.on(window, endEventNameScoped, dragEndFunction, dh, { passive: false });
-			};
+			// let timeout = null;
+			// const addDragEndHandler = () => {
+			// 	window.clearTimeout(timeout);
+			// };
 
-			timeout = window.setTimeout(addDragEndHandler, 10);
+			// timeout = window.setTimeout(addDragEndHandler, 10);
 		}
 
 		this.snappingPoints = this.symbol._pins.map(
@@ -135,52 +135,52 @@ export class NodeComponentInstance extends SVG.Use {
 		);
 
 		// init context menus
-		if (!NodeComponentInstance.#contextMenu) {
-			NodeComponentInstance.#contextMenu = new ContextMenu([
-				{
-					result: "rotateLeft",
-					text: "Rotate counterclockwise",
-					iconText: "rotate_left",
-				},
-				{
-					result: "rotateRight",
-					text: "Rotate clockwise",
-					iconText: "rotate_right",
-				},
-				{
-					result: "remove",
-					text: "Remove",
-					iconText: "delete",
-				},
-			]);
-		}
+		// if (!NodeComponentInstance.#contextMenu) {
+		// 	NodeComponentInstance.#contextMenu = new ContextMenu([
+		// 		{
+		// 			result: "rotateLeft",
+		// 			text: "Rotate counterclockwise",
+		// 			iconText: "rotate_left",
+		// 		},
+		// 		{
+		// 			result: "rotateRight",
+		// 			text: "Rotate clockwise",
+		// 			iconText: "rotate_right",
+		// 		},
+		// 		{
+		// 			result: "remove",
+		// 			text: "Remove",
+		// 			iconText: "delete",
+		// 		},
+		// 	]);
+		// }
 
-		this.on(
-			"contextmenu",
-			(/** @type {PointerEvent} */ evt) => {
-				evt.preventDefault();
-				let result = NodeComponentInstance.#contextMenu.openForResult(evt.clientX, evt.clientY);
-				result
-					.then((res) => {
-						switch (res) {
-							case "rotateLeft":
-								this.rotate(90);
-								return;
-							case "rotateRight":
-								this.rotate(-90);
-								return;
-							case "remove":
-								MainController.controller.removeInstance(this);
-								break;
-							default:
-								console.log("Not implemented: " + res);
-						}
-					})
-					.catch(() => {}); // closed without clicking on item
-					evt.stopPropagation();
-			},
-			this
-		);
+		// this.on(
+		// 	"contextmenu",
+		// 	(/** @type {PointerEvent} */ evt) => {
+		// 		evt.preventDefault();
+		// 		let result = NodeComponentInstance.#contextMenu.openForResult(evt.clientX, evt.clientY);
+		// 		result
+		// 			.then((res) => {
+		// 				switch (res) {
+		// 					case "rotateLeft":
+		// 						this.rotate(90);
+		// 						return;
+		// 					case "rotateRight":
+		// 						this.rotate(-90);
+		// 						return;
+		// 					case "remove":
+		// 						MainController.controller.removeInstance(this);
+		// 						break;
+		// 					default:
+		// 						console.log("Not implemented: " + res);
+		// 				}
+		// 			})
+		// 			.catch(() => {}); // closed without clicking on item
+		// 			evt.stopPropagation();
+		// 	},
+		// 	this
+		// );
 	}
 
 	isInsideSelectionRectangle(selectionRectangle){
