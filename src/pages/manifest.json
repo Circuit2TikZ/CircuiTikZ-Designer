@@ -1,6 +1,7 @@
 {
+	"_comment":"//TODO change the name and description of this manifest",
 	"background_color": "#fff",
-	"description": "A WYSIWHG designer for CircuiTikZ circuits",
+	"description": "A WYSIWYG designer for CircuiTikZ circuits",
 	"display": "standalone",
 	"name": "CircuiCanvas",
 	"start_url": ".",

@@ -40,6 +40,9 @@ export class CopyPaste {
 
 	static paste(){
 		//TODO paste should pick up components instantly and move them to the mouse position
+		if (Object.keys(CopyPaste.#clipboard).length===0) {
+			return
+		}
 		
 		SelectionController.controller.deactivateSelection()
 		SelectionController.controller.activateSelection()

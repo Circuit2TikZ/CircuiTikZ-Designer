@@ -84,7 +84,7 @@ export class ExportController {
 	 * Shows the exportModal with the CitcuiTikZ code.
 	 */
 	exportCircuiTikZ() {
-		this.#heading.textContent = "Export CircuiTikZ code"
+		this.#heading.innerHTML = "Export CircuiTi<i>k</i>Z code"
 		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
 		// create extension select list
 		const extensions = [".tikz", ".tex", ".pgf"];

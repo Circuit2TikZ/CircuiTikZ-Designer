@@ -62,8 +62,8 @@ export class SelectionController {
 		this.#lines = mainController.lines;
 		this.#selectionStartPosition = new SVG.Point()
 		this.#selectionRectangle = this.canvasController.canvas.rect(0,0).move(0,0);
-		this.#selectionRectangle.attr("stroke-width",1)
-		this.#selectionRectangle.attr("stroke","grey")
+		this.#selectionRectangle.attr("stroke-width","0.5pt")
+		this.#selectionRectangle.attr("stroke","black")
 		this.#selectionRectangle.attr("fill","none")
 		this.#selectionRectangle.attr("id","selectionRectangle")
 		this.#selectionEnabled = true

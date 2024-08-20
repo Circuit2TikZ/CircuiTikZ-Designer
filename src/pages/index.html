@@ -9,6 +9,7 @@
 			gtag('js', new Date());
 			gtag('config', 'G-SN05E6G25Q');
 		</script>
+		<!-- TODO change this -->
 		<title>CircuiCanvas</title>
 		<meta
 			name="viewport"
@@ -29,9 +30,12 @@
 		<link rel="icon" type="image/png" sizes="96x96" href="../icons/favicon-96x96.png" />
 		<link rel="icon" type="image/png" sizes="16x16" href="../icons/favicon-16x16.png" />
 		<link rel="manifest" href="manifest.json" />
+
 		<meta name="msapplication-TileColor" content="#2F586E" />
 		<meta name="msapplication-TileImage" content="../icons/ms-icon-144x144.png" />
 		<meta name="theme-color" content="#2F586E" />
+		<meta name="description" content="A GUI for drawing circuits for CircuiTikZ">
+		<meta charset="UTF-8">
 
 		<link rel="stylesheet" href="../styles/styles.scss" />
 		<!-- <link
@@ -51,8 +55,8 @@
 
 	<body class="d-flex flex-column">
 		<nav class="navbar navbar-expand-lg bg-body-secondary">
-			<div class="container-fluid">
-				<div class="d-flex flex-row w-auto">
+			<div class="container-fluid row">
+				<div class="col d-flex flex-row w-auto">
 					<a id="addComponentButton" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
 					<div class="vertical-line mx-2"></div>
 					<a id="modeDragPan" class="material-symbols-outlined mx-1 selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
@@ -62,15 +66,20 @@
 					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl+Z)">undo</a>
 					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl+Y)">redo</a>
 				</div>
-				<a class="navbar-brand unselectable" href=".">
+				<a class="col-md-auto navbar-brand unselectable position-relative mx-3" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
 					CircuiCanvas
 					<span class="badge text-bg-secondary version unselectable">
 						v0.0.0
 					</span>
 				</a>
-				<div class="w-auto d-flex align-items-center gap-2">
-					<a role="button" class="toolbarButton material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal">
+				<div class="col w-auto d-flex justify-content-end align-items-center gap-2">
+					<a role="button" class="toolbarButton material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal"
+						data-bs-toggle-second="tooltip"
+						data-bs-trigger="hover"
+						data-bs-delay='{"show":500,"hide":250}'
+						data-bs-placement="bottom"
+						data-bs-title="Help menu">
 						help
 					</a>
 					<!-- Top right menu -->
@@ -81,8 +90,14 @@
 							role="button"
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
-							>menu</a
-						>
+							data-bs-toggle-second="tooltip"
+							data-bs-trigger="hover"
+							data-bs-delay='{"show":500,"hide":250}'
+							data-bs-placement="bottom"
+							data-bs-title="Menu for IO operations"
+							>
+							menu
+						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
 							<li>
 								<button type="button" class="dropdown-item" id="loadButton">
@@ -106,7 +121,7 @@
 							<li>
 								<button type="button" class="dropdown-item" id="exportSVGButton">
 									<span class="material-symbols-outlined dropdown-item-icon">image</span>
-									Export SVG
+									Export SVG code
 								</button>
 							</li>
 							<li><hr class="dropdown-divider" /></li>
@@ -124,12 +139,6 @@
 		</nav>
 		<!-- Site content -->
 		<div class="position-relative flex-grow-1">
-			<!-- Top left floating buttons -->
-			<!-- <a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
-			<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
-			<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
-			<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a> -->
-			<!-- Bottom right floating action buttons -->
 			<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
 				<a class="btn btn-floating" id="mainFAB">
 					<span class="material-symbols-outlined">done</span>
@@ -337,14 +346,68 @@
 				aria-hidden="true"
 				role="dialog"
 			>
-				<div class="modal-dialog">
+				<div class="modal-dialog modal-dialog-scrollable modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
 							<h1 class="modal-title fs-5" id="helpModalLabel">Help</h1>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
-							TODO
+							<!-- <h1 class="fs-5">App controls</h1> -->
+							<dl>
+								<dt>Snapping</dt>
+								<dd>- Hold <b>Shift</b> to turn <b>off</b> snapping</dd>
+								<dt>Wires</dt>
+								<dd>
+									- <b>Double click</b> to <b>finish</b> wire<br>
+									- <b>Right click</b> to <b>cancel</b> wire<br>
+									- Hold <b>Ctrl</b> for <b>straight</b> line
+								</dd>
+							</dl>
+							<table class="table table-striped ">
+								<caption>List of keyboard shortcuts</caption>
+								<thead>
+									<tr>
+										<th scope="col">Category</th>
+										<th scope="col">Shortcut</th>
+										<th scope="col">Description</th>
+									</tr>
+								</thead>
+								<tbody class="table-group-divider">
+									<tr><td>Modes</td><td>Tab</td><td>Open component drawer</td></tr>
+									<tr><td></td><td>W</td><td>Start wire drawing tool</td></tr>
+									<tr><td></td><td>Del</td><td>Erase components and wires</td></tr>
+									<tr><td></td><td>Esc</td><td>Return to move tool/ cancel component placement</td></tr>
+								</tbody>
+								<tbody class="table-group-divider">
+									<tr><td>IO</td><td>Ctrl+S</td><td>Save to JSON</td></tr>
+									<tr><td></td><td>Ctrl+O</td><td>Load from JSON</td></tr>
+									<tr><td></td><td>Ctrl+E</td><td>Export CircuiTi<i>k</i>Z code</td></tr>
+									<tr><td></td><td>Ctrl+G</td><td>Export SVG code</td></tr>
+								</tbody>
+								<tbody class="table-group-divider">
+									<tr><td>Components</td><td>(Alt+)G</td><td>Place (tailless) ground</td></tr>
+									<tr><td></td><td>R</td><td>Place resistor</td></tr>
+									<tr><td></td><td>(Alt+)L</td><td>Place (cute) inductor</td></tr>
+									<tr><td></td><td>(Alt+)C</td><td>Place (polarized) capacitor</td></tr>
+									<tr><td></td><td>D</td><td>Place diode</td></tr>
+									<tr><td></td><td>(Alt+)B</td><td>Place npn (or pnp) BJT</td></tr>
+									<tr><td></td><td>(Alt+)N</td><td>Place nmos (or pmos) transistor</td></tr>
+									<tr><td></td><td>(Alt+)X</td><td>Place (jump) crossing</td></tr>
+									<tr><td></td><td>.</td><td>Place circ</td></tr>
+								</tbody>
+								<tbody class="table-group-divider">
+									<tr><td>Edit</td><td>Ctrl+C</td><td>Copy selection</td></tr>
+									<tr><td></td><td>Ctrl+V</td><td>Paste selection</td></tr>
+									<tr><td></td><td>Ctrl+X</td><td>Cut selection</td></tr>
+									<tr><td></td><td>Ctrl+Z</td><td>Undo</td></tr>
+									<tr><td></td><td>Ctrl+Y</td><td>Redo</td></tr>
+									<tr><td></td><td>Ctrl+A</td><td>Select all</td></tr>
+									<tr><td></td><td>Ctrl(+Shift)+R</td><td>Rotate (counter-)clockwise</td></tr>
+									<tr><td></td><td>Shift+X</td><td>Flip at x-axis</td></tr>
+									<tr><td></td><td>Shift+Y</td><td>Flip at y-axis</td></tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>

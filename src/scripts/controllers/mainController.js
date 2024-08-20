@@ -97,7 +97,7 @@ export class MainController {
 		this.#initModeButtons();
 
 		//enable tooltips globally
-		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]')
 		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
 			fallbackPlacements:[] //always show them exactly where defined
 		}))
@@ -164,7 +164,6 @@ export class MainController {
 
 		// Prevent "normal" browser menu
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
-
 	}
 
 	/**
@@ -172,7 +171,6 @@ export class MainController {
 	 */
 	#initShortcuts(){		
 		// stop reload behaviour
-		hotkeys('f5', () => false);
 		hotkeys('ctrl+r, command+r', ()=>false);
 
 		// rotate selection
@@ -239,7 +237,29 @@ export class MainController {
 			return false;
 		})
 
+		//save/load
+		hotkeys("ctrl+s",()=>{
+			this.saveController.save()
+			return false;
+		})
+		hotkeys("ctrl+o",()=>{
+			this.saveController.load()
+			return false;
+		})
+		hotkeys("ctrl+e",()=>{
+			this.exportController.exportCircuiTikZ()
+			return false;
+		})
+		hotkeys("ctrl+g",()=>{
+			this.exportController.exportSVG()
+			return false;
+		})
+
 		// mode change
+		hotkeys("tab",()=>{
+			document.getElementById("addComponentButton").dispatchEvent(new MouseEvent("click"))
+			return false;
+		})
 		hotkeys("esc",()=>{
 			this.#switchMode(MainController.modes.DRAG_PAN);
 			return false;
@@ -248,7 +268,7 @@ export class MainController {
 			this.#switchMode(MainController.modes.DRAW_LINE);
 			return false;
 		})
-		hotkeys("del,e",()=>{
+		hotkeys("del",()=>{
 			if(!SelectionController.controller.hasSelection()){
 				this.#switchMode(MainController.modes.ERASE);
 			}else{
@@ -262,12 +282,19 @@ export class MainController {
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
 		var shortcutDict = {
 			"g":"ground",
+			"alt+g":"tlground",
 			"r":"resistor",
 			"c":"capacitor",
+			"alt+c":"curved (polarized) capacitor",
 			"l":"inductor (american)",
-			"z":"jump crossing",
+			"alt+l":"inductor (cute)",
+			"d":"diode",
+			"b":"npn",
+			"alt+b":"pnp",
+			"n":"nmos",
+			"alt+n":"pmos",
 			"x":"plain crossing",
-			"t":"npn",
+			"alt+x":"jump crossing",
 			".":"circ",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
@@ -275,7 +302,7 @@ export class MainController {
 			hotkeys(key,()=>{
 				this.#switchMode(MainController.modes.DRAG_PAN); //switch to standard mode to avoid weird states
 				var componentButton = document.querySelector('[title="'+value+'"]')
-				var clickEvent = new MouseEvent('mousedown',{view:window,bubbles:true,cancelable:true,});
+				var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
 				componentButton?.dispatchEvent(clickEvent);
 			})
 		}
@@ -480,7 +507,7 @@ export class MainController {
 					leftOffcanvasOC.hide();
 				};
 
-				addButton.addEventListener("mousedown", listener);
+				addButton.addEventListener("mouseup", listener);
 				addButton.addEventListener("touchstart", listener, { passive: false });
 
 				/** @type {SVGSVGElement} */
