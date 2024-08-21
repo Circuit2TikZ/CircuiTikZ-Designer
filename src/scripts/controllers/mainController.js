@@ -256,7 +256,7 @@ export class MainController {
 		})
 
 		// mode change
-		hotkeys("tab",()=>{
+		hotkeys("q",()=>{
 			document.getElementById("addComponentButton").dispatchEvent(new MouseEvent("click"))
 			return false;
 		})
@@ -401,11 +401,11 @@ export class MainController {
 		const leftOffcanvas = document.getElementById("leftOffcanvas");
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
 		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
-		document.getElementById("componentFilterInput").addEventListener("keyup",(evt)=>{
-			// only "input" events should trigger the component filter. otherwise shortcuts are also triggered
-			evt.preventDefault();
-			evt.stopPropagation();
-		});
+		// document.getElementById("componentFilterInput").addEventListener("keyup",(evt)=>{
+		// 	// only "input" events should trigger the component filter. otherwise shortcuts are also triggered
+		// 	evt.preventDefault();
+		// 	evt.stopPropagation();
+		// });
 
 		/** @type {HTMLAnchorElement} */
 		const addComponentButton = document.getElementById("addComponentButton");
@@ -414,6 +414,8 @@ export class MainController {
 			(() => {
 				this.#switchMode(MainController.modes.DRAG_PAN);
 				leftOffcanvasOC.toggle();
+				// offcanvas refocuses itself on animation completion so this does not work. TODO find workaround
+				document.getElementById("componentFilterInput").focus()
 			}).bind(this),
 			{ passive: true }
 		);
