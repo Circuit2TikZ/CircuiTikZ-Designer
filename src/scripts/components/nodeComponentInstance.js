@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { rectRectIntersection, selectionColor, selectedBoxWidth } from "../utils/selectionHelper";
 
-import { NodeComponentSymbol,SnapPoint,svgSnapDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
+import { NodeComponentSymbol,SnapPoint,NodeDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
 import hotkeys from "hotkeys-js";
 
 /**
@@ -19,7 +19,7 @@ export class NodeComponentInstance extends SVG.Use {
 	/** @type {NodeComponentSymbol} */
 	symbol;
 
-	/** @type {svgSnapDragHandler} */
+	/** @type {NodeDragHandler} */
 	#snapDragHandler;
 
 	/** @type {SVG.Container} */
@@ -83,7 +83,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.#updateTransform()
 
 		this.node.classList.add("draggable");
-		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, true);
+		this.#snapDragHandler = NodeDragHandler.snapDrag(this, true);
 
 		if (event) {
 			//  && event.type.includes("mouse")
@@ -111,7 +111,7 @@ export class NodeComponentInstance extends SVG.Use {
 			}
 
 			const dragCancelFunction = (/** @type {KeyboardEvent} */evt)=>{
-				svgSnapDragHandler.snapDrag(this,false)
+				NodeDragHandler.snapDrag(this,false)
 				CanvasController.controller.placingComponent=null;
 				MainController.controller.removeInstance(this);	
 				hotkeys.unbind("esc",dragCancelFunction)
@@ -460,7 +460,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @returns {this}
 	 */
 	remove() {
-		this.#snapDragHandler = svgSnapDragHandler.snapDrag(this, false);
+		this.#snapDragHandler = NodeDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
 		super.remove();

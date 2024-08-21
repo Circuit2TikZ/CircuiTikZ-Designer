@@ -23,4 +23,5 @@ export * from "./lines/lineDrawer";
 export * from "./snapDrag/snapController";
 export * from "./snapDrag/snapCursor";
 export * from "./snapDrag/snapPoint";
-export * from "./snapDrag/svgSnapDragHandler";
+export * from "./snapDrag/nodeDragHandler";
+export * from "./snapDrag/pathDragHandler";
