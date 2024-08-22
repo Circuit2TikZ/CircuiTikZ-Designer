@@ -3,7 +3,7 @@
 	"version": "0.1.6",
 	"private": "true",
 	"description": "",
-	"license": "UNLICENSED",
+	"license": "GPL-3.0-only",
 	"author": "Manuel Kirzinger",
 	"source": "src/pages/index.html",
 	"scripts": {
