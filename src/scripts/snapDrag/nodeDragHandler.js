@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, NodeComponentInstance, SelectionController, Undo} from "../internal";
+import {SnapController, NodeComponentInstance, SelectionController, Undo, PathComponentInstance} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -35,7 +35,7 @@ import {SnapController, NodeComponentInstance, SelectionController, Undo} from "
  * Handler/controller enabling components to be draggable and snap to the grid and to other components.
  * @class
  */
-export class svgSnapDragHandler {
+export class NodeDragHandler {
 	/** @type {NodeComponentInstance} */
 	element;
 
@@ -50,11 +50,11 @@ export class svgSnapDragHandler {
 	#currentlyDragging = false
 
 	/**
-	 * Do not call directly. Use {@link svgSnapDragHandler.snapDrag} for enabling and disabling of the handler instead.
+	 * Do not call directly. Use {@link NodeDragHandler.snapDrag} for enabling and disabling of the handler instead.
 	 *
 	 * @private
 	 * @hideconstructor
-	 * @see svgSnapDragHandler.snapDrag - use this instead
+	 * @see NodeDragHandler.snapDrag - use this instead
 	 * @param {SVG.Element} element - the element to enable snap-dragging
 	 * @param {function(boolean): void} element.draggable
 	 */
@@ -76,14 +76,16 @@ export class svgSnapDragHandler {
 	 * @public
 	 * @param {SVG.Element} element - the element to modify/query
 	 * @param {boolean} [enable] - `true` --> activate, `false` --> deactivate, `undefined` --> query
-	 * @returns {svgSnapDragHandler|null} the handler, if activated
+	 * @returns {NodeDragHandler|null} the handler, if activated
 	 */
 	static snapDrag(element, enable) {
-		/** @type {svgSnapDragHandler|null} */
-		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new svgSnapDragHandler(element) : null);
+		
+		/** @type {NodeDragHandler|null} */
+		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new NodeDragHandler(element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
+			console.log(snapDragHandler);
 			snapDragHandler.#dragEnd(null,false)
 			snapDragHandler.removeHandler();
 			return null;

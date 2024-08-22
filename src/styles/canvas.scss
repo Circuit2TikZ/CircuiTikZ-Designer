@@ -21,6 +21,11 @@ svg.mainCanvas {
 	cursor: crosshair; // higher prio than .draggable
 }
 
+.draggable.pathPoint:hover {
+	stroke: #d44;
+	stroke-dasharray: 5;
+}
+
 .eraseCursor,
 .eraseCursor * {
 	cursor:

@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo } from "../internal";
+import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo, PathDragHandler, NodeDragHandler } from "../internal";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 /**
@@ -33,6 +33,8 @@ export class PathComponentInstance extends SVG.G {
 
 	/** @type {SVG.Point} */
 	#midAbs;
+	/** @type {SVG.Point} */
+	relMid;
 	/** @type {number} */
 	#rotationAngle;
 	/** @type {SnapPoint[]} */
@@ -45,6 +47,13 @@ export class PathComponentInstance extends SVG.G {
 	 * @type {?SVG.Rect}
 	 */
 	#selectionRectangle = null;
+
+	/** @type {NodeDragHandler} */
+	#snapDragHandler;
+
+	circleRadius = 20
+	startCircle;
+	endCircle;
 
 	/**
 	 * @type {function():void}
@@ -111,6 +120,23 @@ export class PathComponentInstance extends SVG.G {
 			new SnapPoint(this, null, this.#postPointArray[1], [0, 0], 0),
 			...this.symbol._pins.map((pin) => new SnapPoint(this, pin.name, this.#midAbs, pin, 0)),
 		];
+
+		this.symbolUse.node.classList.add("draggable");
+		this.#snapDragHandler = NodeDragHandler.snapDrag(this, true);
+		
+		this.startCircle = this.circle(this.circleRadius).fill("transparent").id("start")
+		this.startCircle.draggable(true)
+		this.startCircle.node.classList.add("draggable","pathPoint")
+		this.add(this.startCircle)
+		
+		this.endCircle = this.circle(this.circleRadius).fill("transparent").id("start")
+		this.endCircle.draggable(true)
+		this.endCircle.node.classList.add("draggable","pathPoint")
+		this.add(this.endCircle)
+
+		PathDragHandler.snapDrag(this, true, true);
+		PathDragHandler.snapDrag(this, false, true);
+
 	}
 
 	/**
@@ -259,6 +285,9 @@ export class PathComponentInstance extends SVG.G {
 	 * @returns {this}
 	 */
 	remove() {
+		NodeDragHandler.snapDrag(this,false)
+		PathDragHandler.snapDrag(this,false)
+		PathDragHandler.snapDrag(this,false)
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
 		super.remove();
@@ -331,6 +360,7 @@ export class PathComponentInstance extends SVG.G {
 			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
+
 			if (runCB) {
 				this.#finishedPlacingCallback()
 				Undo.addState()
@@ -387,10 +417,6 @@ export class PathComponentInstance extends SVG.G {
 			this.#prePointArray[0][0] = startPoint.x
 			this.#prePointArray[0][1] = startPoint.y
 			let angle = this.#recalcPointsEnd(endPoint)
-			if (this.#selectionRectangle) {
-				this.hideBoundingBox()
-				this.showBoundingBox()
-			}
 			for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 		}
 	}
@@ -411,13 +437,6 @@ export class PathComponentInstance extends SVG.G {
 		// recalculate other points
 		const angle = this.#recalcPointsEnd(endPoint);
 		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
-
-		// recalculate bounding box
-		if (this.#selectionRectangle){
-			// only if it was shown before
-			this.hideBoundingBox()
-			this.showBoundingBox()
-		}
 	}
 
 	flip(horizontal){
@@ -434,6 +453,27 @@ export class PathComponentInstance extends SVG.G {
 		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
 
 		const angle = this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+	}
+
+	/**
+	 * 
+	 * @param {SVG.Point} position 
+	 */
+	moveStartTo(position){
+		this.#prePointArray[0][0] = position.x
+		this.#prePointArray[0][1] = position.y
+
+		const angle = this.#recalcPointsEnd(this.getEndPoint())
+		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+	}
+
+	/**
+	 * 
+	 * @param {SVG.Point} position 
+	 */
+	moveEndTo(position){
+		const angle = this.#recalcPointsEnd(position)
 		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
 	}
 
@@ -469,6 +509,19 @@ export class PathComponentInstance extends SVG.G {
 		// update/draw lines
 		this.#preLine.plot(this.#prePointArray);
 		this.#postLine.plot(this.#postPointArray);
+
+		// recalculate bounding box
+		if (this.#selectionRectangle){
+			// only if it was shown before
+			this.hideBoundingBox()
+			this.showBoundingBox()
+		}
+
+		this.startCircle.move(this.#prePointArray[0][0]-this.circleRadius/2,this.#prePointArray[0][1]-this.circleRadius/2)
+		this.endCircle.move(this.#postPointArray[1][0]-this.circleRadius/2,this.#postPointArray[1][1]-this.circleRadius/2)
+
+		let bbox = this.bbox()
+		this.relMid = this.getAnchorPoint().minus(new SVG.Point(bbox.x,bbox.y))
 
 		return angle;
 	}
