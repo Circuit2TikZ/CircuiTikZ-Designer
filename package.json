@@ -5,6 +5,16 @@
 	"description": "",
 	"license": "GPL-3.0-only",
 	"author": "Manuel Kirzinger",
+	"contributors": [
+		{
+			"name": "Philipp Wiedemann",
+			"email": "jan.p.wiedemann@fau.de"
+		},
+		{
+			"name": "Christof Pfannenmüller",
+			"email": "christof.pfannenmueller@fau.de"
+		}
+	],
 	"source": "src/pages/index.html",
 	"scripts": {
 		"build": "parcel build --public-url ./",
