@@ -85,7 +85,6 @@ export class NodeDragHandler {
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
-			console.log(snapDragHandler);
 			snapDragHandler.#dragEnd(null,false)
 			snapDragHandler.removeHandler();
 			return null;

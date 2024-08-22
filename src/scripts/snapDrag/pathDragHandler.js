@@ -103,8 +103,6 @@ export class PathDragHandler {
 			dragElement = parentElement.endCircle
 		}
 
-		console.log(dragElement)
-
 		/** @type {PathDragHandler|null} */
 		let snapDragHandler = dragElement.remember("_snapDragHandler") ?? (enable ? new PathDragHandler(parentElement,moveStart) : null);
 		if (enable === false && snapDragHandler) {
