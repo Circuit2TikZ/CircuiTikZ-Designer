@@ -1,5 +1,5 @@
 /**
- * @module svgSnapDragHandler
+ * @module nodeDragHandler
  */
 
 import * as SVG from "@svgdotjs/svg.js";

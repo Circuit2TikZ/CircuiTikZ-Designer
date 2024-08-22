@@ -39,6 +39,8 @@ export class PathComponentInstance extends SVG.G {
 	#rotationAngle;
 	/** @type {SnapPoint[]} */
 	snappingPoints;
+	/** @type {SVG.Point[]} */
+	relSnappingPoints = [];
 
 	/**@type {boolean} */
 	#mirror = false;
@@ -354,9 +356,7 @@ export class PathComponentInstance extends SVG.G {
 			this.container.node.classList.remove("selectPoint");
 			this.#pointsSet = 2;
 			CanvasController.controller.placingComponent=null;
-			const angle = this.#recalcPointsEnd(snappedPoint);
-			
-			for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+			this.#recalcPointsEnd(snappedPoint);
 			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
@@ -416,8 +416,7 @@ export class PathComponentInstance extends SVG.G {
 			let endPoint = diff.plus(this.getEndPoint())
 			this.#prePointArray[0][0] = startPoint.x
 			this.#prePointArray[0][1] = startPoint.y
-			let angle = this.#recalcPointsEnd(endPoint)
-			for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+			this.#recalcPointsEnd(endPoint)
 		}
 	}
 
@@ -435,8 +434,7 @@ export class PathComponentInstance extends SVG.G {
 		let endPoint = this.getEndPoint().rotate(angleDeg,this.getAnchorPoint())
 
 		// recalculate other points
-		const angle = this.#recalcPointsEnd(endPoint);
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+		this.#recalcPointsEnd(endPoint);
 	}
 
 	flip(horizontal){
@@ -452,8 +450,7 @@ export class PathComponentInstance extends SVG.G {
 		this.#prePointArray[0][direction] += 2*(horizontal?diffstart.y:diffstart.x)
 		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
 
-		const angle = this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+		this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
 	}
 
 	/**
@@ -464,8 +461,7 @@ export class PathComponentInstance extends SVG.G {
 		this.#prePointArray[0][0] = position.x
 		this.#prePointArray[0][1] = position.y
 
-		const angle = this.#recalcPointsEnd(this.getEndPoint())
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+		this.#recalcPointsEnd(this.getEndPoint())
 	}
 
 	/**
@@ -473,14 +469,12 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {SVG.Point} position 
 	 */
 	moveEndTo(position){
-		const angle = this.#recalcPointsEnd(position)
-		for (const sp of this.snappingPoints) sp.recalculate(null, angle, new SVG.Point(1,this.#mirror?-1:1));
+		this.#recalcPointsEnd(position)
 	}
 
 	/**
 	 * Recalculates the points after an movement
 	 * @param {SVG.Point} endPoint
-	 * @returns {number} the angle in radians
 	 */
 	#recalcPointsEnd(endPoint) {
 		this.#postPointArray[1][0] = endPoint.x;
@@ -523,6 +517,13 @@ export class PathComponentInstance extends SVG.G {
 		let bbox = this.bbox()
 		this.relMid = this.getAnchorPoint().minus(new SVG.Point(bbox.x,bbox.y))
 
-		return angle;
+		// recalculate snapping points
+		let flipVector = new SVG.Point(1,this.#mirror?-1:1)
+		let ref = this.getAnchorPoint()
+		this.relSnappingPoints = []
+		for (const sp of this.snappingPoints){
+			sp.recalculate(null, angle, flipVector);
+			this.relSnappingPoints.push(sp.minus(ref))
+		}
 	}
 }
