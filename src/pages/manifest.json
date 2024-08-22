@@ -1,9 +1,8 @@
 {
-	"_comment":"//TODO change the name and description of this manifest",
 	"background_color": "#fff",
-	"description": "A WYSIWYG designer for CircuiTikZ circuits",
+	"description": "A GUI for drawing CircuiTikZ circuits",
 	"display": "standalone",
-	"name": "CircuiCanvas",
+	"name": "CircuiTikZ Designer",
 	"start_url": ".",
 	"theme_color": "#2F586E",
 	"icons": [

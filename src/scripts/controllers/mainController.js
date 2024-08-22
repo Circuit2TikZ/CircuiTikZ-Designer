@@ -2,8 +2,6 @@
  * @module mainController
  */
 
-//TODO big refactor to typescript
-
 import * as SVG from "@svgdotjs/svg.js";
 import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap";
 import "../utils/impSVGNumber";

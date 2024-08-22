@@ -9,8 +9,7 @@
 			gtag('js', new Date());
 			gtag('config', 'G-SN05E6G25Q');
 		</script>
-		<!-- TODO change this -->
-		<title>CircuiCanvas</title>
+		<title>CircuiTikZ Designer</title>
 		<meta
 			name="viewport"
 			content="width=device-width, height=device-height, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1"
@@ -34,7 +33,7 @@
 		<meta name="msapplication-TileColor" content="#2F586E" />
 		<meta name="msapplication-TileImage" content="../icons/ms-icon-144x144.png" />
 		<meta name="theme-color" content="#2F586E" />
-		<meta name="description" content="A GUI for drawing circuits for CircuiTikZ">
+		<meta name="description" content="A GUI for drawing CircuiTikZ circuits">
 		<meta charset="UTF-8">
 
 		<link rel="stylesheet" href="../styles/styles.scss" />
@@ -68,7 +67,7 @@
 				</div>
 				<a class="col-md-auto navbar-brand unselectable position-relative mx-3" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
-					CircuiCanvas
+					CircuiTi<i>k</i>Z Designer
 					<span class="badge text-bg-secondary version unselectable">
 						v0.0.0
 					</span>
@@ -90,11 +89,6 @@
 							role="button"
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
-							data-bs-toggle-second="tooltip"
-							data-bs-trigger="hover"
-							data-bs-delay='{"show":500,"hide":250}'
-							data-bs-placement="bottom"
-							data-bs-title="Menu for IO operations"
 							>
 							menu
 						</a>
@@ -177,7 +171,7 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h1 class="modal-title fs-5">Load JSON</h1>
+							<h1 class="modal-title fs-3">Load JSON</h1>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body d-flex flex-column gap-3">
@@ -220,7 +214,7 @@
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="exportModalLabel">Export</h1>
+							<h1 class="modal-title fs-3" id="exportModalLabel">Export</h1>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
@@ -280,7 +274,7 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="aboutModalLabel">About Project 
+							<h1 class="modal-title fs-3" id="aboutModalLabel">About CircuiTi<i>k</i>Z-Designer 
 								<span class="badge text-bg-secondary version">
 									v0.0.0
 								</span>
@@ -289,48 +283,40 @@
 						</div>
 						<div class="modal-body">
 							<p>
-								The CircuiCanvas-Project was started as a research project at the Institute of Electronics
-								Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was
-								to create a progressive web application for easy and faster drawing of circuits using
-								CircuiTi<i>k</i>Z.
+								CircuiTi<i>k</i>Z-Designer is part of the Circuit2Ti<i>k</i>Z-Project which was started as a research project at the Institute of Electronics Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was to create a GUI application for easy and fast drawing of circuits to be used in <a href="https://github.com/circuitikz/circuitikz">CircuiTi<i>k</i>Z</a>.
 							</p>
 							<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
-							<div class="row">
-								<div class="col-sm-4">
-									<a class="icon-link" href="https://ussi.e-technik.uni-erlangen.de/" target="_blank">
-										<!-- <svg class="bi" width="32" height="32" fill="currentColor">
-											<use xlink:href="../icons/bootstrap-icons.svg#house" />
-										</svg> -->
-										<span class="material-symbols-outlined">home</span>
-										Homepage
-									</a>
-								</div>
-								<div class="col-sm-4">
-									<!-- TODO change Link to git -->
-									<a
-										class="icon-link"
-										href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/circuitikz-pwa"
-										target="_blank"
-									>
-										<svg class="bi" width="32" height="32" fill="currentColor">
-											<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
-										</svg>
-										CircuiCanvas
-									</a>
-								</div>
-								<div class="col-sm-4">
-									<!-- TODO change Link to git -->
-									<a
-										class="icon-link"
-										href="https://git.lte.e-technik.uni-erlangen.de/circuitikz-gui/SymbolConvert"
-										target="_blank"
-									>
-										<svg class="bi" width="32" height="32" fill="currentColor">
-											<use xlink:href="../icons/bootstrap-icons.svg#gitlab" />
-										</svg>
-										SymbolConvert
-									</a>
-								</div>
+						</div>
+						<div class="modal-footer justify-content-between align-items-center">
+							<!-- <div class="col-sm-4 w-auto">
+								<a class="icon-link" href="TODO" target="_blank">
+									<span class="material-symbols-outlined">home</span>
+									Project-Homepage
+								</a>
+							</div> -->
+							<div class="col-sm-4 w-auto">
+								<a
+									class="icon-link"
+									href="https://github.com/Circuit2TikZ/CircuiTikZ-Designer"
+									target="_blank"
+								>
+									<svg class="bi" width="40" height="40" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#github" />
+									</svg>
+									<span>CircuiTi<i>k</i>Z-Designer</span>
+								</a>
+							</div>
+							<div class="col-sm-4 w-auto">
+								<a
+									class="icon-link"
+									href="https://github.com/Circuit2TikZ/SymbolConvert"
+									target="_blank"
+								>
+									<svg class="bi" width="40" height="40" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#github" />
+									</svg>
+									SymbolConvert
+								</a>
 							</div>
 						</div>
 					</div>
@@ -349,27 +335,40 @@
 				<div class="modal-dialog modal-dialog-scrollable modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="helpModalLabel">Help</h1>
+							<h1 class="modal-title fs-3" id="helpModalLabel">Help</h1>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
-							<!-- <h1 class="fs-5">App controls</h1> -->
+							<h1 class="fs-4">General</h1>
 							<dl>
+								<dt>Position Canvas</dt>
+								<dd>
+									-Hold <b>right click</b> and drag to move the canvas<br>
+									-<b>Scroll</b> to zoom the canvas in or out
+								</dd>
 								<dt>Snapping</dt>
 								<dd>- Hold <b>Shift</b> to turn <b>off</b> snapping</dd>
 								<dt>Wires</dt>
 								<dd>
+									- <b>Left click</b> to place a point of the wire<br>
 									- <b>Double click</b> to <b>finish</b> wire<br>
 									- <b>Right click</b> to <b>cancel</b> wire<br>
-									- Hold <b>Ctrl</b> for <b>straight</b> line
+									- Hold <b>Ctrl</b> for <b>straight</b> wire
+								</dd>
+								<dt>Components</dt>
+								<dd>
+									- Add components via the component drawer (top left "+") or via keyboard shortcuts.
 								</dd>
 								<dt>Selection</dt>
 								<dd>
+									- Hold <b>left click</b> and drag to select a region<br>
 									- Hold <b>Shift</b> before starting to select to <b>add</b> to the <b>current selection</b><br>
 									- Hold <b>Ctrl</b> before starting to select to <b>subtract</b> from the <b>current selection</b><br>
-									- Hold neither <b>Shift</b> nor <b>Ctrl</b> before starting to select start a <b>new selection</b>
+									- Hold neither <b>Shift</b> nor <b>Ctrl</b> before starting to select to start a <b>new selection</b>
 								</dd>
 							</dl>
+							<hr>
+							<h1 class="fs-4">Keyboard Shortcuts</h1>
 							<table class="table table-striped ">
 								<caption>List of keyboard shortcuts</caption>
 								<thead>
