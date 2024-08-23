@@ -1,11 +1,19 @@
 # CircuiTi<i>k</i>Z-Designer
 
-A GUI for easy and fast drawing of circuits to be used with [circuitikz](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and paste it in your LaTeX document!
+A GUI for easy and fast drawing of circuits to be used with [circuitikz](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and include it in your LaTeX document!
 
 <b>Hosting of the tool is currently being worked on! Check back soon for more information!</b>
 
 ![example_image](./example_image.png)
 ![example_image2](./example_image2.png)
+
+## Host locally
+
+1. Have [Node.js](https://nodejs.org/) installed
+2. Clone the repository
+3. Run "npm install" in terminal in project directory
+4. Run "npm start" in terminal in project directory
+5. Open website at URL provided in command line output
 
 ## How to use
 
