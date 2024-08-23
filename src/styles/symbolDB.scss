@@ -57,6 +57,10 @@
 
 div.libComponent {
 	padding: 2px;
+	> svg {
+		min-width: 28px;
+		min-height: 28px;
+	}
 }
 
 div.libComponent:hover {

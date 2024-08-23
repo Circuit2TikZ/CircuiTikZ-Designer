@@ -194,7 +194,8 @@ export class CanvasController {
 		let moveAmount = Math.max(0.05*Math.min(box.w,box.h),10)
 		box.x -= moveAmount
 		box.y += moveAmount
-		document.getElementById("canvas").setAttribute("viewBox",box.toString())
+		this.canvas.viewbox(box)
+		this.canvas.zoom(2,new SVG.Point())
 	}
 
 	/**

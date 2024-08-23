@@ -144,6 +144,11 @@ export class ExportController {
 		svgObj.removeChild(svgObj.getElementById("yAxis"))
 		svgObj.removeChild(svgObj.getElementById("selectionRectangle"))
 		svgObj.removeChild(svgObj.getElementById("snapCursor"))
+
+		// delete path points for moving paths around
+		for (const element of svgObj.querySelectorAll(".draggable.pathPoint")) {
+			element.remove()
+		}
 		
 		// get all used node/symbol names
 		let symbolDB = document.getElementById("symbolDB")

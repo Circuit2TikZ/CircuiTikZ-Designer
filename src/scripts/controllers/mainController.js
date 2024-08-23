@@ -279,21 +279,22 @@ export class MainController {
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
 		var shortcutDict = {
-			"g":"ground",
-			"alt+g":"tlground",
-			"r":"resistor",
-			"c":"capacitor",
-			"alt+c":"curved (polarized) capacitor",
-			"l":"inductor (american)",
-			"alt+l":"inductor (cute)",
-			"d":"diode",
-			"b":"npn",
-			"alt+b":"pnp",
-			"n":"nmos",
-			"alt+n":"pmos",
-			"x":"plain crossing",
-			"alt+x":"jump crossing",
-			".":"circ",
+			"g":"Ground",
+			"alt+g":"Ground (tailless)",
+			"r":"Resistor (american)",
+			"c":"Capacitor",
+			"alt+c":"Curved (polarized) capacitor",
+			"l":"Inductor (american)",
+			"alt+l":"Inductor (cute)",
+			"d":"Empty diode",
+			"b":"NPN",
+			"alt+b":"PNP",
+			"n":"NMOS",
+			"alt+n":"PMOS",
+			"x":"Plain style crossing node",
+			"alt+x":"Jumper-style crossing node",
+			".":"Connected terminal",
+			"alt+.":"Unconnected terminal",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		for (const [key, value] of Object.entries(shortcutDict)) {
