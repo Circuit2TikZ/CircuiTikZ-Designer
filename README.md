@@ -3,6 +3,7 @@
 A GUI for easy and fast drawing of circuits to be used with [circuitikz](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and paste it in your LaTeX document!
 
 <b>Hosting of the tool is currently being worked on! Check back soon for more information!</b>
+In the meantime you can use a previous version of the tool [here.](https://ussi.e-technik.uni-erlangen.de/tikz/)
 
 ![example_image](./example_image.png)
 ![example_image2](./example_image2.png)
