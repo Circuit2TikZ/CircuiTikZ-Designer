@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, NodeComponentInstance, SelectionController, Undo, PathComponentInstance} from "../internal";
+import {SnapController, NodeComponentInstance, SelectionController, Undo} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -48,6 +48,7 @@ export class NodeDragHandler {
 	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
 
 	#currentlyDragging = false
+	#didDrag = false
 
 	/**
 	 * Do not call directly. Use {@link NodeDragHandler.snapDrag} for enabling and disabling of the handler instead.
@@ -147,6 +148,7 @@ export class NodeDragHandler {
 	 */
 	#dragMove(event) {
 		this.#maybeContextmenu = false; // no contextmenu after any move
+		this.#didDrag = true;
 		event.preventDefault();
 
 		/** @type {SVG.Point} */
@@ -203,6 +205,14 @@ export class NodeDragHandler {
 			return
 		}
 
+		if (!this.#didDrag) {
+			// didn't move at all -> essentially clicked the component --> select the component instead
+			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:event.detail.event.ctrlKey?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
+			SelectionController.controller.selectComponents([this.element], selectionMode)
+			trackState = false;
+		}
+
+		this.#didDrag = false;
 		this.#currentlyDragging = false;
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");

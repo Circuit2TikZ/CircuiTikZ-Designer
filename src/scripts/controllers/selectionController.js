@@ -276,6 +276,8 @@ export class SelectionController {
 	}
 
 	selectComponents(components, mode){
+		this.hideSelection();
+
 		if (mode === SelectionController.SelectionMode.RESET) {
 			this.currentlySelectedComponents=components
 		}else if(mode === SelectionController.SelectionMode.ADD){
@@ -294,6 +296,8 @@ export class SelectionController {
 	}
 
 	selectLines(lines, mode){
+		this.hideSelection();
+		
 		if (mode === SelectionController.SelectionMode.RESET) {
 			this.currentlySelectedLines = lines
 		}else if(mode === SelectionController.SelectionMode.ADD){

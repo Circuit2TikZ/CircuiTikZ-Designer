@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, Undo, PathComponentInstance} from "../internal";
+import {SnapController, Undo, PathComponentInstance, SelectionController} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -53,6 +53,7 @@ export class PathDragHandler {
 	#isTemporaryDisabled = false;
 
 	#currentlyDragging = false
+	#didDrag = false
 
 	/**
 	 * Do not call directly. Use {@link PathDragHandler.snapDrag} for enabling and disabling of the handler instead.
@@ -167,6 +168,7 @@ export class PathDragHandler {
 	 */
 	#dragMove(event) {
 		event.preventDefault();
+		this.#didDrag = true;
 		
 		const draggedPoint = new SVG.Point(event.detail.box.x + this.relMid.x, event.detail.box.y + this.relMid.y);
 
@@ -196,6 +198,14 @@ export class PathDragHandler {
 			return
 		}
 
+		if (!this.#didDrag) {
+			// didn't move at all -> essentially clicked the component --> select the component instead
+			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:event.detail.event.ctrlKey?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
+			SelectionController.controller.selectComponents([this.parentElement], selectionMode)
+			trackState = false;
+		}
+
+		this.#didDrag = false;
 		this.#currentlyDragging = false;
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");
