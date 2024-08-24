@@ -82,7 +82,7 @@ export class SelectionController {
 
 			if (evt.button===0&&this.#selectionEnabled) {
 				let shift = evt.shiftKey||evt.detail.shiftKey
-				let ctrl = evt.ctrlKey||evt.detail.ctrlKey
+				let ctrl = evt.ctrlKey||(MainController.controller.isMac&&evt.metaKey)||evt.detail.ctrlKey||(MainController.controller.isMac&&evt.detail.metaKey)
 				if (shift) {
 					if (ctrl) {
 						this.#selectionMode = SelectionController.SelectionMode.RESET
@@ -297,7 +297,7 @@ export class SelectionController {
 
 	selectLines(lines, mode){
 		this.hideSelection();
-		
+
 		if (mode === SelectionController.SelectionMode.RESET) {
 			this.currentlySelectedLines = lines
 		}else if(mode === SelectionController.SelectionMode.ADD){

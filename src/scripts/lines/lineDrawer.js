@@ -124,7 +124,8 @@ export class LineDrawer {
 			this.#canvas.add(this.#newLine);
 		} else {
 			if (this.#lastPoint.x === snappedPoint.x && this.#lastPoint.y === snappedPoint.y) return;
-			let dir = event.ctrlKey?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
+			let ctrlCommand = event.ctrlKey||(MainController.controller.isMac&&event.metaKey)
+			let dir = ctrlCommand?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
 			this.#newLine.pushPoint(dir, snappedPoint);
 			const secondLastPoint = this.#lastPoint;
 			this.#lastPoint = snappedPoint;
@@ -246,7 +247,7 @@ export class LineDrawer {
 			else if ((this.#lastLineDirection.down && isAboveXAxis) || (this.#lastLineDirection.up && !isAboveXAxis))
 				this.#horizontalFirst = true;
 
-			let dir = event.ctrlKey?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
+			let dir = event.ctrlKey||(MainController.controller.isMac&&event.metaKey)?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
 			this.#newLine.updateMousePoint(dir, snappedPoint);
 		}
 	}

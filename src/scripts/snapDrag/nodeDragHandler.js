@@ -207,7 +207,9 @@ export class NodeDragHandler {
 
 		if (!this.#didDrag) {
 			// didn't move at all -> essentially clicked the component --> select the component instead
-			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:event.detail.event.ctrlKey?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
+			let ctrlCommand = event.detail.event.ctrlKey||(MainController.controller.isMac&&event.detail.event.metaKey)
+			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:ctrlCommand?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
+
 			SelectionController.controller.selectComponents([this.element], selectionMode)
 			trackState = false;
 		}

@@ -77,10 +77,14 @@ export class MainController {
 
 	static appVersion = "0.0.0";
 
+	isMac = false
+
 	/**
 	 * Init the app.
 	 */
 	constructor() {
+		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0	
+
 		this.snapController = SnapController.controller;
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
@@ -169,17 +173,17 @@ export class MainController {
 	 */
 	#initShortcuts(){		
 		// stop reload behaviour
-		hotkeys('ctrl+r, command+r', ()=>false);
+		hotkeys('ctrl+r,command+r', ()=>false);
 
 		// rotate selection
-		hotkeys("ctrl+r",()=>{
+		hotkeys("ctrl+r,command+r",()=>{
 			this.selectionController.rotateSelection(-90);
 			if (this.selectionController.hasSelection()) {
 				Undo.addState()
 			}
 			return false;
 		})
-		hotkeys("ctrl+shift+r",()=>{
+		hotkeys("ctrl+shift+r,command+shift+r",()=>{
 			this.selectionController.rotateSelection(90);
 			if (this.selectionController.hasSelection()) {
 				Undo.addState()
@@ -204,17 +208,17 @@ export class MainController {
 		})
 
 		// select everything
-		hotkeys("ctrl+a",()=>{
+		hotkeys("ctrl+a,command+a",()=>{
 			this.selectionController.selectAll();
 			return false;
 		})
 
 		//undo/redo
-		hotkeys("ctrl+z",()=>{
+		hotkeys("ctrl+z,command+z",()=>{
 			Undo.undo();
 			return false;
 		})
-		hotkeys("ctrl+y",()=>{
+		hotkeys("ctrl+y,command+y",()=>{
 			Undo.redo();
 			return false;
 		})
@@ -222,33 +226,33 @@ export class MainController {
 		document.getElementById("redoButton").addEventListener("click",()=>Undo.redo())
 
 		//copy/paste
-		hotkeys("ctrl+c",()=>{
+		hotkeys("ctrl+c,command+c",()=>{
 			CopyPaste.copy()
 			return false;
 		})
-		hotkeys("ctrl+v",()=>{
+		hotkeys("ctrl+v,command+v",()=>{
 			CopyPaste.paste()
 			return false;
 		})
-		hotkeys("ctrl+x",()=>{
+		hotkeys("ctrl+x,command+x",()=>{
 			CopyPaste.cut()
 			return false;
 		})
 
 		//save/load
-		hotkeys("ctrl+s",()=>{
+		hotkeys("ctrl+s,command+s",()=>{
 			this.saveController.save()
 			return false;
 		})
-		hotkeys("ctrl+o",()=>{
+		hotkeys("ctrl+o,command+o",()=>{
 			this.saveController.load()
 			return false;
 		})
-		hotkeys("ctrl+e",()=>{
+		hotkeys("ctrl+e,command+e",()=>{
 			this.exportController.exportCircuiTikZ()
 			return false;
 		})
-		hotkeys("ctrl+g",()=>{
+		hotkeys("ctrl+shift+e,command+shift+e",()=>{
 			this.exportController.exportSVG()
 			return false;
 		})
@@ -280,21 +284,21 @@ export class MainController {
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
 		var shortcutDict = {
 			"g":"Ground",
-			"alt+g":"Ground (tailless)",
+			"alt+g,option+g":"Ground (tailless)",
 			"r":"Resistor (american)",
 			"c":"Capacitor",
-			"alt+c":"Curved (polarized) capacitor",
+			"alt+c,option+c":"Curved (polarized) capacitor",
 			"l":"Inductor (american)",
-			"alt+l":"Inductor (cute)",
+			"alt+l,option+l":"Inductor (cute)",
 			"d":"Empty diode",
 			"b":"NPN",
-			"alt+b":"PNP",
+			"alt+b,option+b":"PNP",
 			"n":"NMOS",
-			"alt+n":"PMOS",
+			"alt+n,option+n":"PMOS",
 			"x":"Plain style crossing node",
-			"alt+x":"Jumper-style crossing node",
+			"alt+x,option+x":"Jumper-style crossing node",
 			".":"Connected terminal",
-			"alt+.":"Unconnected terminal",
+			"alt+.,option+.":"Unconnected terminal",
 		}
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		for (const [key, value] of Object.entries(shortcutDict)) {
