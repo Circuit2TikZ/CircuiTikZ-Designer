@@ -6561,8 +6561,8 @@
 			<ellipse stroke="none" fill="transparent" cx="45.241765" cy="42.861995" rx="36.193412" ry="34.289596" />
 			<defs>
 				<path id="node_en-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
-				<path id="node_en-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 				<path id="node_en-amp_c" d="M5.3081-2.72578c.19128-.1076.2391-.1315.2391-.25106 0-.1315-.03587-.14346-.2391-.26301l-4.55492-2.6421c-.15542-.09563-.20324-.09563-.22715-.09563-.22715 0-.22715.22714-.22715.40647v5.17659c0 .17933 0 .40647.22715.40647.0239 0 .07173 0 .20324-.08368l4.57883-2.65405Zm-.41844-.26301-4.14844 2.40299v-4.79403l4.14844 2.39104Z"/>
+				<path id="node_en-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 				<path id="node_en-amp_d" d="M6.07322-3.23985c-.64557-.81295-.78904-.99228-1.15965-1.29116-.66948-.53798-1.33898-.75317-1.94869-.75317-1.39875 0-2.30735 1.31506-2.30735 2.71382 0 1.37484.88469 2.70187 2.25953 2.70187s2.36712-1.08792 2.95293-2.04434c.64558.81296.78904.99228 1.15965 1.29116.66949.53798 1.33898.75318 1.9487.75318 1.39875 0 2.30734-1.31507 2.30734-2.71383 0-1.37484-.88468-2.70186-2.25953-2.70186s-2.36712 1.08792-2.95292 2.04433Zm.31084.40647c.49016-.86077 1.37484-2.06824 2.72578-2.06824 1.26725 0 1.91282 1.24334 1.91282 2.3193 0 1.17161-.801 2.13998-1.85305 2.13998-.6934 0-1.23138-.50212-1.48244-.75318-.29888-.32279-.57385-.6934-1.30311-1.63786Zm-.8249.51408c-.49017.86077-1.37485 2.06824-2.72579 2.06824-1.26724 0-1.91282-1.24334-1.91282-2.3193 0-1.1716.801-2.13998 1.85305-2.13998.6934 0 1.23138.50212 1.48244.75318.29888.32279.57385.6934 1.30311 1.63786Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
@@ -6970,6 +6970,26 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_spdt">
+			<metadata>
+				<ci:componentInformation type="node" displayName="SPDT" tikzName="spdt" groupName="Switches, buttons and jumpers" refX="22.75392" refY="14.28722" viewBox="0 0 45.50781 28.57441">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-22.48823" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="22.488239999999998" y="-11.90536" isDefault="false" />
+						<ci:pin anchorName="out 2" x="22.488239999999998" y="11.90537" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="22.753905" cy="14.287205" rx="18.203124" ry="11.429764" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M45.24216 2.38186h-12.36861m12.36861 23.81073h-12.36861m-32.60786-11.90537h12.36861"/>
+				<path fill="#fff" stroke-width=".53134" d="M34.98972 2.38186c0-1.16874-.94744-2.11617-2.11617-2.11617s-2.11618.94743-2.11618 2.11617.94744 2.11617 2.11618 2.11617 2.11617-.94743 2.11617-2.11617Zm0 23.81073c0-1.16874-.94744-2.11617-2.11617-2.11617s-2.11618.94743-2.11618 2.11617.94744 2.11617 2.11618 2.11617 2.11617-.94743 2.11617-2.11617Zm-20.23925-11.90537c0-1.16873-.94743-2.11617-2.11617-2.11617s-2.11617.94744-2.11617 2.11617.94743 2.11618 2.11617 2.11618 2.11617-.94744 2.11617-2.11618Zm-2.11617 0"/>
+				<path fill="none" stroke-width="1.06267" d="m14.75047 14.28722 17.52777-9.19389"/>
+			</g>
+		</symbol>
 		<symbol id="path_twoport">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Generic two port" tikzName="twoport" shapeName="twoportshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -6989,6 +7009,25 @@
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
+			</g>
+		</symbol>
+		<symbol id="node_cute-spdt-up">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT up" tikzName="cute spdt up" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38187 18.25594 22.4882-12.69984"/>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_twoportsplit">
@@ -7013,6 +7052,25 @@
 				<path stroke-width=".53134" d="m.53135 37.5704 37.03904-37.03905"/>
 			</g>
 		</symbol>
+		<symbol id="node_cute-spdt-mid">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT mid" tikzName="cute spdt mid" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="M2.38187 18.25594h22.4882"/>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
+			</g>
+		</symbol>
 		<symbol id="path_vco">
 			<metadata>
 				<ci:componentInformation type="path" displayName="VCO" tikzName="vco" shapeName="vcoshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7031,6 +7089,25 @@
 					<path stroke-width="1.06267" d="M37.5704 19.05087c0-10.22816-8.29137-18.51952-18.51953-18.51952s-18.51952 8.29136-18.51952 18.51952 8.29136 18.51952 18.51952 18.51952 18.51952-8.29136 18.51952-18.51952Zm-18.51953 0"/>
 					<path stroke-width=".53134" d="M9.79112 19.05087c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988"/>
 				</g>
+			</g>
+		</symbol>
+		<symbol id="node_cute-spdt-down">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT down" tikzName="cute spdt down" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38187 18.25594 22.4882 12.69984"/>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_vco_box">
@@ -7063,6 +7140,29 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_cute-spdt-up-arrow">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT up with arrow" tikzName="cute spdt up arrow" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38187 18.25594 22.4882-12.69984"/>
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="M8.1505 2.40687c8.7533 3.18597 13.2664 12.86443 10.08042 21.61771a16.86443 16.86443 0 0 1-2.18917 4.12412"/>
+					<path stroke="none" d="M13.22327 31.17602c1.3405-1.14192 3.8076-3.15463 6.31102-3.81919-2.5607.17954-3.64535-.67592-4.06737-3.20799-.063 2.58936-1.44549 5.45752-2.24365 7.02718Z"/>
+				</g>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
+			</g>
+		</symbol>
 		<symbol id="path_bandpass">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Bandpass" tikzName="bandpass" shapeName="bandpassshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7079,6 +7179,29 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M9.79112 9.79112c1.50935-2.37046 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.25938 4.62987 4.62987 1.50936 2.37047 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-6.48195-2.77781-5.55562 5.55563m-6.48194 6.48193c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-18.51951 9.25975c1.50935-2.37047 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37046 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25938 4.62988-4.62987m-6.48195-2.77782-5.55562 5.55563"/>
+			</g>
+		</symbol>
+		<symbol id="node_cute-spdt-mid-arrow">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT mid with arrow" tikzName="cute spdt mid arrow" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="M2.38187 18.25594h22.4882"/>
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="M14.12244 30.37041c5.42896-5.25338 6.81452-13.70832 2.86596-20.54755a16.86781 16.86781 0 0 0-2.87214-3.68157"/>
+					<path stroke="none" d="M10.81492 32.86249c1.51847-.89168 4.29768-2.44519 6.87845-2.66475-2.55293-.26803-3.47246-1.2989-3.4482-3.86575-.51185 2.53902-2.37155 5.12337-3.43025 6.5305Zm-.00001-29.21307c1.0586 1.40718 2.91812 3.99163 3.4298 6.53065-.0241-2.56683.89549-3.59763 3.44841-3.8655-2.58073-.21972-5.35981-1.77338-6.87821-2.66515Z"/>
+				</g>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_bandstop">
@@ -7099,6 +7222,29 @@
 				<path stroke-width=".53134" d="M9.79112 9.79112c1.50935-2.37046 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.25938 4.62987 4.62987 1.50936 2.37047 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-18.51951 9.25975c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-6.48195-2.7778-5.55562 5.55561m-6.48194 6.48194c1.50935-2.37047 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37046 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25938 4.62988-4.62987"/>
 			</g>
 		</symbol>
+		<symbol id="node_cute-spdt-down-arrow">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Cute SPDT down with arrow" tikzName="cute spdt down arrow" groupName="Switches, buttons and jumpers" refX="13.62597" refY="18.25594" viewBox="0 0 27.25189 36.51184">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-13.36029" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="13.360279999999998" y="-15.87408" isDefault="false" />
+						<ci:pin anchorName="out 2" x="13.360279999999998" y="15.874080000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="13.625945" cy="18.25592" rx="10.900756000000001" ry="14.604736" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38187 18.25594 22.4882 12.69984"/>
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="M13.22328 31.17603c7.13564-5.98761 8.0663-16.62587 2.07867-23.76151a16.8699 16.8699 0 0 0-3.4675-3.12681"/>
+					<path stroke="none" d="M8.1505 2.40685c1.2869 1.20201 3.56703 3.42436 4.51186 5.83602-.46947-2.52372.25717-3.69858 2.72486-4.4057-2.57975.23175-5.5865-.81575-7.23673-1.43032Z"/>
+				</g>
+				<path fill="#fff" stroke-width=".53134" d="M26.98625 2.38186c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm0 31.74816c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-22.48823-15.87408c0-1.16874-.94743-2.11617-2.11615-2.11617-1.16874 0-2.11619.94743-2.11619 2.11617s.94745 2.11617 2.11619 2.11617c1.16872 0 2.11615-.94743 2.11615-2.11617Zm-2.11615 0"/>
+			</g>
+		</symbol>
 		<symbol id="path_highpass">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Highpass" tikzName="highpass" shapeName="highpassshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7115,6 +7261,28 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M9.79112 9.79112c1.50935-2.37046 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.25938 4.62987 4.62987 1.50936 2.37047 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-18.51951 9.25975c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-6.48195-2.7778-5.55562 5.55561m-6.48194 6.48194c1.50935-2.37047 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37046 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25938 4.62988-4.62987m-6.48195-2.77782-5.55562 5.55563"/>
+			</g>
+		</symbol>
+		<symbol id="node_proximeter">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Proximeter" tikzName="proximeter" groupName="Switches, buttons and jumpers" refX="16.40544" refY="16.40544" viewBox="0 0 32.81084 32.81084">
+					<ci:pins>
+						<ci:pin anchorName="hlines nw" x="-11.11181" y="-4.762270000000001" isDefault="false" />
+						<ci:pin anchorName="hlines sw" x="-11.11181" y="4.762270000000001" isDefault="false" />
+						<ci:pin anchorName="hlines ne" x="11.111800000000002" y="-4.762270000000001" isDefault="false" />
+						<ci:pin anchorName="hlines se" x="11.111800000000002" y="4.762270000000001" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="16.40542" cy="16.40542" rx="13.124336" ry="13.124336" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path stroke-width="1.06267" d="m.53136 16.40544 15.87408-15.87408 15.87408 15.87408-15.87408 15.87408Z"/>
+					<path stroke-width=".53134" d="M5.29363 11.64317h22.22362m-22.22362 9.52454h22.22362"/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="path_lowpass">
@@ -7135,6 +7303,25 @@
 				<path stroke-width=".53134" d="M9.79112 9.79112c1.50935-2.37046 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.25938 4.62987 4.62987 1.50936 2.37047 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-6.48195-2.77781-5.55562 5.55563m-6.48194 6.48193c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-6.48195-2.7778-5.55562 5.55561m-6.48194 6.48194c1.50935-2.37047 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37046 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25938 4.62988-4.62987"/>
 			</g>
 		</symbol>
+		<symbol id="node_american-and-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="AND gate (american)" tikzName="american and port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h8.73082m-8.73082 21.1653h8.73082m49.47392-10.58263h-8.73081"/>
+				<path stroke-width="1.06267" d="M8.9965.53135v42.33064c22.50208 0 40.7431-9.4759 40.7431-21.16532s-18.24102-21.16532-40.7431-21.16532Z"/>
+			</g>
+		</symbol>
 		<symbol id="path_allpass">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Allpass" tikzName="allpass" shapeName="allpassshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7151,6 +7338,25 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M9.79112 9.79112c1.50935-2.37046 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.25938 4.62987 4.62987 1.50936 2.37047 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-18.51951 9.25975c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-18.51951 9.25975c1.50935-2.37047 2.95385-4.62987 4.62988-4.62987 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37046 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25938 4.62988-4.62987"/>
+			</g>
+		</symbol>
+		<symbol id="node_american-or-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="OR gate (american)" tikzName="american or port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h15.90586m-15.90586 21.1653h15.90586m42.29888-10.58263h-8.73081"/>
+				<path stroke-width="1.06267" d="M8.9965.53135c6.88696 4.25435 10.43779 17.17838 7.9311 28.867-1.34146 6.25526-4.2455 11.18405-7.9311 13.4608 29.10234.00284 29.10234-10.57984 40.7431-21.16248-11.64076-10.58265-11.64076-21.16532-40.7431-21.16532Z"/>
 			</g>
 		</symbol>
 		<symbol id="path_highpass2">
@@ -7171,6 +7377,25 @@
 				<path stroke-width=".53134" d="M9.79112 14.421c1.50935-2.37046 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-18.51951 9.25976c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37045 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987m-6.48195-2.77781-5.55562 5.55562"/>
 			</g>
 		</symbol>
+		<symbol id="node_american-nand-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NAND gate (american)" tikzName="american nand port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h8.73082m-8.73082 21.1653h8.73082m49.47392-10.58263h-8.73081"/>
+				<path stroke-width="1.06267" d="M8.9965.53135v42.33064c20.09124 0 36.37796-9.4759 36.37796-21.16532s-16.28672-21.16532-36.37796-21.16532Zm40.7431 21.16532c0-1.2054-.97716-2.18258-2.18255-2.18258s-2.18258.97718-2.18258 2.18258.97718 2.18257 2.18258 2.18257 2.18256-.97717 2.18256-2.18257Zm-2.18255 0"/>
+			</g>
+		</symbol>
 		<symbol id="path_lowpass2">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Lowpass (two waves)" tikzName="lowpass2" shapeName="lowpass2shape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7187,6 +7412,25 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M9.79112 14.421c1.50935-2.37046 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62987 1.50936 2.37047 2.95386 4.62988 4.62988 4.62988 1.676 0 3.1205-2.2594 4.62988-4.62988m-6.48195-2.7778-5.55562 5.55561m-6.48194 6.48195c1.50935-2.37047 2.95385-4.62988 4.62988-4.62988 1.676 0 3.1205 2.2594 4.62987 4.62988 1.50936 2.37045 2.95386 4.62987 4.62988 4.62987 1.676 0 3.1205-2.25939 4.62988-4.62987"/>
+			</g>
+		</symbol>
+		<symbol id="node_american-nor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOR gate (american)" tikzName="american nor port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h15.90586m-15.90586 21.1653h15.90586m42.29888-10.58263h-8.73081"/>
+				<path stroke-width="1.06267" d="M8.9965.53135c6.88696 4.25435 10.43779 17.17838 7.9311 28.867-1.34146 6.25526-4.2455 11.18405-7.9311 13.4608 29.10234.00284 29.10234-10.57984 36.37796-21.16248-7.27562-10.58265-7.27562-21.16532-36.37796-21.16532Zm40.7431 21.16532c0-1.2054-.97718-2.18258-2.18258-2.18258s-2.18256.97718-2.18256 2.18258.97716 2.18257 2.18256 2.18257 2.18257-.97717 2.18257-2.18257Zm-2.18258 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_adc">
@@ -7215,6 +7459,28 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_american-xor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XOR gate (american)" tikzName="american xor port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h11.90093m-11.90093 21.1653h11.90093m46.30381-10.58263h-8.73081"/>
+				<g stroke-width="1.06267">
+					<path d="M8.9965.53135c6.88696 4.25435 10.43779 17.17838 7.9311 28.867-1.34146 6.25526-4.2455 11.18405-7.9311 13.4608 29.10234.00284 29.10234-10.57984 40.7431-21.16248-11.64076-10.58265-11.64076-21.16532-40.7431-21.16532Z"/>
+					<path d="M6.0861 1.53136c6.33542 4.05364 9.60189 16.36782 7.29596 27.50496-1.234 5.9601-3.90554 10.65633-7.29597 12.82566"/>
+				</g>
+			</g>
+		</symbol>
 		<symbol id="path_dac">
 			<metadata>
 				<ci:componentInformation type="path" displayName="D/A converter" tikzName="dac" shapeName="dacshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7238,6 +7504,28 @@
 				<g stroke="none">
 					<use xlink:href="#path_dac_a" x="-57.71186" y="-57.71186" transform="translate(82.592 92.2026) scale(1.33333)"/>
 					<use xlink:href="#path_dac_b" x="-57.71186" y="-57.71186" transform="translate(99.3524 109.08922) scale(1.33333)"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_american-xnor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XNOR gate (american)" tikzName="american xnor port" groupName="Logic gates" refX="52.65003" refY="21.69667" viewBox="0 0 58.73607 43.3933">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-52.38435" y="-10.58267" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-52.38435" y="10.582629999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="5.820399999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26568 11.114h11.90093m-11.90093 21.1653h11.90093m46.30381-10.58263h-8.73081"/>
+				<g stroke-width="1.06267">
+					<path d="M8.9965.53135c6.88696 4.25435 10.43779 17.17838 7.9311 28.867-1.34146 6.25526-4.2455 11.18405-7.9311 13.4608 29.10234.00284 29.10234-10.57984 36.37796-21.16248-7.27562-10.58265-7.27562-21.16532-36.37796-21.16532Zm40.7431 21.16532c0-1.2054-.97718-2.18258-2.18258-2.18258s-2.18256.97718-2.18256 2.18258.97716 2.18257 2.18256 2.18257 2.18257-.97717 2.18257-2.18257Zm-2.18258 0"/>
+					<path d="M6.0861 1.53136c6.33542 4.05364 9.60189 16.36782 7.29596 27.50496-1.234 5.9601-3.90554 10.65633-7.29597 12.82566"/>
 				</g>
 			</g>
 		</symbol>
@@ -7268,6 +7556,24 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_american-buffer-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Buffer port (american)" tikzName="american buffer port" groupName="Logic gates" refX="26.72226" refY="26.98793" viewBox="0 0 53.44448 53.97582">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-26.45657" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="26.456560000000003" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="26.98791" rx="21.377792" ry="21.590328" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="m45.24178 26.98793-37.03904-26.45657v52.91314l37.03904-26.45657"/>
+				<path stroke-width=".53134" d="M.26569 26.98793h7.93705m44.97608 0h-7.93704"/>
+			</g>
+		</symbol>
 		<symbol id="path_fft">
 			<metadata>
 				<ci:componentInformation type="path" displayName="FFT" tikzName="fft" shapeName="fftshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 43.21358 38.10171">
@@ -7294,6 +7600,27 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_american-not-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOT gate (american)" tikzName="american not port" groupName="Logic gates" refX="26.72226" refY="26.98793" viewBox="0 0 53.44448 53.97582">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-26.45657" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="26.456560000000003" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="26.98791" rx="21.377792" ry="21.590328" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path d="m41.27346 26.98793-33.07072-26.45657v52.91314l33.07072-26.45657"/>
+					<path d="M45.24178 26.98793c0-1.09583-.88834-1.98416-1.98416-1.98416s-1.98416.88833-1.98416 1.98416.88833 1.98416 1.98416 1.98416 1.98416-.88834 1.98416-1.98416Zm-1.98416 0"/>
+				</g>
+				<path stroke-width=".53134" d="M.26569 26.98793h7.93705m44.97608 0h-7.93704"/>
+			</g>
+		</symbol>
 		<symbol id="path_amp">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Amplifier" tikzName="amp" shapeName="ampshape" groupName="Block diagram" refX="19.05087" refY="20.90293" viewBox="0 0 38.10171 41.80583">
@@ -7313,6 +7640,29 @@
 				<path stroke-width="1.06267" d="m.53135.53135 37.03904 20.37158-37.03904 20.37157Z"/>
 			</g>
 		</symbol>
+		<symbol id="node_ieeestd-and-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="AND gate (IEEE)" tikzName="ieeestd and port" groupName="Logic gates" refX="41.12963" refY="21.69628" viewBox="0 0 82.25924 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-26.04913" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-26.04913" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="26.04914" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="21.696265" rx="32.903696000000004" ry="17.357012" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M15.0805 11.11382h-14.81482m14.81482 21.16492h-14.81482"/>
+				<path stroke-width="1.06267" d="M15.0805.53135h30.93336c11.68922 0 21.16493 9.47572 21.16493 21.16493s-9.47571 21.16493-21.16493 21.16493h-30.93336Z"/>
+				<path stroke-width=".53134" d="M67.17877 21.69628h14.81481"/>
+			</g>
+		</symbol>
 		<symbol id="path_iamp">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Instrumentation amplifier" tikzName="iamp" shapeName="iampshape" groupName="Block diagram" refX="19.05087" refY="20.90293" viewBox="0 0 38.10171 41.80583">
@@ -7330,6 +7680,29 @@
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="20.902915" rx="15.240684" ry="16.722332" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="m.53135.53135 37.03904 12.9639v14.81537l-37.03904 12.96388Z"/>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-or-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="OR gate (IEEE)" tikzName="ieeestd or port" groupName="Logic gates" refX="41.12963" refY="22.1329" viewBox="0 0 82.25924 44.26317">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-27.31315" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-27.31315" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="26.04914" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="22.131585" rx="32.903696000000004" ry="17.705268" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M13.81648 11.55044h-13.5508m13.5508 21.16492h-13.5508"/>
+				<path stroke-width="1.06267" d="M15.0805.96797h14.24c15.54686-.43662 30.08613 7.69077 37.85633 21.16363-7.76956 13.47222-22.31012 21.60025-37.85567 21.16428l-18.71224.00196c6.16578-13.29117 6.16578-29.03846 0-42.32962Z"/>
+				<path stroke-width=".53134" d="M67.17877 22.1329h14.81481"/>
 			</g>
 		</symbol>
 		<symbol id="path_vamp">
@@ -7355,6 +7728,30 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_ieeestd-nand-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NAND gate (IEEE)" tikzName="ieeestd nand port" groupName="Logic gates" refX="41.12963" refY="21.69628" viewBox="0 0 82.25924 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-26.04913" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-26.04913" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="32.56822999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="21.696265" rx="32.903696000000004" ry="17.357012" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M15.0805 11.11382h-14.81482m14.81482 21.16492h-14.81482"/>
+				<path fill="none" stroke-width="1.06267" d="M15.0805.53135h30.93336c11.68922 0 21.16493 9.47572 21.16493 21.16493s-9.47571 21.16493-21.16493 21.16493h-30.93336Z"/>
+				<path fill="none" stroke-width=".53134" d="M73.69786 21.69628h8.29572"/>
+				<path fill="#fff" stroke-width="1.06267" d="M73.69786 21.69628c0-1.8002-1.45934-3.25955-3.25954-3.25955-1.80023 0-3.25955 1.45934-3.25955 3.25955s1.45932 3.25955 3.25955 3.25955c1.8002 0 3.25954-1.45934 3.25954-3.25955Zm-3.25954 0"/>
+			</g>
+		</symbol>
 		<symbol id="path_piattenuator">
 			<metadata>
 				<ci:componentInformation type="path" displayName="PI attenuator" tikzName="piattenuator" shapeName="piattenuatorshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7371,6 +7768,30 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M11.64319 26.45856v-14.81537m14.81537 14.81537v-14.81537m-18.5195 0h22.22362"/>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-nor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOR gate (IEEE)" tikzName="ieeestd nor port" groupName="Logic gates" refX="41.12963" refY="22.1329" viewBox="0 0 82.25924 44.26317">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-27.31315" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-27.31315" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="32.56822999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="22.131585" rx="32.903696000000004" ry="17.705268" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M13.81648 11.55044h-13.5508m13.5508 21.16492h-13.5508"/>
+				<path fill="none" stroke-width="1.06267" d="M15.0805.96797h14.24c15.54686-.43662 30.08613 7.69077 37.85633 21.16363-7.76956 13.47222-22.31012 21.60025-37.85567 21.16428l-18.71224.00196c6.16578-13.29117 6.16578-29.03846 0-42.32962Z"/>
+				<path fill="none" stroke-width=".53134" d="M73.69786 22.1329h8.29572"/>
+				<path fill="#fff" stroke-width="1.06267" d="M73.69786 22.1329c0-1.8002-1.45934-3.25955-3.25954-3.25955-1.80023 0-3.25955 1.45934-3.25955 3.25955s1.45932 3.25955 3.25955 3.25955c1.8002 0 3.25954-1.45934 3.25954-3.25955Zm-3.25954 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_vpiattenuator">
@@ -7392,6 +7813,32 @@
 				<path stroke="none" d="M32.01444 4.23522c-1.21904.76942-3.44848 1.75202-5.24919 2.15527l2.71146 2.92007c.53537-1.76594 1.68022-3.91657 2.53773-5.07534"/>
 			</g>
 		</symbol>
+		<symbol id="node_ieeestd-xor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XOR gate (IEEE)" tikzName="ieeestd xor port" groupName="Logic gates" refX="41.12963" refY="22.1329" viewBox="0 0 82.25924 44.26317">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-31.37673" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-31.37673" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="26.04914" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="22.131585" rx="32.903696000000004" ry="17.705268" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M13.81648 11.55044h-13.5508m13.5508 21.16492h-13.5508"/>
+				<g stroke-width="1.06267">
+					<path d="M15.0805.96797h14.24c15.54686-.43662 30.08613 7.69077 37.85633 21.16363-7.76956 13.47222-22.31012 21.60025-37.85567 21.16428l-18.71224.00196c6.16578-13.29117 6.16578-29.03846 0-42.32962Z"/>
+					<path d="M6.54534 43.29784c6.16579-13.29117 6.16579-29.03846 0-42.32962"/>
+				</g>
+				<path stroke-width=".53134" d="M67.17877 22.1329h14.81481"/>
+			</g>
+		</symbol>
 		<symbol id="path_tattenuator">
 			<metadata>
 				<ci:componentInformation type="path" displayName="T attenuator" tikzName="tattenuator" shapeName="tattenuatorshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7408,6 +7855,33 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M19.05087 26.45856v-14.81537m-11.1118 0h22.22361"/>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-xnor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XNOR gate (IEEE)" tikzName="ieeestd xnor port" groupName="Logic gates" refX="41.12963" refY="22.1329" viewBox="0 0 82.25924 44.26317">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-40.86395" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="bin 1" x="-31.37673" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-40.86395" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="bin 2" x="-31.37673" y="10.582459999999998" isDefault="false" />
+						<ci:pin anchorName="out" x="40.86395000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="32.56822999999999" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="41.12962" cy="22.131585" rx="32.903696000000004" ry="17.705268" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M13.81648 11.55044h-13.5508m13.5508 21.16492h-13.5508"/>
+				<g fill="none" stroke-width="1.06267">
+					<path d="M15.0805.96797h14.24c15.54686-.43662 30.08613 7.69077 37.85633 21.16363-7.76956 13.47222-22.31012 21.60025-37.85567 21.16428l-18.71224.00196c6.16578-13.29117 6.16578-29.03846 0-42.32962Z"/>
+					<path d="M6.54534 43.29784c6.16579-13.29117 6.16579-29.03846 0-42.32962"/>
+				</g>
+				<path fill="none" stroke-width=".53134" d="M73.69786 22.1329h8.29572"/>
+				<path fill="#fff" stroke-width="1.06267" d="M73.69786 22.1329c0-1.8002-1.45934-3.25955-3.25954-3.25955-1.80023 0-3.25955 1.45934-3.25955 3.25955s1.45932 3.25955 3.25955 3.25955c1.8002 0 3.25954-1.45934 3.25954-3.25955Zm-3.25954 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_vtattenuator">
@@ -7429,6 +7903,28 @@
 				<path stroke="none" d="M32.01444 4.23522c-1.21904.76942-3.44848 1.75202-5.24919 2.15527l2.71146 2.92007c.53537-1.76594 1.68022-3.91657 2.53773-5.07534"/>
 			</g>
 		</symbol>
+		<symbol id="node_ieeestd-buffer-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Buffer port (IEEE)" tikzName="ieeestd buffer port" groupName="Logic gates" refX="33.4099" refY="21.69628" viewBox="0 0 66.81977 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-33.14422" y="0" isDefault="false" />
+						<ci:pin anchorName="bin" x="-18.3294" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="33.14423" y="0" isDefault="false" />
+						<ci:pin anchorName="up" x="0" y="-10.58246" isDefault="false" />
+						<ci:pin anchorName="down" x="0" y="10.582459999999998" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="33.409885" cy="21.696265" rx="26.727908000000003" ry="17.357012" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M15.0805 21.69628h-14.81482"/>
+				<path stroke-width="1.06267" d="m15.0805.53135 36.65881 21.16493-36.65881 21.16493Z"/>
+				<path stroke-width=".53134" d="M51.73931 21.69628h14.81482"/>
+			</g>
+		</symbol>
 		<symbol id="path_phaseshifter">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Phase shifter" tikzName="phaseshifter" shapeName="phaseshiftershape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7448,6 +7944,28 @@
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<use xlink:href="#path_phaseshifter_a" x="-57.71186" y="-57.71186" stroke="none" transform="translate(89.86532 98.2582) scale(1.33333)"/>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-not-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOT gate (IEEE)" tikzName="ieeestd not port" groupName="Logic gates" refX="33.4099" refY="21.69628" viewBox="0 0 66.81977 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-33.14422" y="0" isDefault="false" />
+						<ci:pin anchorName="bin" x="-18.3294" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="33.14423" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="24.848509999999997" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="33.409885" cy="21.696265" rx="26.727908000000003" ry="17.357012" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M15.0805 21.69628h-14.81482"/>
+				<path fill="none" stroke-width="1.06267" d="m15.0805.53135 36.65881 21.16493-36.65881 21.16493Z"/>
+				<path fill="none" stroke-width=".53134" d="M58.25841 21.69628h8.29572"/>
+				<path fill="#fff" stroke-width="1.06267" d="M58.25841 21.69628c0-1.8002-1.45933-3.25955-3.25955-3.25955-1.8002 0-3.25955 1.45934-3.25955 3.25955s1.45934 3.25955 3.25955 3.25955c1.80022 0 3.25955-1.45934 3.25955-3.25955Zm-3.25955 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_vphaseshifter">
@@ -7473,6 +7991,30 @@
 				<use xlink:href="#path_vphaseshifter_a" x="-57.71186" y="-57.71186" stroke="none" transform="translate(89.86532 98.2582) scale(1.33333)"/>
 			</g>
 		</symbol>
+		<symbol id="node_ieee-tgate">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Transmission gate (IEEE)" tikzName="ieee tgate" groupName="Logic gates" refX="40.74153999999999" refY="15.34672" viewBox="0 0 81.48305 30.69341">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-40.47583999999999" y="0" isDefault="false" />
+						<ci:pin anchorName="bin" x="-25.661039999999993" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="40.47585" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="25.661040000000007" y="0" isDefault="false" />
+						<ci:pin anchorName="gate" x="7.105427357601002e-15" y="14.8148" isDefault="false" />
+						<ci:pin anchorName="notgate" x="7.105427357601002e-15" y="-14.8148" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="40.741525" cy="15.346705" rx="32.59322" ry="12.277364" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M15.0805 15.34672h-14.8148m40.47584 0v14.8148m0-21.8381v-7.7915"/>
+				<path fill="none" stroke-width="1.06267" d="m15.0805.53135 25.66104 14.81537-25.66104 14.81537Zm51.32208 0-25.66104 14.81537 25.66104 14.81537Z"/>
+				<path fill="#fff" stroke-width="1.06267" d="M44.00109 11.58297c0-1.80022-1.45934-3.25955-3.25955-3.25955s-3.25955 1.45933-3.25955 3.25955c0 1.8002 1.45934 3.25953 3.25955 3.25953s3.25955-1.45932 3.25955-3.25953Zm-3.25955 0"/>
+				<path fill="none" stroke-width=".53134" d="M66.40258 15.34672h14.8148"/>
+			</g>
+		</symbol>
 		<symbol id="path_detector">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Detector" tikzName="detector" shapeName="detectorshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7494,6 +8036,30 @@
 				</g>
 			</g>
 		</symbol>
+		<symbol id="node_ieee-double-tgate">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Double Transmission gate (IEEE)" tikzName="ieee double tgate" groupName="Logic gates" refX="40.74153999999999" refY="30.162110000000002" viewBox="0 0 81.48305 60.3242">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-40.47583999999999" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="bin" x="-25.661039999999993" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="out" x="40.47585" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="bout" x="25.661040000000007" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="gate" x="7.105427357601002e-15" y="29.630179999999992" isDefault="false" />
+						<ci:pin anchorName="notgate" x="7.105427357601002e-15" y="-29.630170000000003" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="40.741525" cy="30.1621" rx="32.59322" ry="24.12968" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M15.0805 30.16211h-14.8148m40.47584 14.81538v14.8148m0-51.46885v-7.7915"/>
+				<path fill="none" stroke-width="1.06267" d="m15.0805.53136 25.66104 14.81538-25.66104 14.81537Zm51.32208 0-25.66104 14.81538 25.66104 14.81537Zm-51.32208 59.26151 25.66104-14.81538-25.66104-14.81538Zm51.32208 0-25.66104-14.81538 25.66104-14.81538Z"/>
+				<path fill="#fff" stroke-width="1.06267" d="M44.00109 11.58299c0-1.80022-1.45934-3.25955-3.25955-3.25955s-3.25955 1.45933-3.25955 3.25955c0 1.8002 1.45934 3.25954 3.25955 3.25954s3.25955-1.45933 3.25955-3.25954Zm-3.25955 0"/>
+				<path fill="none" stroke-width=".53134" d="M66.40258 30.16211h14.8148"/>
+			</g>
+		</symbol>
 		<symbol id="path_saturation">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Saturation" tikzName="saturation" shapeName="saturationshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7510,6 +8076,23 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".63758" d="m19.05087 19.05087 7.40769-7.40768h4.62987m-12.03756 7.40768-7.40768 7.40769h-4.62988"/>
+			</g>
+		</symbol>
+		<symbol id="node_notcirc">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Inverting dot for IEEE ports" tikzName="notcirc" groupName="Logic gates" refX="4.04544" refY="4.04544" viewBox="0 0 8.09083 7.83629">
+					<ci:pins>
+						<ci:pin anchorName="east" x="3.25955" y="0" isDefault="false" />
+						<ci:pin anchorName="west" x="-3.25955" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="4.045415" cy="3.918145" rx="3.2363320000000004" ry="3.134516" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="#fff" stroke-width="1.06267" d="M7.30499 4.04544c0-1.80021-1.45934-3.25955-3.25955-3.25955s-3.25955 1.45934-3.25955 3.25955 1.45934 3.25955 3.25955 3.25955 3.25955-1.45934 3.25955-3.25955Zm-3.25955 0"/>
 			</g>
 		</symbol>
 		<symbol id="path_sigmoid">
@@ -7530,6 +8113,23 @@
 				<path stroke-width=".63758" d="M7.01331 26.45856h3.70384c4.16686 0 7.39613-5.7409 8.33372-7.40769m12.03756-7.40768h-3.70384c-4.16685 0-7.39613 5.7409-8.33372 7.40768"/>
 			</g>
 		</symbol>
+		<symbol id="node_schmitt-symbol">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Schmitt symbol for input pins" tikzName="schmitt symbol" groupName="Logic gates" refX="9.78999" refY="6.61523" viewBox="0 0 19.57993 13.23041">
+					<ci:pins>
+						<ci:pin anchorName="south east" x="9.5243" y="6.34953" isDefault="false" />
+						<ci:pin anchorName="north west" x="-9.5243" y="-6.34954" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.789965" cy="6.615205" rx="7.831972" ry="5.292164" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M3.12302 11.0599h4.44465v-8.88934h8.88929m-4.44465 0v8.88933h-8.8893"/>
+			</g>
+		</symbol>
 		<symbol id="path_allornothing">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Comparison (all-or-nothing)" tikzName="allornothing" shapeName="allornothingshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7548,6 +8148,29 @@
 				<path stroke-width=".63758" d="M8.8651 26.45856h10.18577v-14.81537h10.18578"/>
 			</g>
 		</symbol>
+		<symbol id="node_european-and-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="AND gate (european)" tikzName="european and port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 77.27062 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
+			<defs>
+				<path id="node_european-and-port_a" d="M7.24284-3.98506v-.30884l-.96638.02989c-.10959 0-.94645-.00996-1.21544-.02989v.30884c.45828 0 .70735.1893.70735.43836 0 .09963-.04981.16936-.05978.19925-.54794.96638-.99626 1.64384-1.42466 2.17186-.1295-.14944-1.21544-1.51432-1.6538-2.66003.53799-.59775 1.21545-1.35491 1.21545-2.01245 0-.45828-.1594-1.28518-.86675-1.28518-.61768 0-1.35492.54795-1.35492 1.60399 0 .41843.05978 1.13574.40847 2.02241l-.9066.96638c-.44832.45828-.70735.72727-.70735 1.26525 0 .86675.81694 1.4944 1.80324 1.4944.84682 0 1.43462-.4284 1.80324-.75716.68742.59776 1.27522.75716 1.75342.75716.75716 0 1.3848-.56787 1.40473-1.42466h-.24906c-.02989.78705-.6675 1.11582-1.11582 1.11582-.53798 0-1.05604-.5081-1.37484-.88668.45828-.52802.85679-1.20548 1.31507-1.99253.38854-.65753.59775-1.00622 1.48443-1.01619Zm-3.64633-1.87297c0 .65753-.80697 1.52428-1.04607 1.78331-.269-.79701-.29888-1.37484-.29888-1.68369 0-.83686.3985-1.15566.7472-1.15566.59775 0 .59775 1.05604.59775 1.05604Zm.2391 5.13076c-.6376.56787-1.25529.6376-1.53424.6376-.8269 0-1.05604-.96637-1.05604-1.50435 0-.80698.33873-1.16563.87671-1.68369.21918.46825.36862.76713.79701 1.3848.1893.27896.54795.79702.91657 1.16564Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539"/>
+				<use xlink:href="#node_european-and-port_a" x="-21.79797" y="-58.70405" stroke="none" transform="translate(61.20139 100.60938) scale(1.33333)"/>
+			</g>
+		</symbol>
 		<symbol id="path_fiber">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Optical fiber" tikzName="fiber" shapeName="fibershape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7564,6 +8187,33 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="M22.75472 11.64319c0-4.0912-3.31649-7.4077-7.4077-7.4077s-7.40768 3.3165-7.40768 7.4077 3.31649 7.40768 7.40769 7.40768 7.40769-3.31648 7.40769-7.40768Zm3.70384 0c0-4.0912-3.31648-7.4077-7.40769-7.4077s-7.40768 3.3165-7.40768 7.4077 3.31648 7.40768 7.40768 7.40768 7.40769-3.31648 7.40769-7.40768Zm3.70384 0c0-4.0912-3.31648-7.4077-7.40768-7.4077s-7.4077 3.3165-7.4077 7.4077 3.3165 7.40768 7.4077 7.40768 7.40768-3.31648 7.40768-7.40768Zm-29.63105 7.40768h37.03904"/>
+			</g>
+		</symbol>
+		<symbol id="node_european-or-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="OR gate (european)" tikzName="european or port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 87.59927 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
+			<defs>
+				<path id="node_european-or-port_a" d="M6.71482-3.2279c.13948-.05977.19925-.12951.19925-.21917 0-.09963-.03985-.1594-.19925-.22914l-5.48941-2.5903c-.13948-.06973-.17933-.06973-.19926-.06973-.11955 0-.19925.08967-.19925.19925 0 .11956.0797.16937.18929.21918l5.23039 2.46077-5.21047 2.46078c-.19925.08966-.20921.16936-.20921.22914 0 .10959.08966.19925.19925.19925.02989 0 .04982 0 .17933-.06974l5.50934-2.59029Zm-.14944 4.59278c.16936 0 .3487 0 .3487-.19925s-.20922-.19925-.35866-.19925h-5.36987c-.14944 0-.35865 0-.35865.19925s.17933.19925.3487.19925h5.38978Z"/>
+				<path id="node_european-or-port_b" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539"/>
+				<g stroke="none" transform="translate(56.03708 99.37715) scale(1.33333)">
+					<use xlink:href="#node_european-or-port_a" x="-21.79797" y="-58.70405"/>
+					<use xlink:href="#node_european-or-port_b" x="-11.28189" y="-58.70405"/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="path_sdcdc">
@@ -7591,6 +8241,29 @@
 				<path stroke-dasharray="9.259741881,9.259741881" stroke-width=".53134" d="M23.68075 30.62554h9.25974"/>
 			</g>
 		</symbol>
+		<symbol id="node_european-nand-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NAND gate (european)" tikzName="european nand port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 77.27062 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
+			<defs>
+				<path id="node_european-nand-port_a" d="M7.24284-3.98506v-.30884l-.96638.02989c-.10959 0-.94645-.00996-1.21544-.02989v.30884c.45828 0 .70735.1893.70735.43836 0 .09963-.04981.16936-.05978.19925-.54794.96638-.99626 1.64384-1.42466 2.17186-.1295-.14944-1.21544-1.51432-1.6538-2.66003.53799-.59775 1.21545-1.35491 1.21545-2.01245 0-.45828-.1594-1.28518-.86675-1.28518-.61768 0-1.35492.54795-1.35492 1.60399 0 .41843.05978 1.13574.40847 2.02241l-.9066.96638c-.44832.45828-.70735.72727-.70735 1.26525 0 .86675.81694 1.4944 1.80324 1.4944.84682 0 1.43462-.4284 1.80324-.75716.68742.59776 1.27522.75716 1.75342.75716.75716 0 1.3848-.56787 1.40473-1.42466h-.24906c-.02989.78705-.6675 1.11582-1.11582 1.11582-.53798 0-1.05604-.5081-1.37484-.88668.45828-.52802.85679-1.20548 1.31507-1.99253.38854-.65753.59775-1.00622 1.48443-1.01619Zm-3.64633-1.87297c0 .65753-.80697 1.52428-1.04607 1.78331-.269-.79701-.29888-1.37484-.29888-1.68369 0-.83686.3985-1.15566.7472-1.15566.59775 0 .59775 1.05604.59775 1.05604Zm.2391 5.13076c-.6376.56787-1.25529.6376-1.53424.6376-.8269 0-1.05604-.96637-1.05604-1.50435 0-.80698.33873-1.16563.87671-1.68369.21918.46825.36862.76713.79701 1.3848.1893.27896.54795.79702.91657 1.16564Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539m11.11125 0-11.11125-5.15901"/>
+				<use xlink:href="#node_european-nand-port_a" x="-21.79797" y="-58.70405" stroke="none" transform="translate(61.20139 100.60938) scale(1.33333)"/>
+			</g>
+		</symbol>
 		<symbol id="path_sacdc">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Single phase AC/DC converter" tikzName="sacdc" shapeName="sacdcshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7612,6 +8285,33 @@
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="m.53135 37.5704 37.03904-37.03905m-32.59424 9.25977c1.02635-1.61188 2.00859-3.14826 3.14827-3.14826 1.13968 0 2.12191 1.53637 3.14828 3.14826 1.02633 1.61187 2.00857 3.14827 3.14826 3.14827 1.13967 0 2.1219-1.53637 3.14827-3.14827m6.11152 16.20458h9.25974"/>
 				<path stroke-dasharray="9.259741881,9.259741881" stroke-width=".53134" d="M23.68075 30.62554h9.25974"/>
+			</g>
+		</symbol>
+		<symbol id="node_european-nor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOR gate (european)" tikzName="european nor port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 87.59927 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
+			<defs>
+				<path id="node_european-nor-port_a" d="M6.71482-3.2279c.13948-.05977.19925-.12951.19925-.21917 0-.09963-.03985-.1594-.19925-.22914l-5.48941-2.5903c-.13948-.06973-.17933-.06973-.19926-.06973-.11955 0-.19925.08967-.19925.19925 0 .11956.0797.16937.18929.21918l5.23039 2.46077-5.21047 2.46078c-.19925.08966-.20921.16936-.20921.22914 0 .10959.08966.19925.19925.19925.02989 0 .04982 0 .17933-.06974l5.50934-2.59029Zm-.14944 4.59278c.16936 0 .3487 0 .3487-.19925s-.20922-.19925-.35866-.19925h-5.36987c-.14944 0-.35865 0-.35865.19925s.17933.19925.3487.19925h5.38978Z"/>
+				<path id="node_european-nor-port_b" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539m11.11125 0-11.11125-5.15901"/>
+				<g stroke="none" transform="translate(56.03708 99.37715) scale(1.33333)">
+					<use xlink:href="#node_european-nor-port_a" x="-21.79797" y="-58.70405"/>
+					<use xlink:href="#node_european-nor-port_b" x="-11.28189" y="-58.70405"/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="path_sdcac">
@@ -7638,6 +8338,33 @@
 				<path stroke-width=".53134" d="M21.64359 28.31062c1.02634-1.61187 2.00857-3.14827 3.14826-3.14827 1.13967 0 2.1219 1.53637 3.14827 3.14827 1.02634 1.61188 2.00859 3.14826 3.14828 3.14826 1.13965 0 2.1219-1.53637 3.14825-3.14826"/>
 			</g>
 		</symbol>
+		<symbol id="node_european-xor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XOR gate (european)" tikzName="european xor port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 87.59927 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
+			<defs>
+				<path id="node_european-xor-port_b" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+				<path id="node_european-xor-port_a" d="M6.84433-3.25778c.14944 0 .33873 0 .33873-.19926s-.18929-.19925-.32876-.19925h-5.96762c-.13948 0-.32877 0-.32877.19925s.18929.19926.33873.19926h5.9477Zm.00997 1.93275c.13947 0 .32876 0 .32876-.19925s-.18929-.19926-.33873-.19926h-5.9477c-.14943 0-.33872 0-.33872.19926s.18929.19925.32876.19925h5.96763Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539"/>
+				<g stroke="none" transform="translate(56.03708 100.28023) scale(1.33333)">
+					<use xlink:href="#node_european-xor-port_a" x="-21.79797" y="-58.70405"/>
+					<use xlink:href="#node_european-xor-port_b" x="-11.28189" y="-58.70405"/>
+				</g>
+			</g>
+		</symbol>
 		<symbol id="path_sacac">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Single phase AC/AC converter" tikzName="sacac" shapeName="sacacshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7658,6 +8385,33 @@
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h37.03903v37.03903h-37.03903Z"/>
 				<path stroke-width=".53134" d="m.53135 37.5704 37.03904-37.03905m-32.59424 9.25977c1.02635-1.61188 2.00859-3.14826 3.14827-3.14826 1.13968 0 2.12191 1.53637 3.14828 3.14826 1.02633 1.61187 2.00857 3.14827 3.14826 3.14827 1.13967 0 2.1219-1.53637 3.14827-3.14827m4.07436 18.5195c1.02634-1.61187 2.00857-3.14827 3.14826-3.14827 1.13967 0 2.1219 1.53637 3.14827 3.14827 1.02634 1.61188 2.00859 3.14826 3.14828 3.14826 1.13965 0 2.1219-1.53637 3.14825-3.14826"/>
+			</g>
+		</symbol>
+		<symbol id="node_european-xnor-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="XNOR gate (european)" tikzName="european xnor port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 87.59927 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="in 2" x="-66.67036" y="8.598280000000003" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
+			<defs>
+				<path id="node_european-xnor-port_b" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+				<path id="node_european-xnor-port_a" d="M6.84433-3.25778c.14944 0 .33873 0 .33873-.19926s-.18929-.19925-.32876-.19925h-5.96762c-.13948 0-.32877 0-.32877.19925s.18929.19926.33873.19926h5.9477Zm.00997 1.93275c.13947 0 .32876 0 .32876-.19925s-.18929-.19926-.33873-.19926h-5.9477c-.14943 0-.33872 0-.33872.19926s.18929.19925.32876.19925h5.96763Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539m11.11125 0-11.11125-5.15901"/>
+				<g stroke="none" transform="translate(56.03708 100.28023) scale(1.33333)">
+					<use xlink:href="#node_european-xnor-port_a" x="-21.79797" y="-58.70405"/>
+					<use xlink:href="#node_european-xnor-port_b" x="-11.28189" y="-58.70405"/>
+				</g>
 			</g>
 		</symbol>
 		<symbol id="path_tacdc">
@@ -7683,6 +8437,28 @@
 				<path stroke-width=".53134" d="M4.97615 9.79112c1.02635-1.61188 2.00859-3.14826 3.14827-3.14826 1.13968 0 2.12191 1.53637 3.14828 3.14826 1.02633 1.61187 2.00857 3.14827 3.14826 3.14827 1.13967 0 2.1219-1.53637 3.14827-3.14827"/>
 				<path stroke-width=".53134" d="M4.97615 12.56894c1.02635-1.61187 2.00859-3.14827 3.14827-3.14827 1.13968 0 2.12191 1.53637 3.14828 3.14827 1.02633 1.61188 2.00857 3.14826 3.14826 3.14826 1.13967 0 2.1219-1.53637 3.14827-3.14826m6.11152 13.42676h9.25974"/>
 				<path stroke-dasharray="9.259741881,9.259741881" stroke-width=".53134" d="M23.68075 30.62554h9.25974"/>
+			</g>
+		</symbol>
+		<symbol id="node_european-buffer-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Buffer port (european)" tikzName="european buffer port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 74.60941 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
+			<defs>
+				<path id="node_european-buffer-port_a" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 17.72795h14.81538m59.26267 0h-14.81539"/>
+				<use xlink:href="#node_european-buffer-port_a" x="-21.79797" y="-58.70405" stroke="none" transform="translate(63.0478 100.28023) scale(1.33333)"/>
 			</g>
 		</symbol>
 		<symbol id="path_tdcac">
@@ -7711,6 +8487,28 @@
 				<path stroke-width=".53134" d="M21.64359 25.5328c1.02634-1.61187 2.00857-3.14826 3.14826-3.14826 1.13967 0 2.1219 1.53637 3.14827 3.14826 1.02634 1.61188 2.00859 3.14828 3.14828 3.14828 1.13965 0 2.1219-1.53638 3.14825-3.14828"/>
 			</g>
 		</symbol>
+		<symbol id="node_european-not-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="NOT gate (european)" tikzName="european not port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 74.60941 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
+			<defs>
+				<path id="node_european-not-port_a" d="M2.92902-6.37609c0-.2391 0-.25903-.22914-.25903-.61769.63761-1.4944.63761-1.8132.63761v.30884c.19925 0 .78704 0 1.3051-.25903v5.16065c0 .35866-.02989.4782-.92653.4782h-.3188v.30885c.3487-.02989 1.21544-.02989 1.61395-.02989s1.26525 0 1.61395.02989v-.30884h-.3188c-.89665 0-.92653-.1096-.92653-.4782v-5.58905Z"/>
+			</defs>
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path fill="none" stroke-width=".53134" d="M.2657 17.72795h14.81538m59.26267 0h-14.81539m11.11125 0-11.11125-5.15901"/>
+				<use xlink:href="#node_european-not-port_a" x="-21.79797" y="-58.70405" stroke="none" transform="translate(63.0478 100.28023) scale(1.33333)"/>
+			</g>
+		</symbol>
 		<symbol id="path_tacac">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Three phases AC/AC converter" tikzName="tacac" shapeName="tacacshape" groupName="Block diagram" refX="19.05087" refY="19.05087" viewBox="0 0 38.10171 38.10171">
@@ -7737,6 +8535,24 @@
 				<path stroke-width=".53134" d="M4.97615 12.56894c1.02635-1.61187 2.00859-3.14827 3.14827-3.14827 1.13968 0 2.12191 1.53637 3.14828 3.14827 1.02633 1.61188 2.00857 3.14826 3.14826 3.14826 1.13967 0 2.1219-1.53637 3.14827-3.14826"/>
 			</g>
 		</symbol>
+		<symbol id="node_european-blank-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Blank port (european)" tikzName="european blank port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 74.60941 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539"/>
+			</g>
+		</symbol>
 		<symbol id="path_mstline">
 			<metadata>
 				<ci:componentInformation type="path" displayName="Microstrip transmission line" tikzName="mstline" shapeName="mstlineshape" groupName="RF components" refX="32.279160000000005" refY="8.46838" viewBox="0 0 64.55828 16.93673">
@@ -7752,6 +8568,24 @@
 			<ellipse stroke="none" fill="transparent" cx="32.27914" cy="8.468365" rx="25.823312" ry="6.774692000000001" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135.53135h63.49561v15.87407h-63.4956Z"/>
+			</g>
+		</symbol>
+		<symbol id="node_european-blank-not-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Blank not port (european)" tikzName="european blank not port" groupName="Logic gates" refX="66.93605" refY="17.72795" viewBox="0 0 74.60941 35.45587">
+					<ci:pins>
+						<ci:pin anchorName="in 1" x="-66.67036" y="-8.59831" isDefault="false" />
+						<ci:pin anchorName="out" x="7.4077000000000055" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M15.08108.53135h44.44728v34.3932h-44.44728Z"/>
+				<path stroke-width=".53134" d="M.2657 9.12964h14.81538m-14.81539 17.19659h14.81539m59.26267-8.59828h-14.81539m11.11125 0-11.11125-5.15901"/>
 			</g>
 		</symbol>
 		<symbol id="path_tline">
@@ -7773,6 +8607,717 @@
 					<path d="M29.10476.53135c-1.7534 0-3.17476 3.55349-3.17476 7.93703s1.42136 7.93704 3.17476 7.93704"/>
 				</g>
 				<path stroke-width=".53134" d="M29.10476 8.46838h3.17476"/>
+			</g>
+		</symbol>
+		<symbol id="node_schmitt">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Non-Inverting Schmitt trigger" tikzName="schmitt" groupName="Logic gates" refX="26.72226" refY="26.98793" viewBox="0 0 53.44448 53.97582">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-26.45657" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="26.456560000000003" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="26.98791" rx="21.377792" ry="21.590328" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="m45.24178 26.98793-37.03904-26.45657v52.91314Z"/>
+				<path stroke-width=".53134" d="M.26569 26.98793h7.93705m44.97608 0h-7.93704"/>
+				<path stroke-width="1.06267" d="M10.84818 34.92496h5.29162v-15.87407h9.25955m-9.25955 15.87407h3.96833v-15.87407"/>
+			</g>
+		</symbol>
+		<symbol id="path_switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Switch" tikzName="switch" shapeName="cspstshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="11.64328" viewBox="0 0 19.31689 15.97513">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="7.987565" rx="7.726756000000001" ry="6.390052000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m.53135 11.64328 14.81596-9.25996"/>
+					<g stroke-linejoin="bevel">
+						<path fill="none" stroke-width="1.06267" d="M.53135.53136c3.96944 0 7.63852 2.11834 9.62322 5.55597.94014 1.6284 1.44028 3.44756 1.48523 5.2844"/>
+						<path stroke="none" d="M10.97317 15.44383c.41059-1.7124 1.21865-4.79213 2.85018-6.8038-1.96353 1.65348-3.34394 1.6011-5.1765-.19645 1.47437 2.12955 2.0467 5.26165 2.32632 7.00025Z"/>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_invschmitt">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Inverting Schmitt trigger" tikzName="invschmitt" groupName="Logic gates" refX="26.72226" refY="26.98793" viewBox="0 0 53.44448 53.97582">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-26.45657" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="26.456560000000003" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="26.98791" rx="21.377792" ry="21.590328" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path d="m41.27346 26.98793-33.07072-26.45657v52.91314Z"/>
+					<path d="M45.24178 26.98793c0-1.09583-.88834-1.98416-1.98416-1.98416s-1.98416.88833-1.98416 1.98416.88833 1.98416 1.98416 1.98416 1.98416-.88834 1.98416-1.98416Zm-1.98416 0"/>
+				</g>
+				<path stroke-width=".53134" d="M.26569 26.98793h7.93705m44.97608 0h-7.93704"/>
+				<path stroke-width="1.06267" d="M10.84818 34.92496h5.29162v-15.87407h9.25955m-9.25955 15.87407h3.96833v-15.87407"/>
+			</g>
+		</symbol>
+		<symbol id="path_closing-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closing switch" tikzName="closing switch" shapeName="cspstshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="11.64328" viewBox="0 0 19.31689 15.97513">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="7.987565" rx="7.726756000000001" ry="6.390052000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m.53135 11.64328 14.81596-9.25996"/>
+					<g stroke-linejoin="bevel">
+						<path fill="none" stroke-width="1.06267" d="M.53135.53136c3.96944 0 7.63852 2.11834 9.62322 5.55597.94014 1.6284 1.44028 3.44756 1.48523 5.2844"/>
+						<path stroke="none" d="M10.97317 15.44383c.41059-1.7124 1.21865-4.79213 2.85018-6.8038-1.96353 1.65348-3.34394 1.6011-5.1765-.19645 1.47437 2.12955 2.0467 5.26165 2.32632 7.00025Z"/>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-schmitt-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Non-Inverting Schmitt trigger (IEEE)" tikzName="ieeestd schmitt port" groupName="Logic gates" refX="33.4099" refY="21.69628" viewBox="0 0 66.81977 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-33.14422" y="0" isDefault="false" />
+						<ci:pin anchorName="bin" x="-18.3294" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="33.14423" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="18.329410000000003" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="33.409885" cy="21.696265" rx="26.727908000000003" ry="17.357012" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M15.0805 21.69628h-14.81482"/>
+				<path stroke-width="1.06267" d="m15.0805.53135 36.65881 21.16493-36.65881 21.16493Z"/>
+				<path stroke-width=".53134" d="M19.66286 26.9875h4.58235v-10.58244h9.1647m-4.58235 0v10.58244h-4.58235m27.4941-5.29122h14.81482"/>
+			</g>
+		</symbol>
+		<symbol id="path_opening-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Opening switch" tikzName="opening switch" shapeName="ospstshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="11.64327" viewBox="0 0 19.31689 14.1041">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="7.05205" rx="7.726756000000001" ry="5.641640000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m.53135 11.64327 14.81596-9.25995"/>
+					<g stroke-linejoin="bevel">
+						<path fill="none" stroke-width="1.06267" d="M11.47455 13.57278c.68927-3.90915-.75985-7.89013-3.80057-10.44164a11.11024 11.11024 0 0 0-3.08941-1.83401"/>
+						<path stroke="none" d="M.53134.53134c1.53841.8569 4.28644 2.46508 5.784 4.57843-1.06314-2.33653-.64066-3.65176 1.58429-4.9321-2.44813.84592-5.61864.55295-7.36829.35367Z"/>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="node_ieeestd-invschmitt-port">
+			<metadata>
+				<ci:componentInformation type="node" displayName="Inverting Schmitt trigger (IEEE)" tikzName="ieeestd invschmitt port" groupName="Logic gates" refX="33.4099" refY="21.69628" viewBox="0 0 66.81977 43.39253">
+					<ci:pins>
+						<ci:pin anchorName="in" x="-33.14422" y="0" isDefault="false" />
+						<ci:pin anchorName="bin" x="-18.3294" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="33.14423" y="0" isDefault="false" />
+						<ci:pin anchorName="bout" x="24.848509999999997" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="33.409885" cy="21.696265" rx="26.727908000000003" ry="17.357012" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-width=".53134" d="M15.0805 21.69628h-14.81482"/>
+				<path fill="none" stroke-width="1.06267" d="m15.0805.53135 36.65881 21.16493-36.65881 21.16493Z"/>
+				<path fill="none" stroke-width=".53134" d="M19.66286 26.9875h4.58235v-10.58244h9.1647m-4.58235 0v10.58244h-4.58235m34.0132-5.29122h8.29572"/>
+				<path fill="#fff" stroke-width="1.06267" d="M58.25841 21.69628c0-1.8002-1.45933-3.25955-3.25955-3.25955-1.8002 0-3.25955 1.45934-3.25955 3.25955s1.45934 3.25955 3.25955 3.25955c1.80022 0 3.25955-1.45934 3.25955-3.25955Zm-3.25955 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_normal-open-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally open switch" tikzName="normal open switch" shapeName="nosshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="8.4684" viewBox="0 0 19.31689 8.9997">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="4.49985" rx="7.726756000000001" ry="3.5998800000000006" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="m.53135 8.4684 17.59385-7.93704"/>
+			</g>
+		</symbol>
+		<symbol id="path_normal-closed-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally closed switch" tikzName="normal closed switch" shapeName="ncsshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="9.79131" viewBox="0 0 19.31689 10.32262">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="5.16131" rx="7.726756000000001" ry="4.129048" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path stroke-width="1.06267" d="m.53135 9.79131 17.59385-9.25995"/>
+					<path stroke-width=".53134" d="M19.05126 9.79131h-7.408v-9.25995"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_opening-normal-closed-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Opening normally closed switch" tikzName="opening normal closed switch" shapeName="oncsshape" groupName="Switches, buttons and jumpers" refX="10.517669999999999" refY="9.7913" viewBox="0 0 20.04326 11.76974">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.259959999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.259959999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25995" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="10.02163" cy="5.88487" rx="8.017304000000001" ry="4.707896000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m1.25771 9.7913 17.59385-9.25995"/>
+					<g stroke-width=".4">
+						<path fill="none" stroke-width=".53134" d="M19.77762 9.7913h-7.408v-9.25995"/>
+						<g stroke-linejoin="bevel" stroke-width=".79999">
+							<path fill="none" stroke-width="1.06267" d="M9.46508 11.23844c.51694-2.93186-.56989-5.91757-2.85042-7.8312a8.32926 8.32926 0 0 0-2.02848-1.25608"/>
+							<path stroke="none" d="M.53137 1.48919c1.52479.88087 4.24726 2.53184 5.71153 4.66833-1.02642-2.35285-.58341-3.66128 1.66127-4.9066-2.46104.80747-5.6265.4649-7.3728.23827Z"/>
+						</g>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_closing-normal-closed-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closing normally closed switch" tikzName="closing normal closed switch" shapeName="cncsshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="9.79131" viewBox="0 0 19.31689 15.10275">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="7.551375" rx="7.726756000000001" ry="6.0411" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m.53135 9.79131 17.59385-9.25995"/>
+					<g stroke-width=".4">
+						<path fill="none" stroke-width=".53134" d="M19.05126 9.79131h-7.408v-9.25995"/>
+						<g stroke-linejoin="bevel" stroke-width=".79999">
+							<path fill="none" stroke-width="1.06267" d="M.53135 1.45742c4.60274 0 8.3339 3.73115 8.3339 8.3339a8.32783 8.32783 0 0 1-.05312.93972"/>
+							<path stroke="none" d="M7.35809 14.57144c.67837-1.62504 1.96714-4.53652 3.89855-6.26232-2.20205 1.31926-3.55644 1.04744-5.07895-1.0193 1.11596 2.33738 1.18156 5.52067 1.1804 7.28162Z"/>
+						</g>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_opening-normal-open-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Opening normally open switch" tikzName="opening normal open switch" shapeName="onosshape" groupName="Switches, buttons and jumpers" refX="10.517669999999999" refY="9.7913" viewBox="0 0 20.04326 11.76974">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.259959999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.259959999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25995" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="10.02163" cy="5.88487" rx="8.017304000000001" ry="4.707896000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m1.25771 9.7913 17.59385-9.25995"/>
+					<g stroke-width=".4">
+						<path fill="none" stroke-width=".53134" d="M19.77762 9.7913h-7.408v-3.70392"/>
+						<g stroke-linejoin="bevel" stroke-width=".79999">
+							<path fill="none" stroke-width="1.06267" d="M9.46508 11.23844c.51694-2.93186-.56989-5.91757-2.85042-7.8312a8.32926 8.32926 0 0 0-2.02848-1.25608"/>
+							<path stroke="none" d="M.53137 1.48919c1.52479.88087 4.24726 2.53184 5.71153 4.66833-1.02642-2.35285-.58341-3.66128 1.66127-4.9066-2.46104.80747-5.6265.4649-7.3728.23827Z"/>
+						</g>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_closing-normal-open-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closing normally open switch" tikzName="closing normal open switch" shapeName="cnosshape" groupName="Switches, buttons and jumpers" refX="9.7913" refY="9.79131" viewBox="0 0 19.31689 15.10275">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.25996" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.25995" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.25996" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.658445" cy="7.551375" rx="7.726756000000001" ry="6.0411" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="m.53135 9.79131 17.59385-9.25995"/>
+					<g stroke-width=".4">
+						<path fill="none" stroke-width=".53134" d="M19.05126 9.79131h-7.408v-3.70392"/>
+						<g stroke-linejoin="bevel" stroke-width=".79999">
+							<path fill="none" stroke-width="1.06267" d="M.53135 1.45742c4.60274 0 8.3339 3.73115 8.3339 8.3339a8.32783 8.32783 0 0 1-.05312.93972"/>
+							<path stroke="none" d="M7.35809 14.57144c.67837-1.62504 1.96714-4.53652 3.89855-6.26232-2.20205 1.31926-3.55644 1.04744-5.07895-1.0193 1.11596 2.33738 1.18156 5.52067 1.1804 7.28162Z"/>
+						</g>
+					</g>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_push-button">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally open push button" tikzName="push button" shapeName="pushbuttonshape" groupName="Switches, buttons and jumpers" refX="15.8758" refY="13.75965" viewBox="0 0 31.75157 16.40713">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.228300000000003" y="0" isDefault="false" />
+						<ci:pin anchorName="tip" x="0" y="-13.22829" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.875785" cy="8.203565" rx="12.700628000000002" ry="6.5628519999999995" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path fill="none" d="M2.64752 7.14552h26.45657m-13.22828 0v-6.61416"/>
+					<path fill="#fff" d="M4.7637 13.75965c0-1.16874-.94744-2.11617-2.11618-2.11617s-2.11617.94743-2.11617 2.11617.94744 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm26.45656 0c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_normally-closed-push-button">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally closed push button" tikzName="normally closed push button" shapeName="ncpushbuttonshape" groupName="Switches, buttons and jumpers" refX="15.8758" refY="13.75965" viewBox="0 0 31.75157 16.40713">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.228300000000003" y="0" isDefault="false" />
+						<ci:pin anchorName="tip" x="0" y="-13.22829" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.875785" cy="8.203565" rx="12.700628000000002" ry="6.5628519999999995" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path fill="none" d="M2.64752 15.87582h26.45657m-13.22828 0v-15.34446"/>
+					<path fill="#fff" d="M4.7637 13.75965c0-1.16874-.94744-2.11617-2.11618-2.11617s-2.11617.94743-2.11617 2.11617.94744 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm26.45656 0c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_normally-open-push-button-closed">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally open push button (in closed position)" tikzName="normally open push button closed" shapeName="pushbuttoncshape" groupName="Switches, buttons and jumpers" refX="15.8758" refY="9.26166" viewBox="0 0 31.75157 11.90914">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.228300000000003" y="0" isDefault="false" />
+						<ci:pin anchorName="tip" x="0" y="-8.7303" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.875785" cy="5.95457" rx="12.700628000000002" ry="4.763656" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path fill="none" d="M2.64752 7.14549h26.45657m-13.22828 0v-6.61413"/>
+					<path fill="#fff" d="M4.7637 9.26166c0-1.16874-.94744-2.11617-2.11618-2.11617s-2.11617.94743-2.11617 2.11617.94744 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm26.45656 0c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_normally-closed-push-button-open">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Normally closed push button (in open position)" tikzName="normally closed push button open" shapeName="ncpushbuttonoshape" groupName="Switches, buttons and jumpers" refX="15.8758" refY="9.26166" viewBox="0 0 31.75157 16.4071">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.228300000000003" y="0" isDefault="false" />
+						<ci:pin anchorName="tip" x="0" y="-8.7303" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.875785" cy="8.20355" rx="12.700628000000002" ry="6.5628400000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<g stroke-width="1.06267">
+					<path fill="none" d="M2.64752 15.87578h26.45657m-13.22828 0v-15.34442"/>
+					<path fill="#fff" d="M4.7637 9.26166c0-1.16874-.94744-2.11618-2.11618-2.11618s-2.11617.94744-2.11617 2.11618.94744 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm26.45656 0c0-1.16874-.94743-2.11618-2.11617-2.11618s-2.11617.94744-2.11617 2.11618.94743 2.11617 2.11617 2.11617 2.11617-.94744 2.11617-2.11617Zm-2.11617 0"/>
+				</g>
+			</g>
+		</symbol>
+		<symbol id="path_toggle-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Toggle switch" tikzName="toggle switch" shapeName="toggleswitchshape" groupName="Switches, buttons and jumpers" refX="21.431" refY="21.431" viewBox="0 0 42.86197 21.96232">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-21.16531" y="0" isDefault="false" />
+						<ci:pin anchorName="out 1" x="21.165320000000005" y="0" isDefault="false" />
+						<ci:pin anchorName="out 2" x="21.165320000000005" y="-16.9323" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.430985" cy="10.98116" rx="17.144788000000002" ry="8.784927999999999" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width=".53134" d="M.26569 21.431h14.81567"/>
+				<path stroke-width="1.06267" d="m15.08136 21.431 21.1653-10.58264"/>
+				<path stroke-width=".53134" d="M42.59632 21.431h-10.58267m10.58267-16.9323h-10.58267v13.75765m-14.81564-17.99066h8.46599"/>
+				<path stroke-dasharray="1.6932477449999999,.846451187,14.815632173499997,.846451187,16.932291481" stroke-width=".53134" d="M21.431.26569v4.233l-4.23299 4.233 4.233 4.23333v4.233"/>
+			</g>
+		</symbol>
+		<symbol id="path_reed">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Reed switch" tikzName="reed" shapeName="reedshape" groupName="Switches, buttons and jumpers" refX="21.69667" refY="11.11383" viewBox="0 0 43.3933 22.22761">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="21.165320000000005" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-21.16532" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="21.165320000000005" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="21.69665" cy="11.113805" rx="17.35732" ry="8.891043999999999" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="M32.27952.53137c5.8446 0 10.58247 4.73786 10.58247 10.58246s-4.73787 10.58246-10.58247 10.58246h-21.1657c-5.8446 0-10.58247-4.73786-10.58247-10.58246s4.73787-10.58246 10.58248-10.58246Zm-18.91707 10.58246 16.66844-7.93716"/>
+				<path stroke-width=".53134" d="M.53135 11.11383h12.8311m29.49954 0h-12.8311"/>
+			</g>
+		</symbol>
+		<symbol id="path_cute-closed-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Cute closed switch" tikzName="cute closed switch" shapeName="cuteclosedswitchshape" groupName="Switches, buttons and jumpers" refX="15.61014" refY="5.29044" viewBox="0 0 31.22024 7.67226">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.22829" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-15.34445" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="15.34446" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.61012" cy="3.83613" rx="12.488096" ry="3.068904" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38186 5.29044 26.45657-3.17425"/>
+				<path fill="#fff" stroke-width=".53134" d="M4.49803 5.29044c0-1.16873-.94743-2.11617-2.11617-2.11617s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm26.45657 0c0-1.16873-.94744-2.11617-2.11617-2.11617s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_cute-open-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Cute open switch" tikzName="cute open switch" shapeName="cuteopenswitchshape" groupName="Switches, buttons and jumpers" refX="15.61014" refY="17.990270000000002" viewBox="0 0 31.22024 20.37208">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="END" x="13.22829" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="in" x="-15.34445" y="-3.552713678800501e-15" isDefault="false" />
+						<ci:pin anchorName="out" x="15.34446" y="-3.552713678800501e-15" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.61012" cy="10.18604" rx="12.488096" ry="8.148832" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38186 17.99027 26.45657-15.87408"/>
+				<path fill="#fff" stroke-width=".53134" d="M4.49803 17.99027c0-1.16874-.94743-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm26.45657 0c0-1.16874-.94744-2.11617-2.11617-2.11617s-2.11617.94743-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_cute-closing-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Cute closing switch" tikzName="cute closing switch" shapeName="cuteclosingswitchshape" groupName="Switches, buttons and jumpers" refX="15.61014" refY="17.99027" viewBox="0 0 31.22024 21.27799">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.22829" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-15.34445" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="15.34446" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.61012" cy="10.638995" rx="12.488096" ry="8.511196" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38186 17.99027 26.45657-15.87408"/>
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="M7.81112 3.07361c5.90946 2.1509 9.8624 7.51337 10.38666 13.53775"/>
+					<path stroke="none" d="M18.01476 20.7467c.27003-1.74008.82507-4.87525 2.28765-7.01286-1.8226 1.8076-3.20267 1.8676-5.17526.22499 1.64257 2.00262 2.4676 5.07779 2.88761 6.78788Z"/>
+				</g>
+				<path fill="#fff" stroke-width=".53134" d="M4.49803 17.99027c0-1.16873-.94743-2.11617-2.11617-2.11617s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm26.45657 0c0-1.16873-.94744-2.11617-2.11617-2.11617s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_cute-opening-switch">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Cute opening switch" tikzName="cute opening switch" shapeName="cuteopeningswitchshape" groupName="Switches, buttons and jumpers" refX="15.61014" refY="14.2786" viewBox="0 0 31.22024 17.56631">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-13.22828" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="13.22829" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-15.34445" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="15.34446" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.61012" cy="8.783155" rx="12.488096" ry="7.026524000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path fill="none" stroke-linecap="round" stroke-width="4.23234" d="m2.38186 14.2786 26.45657-3.17426"/>
+				<g stroke-width=".79999">
+					<path fill="none" stroke-width="1.06267" d="M18.01474 17.035c.91396-5.18365-.80737-10.38308-4.41168-13.98533"/>
+					<path stroke="none" d="M10.3188.53135c1.03993 1.42108 2.86516 4.02994 3.34324 6.57555.00984-2.56697.94299-3.58555 3.49928-3.81964-2.57765-.25383-5.336-1.84413-6.84252-2.75591Z"/>
+				</g>
+				<path fill="#fff" stroke-width=".53134" d="M4.49803 14.2786c0-1.16874-.94743-2.11618-2.11617-2.11618s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm26.45657 0c0-1.16874-.94744-2.11618-2.11617-2.11618s-2.11617.94744-2.11617 2.11617.94743 2.11617 2.11617 2.11617 2.11617-.94743 2.11617-2.11617Zm-2.11617 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_bare-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Bare jumper" tikzName="bare jumper" shapeName="bjumpershape" groupName="Switches, buttons and jumpers" refX="12.96432" refY="4.04545" viewBox="0 0 25.92861 6.42726">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-10.58246" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="10.582459999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-12.69864" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="12.69865" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="12.964305" cy="3.21363" rx="10.371444" ry="2.5709040000000005" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="#fff" d="M4.49802 4.04545c0-1.16874-.94743-2.11617-2.11616-2.11617-1.16873 0-2.11618.94743-2.11618 2.11617s.94745 2.11617 2.11618 2.11617 2.11616-.94744 2.11616-2.11617Zm21.16495 0c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94744 2.11619-2.11617Zm-2.11619 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_open-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Open jumper" tikzName="open jumper" shapeName="ojumpershape" groupName="Switches, buttons and jumpers" refX="12.96432" refY="10.84654" viewBox="0 0 25.92861 13.22835">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-10.58246" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="10.582459999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-12.69864" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="12.69865" y="0" isDefault="false" />
+						<ci:pin anchorName="top arc" x="0" y="-9.52275" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="12.964305" cy="6.614175" rx="10.371444" ry="5.291340000000001" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="none" d="M3.44019 4.49803c4.23291-4.23234 14.81536-4.23234 19.04827 0"/>
+				<path fill="#fff" d="M4.49802 10.84654c0-1.16874-.94743-2.11617-2.11616-2.11617-1.16873 0-2.11618.94743-2.11618 2.11617s.94745 2.11617 2.11618 2.11617 2.11616-.94743 2.11616-2.11617Zm21.16495 0c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-2.11619 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_closed-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closed jumper" tikzName="closed jumper" shapeName="cjumpershape" groupName="Switches, buttons and jumpers" refX="12.96432" refY="6.6142" viewBox="0 0 25.92861 8.99601">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-10.58246" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="10.582459999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-10.58246" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="10.582459999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="top arc" x="0" y="-5.29043" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="12.964305" cy="4.498005" rx="10.371444" ry="3.5984040000000004" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path fill="none" d="M3.44019 4.49803c4.23291-4.23234 14.81536-4.23234 19.04827 0"/>
+				<path fill="#fff" d="M4.49802 6.6142c0-1.16874-.94743-2.11617-2.11616-2.11617-1.16873 0-2.11618.94743-2.11618 2.11617s.94745 2.11617 2.11618 2.11617 2.11616-.94743 2.11616-2.11617Zm21.16495 0c0-1.16874-.94745-2.11617-2.11619-2.11617-1.16872 0-2.11615.94743-2.11615 2.11617s.94743 2.11617 2.11615 2.11617c1.16874 0 2.11619-.94743 2.11619-2.11617Zm-2.11619 0"/>
+			</g>
+		</symbol>
+		<symbol id="path_open-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Open solder jumper" tikzName="open solder jumper" shapeName="osjumpershape" groupName="Switches, buttons and jumpers" refX="9.79005" refY="8.20272" viewBox="0 0 19.58006 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.52436" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.524360000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-9.52436" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="9.524360000000001" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.79003" cy="8.2027" rx="7.8320240000000005" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm3.17466 0c4.38354 0 7.93703 3.55349 7.93703 7.93703s-3.55349 7.93704-7.93703 7.93704Z"/>
+			</g>
+		</symbol>
+		<symbol id="path_closed-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closed solder jumper" tikzName="closed solder jumper" shapeName="csjumpershape" groupName="Switches, buttons and jumpers" refX="9.79005" refY="8.20272" viewBox="0 0 19.58006 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-9.52436" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="9.524360000000001" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-9.52436" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="9.524360000000001" y="0" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="9.79003" cy="8.2027" rx="7.8320240000000005" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm3.17466 0c4.38354 0 7.93703 3.55349 7.93703 7.93703s-3.55349 7.93704-7.93703 7.93704Zm-3.17466 3.17479h3.17466v9.5245h-3.17466Z"/>
+			</g>
+		</symbol>
+		<symbol id="path_open-double-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Open double solder jumper" tikzName="open double solder jumper" shapeName="odsjumpershape" groupName="Switches, buttons and jumpers" refX="15.346119999999999" refY="8.20272" viewBox="0 0 30.6922 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="in" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="out" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="tap" x="1.7763568394002505e-15" y="-7.93703" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.3461" cy="8.2027" rx="12.27688" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm14.28679 0c4.38355 0 7.93704 3.55349 7.93704 7.93703s-3.55349 7.93704-7.93704 7.93704Zm-11.11191 0h7.93703v15.87407h-7.93703Z"/>
+			</g>
+		</symbol>
+		<symbol id="path_left-double-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Left double solder jumper" tikzName="left double solder jumper" shapeName="ldsjumpershape" groupName="Switches, buttons and jumpers" refX="15.346119999999999" refY="8.20272" viewBox="0 0 30.6922 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="tap up" x="1.7763568394002505e-15" y="-7.93703" isDefault="false" />
+						<ci:pin anchorName="tap down" x="1.7763568394002505e-15" y="7.93704" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.3461" cy="8.2027" rx="12.27688" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm14.28679 0c4.38355 0 7.93704 3.55349 7.93704 7.93703s-3.55349 7.93704-7.93704 7.93704Zm-11.11191 0h7.93703v15.87407h-7.93703Zm-3.17488 3.17479h3.17488v9.5245h-3.17488Z"/>
+			</g>
+		</symbol>
+		<symbol id="path_right-double-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Right double solder jumper" tikzName="right double solder jumper" shapeName="rdsjumpershape" groupName="Switches, buttons and jumpers" refX="15.346119999999999" refY="8.20272" viewBox="0 0 30.6922 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="tap up" x="1.7763568394002505e-15" y="-7.93703" isDefault="false" />
+						<ci:pin anchorName="tap down" x="1.7763568394002505e-15" y="7.93704" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.3461" cy="8.2027" rx="12.27688" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm14.28679 0c4.38355 0 7.93704 3.55349 7.93704 7.93703s-3.55349 7.93704-7.93704 7.93704Zm-11.11191 0h7.93703v15.87407h-7.93703Z"/>
+				<path d="M22.48951 3.44048h-3.17488v9.5245h3.17488Z"/>
+			</g>
+		</symbol>
+		<symbol id="path_closed-double-solder-jumper">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Closed double solder jumper" tikzName="closed double solder jumper" shapeName="cdsjumpershape" groupName="Switches, buttons and jumpers" refX="15.346119999999999" refY="8.20272" viewBox="0 0 30.6922 16.4054">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="left" x="-15.080429999999998" y="0" isDefault="false" />
+						<ci:pin anchorName="right" x="15.08043" y="0" isDefault="false" />
+						<ci:pin anchorName="tap up" x="1.7763568394002505e-15" y="-7.93703" isDefault="false" />
+						<ci:pin anchorName="tap down" x="1.7763568394002505e-15" y="7.93704" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="15.3461" cy="8.2027" rx="12.27688" ry="6.56216" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".53134">
+				<path d="M8.20272.26569c-4.38355 0-7.93703 3.55349-7.93703 7.93703s3.55348 7.93704 7.93703 7.93704Zm14.28679 0c4.38355 0 7.93704 3.55349 7.93704 7.93703s-3.55349 7.93704-7.93704 7.93704Zm-11.11191 0h7.93703v15.87407h-7.93703Zm-3.17488 3.17479h3.17488v9.5245h-3.17488Z"/>
+				<path d="M22.48951 3.44048h-3.17488v9.5245h3.17488Z"/>
 			</g>
 		</symbol>
 		
