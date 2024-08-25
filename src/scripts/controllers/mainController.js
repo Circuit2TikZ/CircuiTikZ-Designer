@@ -34,6 +34,9 @@ export class MainController {
 	/** @type {ComponentSymbol[]} */
 	symbols;
 
+	darkMode = false;
+	darkModeLast = false;
+
 	/**
 	 * COMMENT/TODO: properly utilize the "component placing" mode:
 	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
@@ -162,6 +165,31 @@ export class MainController {
 				Undo.addState()
 			}
 			this.isInitDone = true;
+
+			const htmlElement = document.documentElement;
+			const switchElement = document.getElementById('darkModeSwitch');
+
+			// dark mode
+			const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+			const currentTheme = localStorage.getItem('bsTheme') || defaultTheme;
+			htmlElement.setAttribute('data-bs-theme', currentTheme);
+			switchElement.checked = currentTheme === 'dark';
+			this.darkModeLast=false;
+			this.darkMode = currentTheme === 'dark';
+			
+			switchElement.addEventListener('change', function () {
+				MainController.controller.darkMode = switchElement.checked;
+				if (switchElement.checked) {
+					htmlElement.setAttribute('data-bs-theme', 'dark');
+					localStorage.setItem('bsTheme', 'dark');
+					MainController.controller.updateTheme()
+				} else {
+					htmlElement.setAttribute('data-bs-theme', 'light');
+					localStorage.setItem('bsTheme', 'light');
+					MainController.controller.updateTheme()
+				}
+			});
+			MainController.controller.updateTheme()
 		});
 
 		// Prevent "normal" browser menu
@@ -687,6 +715,64 @@ export class MainController {
 		}
 
 		this.mode = newMode;
+	}
+
+	updateTheme(){
+		if (this.darkModeLast==this.darkMode) {
+			return;
+		}
+		// console.log(this.symbolsSVG.node.children[0].children);
+		// console.log(this.symbols[1].node);
+		const light = "#fff"
+		const dark = "#000"
+
+		// console.log(this.symbols[1].node.querySelector("g"));
+		
+		// for (const element of this.symbols) {
+		// 	const node = element.node;
+		// 	let g = node.querySelector("g")
+		// 	console.log(node)
+		// 	g.setAttribute("stroke",stroke)
+		// 	g.setAttribute("fill",fill)
+		// }
+		// const node = this.symbolsSVG.defs().node.children[0]
+		
+		const node = this.symbolsSVG.defs().node;
+
+		for (const g of node.querySelectorAll("symbol>g")) {
+			let currentStroke = g.getAttribute("stroke")
+			if (currentStroke&&!(currentStroke==="none"||currentStroke==="transparent")) {
+				
+				if (currentStroke===light) {
+					g.setAttribute("stroke",dark)
+				}else if(currentStroke===dark){
+					g.setAttribute("stroke",light)
+				}
+			}
+			let currentFill = g.getAttribute("fill")
+			if (currentFill&&!(currentFill==="none"||currentFill==="transparent")) {
+				if (currentFill===light) {
+					g.setAttribute("fill",dark)
+				}else if(currentFill===dark){
+					g.setAttribute("fill",light)
+				}
+			}
+			// for (const child of g.children) {
+			// 	if (child.getAttribute("stroke")) {
+			// 		child.setAttribute("stroke",stroke)
+			// 	}
+			// 	if (child.getAttribute("fill")) {
+			// 		child.setAttribute("fill",fill)
+			// 	}
+			// }
+		}
+
+		console.log(node);
+
+		//TODO update path component lines
+		
+		// console.log(g)
+		this.darkModeLast = this.darkMode
 	}
 
 	/**

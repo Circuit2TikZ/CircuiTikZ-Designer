@@ -22,6 +22,10 @@
  */
 
 /**
+ * @function ComponentInstance.updateTheme
+ */
+
+/**
  * @function ComponentInstance#finishedPlacingCallback
  */
 

@@ -55,15 +55,15 @@
 	<body class="d-flex flex-column">
 		<nav class="navbar navbar-expand-lg bg-body-secondary">
 			<div class="container-fluid row">
-				<div class="col d-flex flex-row w-auto">
-					<a id="addComponentButton" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
-					<div class="vertical-line mx-2"></div>
-					<a id="modeDragPan" class="material-symbols-outlined mx-1 selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
-					<a id="modeDrawLine" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
-					<a id="modeEraser" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
-					<div class="vertical-line mx-2"></div>
-					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl+Z)">undo</a>
-					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl+Y)">redo</a>
+				<div class="col d-flex flex-row w-auto justify-content-start gap-3">
+					<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
+					<div class="vertical-line"></div>
+					<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
+					<a id="modeDrawLine" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
+					<a id="modeEraser" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
+					<div class="vertical-line"></div>
+					<a role="button" class="toolbarButton material-symbols-outlined" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl+Z)">undo</a>
+					<a role="button" class="toolbarButton material-symbols-outlined" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl+Y)">redo</a>
 				</div>
 				<a class="col-md-auto navbar-brand unselectable position-relative mx-3" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
@@ -72,7 +72,12 @@
 						v0.0.0
 					</span>
 				</a>
-				<div class="col w-auto d-flex justify-content-end align-items-center gap-2">
+				<div class="col w-auto d-flex flex-row justify-content-end gap-3">
+					<div class="form-switch fs-3 m-0 p-0 align-items-center">
+						<input class="form-check-input" type="checkbox" id="darkModeSwitch">
+						<label class="material-symbols-outlined" for="darkModeSwitch" id="darkModeLabel">dark_mode</label>
+					</div>
+					<div class="vertical-line"></div>
 					<a role="button" class="toolbarButton material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal"
 						data-bs-toggle-second="tooltip"
 						data-bs-trigger="hover"
