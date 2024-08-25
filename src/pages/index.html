@@ -143,18 +143,20 @@
 	
 			<!-- Left offcanvas (symbol DB) -->
 			<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
-				<div class="offcanvas-header">
-					<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-				</div>
-				<div class="offcanvas-body">
-					<div class="offcanvas-search">
+				<div class="offcanvas-header flex-column gap-3">
+					<div class="d-flex justify-content-between align-items-center w-100">
+						<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-search w-100">
 						<span class="material-symbols-outlined">search</span>
 						<input type="search" class="form-control" id="componentFilterInput" placeholder="Search" aria-label="Search">
 					</div>
 					<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
 						Please enter a valid (regex) search string!
 					</div>
+				</div>
+				<div class="offcanvas-body pt-0">
 					<div class="accordion" id="leftOffcanvasAccordion"></div>
 				</div>
 			</div>

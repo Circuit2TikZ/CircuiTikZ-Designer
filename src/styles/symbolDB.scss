@@ -22,10 +22,6 @@
 	}
 }
 
-.accordion{
-	margin-top: 16px;
-}
-
 // fix style when searching for symbols of first shown group
 .accordion-item:nth-child(1 of :not(.d-none)) {
 	border-top-left-radius: var(--bs-accordion-border-radius);
