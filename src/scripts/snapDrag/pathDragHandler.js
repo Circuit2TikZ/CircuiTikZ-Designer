@@ -52,7 +52,7 @@ export class PathDragHandler {
 	/** @type {boolean} */
 	#isTemporaryDisabled = false;
 
-	#currentlyDragging = false
+	#startedDragging = false
 	#didDrag = false
 
 	/**
@@ -153,11 +153,9 @@ export class PathDragHandler {
 	 * @param {DragEvent} event
 	 */
 	#dragStart(event) {
-		this.#currentlyDragging = true;
+		this.#startedDragging = true;
 		this.element.node.classList.add("dragging");
-		this.element.parent().node.classList.add("dragging");		
-
-		SnapController.controller.showSnapPoints();
+		this.element.parent().node.classList.add("dragging");
 	}
 
 	/**
@@ -168,6 +166,11 @@ export class PathDragHandler {
 	 */
 	#dragMove(event) {
 		event.preventDefault();
+
+		if (!this.#didDrag) {
+			// only show snapping points if actually moving
+			SnapController.controller.showSnapPoints();
+		}
 		this.#didDrag = true;
 		
 		const draggedPoint = new SVG.Point(event.detail.box.x + this.relMid.x, event.detail.box.y + this.relMid.y);
@@ -194,7 +197,7 @@ export class PathDragHandler {
 	 * @param {DragEvent} event
 	 */
 	#dragEnd(event, trackState=true) {
-		if (!this.#currentlyDragging) {
+		if (!this.#startedDragging) {
 			return
 		}
 
@@ -208,7 +211,7 @@ export class PathDragHandler {
 		}
 
 		this.#didDrag = false;
-		this.#currentlyDragging = false;
+		this.#startedDragging = false;
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");
 

@@ -47,7 +47,7 @@ export class NodeDragHandler {
 	/** @type {boolean} */
 	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
 
-	#currentlyDragging = false
+	#startedDragging = false
 	#didDrag = false
 
 	/**
@@ -130,11 +130,9 @@ export class NodeDragHandler {
 	 * @param {DragEvent} event
 	 */
 	#dragStart(event) {
-		this.#currentlyDragging = true;
+		this.#startedDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
-
-		SnapController.controller.showSnapPoints();
 
 		// is TouchEvent?
 		this.#maybeContextmenu = window.TouchEvent && event.detail?.event instanceof TouchEvent;
@@ -148,6 +146,12 @@ export class NodeDragHandler {
 	 */
 	#dragMove(event) {
 		this.#maybeContextmenu = false; // no contextmenu after any move
+
+		if (!this.#didDrag) {
+			// only show snapping points if actually moving
+			SnapController.controller.showSnapPoints();
+		}
+
 		this.#didDrag = true;
 		event.preventDefault();
 
@@ -201,7 +205,7 @@ export class NodeDragHandler {
 	 * @param {DragEvent} event
 	 */
 	#dragEnd(event, trackState=true) {
-		if (!this.#currentlyDragging) {
+		if (!this.#startedDragging) {
 			return
 		}
 
@@ -215,7 +219,7 @@ export class NodeDragHandler {
 		}
 
 		this.#didDrag = false;
-		this.#currentlyDragging = false;
+		this.#startedDragging = false;
 		this.element.node.classList.remove("dragging");
 		this.element.parent().node.classList.remove("dragging");
 
