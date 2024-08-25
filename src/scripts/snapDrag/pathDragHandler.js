@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, Undo, PathComponentInstance, SelectionController} from "../internal";
+import {SnapController, Undo, PathComponentInstance, SelectionController, MainController} from "../internal";
 
 /**
  * @typedef {object} DragHandler

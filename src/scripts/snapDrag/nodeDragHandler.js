@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
-import {SnapController, NodeComponentInstance, SelectionController, Undo} from "../internal";
+import {SnapController, NodeComponentInstance, SelectionController, Undo, MainController} from "../internal";
 
 /**
  * @typedef {object} DragHandler
@@ -211,7 +211,7 @@ export class NodeDragHandler {
 			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:ctrlCommand?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
 
 			SelectionController.controller.selectComponents([this.element], selectionMode)
-			trackState = false;
+			trackState = false;			
 		}
 
 		this.#didDrag = false;
