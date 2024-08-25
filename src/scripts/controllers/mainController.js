@@ -270,7 +270,7 @@ export class MainController {
 			this.#switchMode(MainController.modes.DRAW_LINE);
 			return false;
 		})
-		hotkeys("del",()=>{
+		hotkeys("del, backspace",()=>{
 			if(!SelectionController.controller.hasSelection()){
 				this.#switchMode(MainController.modes.ERASE);
 			}else{
