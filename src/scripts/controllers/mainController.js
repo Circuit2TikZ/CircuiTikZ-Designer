@@ -34,8 +34,8 @@ export class MainController {
 	/** @type {ComponentSymbol[]} */
 	symbols;
 
-	darkMode = false;
-	#darkModeLast = false;
+	darkMode = true;
+	#darkModeLast = true;
 	#currentTheme = "dark";
 
 	/**
@@ -93,7 +93,6 @@ export class MainController {
 		const htmlElement = document.documentElement;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
 		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-		console.log("Default "+defaultTheme);
 		
 		this.#currentTheme = localStorage.getItem('bsTheme') || defaultTheme;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
