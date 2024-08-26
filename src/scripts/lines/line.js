@@ -39,6 +39,8 @@ export class Line extends SVG.Polyline {
 	/** @type {?number[]} */
 	#mousePoint;
 
+	isSelected=false
+
 	/**
 	 *
 	 * @param {SVG.Point|SnapPoint} firstPoint
@@ -62,9 +64,15 @@ export class Line extends SVG.Polyline {
 
 		this.attr({
 			fill: "none",
-			stroke: "#000",
+			stroke: MainController.controller.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
+	}
+
+	updateTheme(){
+		if (!this.isSelected) {
+			this.stroke(MainController.controller.darkMode?"#fff":"#000");
+		}
 	}
 
 	/**
@@ -132,13 +140,15 @@ export class Line extends SVG.Polyline {
 			"stroke":selectionColor,
 			// "stroke-width": selectedWireWidth,
 		});
+		this.isSelected = true;
 	}
 
 	hideBoundingBox(){
 		this.attr({
-			"stroke":"#000",
+			"stroke":MainController.controller.darkMode?"#fff":"#000",
 			// "stroke-width": "0.4pt",
 		});
+		this.isSelected = false;
 	}
 
 	/**

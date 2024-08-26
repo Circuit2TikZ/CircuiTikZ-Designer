@@ -47,10 +47,15 @@ $danger: #c50f3c;
 	user-select: none;
 }
 
-div.vertical-line{
+.vertical-line{
 	width: 1px; /* Line width */
-	background-color: #888; /* Line color */
-	display: inline-block;
+	min-width: 1px;
+	background-color: var(--bs-secondary-color); /* Line color */
+	align-self: stretch;
+}
+
+#darkModeLabel{
+	@extend %floatingToolbarButton
 }
 
 // main content:

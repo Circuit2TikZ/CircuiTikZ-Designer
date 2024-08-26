@@ -34,6 +34,10 @@ export class MainController {
 	/** @type {ComponentSymbol[]} */
 	symbols;
 
+	darkMode = false;
+	#darkModeLast = false;
+	#currentTheme = "dark";
+
 	/**
 	 * COMMENT/TODO: properly utilize the "component placing" mode:
 	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
@@ -83,7 +87,18 @@ export class MainController {
 	 * Init the app.
 	 */
 	constructor() {
-		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0	
+		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0
+
+		// dark mode init
+		const htmlElement = document.documentElement;
+		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
+		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+		console.log("Default "+defaultTheme);
+		
+		this.#currentTheme = localStorage.getItem('bsTheme') || defaultTheme;
+		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
+		this.#darkModeLast=false;
+		this.darkMode = this.#currentTheme === 'dark';
 
 		this.snapController = SnapController.controller;
 		let canvasPromise = this.#initCanvas();
@@ -162,6 +177,26 @@ export class MainController {
 				Undo.addState()
 			}
 			this.isInitDone = true;
+
+			// prepare symbolDB for colorTheme
+			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
+				this.#addFill(g)
+			}
+
+			const htmlElement = document.documentElement;
+			const switchElement = document.getElementById('darkModeSwitch');
+			switchElement.checked = this.darkMode;
+			switchElement.addEventListener('change', function () {
+				if (MainController.controller.darkMode = switchElement.checked) {
+					htmlElement.setAttribute('data-bs-theme', 'dark');
+					localStorage.setItem('bsTheme', 'dark');
+				} else {
+					htmlElement.setAttribute('data-bs-theme', 'light');
+					localStorage.setItem('bsTheme', 'light');
+				}
+				MainController.controller.updateTheme()
+			});
+			MainController.controller.updateTheme()
 		});
 
 		// Prevent "normal" browser menu
@@ -687,6 +722,69 @@ export class MainController {
 		}
 
 		this.mode = newMode;
+	}
+
+	updateTheme(){
+		if (this.#darkModeLast==this.darkMode) {
+			return;
+		}
+		const light = "#fff"
+		const dark = "#000"
+		const node = this.symbolsSVG.defs().node;
+
+		// toggle stroke and fill for each element if the attribute exists on this element
+		for (const g of node.querySelectorAll("g,path,use")) {
+			let currentStroke = g.getAttribute("stroke")
+			if (currentStroke&&!(currentStroke==="none"||currentStroke==="transparent")) {
+				if (currentStroke===light) {
+					g.setAttribute("stroke",dark)
+				}else if(currentStroke===dark){
+					g.setAttribute("stroke",light)
+				}
+			}
+			let currentFill = g.getAttribute("fill")
+			if (currentFill&&!(currentFill==="none"||currentFill==="transparent")) {
+				if (currentFill===light) {
+					g.setAttribute("fill",dark)
+				}else if(currentFill===dark){
+					g.setAttribute("fill",light)
+				}
+			}
+		}
+
+		for (const line of this.lines) {
+			line.updateTheme()
+		}
+
+		for (const instance of this.instances) {
+			if (instance instanceof PathComponentInstance) {
+				instance.updateTheme()
+			}
+		}
+		SelectionController.controller.updateTheme()
+
+		this.#darkModeLast = this.darkMode
+	}
+
+	/**
+	 * add missing fill attributes to all symbol db entries where fill is undefined --> needs explicit setting, otherwise the color theme change does strange things
+	 * called once on initialization
+	 * @param {Element} node 
+	 */
+	#addFill(node){
+		let hasFill = node.getAttribute("fill") !==null;
+		if (hasFill) {
+			return;
+		}
+		for (const element of node.children) {
+			if (element.nodeName === "g") {
+				this.#addFill(element)
+			}else{
+				if (!element.getAttribute("fill")) {
+					element.setAttribute("fill","#000")
+				}
+			}
+		}
 	}
 
 	/**

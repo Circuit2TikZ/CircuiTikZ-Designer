@@ -5,6 +5,7 @@
 	height: auto;
 	max-height: calc(100vh - 250px); // 184.5px
 	white-space: pre;
+	background-color: var(--bs-body-bg);
 	resize: none;
 }
 
@@ -19,7 +20,7 @@
 	border-radius: 10px;
 	font-size: 30px;
 	text-align: center;
-	background-color: white;
+	background-color: var(--bs-body-bg);
 }
 
 .copyContentIcon:hover,

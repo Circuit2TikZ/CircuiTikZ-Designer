@@ -5,20 +5,20 @@
 	display: block;
 	padding: 0px;
 	margin: 0px;
-	width: 40px;
+	// width: 40px;
 	height: 40px;
 	border-radius: 20px;
 	text-align: center;
 	line-height: 40px;
 	text-decoration: none;
-	color: #000;
+	color: var(--bs-emphasis-color);
 	font-size: 32px;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+	text-shadow: 2px 2px 2px #888;
 }
 
 %floatingToolbarButton:hover,
 %floatingToolbarButton.selected {
-	text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.95);
+	text-shadow: 2px 2px 4px #888;
 }
 
 %floatingToolbarButton.selected {

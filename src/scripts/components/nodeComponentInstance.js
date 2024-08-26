@@ -181,6 +181,12 @@ export class NodeComponentInstance extends SVG.Use {
 		// 	},
 		// 	this
 		// );
+		this.updateTheme()
+	}
+
+	updateTheme(){
+		let theme = MainController.controller.darkMode
+		
 	}
 
 	isInsideSelectionRectangle(selectionRectangle){
