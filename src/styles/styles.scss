@@ -49,8 +49,13 @@ $danger: #c50f3c;
 
 .vertical-line{
 	width: 1px; /* Line width */
+	min-width: 1px;
 	background-color: var(--bs-secondary-color); /* Line color */
-	display: inline-block;
+	align-self: stretch;
+}
+
+#darkModeLabel{
+	@extend %floatingToolbarButton
 }
 
 // main content:
