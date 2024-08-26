@@ -87,7 +87,7 @@ export class SaveController {
 				var reader = new FileReader();
 				reader.readAsText(file, "UTF-8");
 				reader.onload = (evt) => {
-					this.loadFromText(evt.target.result, true);
+					this.loadFromJSON(JSON.parse(evt.target.result), true);
 					this.#loadModal.hide()
 				}
 				reader.onerror = (evt) => {
@@ -114,15 +114,12 @@ export class SaveController {
 		});
 	}
 
-	loadFromText(text, selectComponents=false){
+	loadFromJSON(obj, selectComponents=false){
 		//delete current state if necessary		
 		if (document.getElementById("loadCheckRemove").checked) {
 			SelectionController.controller.selectAll()
 			SelectionController.controller.removeSelection()
 		}
-
-		// load data from json
-		let obj = JSON.parse(text)
 
 		let nodes = []
 		let paths = []

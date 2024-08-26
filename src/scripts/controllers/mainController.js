@@ -38,6 +38,8 @@ export class MainController {
 	#darkModeLast = true;
 	#currentTheme = "dark";
 
+	#tabID=-1
+
 	/**
 	 * COMMENT/TODO: properly utilize the "component placing" mode:
 	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
@@ -89,12 +91,14 @@ export class MainController {
 	constructor() {
 		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0
 
+		this.#addSaveStateManagement()
+
 		// dark mode init
 		const htmlElement = document.documentElement;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
 		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
 		
-		this.#currentTheme = localStorage.getItem('bsTheme') || defaultTheme;
+		this.#currentTheme = localStorage.getItem('circuitikz-designer-theme') || defaultTheme;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
 		this.#darkModeLast=false;
 		this.darkMode = this.#currentTheme === 'dark';
@@ -169,9 +173,12 @@ export class MainController {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
-			let currentProgress = localStorage.getItem('currentProgress')
-			if (currentProgress) {
-				this.saveController.loadFromText(currentProgress)
+
+			/** @type {Progress} */
+			let currentProgress = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
+		
+			if (Object.keys(currentProgress.currentData[this.#tabID]).length>0) {
+				this.saveController.loadFromJSON(currentProgress.currentData[this.#tabID])
 			}else{
 				Undo.addState()
 			}
@@ -188,10 +195,10 @@ export class MainController {
 			switchElement.addEventListener('change', function () {
 				if (MainController.controller.darkMode = switchElement.checked) {
 					htmlElement.setAttribute('data-bs-theme', 'dark');
-					localStorage.setItem('bsTheme', 'dark');
+					localStorage.setItem('circuitikz-designer-theme', 'dark');
 				} else {
 					htmlElement.setAttribute('data-bs-theme', 'light');
-					localStorage.setItem('bsTheme', 'light');
+					localStorage.setItem('circuitikz-designer-theme', 'light');
 				}
 				MainController.controller.updateTheme()
 			});
@@ -200,6 +207,85 @@ export class MainController {
 
 		// Prevent "normal" browser menu
 		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
+	}
+	
+	/**
+	 * @typedef {Object} Progress
+	 * @property {number} desiredWindows
+	 * @property {Array} currentIndices
+	 * @property {Array} currentData
+	 */
+
+	/**
+	 * make it possible to open multiple tabs and all with different save States.
+	 */
+	#addSaveStateManagement(){
+		const objname = "circuitikz-designer-saveState"
+
+		/** @type {Progress} */
+		let defaultProgress = {
+			desiredWindows:0,
+			currentIndices:[],
+			currentData:[]
+		}
+
+		// TODO check if multithreading of tabs can mess with localStorage due to a race condition???
+		
+		// load localStorage or default if it doesn't exist
+		let storageString = localStorage.getItem(objname)
+		/** @type {Progress} */
+		let current = storageString?JSON.parse(storageString):defaultProgress
+		current.desiredWindows++
+
+		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
+		let sessionTabID = sessionStorage.getItem("circuitikz-designer-tabID")
+		if (sessionTabID) {
+			this.#tabID = Number.parseInt(sessionTabID)
+			current.currentIndices.push(this.#tabID)
+		}
+		
+		// this is a new tab --> assign tab ID
+		if (this.#tabID<0) {
+			// populate first available slot
+			for (let index = 0; index < current.desiredWindows; index++) {
+				if (!current.currentIndices.includes(index)) {
+					this.#tabID = index
+					current.currentIndices.push(this.#tabID)
+					break;
+				}
+			}
+		}
+
+		// save the assigned tab ID
+		sessionStorage.setItem("circuitikz-designer-tabID",this.#tabID)
+
+		// adjust the saveData object to accomodate new data if necessary
+		if (current.currentData.length<current.desiredWindows) {
+			current.currentData.push({})
+		}
+		
+		// save the current state of tabs
+		localStorage.setItem(objname,JSON.stringify(current))
+
+		// prepare saveState for unloading
+		window.addEventListener("beforeunload",(ev)=>{
+			/** @type {Progress} */
+			let currentProgress = JSON.parse(localStorage.getItem(objname))
+			
+			currentProgress.desiredWindows--;
+			currentProgress.currentIndices.splice(currentProgress.currentIndices.findIndex((value)=>value==MainController.controller.#tabID),1)
+			currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
+			localStorage.setItem(objname,JSON.stringify(currentProgress))
+			
+			// localStorage.clear() //use this here if the localStorage is fucked in development
+			//TODO add manual way to clear the localStorage
+		})
+	}
+
+	saveProgress(){
+		let currentProgress = JSON.parse(localStorage.getItem(objname))
+		currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
+		localStorage.setItem("circuitikz-designer-saveState",JSON.stringify(currentProgress))
 	}
 
 	/**

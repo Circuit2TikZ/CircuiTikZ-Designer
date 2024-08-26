@@ -45,8 +45,10 @@ export class Undo {
 		Undo.#states = Undo.#states.slice(0,Undo.#currentIndex+1)
 		Undo.#states.push(currentState)
 		Undo.#currentIndex = Undo.#states.length-1
+	}
 
-		localStorage.setItem('currentProgress', JSON.stringify(currentState))
+	static getCurrentState(){
+		return Undo.#states[Undo.#currentIndex]
 	}
 
 	static undo(){
@@ -116,6 +118,5 @@ export class Undo {
 			paths:state.paths,
 			lines:state.lines,
 		}
-		localStorage.setItem('currentProgress', JSON.stringify(currentState))
 	}
 }
