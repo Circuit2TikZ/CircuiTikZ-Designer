@@ -56,14 +56,14 @@
 		<nav class="navbar navbar-expand-lg bg-body-secondary">
 			<div class="container-fluid row">
 				<div class="col d-flex flex-row w-auto">
-					<a id="addComponentButton" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer" aria-controls="leftOffcanvas">add</a>
+					<a id="addComponentButton" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer (Q)" aria-controls="leftOffcanvas">add</a>
 					<div class="vertical-line mx-2"></div>
 					<a id="modeDragPan" class="material-symbols-outlined mx-1 selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
 					<a id="modeDrawLine" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Draw wires (W)">draw</a>
-					<a id="modeEraser" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (E, Del)">ink_eraser</a>
+					<a id="modeEraser" class="material-symbols-outlined mx-1" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Erase components and wires (Del, Backspace)">ink_eraser</a>
 					<div class="vertical-line mx-2"></div>
-					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl+Z)">undo</a>
-					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl+Y)">redo</a>
+					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl/⌘+Z)">undo</a>
+					<a role="button" class="toolbarButton material-symbols-outlined mx-1" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl/⌘+Y)">redo</a>
 				</div>
 				<a class="col-md-auto navbar-brand unselectable position-relative mx-3" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
@@ -94,26 +94,26 @@
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
 							<li>
-								<button type="button" class="dropdown-item" id="loadButton">
+								<button type="button" class="dropdown-item" id="loadButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-title="Load a circuit (part) from a JSON file (Ctrl/⌘ + O)">
 									<span class="material-symbols-outlined dropdown-item-icon">file_open</span>
 									Load
 								</button>
 							</li>
 							<li>
-								<button type="button" class="dropdown-item" id="saveButton">
+								<button type="button" class="dropdown-item" id="saveButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-title="Save the circuit in a JSON file (Ctrl/⌘ + S)">
 									<span class="material-symbols-outlined dropdown-item-icon">save</span>
 									Save
 								</button>
 							</li>
 							<li><hr class="dropdown-divider" /></li>
 							<li>
-								<button type="button" class="dropdown-item" id="exportCircuiTikZButton">
+								<button type="button" class="dropdown-item" id="exportCircuiTikZButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-title="Export the circuit as CircuiTikZ code (Ctrl/⌘ + E)">
 									<span class="material-symbols-outlined dropdown-item-icon">code</span>
 									<div>Export CircuiTi<i>k</i>Z code</div>
 								</button>
 							</li>
 							<li>
-								<button type="button" class="dropdown-item" id="exportSVGButton">
+								<button type="button" class="dropdown-item" id="exportSVGButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-title="Export the circuit as SVG code (Ctrl/⌘ + Shift + E)">
 									<span class="material-symbols-outlined dropdown-item-icon">image</span>
 									Export SVG code
 								</button>
