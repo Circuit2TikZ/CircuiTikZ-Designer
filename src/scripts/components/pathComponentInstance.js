@@ -95,13 +95,13 @@ export class PathComponentInstance extends SVG.G {
 		this.#preLine = this.line(this.#prePointArray);
 		this.#preLine.attr({
 			fill: "none",
-			stroke: "#000",
+			stroke: MainController.controller.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
 		this.#postLine = this.line(this.#postPointArray);
 		this.#postLine.attr({
 			fill: "none",
-			stroke: "#000",
+			stroke: MainController.controller.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
 
@@ -139,6 +139,13 @@ export class PathComponentInstance extends SVG.G {
 		PathDragHandler.snapDrag(this, true, true);
 		PathDragHandler.snapDrag(this, false, true);
 
+	}
+
+	updateTheme(){
+		if (!this.#selectionRectangle) {
+			this.#preLine.stroke(MainController.controller.darkMode?"#fff":"#000")
+			this.#postLine.stroke(MainController.controller.darkMode?"#fff":"#000")
+		}
 	}
 
 	/**
@@ -222,10 +229,10 @@ export class PathComponentInstance extends SVG.G {
 		this.#selectionRectangle?.remove();
 		this.#selectionRectangle = null
 		this.#preLine.attr({
-			"stroke":"#000",
+			"stroke":MainController.controller.darkMode?"#fff":"#000",
 		});
 		this.#postLine.attr({
-			"stroke":"#000",
+			"stroke":MainController.controller.darkMode?"#fff":"#000",
 		});
 	}
 

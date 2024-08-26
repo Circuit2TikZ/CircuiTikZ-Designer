@@ -146,6 +146,10 @@ export class SelectionController {
 		SelectionController.controller = this;
 	}
 
+	updateTheme(){
+		this.#selectionRectangle.stroke(MainController.controller.darkMode?"#fff":"#000")
+	}
+
 	#showSelection(){
 		let selectionBox = this.#selectionRectangle.bbox();
 		for (const instance of this.#instances) {

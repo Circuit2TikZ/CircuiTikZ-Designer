@@ -123,6 +123,10 @@ export class ExportController {
 		let bbox = SelectionController.controller.getOverallBoundingBox()
 		SelectionController.controller.deactivateSelection()
 
+		let colorTheme = MainController.controller.darkMode;
+		MainController.controller.darkMode = false;
+		MainController.controller.updateTheme()
+
 		//Get the canvas
 		let svgObj = document.getElementById("canvas").cloneNode(true)
 		svgObj.removeAttribute("xmlns:svgjs")
@@ -190,6 +194,8 @@ export class ExportController {
 		this.#exportedContent.rows = textContent.split("\n").length
 		this.#exportedContent.value = textContent;
 		const extensions = [".svg", ".txt"];
+		MainController.controller.darkMode = colorTheme;
+		MainController.controller.updateTheme()
 		this.#export(extensions)
 		SelectionController.controller.activateSelection()
 	}
