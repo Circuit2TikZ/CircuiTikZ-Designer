@@ -53,9 +53,9 @@
 	</head>
 
 	<body class="d-flex flex-column">
-		<nav class="navbar navbar-expand-lg bg-body-secondary">
-			<div class="container-fluid row">
-				<div class="col d-flex flex-row w-auto justify-content-start gap-3 align-items-center">
+		<nav class="navbar bg-body-secondary">
+			<div class="row w-100 mx-0 px-2">
+				<div class="col d-flex flex-row justify-content-start gap-3 align-items-center px-0">
 					<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer (Q)" aria-controls="leftOffcanvas">add</a>
 					<div class="vertical-line"></div>
 					<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
@@ -65,15 +65,15 @@
 					<a role="button" class="toolbarButton material-symbols-outlined" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl/⌘+Z)">undo</a>
 					<a role="button" class="toolbarButton material-symbols-outlined" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl/⌘+Y)">redo</a>
 				</div>
-				<a class="col-md-auto navbar-brand unselectable position-relative mx-3" href=".">
+				<a class="col-md-auto navbar-brand unselectable position-relative px-0 mx-3" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
-					CircuiTi<i>k</i>Z Designer
+					<span class="">CircuiTi<i>k</i>Z Designer</span>
 					<span class="badge text-bg-secondary version unselectable">
 						v0.0.0
 					</span>
 				</a>
-				<div class="col w-auto d-flex flex-row justify-content-end gap-3 align-items-center">
-					<div class="form-check form-switch d-flex pl-0 mb-0 fs-3 gap-2">
+				<div class="col d-flex flex-row justify-content-end gap-3 align-items-center px-0">
+					<div class="form-check form-switch d-flex ps-0 mb-0 fs-3 gap-2">
 						<label class="form-check-label material-symbols-outlined" for="darkModeSwitch" id="darkModeLabel">dark_mode</label>
 						<input class="form-check-input position-relative m-0 align-self-center" type="checkbox" id="darkModeSwitch">
 					</div>
@@ -294,13 +294,15 @@
 							</p>
 							<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
 						</div>
-						<div class="modal-footer justify-content-between align-items-center">
-							<!-- <div class="col-sm-4 w-auto">
-								<a class="icon-link" href="TODO" target="_blank">
-									<span class="material-symbols-outlined">home</span>
-									Project-Homepage
+						<div class="modal-footer justify-content-between align-items-baseline">
+							<div class="col-sm-4 w-auto">
+								<a class="icon-link" href="https://www.circuit2tikz.tf.fau.de/" target="_blank">
+									<svg class="bi" width="40" height="40" fill="currentColor">
+										<use xlink:href="../icons/bootstrap-icons.svg#house" />
+									</svg>
+									<span>Circuit2Ti<em>k</em>Z</span>
 								</a>
-							</div> -->
+							</div>
 							<div class="col-sm-4 w-auto">
 								<a
 									class="icon-link"
@@ -310,7 +312,7 @@
 									<svg class="bi" width="40" height="40" fill="currentColor">
 										<use xlink:href="../icons/bootstrap-icons.svg#github" />
 									</svg>
-									<span>CircuiTi<i>k</i>Z-Designer</span>
+									<span>CircuiTi<em>k</em>Z-Designer</span>
 								</a>
 							</div>
 							<div class="col-sm-4 w-auto">

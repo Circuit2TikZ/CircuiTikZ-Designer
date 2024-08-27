@@ -101,3 +101,7 @@
 
 ### Backups/Old versions
 *.old
+
+# Packaged builds
+*.7z
+*.zip
