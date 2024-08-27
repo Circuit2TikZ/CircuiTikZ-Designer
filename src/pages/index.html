@@ -52,10 +52,10 @@
 		<script type="module" src="../scripts/index.js"></script>
 	</head>
 
-	<body class="d-flex flex-column">
+	<body class="d-flex flex-column w-100 h-100">
 		<nav class="navbar bg-body-secondary">
-			<div class="row w-100 mx-0 px-2">
-				<div class="col d-flex flex-row justify-content-start gap-3 align-items-center px-0">
+			<div class="row w-100 mx-0 px-2 gx-3">
+				<div class="col d-flex flex-row justify-content-start gap-3 align-items-center ps-0">
 					<a id="addComponentButton" class="material-symbols-outlined" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Open component drawer (Q)" aria-controls="leftOffcanvas">add</a>
 					<div class="vertical-line"></div>
 					<a id="modeDragPan" class="material-symbols-outlined selected" role="button" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Pan or zoom the canvas (Esc)">drag_pan</a>
@@ -65,14 +65,14 @@
 					<a role="button" class="toolbarButton material-symbols-outlined" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl/⌘+Z)">undo</a>
 					<a role="button" class="toolbarButton material-symbols-outlined" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl/⌘+Y)">redo</a>
 				</div>
-				<a class="col-md-auto navbar-brand unselectable position-relative px-0 mx-3" href=".">
+				<a class="col-md-auto navbar-brand unselectable position-relative mx-0" href=".">
 					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
 					<span class="">CircuiTi<i>k</i>Z Designer</span>
 					<span class="badge text-bg-secondary version unselectable">
 						v0.0.0
 					</span>
 				</a>
-				<div class="col d-flex flex-row justify-content-end gap-3 align-items-center px-0">
+				<div class="col d-flex flex-row justify-content-end gap-3 align-items-center pe-0">
 					<div class="form-check form-switch d-flex ps-0 mb-0 fs-3 gap-2">
 						<label class="form-check-label material-symbols-outlined" for="darkModeSwitch" id="darkModeLabel">dark_mode</label>
 						<input class="form-check-input position-relative m-0 align-self-center" type="checkbox" id="darkModeSwitch">
@@ -137,298 +137,309 @@
 			</div>
 		</nav>
 		<!-- Site content -->
-		<div class="position-relative flex-grow-1">
-			<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
-				<a class="btn btn-floating" id="mainFAB">
-					<span class="material-symbols-outlined">done</span>
-				</a>
-	
-				<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
-			</div>
-	
-			<!-- Left offcanvas (symbol DB) -->
-			<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
-				<div class="offcanvas-header flex-column gap-3">
-					<div class="d-flex justify-content-between align-items-center w-100">
-						<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		<div class="d-block flex-grow-1 w-100 overflow-hidden p-2">
+			<div class="container-fluid h-100 m-0 p-0">
+				<div class="row w-100 h-100 m-0">
+					<div class="col h-100 p-0 me-2">
+						<!-- The actual canvas -->
+						<include src="pages/canvas.svg"></include>
 					</div>
-					<div class="offcanvas-search w-100">
-						<span class="material-symbols-outlined">search</span>
-						<input type="search" class="form-control" id="componentFilterInput" placeholder="Search" aria-label="Search">
-					</div>
-					<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
-						Please enter a valid (regex) search string!
-					</div>
-				</div>
-				<div class="offcanvas-body pt-0">
-					<div class="accordion" id="leftOffcanvasAccordion"></div>
-				</div>
-			</div>
-	
-			<!-- Modal (load json) -->
-			<div 
-				class="modal fade" 
-				id="loadModal"
-				aria-labelledby="loadModalLabel"
-				aria-hidden="true"
-				tabindex="-1"
-				role="dialog"
-			>
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-3">Load JSON</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body d-flex flex-column gap-3">
-							<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
-								<div id="dragdroparea" class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
-									<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
-									<span class="material-symbols-outlined" style="font-size: 50px;">place_item</span>
-									<span class="fs-4">Drag&Drop here</span>
-									<span class="fs-6">or</span>
-									<button class="btn btn-primary">Browse file</button>
-									<input id="file-input" type="file">
-								</div>
-							</div>
-							<span id="load-message">No file selected</span>
-						</div>
-						<div class="modal-footer justify-content-between">
-							<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
-								<input class="form-check-input" type="checkbox" value="" id="loadCheckRemove">
-								<label class="form-check-label" for="loadCheckRemove">
-									Remove existing components
-								</label>
-							  </div>
-							<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
-								<span class="material-symbols-outlined">file_open</span>Load
-							</button>
+					<div class="col-4 p-2 bg-body-tertiary border border-secondary rounded" id="properties">
+						<h5 class="fs-3 align-self-center">Properties</h5>
+						<div id="properties-content">
+							
 						</div>
 					</div>
 				</div>
 			</div>
-	
-			<!-- Modal (export dialog) -->
-			<div
-				class="modal fade"
-				id="exportModal"
-				tabindex="-1"
-				aria-labelledby="exportModalLabel"
-				aria-hidden="true"
-				role="dialog"
-			>
-				<div class="modal-dialog modal-lg">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-3" id="exportModalLabel">Export</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<div
-								id="copyExportedContent"
-								class="copyContentIcon material-symbols-outlined"
-								aria-label="Copy to clipboard"
-								role="button"
-							>
-								content_copy
-							</div>
-							<textarea id="exportedContent" spellcheck="false"></textarea>
-						</div>
-						<div class="modal-footer">
-							<div class="input-group w-px-200 flex-grow-1">
-								<input
-									type="text"
-									class="form-control"
-									aria-label="Filename"
-									id="exportModalFileBasename"
-									placeholder="Circuit"
-								/>
-								<input
-									type="text"
-									disabled
-									id="exportModalFileExtension"
-									class="form-control"
-									aria-label="Filename extension"
-								/>
-								<button
-									type="button"
-									class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-								>
-									<span class="visually-hidden">Select filename extension</span>
-								</button>
-								<ul class="dropdown-menu dropdown-menu-end" id="exportModalFileExtensionDropdown"></ul>
-							</div>
-							<button type="button" class="btn btn-primary icon-button" id="exportModalSave">
-								<span class="material-symbols-outlined">save</span>Save
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-	
-			<!-- Modal (about dialog) -->
-			<div
-				class="modal fade"
-				id="aboutModal"
-				tabindex="-1"
-				aria-labelledby="aboutModalLabel"
-				aria-hidden="true"
-				role="dialog"
-			>
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-3" id="aboutModalLabel">About CircuiTi<i>k</i>Z-Designer 
-								<span class="badge text-bg-secondary version">
-									v0.0.0
-								</span>
-							</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<p>
-								CircuiTi<i>k</i>Z-Designer is part of the Circuit2Ti<i>k</i>Z-Project which was started as a research project at the Institute of Electronics Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was to create a GUI application for easy and fast drawing of circuits to be used in <a href="https://github.com/circuitikz/circuitikz">CircuiTi<i>k</i>Z</a>.
-							</p>
-							<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
-						</div>
-						<div class="modal-footer justify-content-between align-items-baseline">
-							<div class="col-sm-4 w-auto">
-								<a class="icon-link" href="https://www.circuit2tikz.tf.fau.de/" target="_blank">
-									<svg class="bi" width="40" height="40" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#house" />
-									</svg>
-									<span>Circuit2Ti<em>k</em>Z</span>
-								</a>
-							</div>
-							<div class="col-sm-4 w-auto">
-								<a
-									class="icon-link"
-									href="https://github.com/Circuit2TikZ/CircuiTikZ-Designer"
-									target="_blank"
-								>
-									<svg class="bi" width="40" height="40" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#github" />
-									</svg>
-									<span>CircuiTi<em>k</em>Z-Designer</span>
-								</a>
-							</div>
-							<div class="col-sm-4 w-auto">
-								<a
-									class="icon-link"
-									href="https://github.com/Circuit2TikZ/SymbolConvert"
-									target="_blank"
-								>
-									<svg class="bi" width="40" height="40" fill="currentColor">
-										<use xlink:href="../icons/bootstrap-icons.svg#github" />
-									</svg>
-									SymbolConvert
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+		</div>
+		<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
+			<a class="btn btn-floating" id="mainFAB">
+				<span class="material-symbols-outlined">done</span>
+			</a>
 
-			<!-- Modal help -->
-			<div
-				class="modal fade"
-				id="helpModal"
-				tabindex="-1"
-				aria-labelledby="helpModalLabel"
-				aria-hidden="true"
-				role="dialog"
-			>
-				<div class="modal-dialog modal-dialog-scrollable modal-lg">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-3" id="helpModalLabel">Help</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
+		</div>
+
+		<!-- Left offcanvas (symbol DB) -->
+		<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
+			<div class="offcanvas-header flex-column gap-3">
+				<div class="d-flex justify-content-between align-items-center w-100">
+					<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+				</div>
+				<div class="offcanvas-search w-100">
+					<span class="material-symbols-outlined">search</span>
+					<input type="search" class="form-control" id="componentFilterInput" placeholder="Search" aria-label="Search">
+				</div>
+				<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
+					Please enter a valid (regex) search string!
+				</div>
+			</div>
+			<div class="offcanvas-body pt-0">
+				<div class="accordion" id="leftOffcanvasAccordion"></div>
+			</div>
+		</div>
+
+		<!-- Modal (load json) -->
+		<div 
+			class="modal fade" 
+			id="loadModal"
+			aria-labelledby="loadModalLabel"
+			aria-hidden="true"
+			tabindex="-1"
+			role="dialog"
+		>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-3">Load JSON</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body d-flex flex-column gap-3">
+						<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
+							<div id="dragdroparea" class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
+								<div id="dragdropbackground" class="position-absolute top-0 start-0 w-100 h-100 bg-secondary" style="opacity: 0;"></div>
+								<span class="material-symbols-outlined" style="font-size: 50px;">place_item</span>
+								<span class="fs-4">Drag&Drop here</span>
+								<span class="fs-6">or</span>
+								<button class="btn btn-primary">Browse file</button>
+								<input id="file-input" type="file">
+							</div>
 						</div>
-						<div class="modal-body">
-							<h1 class="fs-4">General</h1>
-							<dl>
-								<dt>Position Canvas</dt>
-								<dd>
-									-Hold <b>right click</b> and <b>drag</b> to move the canvas<br>
-									-<b>Scroll</b> to <b>zoom</b> the canvas in or out
-								</dd>
-								<dt>Snapping</dt>
-								<dd>- Hold <b>Shift</b> to turn <b>off</b> snapping</dd>
-								<dt>Wires</dt>
-								<dd>
-									- <b>Left click</b> to place a point of the wire<br>
-									- <b>Double click</b> to <b>finish</b> wire<br>
-									- <b>Right click</b> to <b>cancel</b> wire<br>
-									- Hold <b>Ctrl/⌘</b> for <b>straight</b> wire
-								</dd>
-								<dt>Components</dt>
-								<dd>
-									- Add components via the component drawer (top left "+") or via keyboard shortcuts.
-								</dd>
-								<dt>Selection</dt>
-								<dd>
-									- Hold <b>left click</b> and drag to select a region<br>
-									- Hold <b>Shift</b> before starting to select to <b>add</b> to the <b>current selection</b><br>
-									- Hold <b>Ctrl/⌘</b> before starting to select to <b>subtract</b> from the <b>current selection</b><br>
-									- Hold neither <b>Shift</b> nor <b>Ctrl/⌘</b> before starting to select to start a <b>new selection</b>
-								</dd>
-							</dl>
-							<hr>
-							<h1 class="fs-4">Keyboard Shortcuts</h1>
-							<table class="table table-striped ">
-								<caption>List of keyboard shortcuts</caption>
-								<thead>
-									<tr>
-										<th scope="col">Category</th>
-										<th scope="col">Shortcut</th>
-										<th scope="col">Description</th>
-									</tr>
-								</thead>
-								<tbody class="table-group-divider">
-									<tr><td>Modes</td><td>Q</td><td>Open component drawer</td></tr>
-									<tr><td></td><td>W</td><td>Start wire drawing tool</td></tr>
-									<tr><td></td><td>Del/Backspace</td><td>Erase components and wires</td></tr>
-									<tr><td></td><td>Esc</td><td>Return to move tool/ cancel component placement</td></tr>
-								</tbody>
-								<tbody class="table-group-divider">
-									<tr><td>IO</td><td>Ctrl/⌘ + S</td><td>Save to JSON</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + O</td><td>Load from JSON</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + E</td><td>Export CircuiTi<i>k</i>Z code</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + Shift + E</td><td>Export SVG code</td></tr>
-								</tbody>
-								<tbody class="table-group-divider">
-									<tr><td>Components</td><td>(Alt/⌥ +) G</td><td>Place (tailless) ground</td></tr>
-									<tr><td></td><td>R</td><td>Place resistor</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) L</td><td>Place (cute) inductor</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) C</td><td>Place (polarized) capacitor</td></tr>
-									<tr><td></td><td>D</td><td>Place diode</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) B</td><td>Place npn (or pnp) BJT</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) N</td><td>Place nmos (or pmos) transistor</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) X</td><td>Place (jump) crossing</td></tr>
-									<tr><td></td><td>(Alt/⌥ +) .</td><td>Place (un-)connected terminal</td></tr>
-								</tbody>
-								<tbody class="table-group-divider">
-									<tr><td>Edit</td><td>Ctrl/⌘ + C</td><td>Copy selection</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + V</td><td>Paste selection</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + X</td><td>Cut selection</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + Z</td><td>Undo</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + Y</td><td>Redo</td></tr>
-									<tr><td></td><td>Ctrl/⌘ + A</td><td>Select all</td></tr>
-									<tr><td></td><td>Ctrl/⌘ (+ Shift) + R</td><td>Rotate (counter-)clockwise</td></tr>
-									<tr><td></td><td>Shift + X</td><td>Flip at x-axis</td></tr>
-									<tr><td></td><td>Shift + Y</td><td>Flip at y-axis</td></tr>
-								</tbody>
-							</table>
+						<span id="load-message">No file selected</span>
+					</div>
+					<div class="modal-footer justify-content-between">
+						<div class="form-check" data-bs-toggle="tooltip" data-bs-title="If all existing components should be removed before the new components are loaded in or not">
+							<input class="form-check-input" type="checkbox" value="" id="loadCheckRemove">
+							<label class="form-check-label" for="loadCheckRemove">
+								Remove existing components
+							</label>
+						  </div>
+						<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
+							<span class="material-symbols-outlined">file_open</span>Load
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal (export dialog) -->
+		<div
+			class="modal fade"
+			id="exportModal"
+			tabindex="-1"
+			aria-labelledby="exportModalLabel"
+			aria-hidden="true"
+			role="dialog"
+		>
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-3" id="exportModalLabel">Export</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div
+							id="copyExportedContent"
+							class="copyContentIcon material-symbols-outlined"
+							aria-label="Copy to clipboard"
+							role="button"
+						>
+							content_copy
+						</div>
+						<textarea id="exportedContent" spellcheck="false"></textarea>
+					</div>
+					<div class="modal-footer">
+						<div class="input-group w-px-200 flex-grow-1">
+							<input
+								type="text"
+								class="form-control"
+								aria-label="Filename"
+								id="exportModalFileBasename"
+								placeholder="Circuit"
+							/>
+							<input
+								type="text"
+								disabled
+								id="exportModalFileExtension"
+								class="form-control"
+								aria-label="Filename extension"
+							/>
+							<button
+								type="button"
+								class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+							>
+								<span class="visually-hidden">Select filename extension</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-end" id="exportModalFileExtensionDropdown"></ul>
+						</div>
+						<button type="button" class="btn btn-primary icon-button" id="exportModalSave">
+							<span class="material-symbols-outlined">save</span>Save
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal (about dialog) -->
+		<div
+			class="modal fade"
+			id="aboutModal"
+			tabindex="-1"
+			aria-labelledby="aboutModalLabel"
+			aria-hidden="true"
+			role="dialog"
+		>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-3" id="aboutModalLabel">About CircuiTi<i>k</i>Z-Designer 
+							<span class="badge text-bg-secondary version">
+								v0.0.0
+							</span>
+						</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>
+							CircuiTi<i>k</i>Z-Designer is part of the Circuit2Ti<i>k</i>Z-Project which was started as a research project at the Institute of Electronics Engineering at the Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg. The goal was to create a GUI application for easy and fast drawing of circuits to be used in <a href="https://github.com/circuitikz/circuitikz">CircuiTi<i>k</i>Z</a>.
+						</p>
+						<p>&copy; 2024 Manuel Kirzinger, Christof Pfannenm&uuml;ller, Philipp Wiedemann </p>
+					</div>
+					<div class="modal-footer justify-content-between align-items-baseline">
+						<div class="col-sm-4 w-auto">
+							<a class="icon-link" href="https://www.circuit2tikz.tf.fau.de/" target="_blank">
+								<svg class="bi" width="40" height="40" fill="currentColor">
+									<use xlink:href="../icons/bootstrap-icons.svg#house" />
+								</svg>
+								<span>Circuit2Ti<em>k</em>Z</span>
+							</a>
+						</div>
+						<div class="col-sm-4 w-auto">
+							<a
+								class="icon-link"
+								href="https://github.com/Circuit2TikZ/CircuiTikZ-Designer"
+								target="_blank"
+							>
+								<svg class="bi" width="40" height="40" fill="currentColor">
+									<use xlink:href="../icons/bootstrap-icons.svg#github" />
+								</svg>
+								<span>CircuiTi<em>k</em>Z-Designer</span>
+							</a>
+						</div>
+						<div class="col-sm-4 w-auto">
+							<a
+								class="icon-link"
+								href="https://github.com/Circuit2TikZ/SymbolConvert"
+								target="_blank"
+							>
+								<svg class="bi" width="40" height="40" fill="currentColor">
+									<use xlink:href="../icons/bootstrap-icons.svg#github" />
+								</svg>
+								SymbolConvert
+							</a>
 						</div>
 					</div>
 				</div>
 			</div>
-	
-			<!-- The actual canvas -->
-			<include src="pages/canvas.svg"></include>
+		</div>
+
+		<!-- Modal help -->
+		<div
+			class="modal fade"
+			id="helpModal"
+			tabindex="-1"
+			aria-labelledby="helpModalLabel"
+			aria-hidden="true"
+			role="dialog"
+		>
+			<div class="modal-dialog modal-dialog-scrollable modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-3" id="helpModalLabel">Help</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<h1 class="fs-4">General</h1>
+						<dl>
+							<dt>Position Canvas</dt>
+							<dd>
+								-Hold <b>right click</b> and <b>drag</b> to move the canvas<br>
+								-<b>Scroll</b> to <b>zoom</b> the canvas in or out
+							</dd>
+							<dt>Snapping</dt>
+							<dd>- Hold <b>Shift</b> to turn <b>off</b> snapping</dd>
+							<dt>Wires</dt>
+							<dd>
+								- <b>Left click</b> to place a point of the wire<br>
+								- <b>Double click</b> to <b>finish</b> wire<br>
+								- <b>Right click</b> to <b>cancel</b> wire<br>
+								- Hold <b>Ctrl/⌘</b> for <b>straight</b> wire
+							</dd>
+							<dt>Components</dt>
+							<dd>
+								- Add components via the component drawer (top left "+") or via keyboard shortcuts.
+							</dd>
+							<dt>Selection</dt>
+							<dd>
+								- Hold <b>left click</b> and drag to select a region<br>
+								- Hold <b>Shift</b> before starting to select to <b>add</b> to the <b>current selection</b><br>
+								- Hold <b>Ctrl/⌘</b> before starting to select to <b>subtract</b> from the <b>current selection</b><br>
+								- Hold neither <b>Shift</b> nor <b>Ctrl/⌘</b> before starting to select to start a <b>new selection</b>
+							</dd>
+						</dl>
+						<hr>
+						<h1 class="fs-4">Keyboard Shortcuts</h1>
+						<table class="table table-striped ">
+							<caption>List of keyboard shortcuts</caption>
+							<thead>
+								<tr>
+									<th scope="col">Category</th>
+									<th scope="col">Shortcut</th>
+									<th scope="col">Description</th>
+								</tr>
+							</thead>
+							<tbody class="table-group-divider">
+								<tr><td>Modes</td><td>Q</td><td>Open component drawer</td></tr>
+								<tr><td></td><td>W</td><td>Start wire drawing tool</td></tr>
+								<tr><td></td><td>Del/Backspace</td><td>Erase components and wires</td></tr>
+								<tr><td></td><td>Esc</td><td>Return to move tool/ cancel component placement</td></tr>
+							</tbody>
+							<tbody class="table-group-divider">
+								<tr><td>IO</td><td>Ctrl/⌘ + S</td><td>Save to JSON</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + O</td><td>Load from JSON</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + E</td><td>Export CircuiTi<i>k</i>Z code</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + Shift + E</td><td>Export SVG code</td></tr>
+							</tbody>
+							<tbody class="table-group-divider">
+								<tr><td>Components</td><td>(Alt/⌥ +) G</td><td>Place (tailless) ground</td></tr>
+								<tr><td></td><td>R</td><td>Place resistor</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) L</td><td>Place (cute) inductor</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) C</td><td>Place (polarized) capacitor</td></tr>
+								<tr><td></td><td>D</td><td>Place diode</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) B</td><td>Place npn (or pnp) BJT</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) N</td><td>Place nmos (or pmos) transistor</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) X</td><td>Place (jump) crossing</td></tr>
+								<tr><td></td><td>(Alt/⌥ +) .</td><td>Place (un-)connected terminal</td></tr>
+							</tbody>
+							<tbody class="table-group-divider">
+								<tr><td>Edit</td><td>Ctrl/⌘ + C</td><td>Copy selection</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + V</td><td>Paste selection</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + X</td><td>Cut selection</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + Z</td><td>Undo</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + Y</td><td>Redo</td></tr>
+								<tr><td></td><td>Ctrl/⌘ + A</td><td>Select all</td></tr>
+								<tr><td></td><td>Ctrl/⌘ (+ Shift) + R</td><td>Rotate (counter-)clockwise</td></tr>
+								<tr><td></td><td>Shift + X</td><td>Flip at x-axis</td></tr>
+								<tr><td></td><td>Shift + Y</td><td>Flip at y-axis</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>
