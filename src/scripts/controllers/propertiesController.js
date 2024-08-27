@@ -2,7 +2,7 @@
  * @module propertyController
  */
 
-import { MainController, SelectionController } from "../internal";
+import { CanvasController, SelectionController } from "../internal";
 
 export class PropertyController{
 
@@ -52,7 +52,7 @@ export class PropertyController{
 
 			this.#setForm(component,form_entries);
 		}else{
-			//TODO
+			this.#objectName.innerText = "Please select only one component to view its properties"
 		}
 	}
 
@@ -62,6 +62,7 @@ export class PropertyController{
 	 */
 	#setForm(component,formEntries){
 		this.#clearForm()
+		this.#basicProperties.classList.remove("d-none")
 
 		this.#objectName.innerText = component.symbol.displayName
 		
@@ -69,16 +70,43 @@ export class PropertyController{
 	
 	#setFormGrid(){
 		this.#clearForm()
+		this.#gridProperties.classList.remove("d-none")
+		this.#objectName.innerText = "Grid settings"
 
 		let minorSlider = document.getElementById("minorSliderInput")
-		
-		// slider.oninput = 
+		minorSlider.value = CanvasController.controller.majorGridSubdivisions
+
+		let majorSlider = document.getElementById("majorSliderInput")
+		majorSlider.value = CanvasController.controller.majorGridSizecm
+
 		minorSlider.addEventListener('input',(ev)=>{
-			console.log(minorSlider.value)
+			this.#changeGrid(CanvasController.controller.majorGridSizecm, Number.parseFloat(minorSlider.value))
 		})
+
+		majorSlider.addEventListener('input',(ev)=>{
+			this.#changeGrid(Number.parseFloat(majorSlider.value), CanvasController.controller.majorGridSubdivisions)
+		})
+
+		this.#changeGrid(CanvasController.controller.majorGridSizecm, CanvasController.controller.majorGridSubdivisions)		
+	}
+
+	#changeGrid(majorSizecm, majorSubdivisions){
+		CanvasController.controller.changeGrid(majorSizecm, majorSubdivisions)
+
+		let majorLabel = document.getElementById("majorLabel")
+		majorLabel.innerText = majorSizecm+" cm"
+
+		let minorLabel = document.getElementById("minorLabel")		
+		minorLabel.innerText = majorSubdivisions
+
+		let gridInfo = document.getElementById("gridInfo")		
+		gridInfo.innerText = "Current grid spacing: " + (majorSizecm/majorSubdivisions).toLocaleString(undefined, {maximumFractionDigits:2}) + " cm"
 	}
 
 	#clearForm(){
+		this.#gridProperties.classList.add("d-none")
+		this.#basicProperties.classList.add("d-none")
+		this.#otherProperties.classList.add("d-none")
 		
 		while (this.#otherProperties.lastChild) {
 			this.#otherProperties.removeChild(this.#otherProperties.lastChild)

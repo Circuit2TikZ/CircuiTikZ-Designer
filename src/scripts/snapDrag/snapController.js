@@ -101,7 +101,7 @@ export class SnapController {
 		// 1. Calculate grid snap points
 		const canvasController = CanvasController.controller;
 		/** @type {SVG.Number} */
-		const gridSpacing = new SVG.Number(canvasController.majorGridDistance/canvasController.minorToMajorGridPoints, "cm").convertToUnit("px");
+		const gridSpacing = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px");
 		const movingSnapPoints = relSnapPoints.map((point) => new SVG.Point(pos.x + point.x, pos.y + point.y));
 
 		// directly calculate the closest grid snapping point to each possible relSnapPoint and filter which is closest overall

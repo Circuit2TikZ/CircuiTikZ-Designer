@@ -168,12 +168,12 @@ export class MainController {
 			this.lineDrawer = new LineDrawer(this);
 			this.eraseController = new EraseController(this);
 			this.selectionController = new SelectionController(this);
+			new PropertyController();
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
-			new PropertyController();
 
 			/** @type {Progress} */
 			let currentProgress = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
@@ -183,7 +183,6 @@ export class MainController {
 			}else{
 				Undo.addState()
 			}
-			this.isInitDone = true;
 
 			// prepare symbolDB for colorTheme
 			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
@@ -204,6 +203,8 @@ export class MainController {
 				MainController.controller.updateTheme()
 			});
 			MainController.controller.updateTheme()
+			PropertyController.controller.update()
+			this.isInitDone = true;
 		});
 
 		// Prevent "normal" browser menu

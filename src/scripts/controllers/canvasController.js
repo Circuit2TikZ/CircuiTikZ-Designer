@@ -59,11 +59,11 @@ export class CanvasController {
 	/** Distance between major grid lines
 	 * @type {float}
 	 */
-	majorGridDistance = 1;
+	majorGridSizecm = 1;
 	/** How many minor grid lines are drawn for every major grid line
 	 * @type {int}
 	 */
-	minorToMajorGridPoints = 4;
+	majorGridSubdivisions = 4;
 
 	/**
 	 * Needed for window size changes to reconstruct the old zoom level.
@@ -196,6 +196,18 @@ export class CanvasController {
 		box.y += moveAmount
 		this.canvas.viewbox(box)
 		this.canvas.zoom(2,new SVG.Point())
+
+		try {
+			let gridSettings = JSON.parse(localStorage.getItem("circuit2tikz-designer-grid"))
+			if (gridSettings&&gridSettings.majorGridSizecm&&gridSettings.majorGridSubdivisions) {
+				this.changeGrid(gridSettings.majorGridSizecm,gridSettings.majorGridSubdivisions)
+			}
+		} catch (error) {
+			localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
+				majorGridSizecm:this.majorGridSizecm,
+				majorGridSubdivisions:this.majorGridSubdivisions
+			}))
+		}
 	}
 
 	/**
@@ -270,18 +282,17 @@ export class CanvasController {
 
 
 	/** how the grid should be drawn
-	 * @param {number} minorGridDistance the distance between two major grid lines in cm
-	 * @param {int} minorToMajorGridPoints how many minor grid lines are drawn per major grid line (>=1)
+	 * @param {number} majorSizecm the distance between two major grid lines in cm
+	 * @param {int} majorSubdivisions how many minor grid lines are drawn per major grid line (>=1)
 	 */
-	changeGrid(majorGridDistance, minorToMajorGridPoints){
-		minorToMajorGridPoints = minorToMajorGridPoints>0?minorToMajorGridPoints:1;
-		this.minorToMajorGridPoints = minorToMajorGridPoints;
-		this.majorGridDistance = majorGridDistance;
-		let minorGridDistance = majorGridDistance/minorToMajorGridPoints;
+	changeGrid(majorSizecm, majorSubdivisions){
+		this.majorGridSubdivisions = majorSubdivisions;
+		this.majorGridSizecm = majorSizecm;
+		let minorGridDistance = majorSizecm/majorSubdivisions;
 		const snapDistanceNum = new SVG.Number(minorGridDistance, "cm").toString();
 		const snapDistancePx = new SVG.Number(minorGridDistance, "cm").convertToUnit("px").value;
-		const majorDistanceNum = new SVG.Number(majorGridDistance, "cm").toString();
-		const majorDistancePx = new SVG.Number(majorGridDistance, "cm").convertToUnit("px").value;
+		const majorDistanceNum = new SVG.Number(majorSizecm, "cm").toString();
+		const majorDistancePx = new SVG.Number(majorSizecm, "cm").convertToUnit("px").value;
 
 		// change small grid
 		const minorGrid = document.getElementById("smallGridPattern");
@@ -296,6 +307,11 @@ export class CanvasController {
 		majorGrid.children[0]?.setAttribute("width",majorDistanceNum);
 		majorGrid.children[0]?.setAttribute("height",majorDistanceNum);
 		majorGrid.children[1]?.setAttribute("d",`M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`);
+
+		localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
+			majorGridSizecm:this.majorGridSizecm,
+			majorGridSubdivisions:this.majorGridSubdivisions
+		}))
 	}
 
 	/**
