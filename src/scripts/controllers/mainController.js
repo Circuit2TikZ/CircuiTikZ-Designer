@@ -224,7 +224,6 @@ export class MainController {
 
 		/** @type {Progress} */
 		let defaultProgress = {
-			desiredWindows:0,
 			currentIndices:[],
 			currentData:[]
 		}
@@ -235,7 +234,6 @@ export class MainController {
 		let storageString = localStorage.getItem(objname)
 		/** @type {Progress} */
 		let current = storageString?JSON.parse(storageString):defaultProgress
-		current.desiredWindows++
 
 		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
 		let sessionTabID = sessionStorage.getItem("circuitikz-designer-tabID")
@@ -247,20 +245,19 @@ export class MainController {
 		// this is a new tab --> assign tab ID
 		if (this.#tabID<0) {
 			// populate first available slot
-			for (let index = 0; index < current.desiredWindows; index++) {
-				if (!current.currentIndices.includes(index)) {
-					this.#tabID = index
-					current.currentIndices.push(this.#tabID)
-					break;
-				}
+			let index = 0
+			while (current.currentIndices.includes(index)) {
+				index++;
 			}
+			this.#tabID = index
+			current.currentIndices.push(this.#tabID)
 		}
 
 		// save the assigned tab ID
 		sessionStorage.setItem("circuitikz-designer-tabID",this.#tabID)
 
 		// adjust the saveData object to accomodate new data if necessary
-		if (current.currentData.length<current.desiredWindows) {
+		if (current.currentData.length<=this.#tabID) {
 			current.currentData.push({})
 		}
 		
