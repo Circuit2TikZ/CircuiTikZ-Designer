@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { Line,NodeComponentInstance,MainController } from "../internal";
+import { Line,NodeComponentInstance,MainController, PropertyController } from "../internal";
 
 /** @typedef {import("../controllers/canvasController").default} CanvasController */
 
@@ -141,6 +141,7 @@ export class SelectionController {
 					this.deactivateSelection();
 					this.activateSelection();
 				}
+				PropertyController.controller.update()
 			}
 		})
 		SelectionController.controller = this;
@@ -297,6 +298,8 @@ export class SelectionController {
 		}
 		
 		this.showSelection();
+		
+		PropertyController.controller.update()
 	}
 
 	selectLines(lines, mode){
@@ -317,6 +320,7 @@ export class SelectionController {
 		}
 
 		this.showSelection();
+		PropertyController.controller.update()
 	}
 
 	selectAll(){
@@ -473,6 +477,7 @@ export class SelectionController {
 
 		this.currentlySelectedComponents=[]
 		this.currentlySelectedLines=[]
+		PropertyController.controller.update()
 	}
 
 	/**

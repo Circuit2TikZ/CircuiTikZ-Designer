@@ -9,7 +9,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
 /** @typedef {import("../internal").ComponentInstance} ComponentInstance */
@@ -173,6 +173,7 @@ export class MainController {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
+			new PropertyController();
 
 			/** @type {Progress} */
 			let currentProgress = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))

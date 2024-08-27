@@ -146,8 +146,40 @@
 					</div>
 					<div class="col-4 p-2 bg-body-tertiary border border-secondary rounded" id="properties">
 						<h5 class="fs-3 align-self-center">Properties</h5>
-						<div id="properties-content">
-							
+						<div id="properties-content d-flex flex-column w-100">
+							<div id="objectName">
+								Object name
+							</div>
+							<div class="d-flex flex-column w-100 h-auto" id="grid-properties">
+								<div id="majorSlider">
+									<label for="majorSliderInput" class="form-label">Major grid size</label>
+									<input type="range" class="form-range" min="1" max="5" step="1" list="majorValues" id="majorSliderInput">
+									<datalist id="majorValues">
+										<option value="1" label="1 cm"></option>
+										<option value="2" label="2 cm"></option>
+										<option value="3" label="3 cm"></option>
+										<option value="4" label="4 cm"></option>
+										<option value="5" label="5 cm"></option>
+									</datalist>
+								</div>
+								<div id="minorSlider">
+									<label for="minorSliderInput" class="form-label">Minor grid subdivisions</label>
+									<input type="range" class="form-range" min="1" max="10" step="1" list="minorValues" id="minorSliderInput">
+									<datalist id="minorValues">
+										<option value="1" label="1"></option>
+										<option value="2" label="2"></option>
+										<option value="3" label="3"></option>
+										<option value="4" label="4"></option>
+										<option value="5" label="5"></option>
+									</datalist>
+								</div>
+							</div>
+							<div id="basic-properties">
+								<!-- name -->
+							</div>
+							<div id="other-properties">
+
+							</div>
 						</div>
 					</div>
 				</div>

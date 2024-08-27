@@ -111,23 +111,14 @@ export class NodeComponentInstance extends SVG.Use {
 			}
 
 			const dragCancelFunction = (/** @type {KeyboardEvent} */evt)=>{
-				NodeDragHandler.snapDrag(this,false)
-				CanvasController.controller.placingComponent=null;
+				dragEndFunction(evt)
 				MainController.controller.removeInstance(this);	
-				hotkeys.unbind("esc",dragCancelFunction)
 			}
 
 			hotkeys("esc",dragCancelFunction)
 
 			SVG.off(window, endEventNameScoped);
 			SVG.on(window, endEventNameScoped, dragEndFunction, dh, { passive: false });
-
-			// let timeout = null;
-			// const addDragEndHandler = () => {
-			// 	window.clearTimeout(timeout);
-			// };
-
-			// timeout = window.setTimeout(addDragEndHandler, 10);
 		}
 
 		this.snappingPoints = this.symbol._pins.map(
