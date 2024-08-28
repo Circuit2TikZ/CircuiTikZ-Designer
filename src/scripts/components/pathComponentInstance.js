@@ -204,6 +204,7 @@ export class PathComponentInstance extends SVG.G {
 	showBoundingBox(){
 		if (!this.#selectionRectangle) {
 			let box = this.symbolUse.bbox();
+			// TODO this tansformation doesn't work in safari, but works in chrome, firefox and edge. Find out why
 			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
 									   .transform({ 
 													rotate: -this.#rotationAngle, 
