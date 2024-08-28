@@ -101,8 +101,14 @@ export class SnapController {
 		// 1. Calculate grid snap points
 		const canvasController = CanvasController.controller;
 		/** @type {SVG.Number} */
-		const gridSpacing = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px");
+		let gridSpacing = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px");
+		const maxSnapDistance = new SVG.Number(0.5, "cm").convertToUnit("px")
 		const movingSnapPoints = relSnapPoints.map((point) => new SVG.Point(pos.x + point.x, pos.y + point.y));
+
+		if (!CanvasController.controller.gridVisible) {
+			// effectively only snap the origin
+			gridSpacing = 1e9
+		}
 
 		// directly calculate the closest grid snapping point to each possible relSnapPoint and filter which is closest overall
 		let distStruct = movingSnapPoints.reduce(
@@ -140,10 +146,10 @@ export class SnapController {
 			if (point.y < relSnapPointsMinY) relSnapPointsMinY = point.y;
 			else if (point.y > relSnapPointsMaxY) relSnapPointsMaxY = point.y;
 		}
-		const xMin = Math.floor((relSnapPointsMinX + pos.x) / gridSpacing) * gridSpacing;
-		const yMin = Math.floor((relSnapPointsMinY + pos.y) / gridSpacing) * gridSpacing;
-		const xMax = Math.ceil((relSnapPointsMaxX + pos.x) / gridSpacing) * gridSpacing;
-		const yMax = Math.ceil((relSnapPointsMaxY + pos.y) / gridSpacing) * gridSpacing;
+		const xMin = (relSnapPointsMinX + pos.x) - maxSnapDistance;
+		const yMin = (relSnapPointsMinY + pos.y) - maxSnapDistance;
+		const xMax = (relSnapPointsMaxX + pos.x) + maxSnapDistance;
+		const yMax = (relSnapPointsMaxY + pos.y) + maxSnapDistance;
 
 		// 3. filter remaining snap points
 		const filteredFixSnapPoints = this.#snapPoints.filter(
@@ -155,6 +161,10 @@ export class SnapController {
 			distStruct = this.#getSnapDistStruct(movingSnapPoints, filteredFixSnapPoints, distStruct);
 
 		// 5. Calculate snapped point using vector
+		if (distStruct.dist>maxSnapDistance*maxSnapDistance) {
+			// only snap if the snap distance is not too long
+			distStruct.vector = new SVG.Point(0,0)
+		}
 		return distStruct.vector.plus(pos);
 	}
 

@@ -3,6 +3,7 @@
  */
 
 /** @typedef {import("../snapDrag/snapPoint")} SnapPoint */
+/** @typedef {import("../controllers/propertiesController")} FormEntry */
 
 /**
  * @interface ComponentInstance
@@ -19,6 +20,11 @@
  * @param {MouseEvent} [_event] - an optional (mouse/touch) event, which caused the element to be added
  * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
  * @returns {ComponentInstance}
+ */
+
+/**
+ * @function ComponentInstance.getFormEntries
+ * @returns {FormEntry[]}
  */
 
 /**

@@ -9,6 +9,10 @@ import { NodeComponentSymbol,SnapPoint,NodeDragHandler,ContextMenu,MainControlle
 import hotkeys from "hotkeys-js";
 
 /**
+ * @typedef {import("../controllers/propertiesController")} FormEntry
+ */
+
+/**
  * Instance of a `NodeComponentsSymbol`.
  * @implements {import("./componentInstance").ComponentInstance}
  */
@@ -176,8 +180,7 @@ export class NodeComponentInstance extends SVG.Use {
 	}
 
 	updateTheme(){
-		let theme = MainController.controller.darkMode
-		
+
 	}
 
 	isInsideSelectionRectangle(selectionRectangle){
@@ -292,6 +295,15 @@ export class NodeComponentInstance extends SVG.Use {
 			this.#midAbs.toTikzString() +
 			" {};"
 		);
+	}
+
+	/**
+	 * @returns {FormEntry[]}
+	 */
+	getFormEntries(){
+		let formEntries = []
+
+
 	}
 	
 	/**

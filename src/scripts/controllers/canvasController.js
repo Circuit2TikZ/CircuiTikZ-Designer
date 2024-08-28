@@ -64,6 +64,7 @@ export class CanvasController {
 	 * @type {int}
 	 */
 	majorGridSubdivisions = 4;
+	gridVisible = true
 
 	/**
 	 * Needed for window size changes to reconstruct the old zoom level.
@@ -123,46 +124,6 @@ export class CanvasController {
 		canvas.on(["mousemove","touchmove"],(/**@type {MouseEvent}*/evt)=>{
 			this.lastCanvasPoint = this.pointerEventToPoint(evt);
 		})
-	
-		// init context menus
-		// if (!CanvasController.#contextMenu) {
-		// 	let gridContextEntries = [];
-		// 	const gridSpacings = [0.2,0.25,0.5,1,2];
-		// 	gridSpacings.forEach(element => {
-		// 		gridContextEntries.push({
-		// 			result: element.toString(),
-		// 			text: `Grid ${element} cm`,
-		// 			iconText:"",
-		// 		})
-		// 	});
-	
-		// 	const gridMul = [1,2,4,5,8,10];
-		// 	gridMul.forEach(element => {
-		// 		gridContextEntries.push({
-		// 			result: (-element).toString(),
-		// 			text: `Grid ratio: ${element}`,
-		// 			iconText:"",
-		// 		})
-		// 	});
-		// 	CanvasController.#contextMenu = new ContextMenu(gridContextEntries);
-		// }
-
-		// canvas.on('contextmenu', (evt)=>{
-		// 	evt.preventDefault();
-		// 	let result = CanvasController.#contextMenu.openForResult(evt.clientX, evt.clientY)
-		// 	result.then((res) => {
-		// 		let gridNum = parseFloat(res);
-		// 		if (gridNum>0) {
-		// 			// large spacing
-		// 			this.changeGrid(gridNum, this.minorToMajorGridPoints);
-		// 		}else if (gridNum<0) {
-		// 			// grid line ratio
-		// 			this.changeGrid(this.majorGridDistance, -gridNum);
-		// 		}
-		// 	})
-		// 	.catch(() => {}); // closed without clicking on item
-		// 	evt.stopPropagation();
-		// });
 
 		// Modify point, viewbox and zoom functions to cache the inverse screen CTM (document -> viewport coords)
 		/**
@@ -197,17 +158,46 @@ export class CanvasController {
 		this.canvas.viewbox(box)
 		this.canvas.zoom(2,new SVG.Point())
 
+		let gridVisibleToggle = document.getElementById("gridVisible")
 		try {
 			let gridSettings = JSON.parse(localStorage.getItem("circuit2tikz-designer-grid"))
-			if (gridSettings&&gridSettings.majorGridSizecm&&gridSettings.majorGridSubdivisions) {
-				this.changeGrid(gridSettings.majorGridSizecm,gridSettings.majorGridSubdivisions)
+			if (gridSettings) {
+				if (gridSettings.majorGridSizecm&&gridSettings.majorGridSubdivisions) {
+					this.changeGrid(gridSettings.majorGridSizecm,gridSettings.majorGridSubdivisions)
+				}
+				gridVisibleToggle.checked = gridSettings.gridVisible
+				this.gridVisible = gridSettings.gridVisible
+				if (!this.gridVisible) {
+					this.paper.addClass("d-none")
+				}
 			}
 		} catch (error) {
 			localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
 				majorGridSizecm:this.majorGridSizecm,
-				majorGridSubdivisions:this.majorGridSubdivisions
+				majorGridSubdivisions:this.majorGridSubdivisions,
+				gridVisible:this.gridVisible
 			}))
 		}
+
+		gridVisibleToggle.addEventListener("change",(ev)=>{
+			this.gridVisible = gridVisibleToggle.checked
+			if (this.gridVisible) {
+				if (this.paper.hasClass("d-none")) {
+					this.paper.removeClass("d-none")
+				}
+			}else{
+				this.paper.addClass("d-none")
+			}
+			this.#saveSettings()
+		})
+	}
+
+	#saveSettings(){
+		localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
+			majorGridSizecm:this.majorGridSizecm,
+			majorGridSubdivisions:this.majorGridSubdivisions,
+			gridVisible:this.gridVisible
+		}))
 	}
 
 	/**
@@ -308,10 +298,7 @@ export class CanvasController {
 		majorGrid.children[0]?.setAttribute("height",majorDistanceNum);
 		majorGrid.children[1]?.setAttribute("d",`M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`);
 
-		localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
-			majorGridSizecm:this.majorGridSizecm,
-			majorGridSubdivisions:this.majorGridSubdivisions
-		}))
+		this.#saveSettings()
 	}
 
 	/**

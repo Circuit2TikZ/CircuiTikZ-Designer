@@ -145,14 +145,18 @@
 						<include src="pages/canvas.svg"></include>
 					</div>
 					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0" id="properties">
-						<h5 class="fs-3 align-self-center mb-0 p-2">Properties</h5>
+						<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
 						<hr class="m-0">
-						<div class="d-flex flex-column w-100 p-2" id="properties-content">
-							<div class="fs-4 mb-3" id="objectName">
+						<div class="d-flex flex-column w-100 p-3" id="properties-content">
+							<span class="fs-4 mb-3" id="objectName">
 								Object name
-							</div>
+							</span>
 							<div class="d-none" id="grid-properties">
-								<div class="d-flex flex-column w-100 h-auto gap-3 px-3" >
+								<div class="d-flex flex-column w-100 h-auto gap-3" >
+									<div class="form-check form-switch m-0 p-0 d-flex justify-content-between align-items-center">
+										<span class="form-check-label">Enable grid</span>
+										<input class="form-check-input m-0 fs-4" type="checkbox" role="switch" id="gridVisible">
+									</div>
 									<div id="majorSlider" class="">
 										<div class="d-flex w-100 justify-content-between align-items-baseline">
 											<label for="majorSliderInput" class="form-label">Major grid size</label>

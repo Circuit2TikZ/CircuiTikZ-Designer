@@ -4,6 +4,15 @@
 
 import { CanvasController, SelectionController } from "../internal";
 
+/**
+ * @typedef {Object} FormEntry
+ * @property {object} originalObject
+ * @property {string} propertyName
+ * @property {string} type
+ * @property {any} currentValue
+ * @property {function(ev:Event):void} changeCallback
+ */
+
 export class PropertyController{
 
 	/** @type {PropertyController} */
@@ -14,6 +23,7 @@ export class PropertyController{
 	#gridProperties
 	#basicProperties
 	#otherProperties
+	#propertiesTitle
 
 	constructor(){
 		this.#propertiesContainer = document.getElementById("properties-content")
@@ -21,18 +31,10 @@ export class PropertyController{
 		this.#gridProperties = document.getElementById("grid-properties")
 		this.#basicProperties = document.getElementById("basic-properties")
 		this.#otherProperties = document.getElementById("other-properties")
+		this.#propertiesTitle = document.getElementById("propertiesTitle")
 
 		PropertyController.controller = this;
 	}
-
-	/**
-	 * @typedef {Object} FormEntry
-	 * @property {object} originalObject
-	 * @property {string} propertyName
-	 * @property {string} type
-	 * @property {any} currentValue
-	 * @property {function(ev:Event):void} changeCallback
-	 */
 
 	update(){
 		
@@ -61,17 +63,16 @@ export class PropertyController{
 	 * @param {FormEntry[]} formEntries 
 	 */
 	#setForm(component,formEntries){
-		this.#clearForm()
 		this.#basicProperties.classList.remove("d-none")
+		this.#objectName.classList.remove("d-none")
 
 		this.#objectName.innerText = component.symbol.displayName
 		
 	}
 	
 	#setFormGrid(){
-		this.#clearForm()
 		this.#gridProperties.classList.remove("d-none")
-		this.#objectName.innerText = "Grid settings"
+		this.#propertiesTitle.innerText = "Grid settings"
 
 		let minorSlider = document.getElementById("minorSliderInput")
 		minorSlider.value = CanvasController.controller.majorGridSubdivisions
@@ -104,9 +105,11 @@ export class PropertyController{
 	}
 
 	#clearForm(){
+		this.#propertiesTitle.innerText = "Properties"
 		this.#gridProperties.classList.add("d-none")
 		this.#basicProperties.classList.add("d-none")
 		this.#otherProperties.classList.add("d-none")
+		this.#objectName.classList.add("d-none")
 		
 		while (this.#otherProperties.lastChild) {
 			this.#otherProperties.removeChild(this.#otherProperties.lastChild)
