@@ -18,6 +18,7 @@ export class CopyPaste {
 			let paths = []
 			for (const component of SelectionController.controller.currentlySelectedComponents) {
 				let componentObject = component.toJson()
+				componentObject.tikzName = ""
 				if (component instanceof NodeComponentInstance) {
 					nodes.push(componentObject)
 				}else{

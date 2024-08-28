@@ -7,6 +7,7 @@ import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo, PathDragHandler, NodeDragHandler } from "../internal";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
+const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 /**
  * Instance of a `PathComponentSymbol`.
  * @implements {import("./componentInstance").ComponentInstance}
@@ -16,6 +17,9 @@ export class PathComponentInstance extends SVG.G {
 	symbol;
 	/** @type {SVG.Use} */
 	symbolUse;
+
+	/** @type {string} */
+	tikzName = ""
 
 	/** @type {boolean} */
 	static #hasMouse = matchMedia("(pointer:fine)").matches;
@@ -149,6 +153,45 @@ export class PathComponentInstance extends SVG.G {
 	}
 
 	/**
+	 * @returns {FormEntry[]}
+	 */
+	getFormEntries(){
+		let formEntries = []
+
+		let nameCallback = (/** @type {string}*/name)=>{
+			if (name==="") {
+				this.tikzName = name
+				return ""
+			}
+
+			if (name.match(invalidNameRegEx)) {
+				return "Contains forbidden characters!"
+			}
+			
+			for (const instance of MainController.controller.instances) {
+				if (instance!=this) {
+					if (instance.tikzName==name) {
+						return "Name is already taken!"
+					}
+				}
+			}
+			this.tikzName = name
+			return "";
+		}
+
+		let nameEntry = {
+			originalObject:this,
+			propertyName:"Name",
+			inputType:"text",
+			currentValue:this.tikzName,
+			changeCallback:nameCallback
+		}
+
+		formEntries.push(nameEntry)
+		return formEntries
+	}
+
+	/**
 	 * Add a instance of an (path) symbol to an container.
 	 *
 	 * @param {PathComponentSymbol} symbol - the symbol to use
@@ -249,6 +292,7 @@ export class PathComponentInstance extends SVG.G {
 		pathComponent.firstClick(new SVG.Point(serialized.start))
 		pathComponent.#mirror = serialized.mirror
 		pathComponent.secondClick(new SVG.Point(serialized.end),false)
+		pathComponent.tikzName = serialized.tikzName
 
 		MainController.controller.addInstance(pathComponent);
 		return pathComponent
@@ -263,6 +307,7 @@ export class PathComponentInstance extends SVG.G {
 		//TODO add additional options!?
 		let data = {
 			id:this.symbol.node.id,
+			tikzName:this.tikzName,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
 			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},
 			mirror:this.#mirror
@@ -281,6 +326,7 @@ export class PathComponentInstance extends SVG.G {
 			this.snappingPoints[0].toTikzString() +
 			" to[" +
 			this.symbol.tikzName +
+			(this.tikzName===""?"":", name="+this.tikzName) +
 			(this.#mirror?", mirror":"") +
 			"] " +
 			this.snappingPoints[1].toTikzString() +

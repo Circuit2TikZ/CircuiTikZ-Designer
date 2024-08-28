@@ -12,16 +12,18 @@ import hotkeys from "hotkeys-js";
  * @typedef {import("../controllers/propertiesController")} FormEntry
  */
 
+const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
+
 /**
  * Instance of a `NodeComponentsSymbol`.
  * @implements {import("./componentInstance").ComponentInstance}
  */
 export class NodeComponentInstance extends SVG.Use {
-	/** @type {?ContextMenu} */
-	static #contextMenu = null;
-
 	/** @type {NodeComponentSymbol} */
 	symbol;
+
+	/** @type {string} */
+	tikzName="";
 
 	/** @type {NodeDragHandler} */
 	#snapDragHandler;
@@ -129,53 +131,6 @@ export class NodeComponentInstance extends SVG.Use {
 			(pin) => new SnapPoint(this, pin.name, this.#midAbs, pin, this.#angleDeg, true)
 		);
 
-		// init context menus
-		// if (!NodeComponentInstance.#contextMenu) {
-		// 	NodeComponentInstance.#contextMenu = new ContextMenu([
-		// 		{
-		// 			result: "rotateLeft",
-		// 			text: "Rotate counterclockwise",
-		// 			iconText: "rotate_left",
-		// 		},
-		// 		{
-		// 			result: "rotateRight",
-		// 			text: "Rotate clockwise",
-		// 			iconText: "rotate_right",
-		// 		},
-		// 		{
-		// 			result: "remove",
-		// 			text: "Remove",
-		// 			iconText: "delete",
-		// 		},
-		// 	]);
-		// }
-
-		// this.on(
-		// 	"contextmenu",
-		// 	(/** @type {PointerEvent} */ evt) => {
-		// 		evt.preventDefault();
-		// 		let result = NodeComponentInstance.#contextMenu.openForResult(evt.clientX, evt.clientY);
-		// 		result
-		// 			.then((res) => {
-		// 				switch (res) {
-		// 					case "rotateLeft":
-		// 						this.rotate(90);
-		// 						return;
-		// 					case "rotateRight":
-		// 						this.rotate(-90);
-		// 						return;
-		// 					case "remove":
-		// 						MainController.controller.removeInstance(this);
-		// 						break;
-		// 					default:
-		// 						console.log("Not implemented: " + res);
-		// 				}
-		// 			})
-		// 			.catch(() => {}); // closed without clicking on item
-		// 			evt.stopPropagation();
-		// 	},
-		// 	this
-		// );
 		this.updateTheme()
 	}
 
@@ -246,7 +201,7 @@ export class NodeComponentInstance extends SVG.Use {
 		nodeComponent.moveTo(new SVG.Point(serialized.position))
 		nodeComponent.#angleDeg = serialized.rotation
 		nodeComponent.#flip= new SVG.Point(serialized.flip)
-		nodeComponent.nodeName = serialized.nodeName
+		nodeComponent.tikzName = serialized.tikzName
 		nodeComponent.#updateTransform()
 		nodeComponent.#recalculateRelSnappingPoints()
 		nodeComponent.recalculateSnappingPoints()
@@ -265,7 +220,7 @@ export class NodeComponentInstance extends SVG.Use {
 		//necessary information: symbol_id,name,position,rotation,flip
 		let data = {
 			id:this.symbol.node.id,
-			name:this.nodeName,
+			tikzName:this.tikzName,
 			position:this.getAnchorPoint().clone(),
 			rotation:this.#angleDeg,
 			flip:this.#flip.clone()
@@ -290,7 +245,7 @@ export class NodeComponentInstance extends SVG.Use {
 			(this.#flip.x < 0 ? `, xscale=-1` : "") +
 			(this.#flip.y < 0 ? `, yscale=-1` : "") +
 			"] " +
-			(this.nodeName ? "(" + this.nodeName + ") " : "") +
+			(this.tikzName ? "(" + this.tikzName + ") " : "") +
 			"at " +
 			this.#midAbs.toTikzString() +
 			" {};"
@@ -303,7 +258,38 @@ export class NodeComponentInstance extends SVG.Use {
 	getFormEntries(){
 		let formEntries = []
 
+		let nameCallback = (/** @type {string}*/name)=>{
+			if (name==="") {
+				this.tikzName = name
+				return ""
+			}
 
+			if (name.match(invalidNameRegEx)) {
+				return "Contains forbidden characters!"
+			}
+			
+			for (const instance of MainController.controller.instances) {
+				if (instance!=this) {
+					if (instance.tikzName==name) {
+						return "Name is already taken!"
+					}
+				}
+			}
+			this.tikzName = name
+			
+			return "";
+		}
+
+		let nameEntry = {
+			originalObject:this,
+			propertyName:"Name",
+			inputType:"text",
+			currentValue:this.tikzName,
+			changeCallback:nameCallback
+		}
+
+		formEntries.push(nameEntry)
+		return formEntries
 	}
 	
 	/**
@@ -442,6 +428,9 @@ export class NodeComponentInstance extends SVG.Use {
 
 		this.#recalculateRelSnappingPoints()
 		this.recalculateSnappingPoints()
+
+		console.log(this.tikzName);
+		
 	}
 
 	/**

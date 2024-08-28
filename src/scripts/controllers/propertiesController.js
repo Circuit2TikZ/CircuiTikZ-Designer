@@ -2,15 +2,15 @@
  * @module propertyController
  */
 
-import { CanvasController, SelectionController } from "../internal";
+import { CanvasController, MainController, SelectionController, Undo } from "../internal";
 
 /**
  * @typedef {Object} FormEntry
  * @property {object} originalObject
  * @property {string} propertyName
- * @property {string} type
+ * @property {string} inputType
  * @property {any} currentValue
- * @property {function(ev:Event):void} changeCallback
+ * @property {function(newValue:any):string} changeCallback
  */
 
 export class PropertyController{
@@ -49,10 +49,9 @@ export class PropertyController{
 			}
 		}else if(components.length==1){
 
-			let form_entries = []
-			let component = components[0]
+			let component = components[0]			
 
-			this.#setForm(component,form_entries);
+			this.#setForm(component,component.getFormEntries());
 		}else{
 			this.#objectName.innerText = "Please select only one component to view its properties"
 		}
@@ -67,6 +66,46 @@ export class PropertyController{
 		this.#objectName.classList.remove("d-none")
 
 		this.#objectName.innerText = component.symbol.displayName
+
+		let entryBlueprint = this.#basicProperties.querySelector("#basicBlueprint")
+		
+		for (const formEntry of formEntries) {
+			let entryNode = entryBlueprint.cloneNode(true)
+			entryNode.classList.remove("d-none")
+			let label = entryNode.querySelector("span");
+			let input = entryNode.querySelector("input");
+			let invalidDiv = entryNode.querySelector("div");
+
+			input.value = formEntry.currentValue
+			input.addEventListener("input",(ev)=>{
+				let invalidReason = formEntry.changeCallback(input.value)
+				if (invalidReason==="") {
+					invalidDiv.classList.add("d-none")
+					input.classList.remove("is-invalid")
+				}else{
+					invalidDiv.classList.remove("d-none")
+					invalidDiv.innerText = "Invalid! " + invalidReason
+					input.classList.add("is-invalid")
+				}
+			})
+
+			// check if the name changed and if so, add an undo state
+			let value;
+			input.addEventListener("focusin",(ev)=>{
+				value = input.value
+			})
+			input.addEventListener("focusout",(ev)=>{
+				if (value!==undefined&&input.value!==value) {
+					Undo.addState()					
+				}
+			})
+
+
+			label.innerText = formEntry.propertyName
+			input.setAttribute("type",formEntry.inputType)		
+			
+			this.#basicProperties.appendChild(entryNode)
+		}
 		
 	}
 	
@@ -113,6 +152,10 @@ export class PropertyController{
 		
 		while (this.#otherProperties.lastChild) {
 			this.#otherProperties.removeChild(this.#otherProperties.lastChild)
+		}
+
+		while (this.#basicProperties.children.length>1) {
+			this.#basicProperties.removeChild(this.#basicProperties.lastChild)
 		}
 	}
 }

@@ -9,6 +9,7 @@
  * @interface ComponentInstance
  * @typedef ComponentInstance
  * @property {SnapPoint[]} snappingPoints
+ * @property {string} tikzName
  */
 
 /**
