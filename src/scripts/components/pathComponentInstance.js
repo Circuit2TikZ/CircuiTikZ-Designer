@@ -204,13 +204,15 @@ export class PathComponentInstance extends SVG.G {
 	showBoundingBox(){
 		if (!this.#selectionRectangle) {
 			let box = this.symbolUse.bbox();
-			// TODO this tansformation doesn't work in safari, but works in chrome, firefox and edge. Find out why
-			this.#selectionRectangle = this.container.rect(box.w,box.h).move(box.x,box.y)
-									   .transform({ 
-													rotate: -this.#rotationAngle, 
-													ox: this.#midAbs.x, 
-													oy: this.#midAbs.y, 
-													scaleY: this.#mirror?-1:1 });
+			let moveVec = this.#midAbs.minus(this.symbol.relMid)
+
+			this.#selectionRectangle = this.container.rect(box.w,box.h)
+													.move(moveVec.x,moveVec.y)
+													.transform({
+														rotate: -this.#rotationAngle, 
+														ox: this.#midAbs.x, 
+														oy: this.#midAbs.y, 
+														scaleY: this.#mirror?-1:1 });
 			this.#selectionRectangle.attr({
 				"stroke-width": selectedBoxWidth,
 				"stroke": selectionColor,
