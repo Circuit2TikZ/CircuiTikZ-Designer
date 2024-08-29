@@ -21,6 +21,9 @@ export class PathComponentInstance extends SVG.G {
 	/** @type {string} */
 	tikzName = ""
 
+	/** @type {string} */
+	label = ""
+
 	/** @type {boolean} */
 	static #hasMouse = matchMedia("(pointer:fine)").matches;
 
@@ -48,6 +51,8 @@ export class PathComponentInstance extends SVG.G {
 
 	/**@type {boolean} */
 	#mirror = false;
+	/**@type {boolean} */
+	#invert = false;
 
 	/**
 	 * @type {?SVG.Rect}
@@ -182,12 +187,36 @@ export class PathComponentInstance extends SVG.G {
 		let nameEntry = {
 			originalObject:this,
 			propertyName:"Name",
-			inputType:"text",
+			inputType:"string",
 			currentValue:this.tikzName,
 			changeCallback:nameCallback
 		}
 
+		let mirrorEntry = {
+			originalObject:this,
+			propertyName:"Mirror",
+			inputType:"boolean",
+			currentValue:this.#mirror,
+			changeCallback:(mirror)=>{
+				this.#mirror = mirror
+				this.#recalcPointsEnd(this.getEndPoint())
+			}
+		}
+
+		let invertEntry = {
+			originalObject:this,
+			propertyName:"Invert",
+			inputType:"boolean",
+			currentValue:this.#invert,
+			changeCallback:(invert)=>{
+				this.#invert = invert
+				this.#recalcPointsEnd(this.getEndPoint())
+			}
+		}
+
 		formEntries.push(nameEntry)
+		formEntries.push(mirrorEntry)
+		formEntries.push(invertEntry)
 		return formEntries
 	}
 
@@ -252,7 +281,8 @@ export class PathComponentInstance extends SVG.G {
 													rotate: -this.#rotationAngle, 
 													ox: this.#midAbs.x, 
 													oy: this.#midAbs.y, 
-													scaleY: this.#mirror?-1:1 });
+													scaleY: this.#mirror?-1:1, 
+													scaleX: this.#invert?-1:1 });
 			this.#selectionRectangle.attr({
 				"stroke-width": selectedBoxWidth,
 				"stroke": selectionColor,
@@ -291,6 +321,7 @@ export class PathComponentInstance extends SVG.G {
 		let pathComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
 		pathComponent.firstClick(new SVG.Point(serialized.start))
 		pathComponent.#mirror = serialized.mirror
+		pathComponent.#invert = serialized.invert
 		pathComponent.secondClick(new SVG.Point(serialized.end),false)
 		pathComponent.tikzName = serialized.tikzName
 
@@ -310,7 +341,8 @@ export class PathComponentInstance extends SVG.G {
 			tikzName:this.tikzName,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
 			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},
-			mirror:this.#mirror
+			mirror:this.#mirror,
+			invert:this.#invert
 		}
 
 		return data
@@ -328,6 +360,7 @@ export class PathComponentInstance extends SVG.G {
 			this.symbol.tikzName +
 			(this.tikzName===""?"":", name="+this.tikzName) +
 			(this.#mirror?", mirror":"") +
+			(this.#invert?", invert":"") +
 			"] " +
 			this.snappingPoints[1].toTikzString() +
 			";"
@@ -546,7 +579,8 @@ export class PathComponentInstance extends SVG.G {
 			rotate: -this.#rotationAngle, 
 			ox: this.#midAbs.x, 
 			oy: this.#midAbs.y,
-			scaleY: this.#mirror?-1:1
+			scaleY: this.#mirror?-1:1,
+			scaleX: this.#invert?-1:1
 		});
 
 		// recalc pins

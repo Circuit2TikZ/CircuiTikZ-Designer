@@ -283,7 +283,7 @@ export class NodeComponentInstance extends SVG.Use {
 		let nameEntry = {
 			originalObject:this,
 			propertyName:"Name",
-			inputType:"text",
+			inputType:"string",
 			currentValue:this.tikzName,
 			changeCallback:nameCallback
 		}

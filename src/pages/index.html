@@ -50,6 +50,7 @@
 			crossorigin="anonymous"
 		/>
 		<script type="module" src="../scripts/index.js"></script>
+		<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 	</head>
 
 	<body class="d-flex flex-column w-100 h-100">
@@ -147,8 +148,8 @@
 					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0 d-flex flex-column h-100" id="properties">
 						<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
 						<hr class="m-0">
-						<div class="d-flex flex-column w-100 p-3" id="properties-content">
-							<span class="fs-4 mb-3" id="objectName">
+						<div class="d-flex flex-column w-100 p-3 fs-5" id="properties-content">
+							<span class="align-self-center text-center fs-4 mb-3" id="objectName">
 								Object name
 							</span>
 							<div class="d-none" id="grid-properties">
@@ -177,15 +178,19 @@
 									</div>
 								</div>
 							</div>
-							<div class="d-flex flex-column w-100 gap-3 d-none" id="basic-properties">
-								<div id="basicBlueprint" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start d-none">
+							<div id="blueprints" class="d-none w-0 h-0">
+								<div id="blueprintText" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start blueprint">
 									<span class="form-label">Label</span>
 									<input type="text" class="form-control">
 									<div class="invalid-feedback d-none">Invalid</div>
 								</div>
+								<div id="blueprintCheck" class="d-flex w-100 h-auto justify-content-between align-items-center blueprint">
+									<span class="form-check-label">Label</span>
+									<input type="checkbox" class="form-check-input">
+								</div>
 							</div>
-							<div id="other-properties">
-
+							<div class="d-flex flex-column w-100 gap-3 d-none" id="propertiesEntries">
+								
 							</div>
 						</div>
 					</div>
