@@ -22,7 +22,9 @@ export class PathComponentInstance extends SVG.G {
 	tikzName = ""
 
 	/** @type {string} */
-	label = ""
+	#label = ""
+	/** @type {SVG.Element} */
+	#labelSVG
 
 	/** @type {boolean} */
 	static #hasMouse = matchMedia("(pointer:fine)").matches;
@@ -214,10 +216,56 @@ export class PathComponentInstance extends SVG.G {
 			}
 		}
 
+		let labelEntry = {
+			originalObject:this,
+			propertyName:"Label",
+			inputType:"mathJax",
+			currentValue:this.#label,
+			changeCallback:(label,button)=>{
+				this.#label = label
+				button.disabled = true;
+
+				if (this.#labelSVG) {
+					this.#labelSVG.remove()
+				}
+
+				if (label!=="") {
+					
+					MathJax.texReset();
+					MathJax.tex2svgPromise(label).then((/**@type {Node} */ node) =>{
+						this.#labelSVG = new SVG.ForeignObject()
+						console.log(node.lastChild.lastChild);
+						this.#labelSVG.width("50")
+						this.#labelSVG.height("50")
+						this.#labelSVG.add(node)
+						this.container.add(this.#labelSVG)
+	
+						//TODO transform to correct position and rotation (break point is 70 deg for parallel with x axis or parallel with path)
+						// mirror on invert don't affect the side of the label
+						
+						// MathJax.startup.document.clear();
+						// MathJax.startup.document.updateDocument();
+					}).catch(function (err) {
+						console.log(err);
+										
+						this.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+					}).then(function () {
+						button.disabled = false;
+					});
+				}
+			}
+		}
+
 		formEntries.push(nameEntry)
+		formEntries.push(labelEntry)
 		formEntries.push(mirrorEntry)
 		formEntries.push(invertEntry)
 		return formEntries
+	}
+
+	#updateLabelPos(){
+		//TODO implement
+
 	}
 
 	/**

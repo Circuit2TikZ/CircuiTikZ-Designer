@@ -51,6 +51,7 @@ export class PropertyController{
 
 			this.#setForm(component,component.getFormEntries());
 		}else{
+			this.#objectName.classList.remove("d-none")
 			this.#objectName.innerText = "Please select only one component to view its properties"
 		}
 	}
@@ -65,6 +66,8 @@ export class PropertyController{
 
 		this.#objectName.innerText = component.symbol.displayName
 
+		/** @type {MathJax} */
+		const MathJax = window.MathJax
 		
 		const formMap = {
 			"string":{
@@ -76,6 +79,10 @@ export class PropertyController{
 				id:"blueprintCheck",
 				canInvalid:false,
 				value:"checked"
+			},
+			"mathJax":{
+				id:"blueprintMathJax",
+				value:"value"
 			}
 		}
 		
@@ -125,6 +132,13 @@ export class PropertyController{
 					input[formSettings.value] = formEntry.currentValue
 					input.addEventListener("input",(ev)=>{
 						formEntry.changeCallback(input[formSettings.value])					
+					})
+					break;
+				case "mathJax":
+					input.value = formEntry.currentValue
+					const submitButton = entryNode.querySelector("button");
+					submitButton.addEventListener("click",(ev)=>{
+						formEntry.changeCallback(input.value,submitButton)
 					})
 					break;
 				default:
