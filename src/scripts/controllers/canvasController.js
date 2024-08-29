@@ -159,25 +159,27 @@ export class CanvasController {
 		this.canvas.zoom(2,new SVG.Point())
 
 		let gridVisibleToggle = document.getElementById("gridVisible")
-		try {
-			let gridSettings = JSON.parse(localStorage.getItem("circuit2tikz-designer-grid"))
+
+		let storage = localStorage.getItem("circuit2tikz-designer-grid")
+		if(storage) {
+			let gridSettings = JSON.parse(storage)
 			if (gridSettings) {
 				if (gridSettings.majorGridSizecm&&gridSettings.majorGridSubdivisions) {
 					this.changeGrid(gridSettings.majorGridSizecm,gridSettings.majorGridSubdivisions)
 				}
-				gridVisibleToggle.checked = gridSettings.gridVisible
 				this.gridVisible = gridSettings.gridVisible
 				if (!this.gridVisible) {
 					this.paper.addClass("d-none")
 				}
 			}
-		} catch (error) {
+		} else {
 			localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
 				majorGridSizecm:this.majorGridSizecm,
 				majorGridSubdivisions:this.majorGridSubdivisions,
 				gridVisible:this.gridVisible
 			}))
 		}
+		gridVisibleToggle.checked = this.gridVisible
 
 		gridVisibleToggle.addEventListener("change",(ev)=>{
 			this.gridVisible = gridVisibleToggle.checked

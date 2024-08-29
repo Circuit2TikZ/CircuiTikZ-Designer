@@ -76,10 +76,18 @@ export class PropertyController{
 			let input = entryNode.querySelector("input");
 			let invalidDiv = entryNode.querySelector("div");
 
+			// check if the name changed and if so, add an undo state
+			let oldValue;
+			input.addEventListener("focusin",(ev)=>{
+				oldValue = input.value
+			})
+
+			let newValue;
 			input.value = formEntry.currentValue
 			input.addEventListener("input",(ev)=>{
 				let invalidReason = formEntry.changeCallback(input.value)
 				if (invalidReason==="") {
+					newValue = input.value
 					invalidDiv.classList.add("d-none")
 					input.classList.remove("is-invalid")
 				}else{
@@ -89,13 +97,8 @@ export class PropertyController{
 				}
 			})
 
-			// check if the name changed and if so, add an undo state
-			let value;
-			input.addEventListener("focusin",(ev)=>{
-				value = input.value
-			})
 			input.addEventListener("focusout",(ev)=>{
-				if (value!==undefined&&input.value!==value) {
+				if (oldValue!==undefined&&newValue!==undefined&&oldValue!==newValue) {
 					Undo.addState()					
 				}
 			})
@@ -140,7 +143,7 @@ export class PropertyController{
 		minorLabel.innerText = majorSubdivisions
 
 		let gridInfo = document.getElementById("gridInfo")		
-		gridInfo.innerText = "Current grid spacing: " + (majorSizecm/majorSubdivisions).toLocaleString(undefined, {maximumFractionDigits:2}) + " cm"
+		gridInfo.innerText = (majorSizecm/majorSubdivisions).toLocaleString(undefined, {maximumFractionDigits:2}) + " cm"
 	}
 
 	#clearForm(){

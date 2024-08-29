@@ -75,7 +75,7 @@
 				<div class="col d-flex flex-row justify-content-end gap-3 align-items-center pe-0">
 					<div class="form-check form-switch d-flex ps-0 mb-0 fs-3 gap-2">
 						<label class="form-check-label material-symbols-outlined" for="darkModeSwitch" id="darkModeLabel">dark_mode</label>
-						<input class="form-check-input position-relative m-0 align-self-center" type="checkbox" id="darkModeSwitch">
+						<input class="form-check-input position-relative m-0 align-self-center" type="checkbox" id="darkModeSwitch" checked>
 					</div>
 					<div class="vertical-line"></div>
 					<a role="button" class="toolbarButton material-symbols-outlined" id="helpButton" data-bs-toggle="modal" data-bs-target="#helpModal"
@@ -144,7 +144,7 @@
 						<!-- The actual canvas -->
 						<include src="pages/canvas.svg"></include>
 					</div>
-					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0" id="properties">
+					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0 d-flex flex-column h-100" id="properties">
 						<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
 						<hr class="m-0">
 						<div class="d-flex flex-column w-100 p-3" id="properties-content">
@@ -171,8 +171,9 @@
 										</div>
 										<input type="range" class="form-range" min="1" max="10" step="1" id="minorSliderInput">
 									</div>
-									<div id="gridInfo" class="w-100 border border-info-subtle rounded p-2">
-										Current grid spacing:
+									<div class="w-100 border border-info-subtle bg-info-subtle text-info-emphasis rounded p-2 d-flex justify-content-between align-items-center gap-2">
+										<div class="flex-shrink-1">Current grid spacing:</div>
+										<span id="gridInfo" class="flex-shrink-0"></span>
 									</div>
 								</div>
 							</div>

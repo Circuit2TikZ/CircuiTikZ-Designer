@@ -94,14 +94,14 @@ export class MainController {
 		this.#addSaveStateManagement()
 
 		// dark mode init
-		const htmlElement = document.documentElement;
-		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
+		const htmlElement = document.documentElement;		
+		const switchElement = document.getElementById('darkModeSwitch');
 		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-		
 		this.#currentTheme = localStorage.getItem('circuitikz-designer-theme') || defaultTheme;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
 		this.#darkModeLast=false;
 		this.darkMode = this.#currentTheme === 'dark';
+		switchElement.checked = this.darkMode;
 
 		this.snapController = SnapController.controller;
 		let canvasPromise = this.#initCanvas();
@@ -175,6 +175,9 @@ export class MainController {
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
 
+			// Prevent "normal" browser menu
+			document.getElementById("canvas").addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
+
 			/** @type {Progress} */
 			let currentProgress = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
 		
@@ -191,7 +194,6 @@ export class MainController {
 
 			const htmlElement = document.documentElement;
 			const switchElement = document.getElementById('darkModeSwitch');
-			switchElement.checked = this.darkMode;
 			switchElement.addEventListener('change', function () {
 				if (MainController.controller.darkMode = switchElement.checked) {
 					htmlElement.setAttribute('data-bs-theme', 'dark');
@@ -206,14 +208,10 @@ export class MainController {
 			PropertyController.controller.update()
 			this.isInitDone = true;
 		});
-
-		// Prevent "normal" browser menu
-		document.body.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
 	}
 	
 	/**
 	 * @typedef {Object} Progress
-	 * @property {number} desiredWindows
 	 * @property {Array} currentIndices
 	 * @property {Array} currentData
 	 */
