@@ -236,6 +236,7 @@ export class PathComponentInstance extends SVG.G {
 				if (label!=="") {
 					this.#generateLabelRender(label).catch(function (err) {
 						console.log(err);
+						//TODO change this to instead show an error message in the properties panel
 						this.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
 					}).then(function () {
 						button.disabled = false;

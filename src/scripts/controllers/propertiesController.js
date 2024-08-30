@@ -156,6 +156,11 @@ export class PropertyController{
 					submitButton.addEventListener("click",(ev)=>{
 						formEntry.changeCallback(input.value,submitButton)
 					})
+					input.addEventListener("keydown",(/** @type {KeyboardEvent}*/ev)=>{						
+						if (ev.key==="Enter"&&!submitButton.diabled) {
+							formEntry.changeCallback(input.value,submitButton)	
+						}
+					})
 					break;
 				default:
 					break;
