@@ -232,19 +232,29 @@ export class PathComponentInstance extends SVG.G {
 				if (label!=="") {
 					
 					MathJax.texReset();
-					MathJax.tex2svgPromise(label).then((/**@type {Node} */ node) =>{
-						this.#labelSVG = new SVG.ForeignObject()
-						console.log(node.lastChild.lastChild);
-						this.#labelSVG.width("50")
-						this.#labelSVG.height("50")
-						this.#labelSVG.add(node)
-						this.container.add(this.#labelSVG)
-	
-						//TODO transform to correct position and rotation (break point is 70 deg for parallel with x axis or parallel with path)
-						// mirror on invert don't affect the side of the label
+					MathJax.tex2svgPromise(label).then((/**@type {Element} */ node) =>{
+						/**@type {Element} */
+						let svgElement = node.querySelector("svg")
+						padding_ex = 0.4
+						svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
+
+						let width = svgElement.getAttribute("width")
+						width = Number.parseFloat(width.split(0,width.length-2))+padding_ex*2
+						let height = svgElement.getAttribute("height")
+						height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
+
+						width = width + "ex"
+						height = height + "ex"
+						svgElement.setAttribute("width",width)
+						svgElement.setAttribute("height",height)
 						
-						// MathJax.startup.document.clear();
-						// MathJax.startup.document.updateDocument();
+						this.#labelSVG = new SVG.ForeignObject()
+						this.#labelSVG.width(width)
+						this.#labelSVG.height(height)
+						this.#labelSVG.add(svgElement)
+						this.container.add(this.#labelSVG)
+						this.#updateLabelPos()
+
 					}).catch(function (err) {
 						console.log(err);
 										
@@ -264,8 +274,8 @@ export class PathComponentInstance extends SVG.G {
 	}
 
 	#updateLabelPos(){
-		//TODO implement
-
+		//TODO transform to correct position and rotation (break point is 70 deg for parallel with x axis or parallel with path)
+		// mirror on invert don't affect the side of the label
 	}
 
 	/**
