@@ -104,6 +104,7 @@ export class MainController {
 		switchElement.checked = this.darkMode;
 
 		this.snapController = SnapController.controller;
+		let mathJaxPromise = this.#loadMathJax();
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
 
@@ -170,7 +171,7 @@ export class MainController {
 			this.selectionController = new SelectionController(this);
 			new PropertyController();
 		});
-		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise]).then(() => {
+		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
 			new SnapCursorController(this.canvasController.canvas);
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
@@ -208,6 +209,26 @@ export class MainController {
 			PropertyController.controller.update()
 			this.isInitDone = true;
 		});
+	}
+
+	async #loadMathJax(){
+		var promise = new Promise((resolve)=>{
+			if (!window.MathJax) {
+				window.MathJax = {
+					tex: {
+						inlineMath: {'[+]': [['$', '$']]}
+					}
+				};
+			}
+			var script = document.createElement('script');
+			script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+			document.head.appendChild(script);
+	
+			script.addEventListener('load', function() {
+				resolve();
+			}, false);
+		})
+		return promise
 	}
 	
 	/**
@@ -266,10 +287,10 @@ export class MainController {
 
 		// prepare saveState for unloading
 		window.addEventListener("beforeunload",(ev)=>{
+			Undo.addState()
 			/** @type {Progress} */
 			let currentProgress = JSON.parse(localStorage.getItem(objname))
 			
-			currentProgress.desiredWindows--;
 			currentProgress.currentIndices.splice(currentProgress.currentIndices.findIndex((value)=>value==MainController.controller.#tabID),1)
 			currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
 			localStorage.setItem(objname,JSON.stringify(currentProgress))
@@ -277,12 +298,6 @@ export class MainController {
 			// localStorage.clear() //use this here if the localStorage is fucked in development
 			//TODO add manual way to clear the localStorage
 		})
-	}
-
-	saveProgress(){
-		let currentProgress = JSON.parse(localStorage.getItem(objname))
-		currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
-		localStorage.setItem("circuitikz-designer-saveState",JSON.stringify(currentProgress))
 	}
 
 	/**
@@ -656,7 +671,7 @@ export class MainController {
 				if (!symbol.viewBox) iconsWithoutViewBox.append(svgIcon);
 			}
 
-			if (firstGroup) firstGroup = false;
+			firstGroup = false;
 		}
 
 		/**

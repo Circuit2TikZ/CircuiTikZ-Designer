@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo, PathDragHandler, NodeDragHandler } from "../internal";
+import { CanvasController,PathComponentSymbol,SnapController,SnapCursorController,SnapPoint,MainController, Undo, PathDragHandler, NodeDragHandler} from "../internal";
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
@@ -160,6 +160,7 @@ export class PathComponentInstance extends SVG.G {
 	}
 
 	/**
+	 * Provide all information necessary to build a properties panel for this component
 	 * @returns {FormEntry[]}
 	 */
 	getFormEntries(){
@@ -222,6 +223,9 @@ export class PathComponentInstance extends SVG.G {
 			inputType:"mathJax",
 			currentValue:this.#label,
 			changeCallback:(label,button)=>{
+				if (this.#label===label) {
+					return
+				}
 				this.#label = label
 				button.disabled = true;
 
@@ -230,37 +234,12 @@ export class PathComponentInstance extends SVG.G {
 				}
 
 				if (label!=="") {
-					
-					MathJax.texReset();
-					MathJax.tex2svgPromise(label).then((/**@type {Element} */ node) =>{
-						/**@type {Element} */
-						let svgElement = node.querySelector("svg")
-						padding_ex = 0.4
-						svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
-
-						let width = svgElement.getAttribute("width")
-						width = Number.parseFloat(width.split(0,width.length-2))+padding_ex*2
-						let height = svgElement.getAttribute("height")
-						height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
-
-						width = width + "ex"
-						height = height + "ex"
-						svgElement.setAttribute("width",width)
-						svgElement.setAttribute("height",height)
-						
-						this.#labelSVG = new SVG.ForeignObject()
-						this.#labelSVG.width(width)
-						this.#labelSVG.height(height)
-						this.#labelSVG.add(svgElement)
-						this.container.add(this.#labelSVG)
-						this.#updateLabelPos()
-
-					}).catch(function (err) {
+					this.#generateLabelRender(label).catch(function (err) {
 						console.log(err);
-										
 						this.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
 					}).then(function () {
 						button.disabled = false;
+						Undo.addState()
 					});
 				}
 			}
@@ -273,9 +252,118 @@ export class PathComponentInstance extends SVG.G {
 		return formEntries
 	}
 
-	#updateLabelPos(){
-		//TODO transform to correct position and rotation (break point is 70 deg for parallel with x axis or parallel with path)
-		// mirror on invert don't affect the side of the label
+	/**
+	 * 
+	 * @param {string} label 
+	 * @returns {Promise}
+	 */
+	async #generateLabelRender(label){
+		MathJax.texReset();
+		return MathJax.tex2svgPromise(label).then((/**@type {Element} */ node) =>{
+			/**@type {SVG.Container} */
+			let svgElement = node.querySelector("svg")
+			// slight padding of the label text
+			let padding_ex = 0.2
+			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
+
+			// increase the width and height of the svg element by the padding
+			let width = svgElement.getAttribute("width")
+			width = Number.parseFloat(width.split(0,width.length-2))+padding_ex*2
+			let height = svgElement.getAttribute("height")
+			height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
+
+			width = width + "ex"
+			height = height + "ex"
+			svgElement.setAttribute("width",width)
+			svgElement.setAttribute("height",height)
+			svgElement.setAttribute("overflow","visible")
+			
+			//also set the width and height for the svg container
+			this.#labelSVG = new SVG.ForeignObject()
+			this.#labelSVG.width(width)
+			this.#labelSVG.height(height)
+			this.#labelSVG.add(svgElement)
+			this.container.add(this.#labelSVG)
+			this.#updateLabelPosition()
+		})
+	}
+
+	#updateLabelPosition(){
+		if (this.#label==="") {
+			return
+		}
+		// breaking points where the label is parallel to the path or to the x axis. in degrees
+		const breakVertical = 70
+		const breakHorizontal = 21
+
+		let pathDiff = this.getEndPoint().minus(this.getStartPoint())
+		// at which angle the path is drawn
+		let pathAngle = Math.atan2(pathDiff.y, pathDiff.x);   //radians
+		pathAngle = 180*pathAngle/Math.PI;  //degrees
+
+		// the bounding boxes for the label and the symbol
+		let labelBBox = this.#labelSVG.bbox()
+		let symbolBBox = this.symbolUse.bbox()
+
+		// the nominal reference point of the label (bottom center)
+		let labelRef = new SVG.Point(labelBBox.w/2,labelBBox.h)
+		// the rotation angle of the label (not always identical to the path rotation angle)
+		let rotAngle = this.#rotationAngle
+		if (rotAngle>90) {
+			// upper left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
+			rotAngle-=180
+			// the label reference point should now by the top center
+			labelRef = new SVG.Point(labelBBox.w/2,0)
+		}else if(rotAngle<-90){
+			// lower left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
+			rotAngle+=180
+			// the label reference point should now by the top center
+			labelRef = new SVG.Point(labelBBox.w/2,0)
+		}
+
+		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
+		let referenceoffsetY = this.#mirror?this.symbol.relMid.y-symbolBBox.h:-this.symbol.relMid.y
+		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
+		let referenceOffsetX = 0
+
+		// if the path is close to horizontal or vertical according to the break points
+		let nearHorizontal = Math.abs(pathAngle)<breakHorizontal||Math.abs(pathAngle)>(180-breakHorizontal);
+		let nearVertical = Math.abs(pathAngle)>(breakVertical)&&Math.abs(pathAngle)<(180-breakVertical);
+
+		if (nearHorizontal) {
+			// the label should not be rotated w.r.t. the x axis
+			rotAngle=0
+			//the offset where the rotation pivot point should lie (for both label and symbol)
+			let horizontalOffset = Math.min(labelBBox.w,symbolBBox.w)*Math.sign(this.#rotationAngle)/2
+			referenceOffsetX = horizontalOffset*Math.sign(pathDiff.x)
+			labelRef.x+=horizontalOffset
+		}else if(nearVertical){
+			// the label should not be rotated w.r.t. the x axis
+			rotAngle=0
+			let side = Math.sign(-rotAngle)
+			let up = Math.sign(this.#rotationAngle)
+			//the offset where the rotation pivot point should lie (for both label and symbol)
+			let verticalOffset = Math.min(labelBBox.h,symbolBBox.w)/2
+			referenceOffsetX = verticalOffset*-side
+
+			labelRef = new SVG.Point(labelBBox.w*(1+up)/2,verticalOffset*side*up)
+			labelRef.y+=verticalOffset
+		}
+
+		// where the anchor point of the symbol is located relative to the midAbs point
+		let referenceOffset = new SVG.Point(referenceOffsetX,referenceoffsetY).transform({
+			rotate:-this.#rotationAngle
+		})
+		
+		// acutally move and rotate the label to the correct position
+		let compRef = this.#midAbs.plus(referenceOffset)
+		let movePos = compRef.minus(labelRef)
+		this.#labelSVG.move(movePos.x,movePos.y)
+		.transform({
+			rotate:-rotAngle,
+			ox:compRef.x,
+			oy:compRef.y
+		})
 	}
 
 	/**
@@ -334,6 +422,7 @@ export class PathComponentInstance extends SVG.G {
 	showBoundingBox(){
 		if (!this.#selectionRectangle) {
 			let box = this.symbolUse.bbox();
+			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let moveVec = this.#midAbs.minus(this.symbol.relMid)
 
 			this.#selectionRectangle = this.container.rect(box.w,box.h)
@@ -349,6 +438,7 @@ export class PathComponentInstance extends SVG.G {
 				"stroke-dasharray":"3,3",
 				"fill": "none"
 			});
+			// also paint the lines leading to the symbol
 			this.#preLine.attr({
 				"stroke":selectionColor,
 			});
@@ -384,6 +474,10 @@ export class PathComponentInstance extends SVG.G {
 		pathComponent.#invert = serialized.invert
 		pathComponent.secondClick(new SVG.Point(serialized.end),false)
 		pathComponent.tikzName = serialized.tikzName
+		if (serialized.label!=="") {
+			pathComponent.#label = serialized.label
+			pathComponent.#generateLabelRender(serialized.label)
+		}
 
 		MainController.controller.addInstance(pathComponent);
 		return pathComponent
@@ -399,6 +493,7 @@ export class PathComponentInstance extends SVG.G {
 		let data = {
 			id:this.symbol.node.id,
 			tikzName:this.tikzName,
+			label:this.#label,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
 			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},
 			mirror:this.#mirror,
@@ -419,6 +514,7 @@ export class PathComponentInstance extends SVG.G {
 			" to[" +
 			this.symbol.tikzName +
 			(this.tikzName===""?"":", name="+this.tikzName) +
+			(this.#label!==""?", l=$"+this.#label+"$":"") +
 			(this.#mirror?", mirror":"") +
 			(this.#invert?", invert":"") +
 			"] " +
@@ -438,6 +534,7 @@ export class PathComponentInstance extends SVG.G {
 		PathDragHandler.snapDrag(this,false)
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
+		this.#labelSVG.remove()
 		super.remove();
 		return this;
 	}
@@ -672,5 +769,7 @@ export class PathComponentInstance extends SVG.G {
 			sp.recalculate(null, angle, flipVector);
 			this.relSnappingPoints.push(sp.minus(ref))
 		}
+
+		this.#updateLabelPosition()
 	}
 }

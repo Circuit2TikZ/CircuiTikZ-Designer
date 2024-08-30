@@ -427,10 +427,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.#updateTransform()
 
 		this.#recalculateRelSnappingPoints()
-		this.recalculateSnappingPoints()
-
-		console.log(this.tikzName);
-		
+		this.recalculateSnappingPoints()		
 	}
 
 	/**
