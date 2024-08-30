@@ -59,6 +59,7 @@ export class PropertyController{
 	/**
 	 * 
 	 * @param {FormEntry[]} formEntries 
+	 * @param {FormEntry[]} formEntries 
 	 */
 	#setForm(component,formEntries){
 		this.#propertiesEntries.classList.remove("d-none")
@@ -85,7 +86,22 @@ export class PropertyController{
 				value:"value"
 			}
 		}
+
+		/**@type {Element} */
+		let tikzIDNode = document.getElementById("blueprintInfo").cloneNode(true)
+		tikzIDNode.firstElementChild.innerHTML = "ID"
+		tikzIDNode.lastElementChild.innerHTML = component.symbol.tikzName
+		this.#propertiesEntries.appendChild(tikzIDNode)
+
+		let tikzOptions = Array.from(component.symbol._tikzOptions.keys()).join(", ")
+		if (tikzOptions) {
+			let tikzOptionsNode = document.getElementById("blueprintInfo").cloneNode(true)
+			tikzOptionsNode.firstElementChild.innerHTML = "Options"
+			tikzOptionsNode.lastElementChild.innerHTML = tikzOptions
+			this.#propertiesEntries.appendChild(tikzOptionsNode)
+		}
 		
+
 		for (const formEntry of formEntries) {
 			let formSettings = formMap[formEntry.inputType]
 

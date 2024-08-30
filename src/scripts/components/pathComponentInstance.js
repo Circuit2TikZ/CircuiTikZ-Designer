@@ -534,7 +534,7 @@ export class PathComponentInstance extends SVG.G {
 		PathDragHandler.snapDrag(this,false)
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
-		this.#labelSVG.remove()
+		this.#labelSVG?.remove()
 		super.remove();
 		return this;
 	}
