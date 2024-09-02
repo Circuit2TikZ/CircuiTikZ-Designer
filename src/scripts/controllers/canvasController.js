@@ -94,6 +94,9 @@ export class CanvasController {
 	 */
 	lastCanvasPoint = new SVG.Point(0,0)
 
+	// the first index a component can be placed at while still being drawn above the background grid and axis
+	#firstIndex = 5
+
 	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
@@ -200,6 +203,14 @@ export class CanvasController {
 			majorGridSubdivisions:this.majorGridSubdivisions,
 			gridVisible:this.gridVisible
 		}))
+	}
+
+	bringComponentToFront(component){
+		component.front()
+	}
+
+	moveComponentToBack(component){
+		component.insertAfter(this.canvas.children()[this.#firstIndex])
 	}
 
 	/**

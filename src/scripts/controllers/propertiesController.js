@@ -46,7 +46,6 @@ export class PropertyController{
 				this.#setFormGrid()
 			}
 		}else if(components.length==1){
-
 			let component = components[0]			
 
 			this.#setForm(component,component.getFormEntries());
@@ -100,6 +99,15 @@ export class PropertyController{
 			tikzOptionsNode.lastElementChild.innerHTML = tikzOptions
 			this.#propertiesEntries.appendChild(tikzOptionsNode)
 		}
+
+		let zorderControls = document.getElementById("zorder-controls").cloneNode(true)
+		zorderControls.firstElementChild.addEventListener("click",()=>{
+			CanvasController.controller.bringComponentToFront(component)
+		})
+		zorderControls.lastElementChild.addEventListener("click",()=>{
+			CanvasController.controller.moveComponentToBack(component)
+		})
+		this.#propertiesEntries.appendChild(zorderControls)
 		
 
 		for (const formEntry of formEntries) {

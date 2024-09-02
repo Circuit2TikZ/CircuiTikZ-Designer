@@ -147,7 +147,7 @@
 					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0 d-flex flex-column h-100" id="properties">
 						<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
 						<hr class="m-0">
-						<div class="d-flex flex-column w-100 p-3 fs-5" id="properties-content">
+						<div class="d-flex flex-column w-100 p-3 fs-5 gap-3" id="properties-content">
 							<span class="align-self-center text-center fs-4 mb-3" id="objectName">
 								Object name
 							</span>
@@ -178,6 +178,14 @@
 								</div>
 							</div>
 							<div id="blueprints" class="d-none w-0 h-0">
+								<div id="zorder-controls" class="d-flex justify-content-between gap-3">
+									<button class="btn btn-primary flex-grow-1" id="bringToFront">
+										Bring to front
+									</button>
+									<button class="btn btn-primary flex-grow-1" id="pushToBack">
+										Push to back
+									</button>
+								</div>
 								<div id="blueprintInfo" class="d-flex gap-3 w-100 h-auto justify-content-between align-items-center blueprint">
 									<span class="text-end"></span>
 									<span class="text-end"></span>
