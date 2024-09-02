@@ -2,8 +2,7 @@
 
 A GUI for easy and fast drawing of circuits to be used with [circuitikz](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and include it in your LaTeX document!
 
-<b>Hosting of the tool is currently being worked on! Check back soon for more information!</b>
-In the meantime you can use a previous version of the tool [here.](https://ussi.e-technik.uni-erlangen.de/tikz/)
+The official hosting of the current build can be found under https://circuit2tikz.tf.fau.de/designer/
 
 ![example_image](./example_image.png)
 ![example_image2](./example_image2.png)
