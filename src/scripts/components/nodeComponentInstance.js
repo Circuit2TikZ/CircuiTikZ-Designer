@@ -201,7 +201,11 @@ export class NodeComponentInstance extends SVG.Use {
 		nodeComponent.moveTo(new SVG.Point(serialized.position))
 		nodeComponent.#angleDeg = serialized.rotation
 		nodeComponent.#flip= new SVG.Point(serialized.flip)
-		nodeComponent.tikzName = serialized.tikzName
+		if (serialized.tikzName) {
+			nodeComponent.tikzName = serialized.tikzName
+		}else{
+			nodeComponent.tikzName = ""
+		}
 		nodeComponent.#updateTransform()
 		nodeComponent.#recalculateRelSnappingPoints()
 		nodeComponent.recalculateSnappingPoints()
@@ -220,10 +224,12 @@ export class NodeComponentInstance extends SVG.Use {
 		//necessary information: symbol_id,name,position,rotation,flip
 		let data = {
 			id:this.symbol.node.id,
-			tikzName:this.tikzName,
 			position:this.getAnchorPoint().clone(),
 			rotation:this.#angleDeg,
 			flip:this.#flip.clone()
+		}
+		if (this.tikzName) {
+			data.tikzName = this.tikzName
 		}
 
 		return data

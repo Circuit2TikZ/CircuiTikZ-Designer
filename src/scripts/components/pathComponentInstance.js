@@ -474,10 +474,17 @@ export class PathComponentInstance extends SVG.G {
 		pathComponent.#mirror = serialized.mirror
 		pathComponent.#invert = serialized.invert
 		pathComponent.secondClick(new SVG.Point(serialized.end),false)
-		pathComponent.tikzName = serialized.tikzName
-		if (serialized.label!=="") {
+		if (serialized.label) {
 			pathComponent.#label = serialized.label
 			pathComponent.#generateLabelRender(serialized.label)
+		}else{
+			pathComponent.#label = ""
+		}
+
+		if (serialized.tikzName) {
+			pathComponent.tikzName = serialized.tikzName
+		}else{
+			pathComponent.tikzName = ""
 		}
 
 		MainController.controller.addInstance(pathComponent);
@@ -493,12 +500,17 @@ export class PathComponentInstance extends SVG.G {
 		//TODO add additional options!?
 		let data = {
 			id:this.symbol.node.id,
-			tikzName:this.tikzName,
-			label:this.#label,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
 			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},
 			mirror:this.#mirror,
 			invert:this.#invert
+		}
+
+		if (this.tikzName) {
+			data.tikzName = this.tikzName
+		}
+		if (this.#label) {
+			data.label = this.#label
 		}
 
 		return data
