@@ -607,6 +607,7 @@ export class MainController {
 				/** @type {HTMLDivElement} */
 				const addButton = accordionItemBody.appendChild(document.createElement("div"));
 				addButton.classList.add("libComponent");
+				addButton.setAttribute("searchData",[symbol.tikzName].concat(Array.from(symbol._tikzOptions.keys())).join(" "))
 				addButton.ariaRoleDescription = "button";
 				addButton.title = symbol.displayName || symbol.tikzName;
 
@@ -706,7 +707,6 @@ export class MainController {
 	filterComponents(evt){
 		evt.preventDefault();
 		evt.stopPropagation();
-
 		
 		const element = document.getElementById('componentFilterInput');
 		const feedbacktext = document.getElementById('invalid-feedback-text');
@@ -731,7 +731,7 @@ export class MainController {
 			let showCount = 0;
 			Array.prototype.forEach.call(libComponents,(/**@type {HTMLDivElement} */libComponent)=>{
 				if (text) {
-					if (!regex.test(libComponent.title)) {
+					if (!(regex.test(libComponent.title)||regex.test(libComponent.getAttribute("searchData")))) {
 						libComponent.classList.add("d-none");
 						return;
 					}
