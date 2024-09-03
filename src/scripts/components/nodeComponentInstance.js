@@ -105,7 +105,6 @@ export class NodeComponentInstance extends SVG.Use {
 
 			dh.startDrag(event);
 
-			// Prevent immediate dragend --> 10ms delay before recognizing dragend
 			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
 			const endEventNameScoped = endEventName + ".drag";
 
@@ -174,6 +173,16 @@ export class NodeComponentInstance extends SVG.Use {
 	 */
 	disableDragging() {
 		this.#snapDragHandler.temporaryDisabled = true;
+	}
+
+	setDraggable(drag){
+		if (drag) {
+			this.node.classList.add("draggable");
+			this.#snapDragHandler = NodeDragHandler.snapDrag(this, true);
+		}else{
+			this.node.classList.remove("draggable");
+			this.#snapDragHandler = NodeDragHandler.snapDrag(this, false);
+		}
 	}
 
 	/**

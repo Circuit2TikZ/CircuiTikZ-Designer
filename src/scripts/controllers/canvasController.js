@@ -205,12 +205,24 @@ export class CanvasController {
 		}))
 	}
 
+	/**
+	 * 
+	 * @param {SVG.Element} component 
+	 */
 	bringComponentToFront(component){
-		component.front()
+		this.canvas.removeElement(component)
+		this.canvas.add(component)
 	}
 
+	/**
+	 * 
+	 * @param {SVG.Element} component 
+	 */
 	moveComponentToBack(component){
-		component.insertAfter(this.canvas.children()[this.#firstIndex])
+		//for some reason, this is necessary. Wouldn't be draggable otherwise
+		component.setDraggable(false)
+		this.canvas.get(this.#firstIndex).after(component)
+		component.setDraggable(true)
 	}
 
 	/**
