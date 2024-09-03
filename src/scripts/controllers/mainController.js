@@ -536,11 +536,6 @@ export class MainController {
 		const leftOffcanvas = document.getElementById("leftOffcanvas");
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
 		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
-		// document.getElementById("componentFilterInput").addEventListener("keyup",(evt)=>{
-		// 	// only "input" events should trigger the component filter. otherwise shortcuts are also triggered
-		// 	evt.preventDefault();
-		// 	evt.stopPropagation();
-		// });
 
 		/** @type {HTMLAnchorElement} */
 		const addComponentButton = document.getElementById("addComponentButton");
@@ -548,9 +543,16 @@ export class MainController {
 			"click",
 			(() => {
 				this.#switchMode(MainController.modes.DRAG_PAN);
-				leftOffcanvasOC.toggle();
-				// offcanvas refocuses itself on animation completion so this does not work. TODO find workaround
-				document.getElementById("componentFilterInput").focus()
+				leftOffcanvasOC.toggle();				
+				if (leftOffcanvas.classList.contains("showing")) {
+					let searchBar = document.getElementById("componentFilterInput")
+					const refocus = ()=>{
+						searchBar.focus()
+						leftOffcanvas.removeEventListener('shown.bs.offcanvas',refocus)
+					}
+					refocus()
+					leftOffcanvas.addEventListener('shown.bs.offcanvas',refocus)
+				}
 			}).bind(this),
 			{ passive: true }
 		);
