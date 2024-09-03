@@ -1,6 +1,6 @@
 {
 	"background_color": "#fff",
-	"description": "A GUI for drawing CircuiTikZ circuits",
+	"description": "A GUI for easily drawing circuits with CircuiTikZ components. Draw your circuit, export it to circuitikz or SVG code and include it in your project.",
 	"display": "standalone",
 	"name": "CircuiTikZ Designer",
 	"start_url": ".",
