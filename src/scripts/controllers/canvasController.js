@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, ComponentInstance, MainController } from "../internal";
+import { SnapController, ComponentInstance, MainController, SelectionController } from "../internal";
 
 /**
  * @typedef {object} PanningEventDetail
@@ -210,8 +210,7 @@ export class CanvasController {
 	 * @param {SVG.Element} component 
 	 */
 	bringComponentToFront(component){
-		this.canvas.removeElement(component)
-		this.canvas.add(component)
+		this.canvas.put(component)
 	}
 
 	/**
@@ -219,10 +218,8 @@ export class CanvasController {
 	 * @param {SVG.Element} component 
 	 */
 	moveComponentToBack(component){
-		//for some reason, this is necessary. Wouldn't be draggable otherwise
-		component.setDraggable(false)
-		this.canvas.get(this.#firstIndex).after(component)
-		component.setDraggable(true)
+		// for some reason, the position is wrong...
+		this.canvas.put(component,this.#firstIndex)
 	}
 
 	/**
