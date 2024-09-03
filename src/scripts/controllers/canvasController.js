@@ -238,7 +238,7 @@ export class CanvasController {
 			panning: true,
 			pinchZoom: true,
 			wheelZoom: true,
-			panButton: 2,
+			panButton: 1,
 			oneFingerPan: true,
 			zoomFactor: this.zoomFactor,
 			zoomMin: this.zoomMin,
