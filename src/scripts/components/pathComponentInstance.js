@@ -135,21 +135,41 @@ export class PathComponentInstance extends SVG.G {
 		];
 
 		this.symbolUse.node.classList.add("draggable");
-		this.#snapDragHandler = NodeDragHandler.snapDrag(this, true);
 		
-		this.startCircle = this.circle(this.circleRadius).fill("transparent").id("start")
-		this.startCircle.draggable(true)
-		this.startCircle.node.classList.add("draggable","pathPoint")
+		this.startCircle = this.circle(this.circleRadius).fill("transparent")
+		this.startCircle.node.classList.add("pathPoint")
 		this.add(this.startCircle)
 		
-		this.endCircle = this.circle(this.circleRadius).fill("transparent").id("start")
-		this.endCircle.draggable(true)
-		this.endCircle.node.classList.add("draggable","pathPoint")
+		this.endCircle = this.circle(this.circleRadius).fill("transparent")
+		this.endCircle.node.classList.add("pathPoint")
 		this.add(this.endCircle)
 
-		PathDragHandler.snapDrag(this, true, true);
-		PathDragHandler.snapDrag(this, false, true);
+		this.setDraggable(true)
+	}
 
+	/**
+	 * 
+	 * @param {boolean} drag if the component should be draggable or not
+	 */
+	setDraggable(drag){
+		this.startCircle.draggable(drag)
+		this.endCircle.draggable(drag)
+		if (drag) {
+			this.symbolUse.node.classList.add("draggable");
+			this.startCircle.node.classList.add("draggable")
+			this.startCircle.node.classList.remove("d-none")
+			this.endCircle.node.classList.add("draggable")
+			this.endCircle.node.classList.remove("d-none")
+		}else{
+			this.symbolUse.node.classList.remove("draggable");
+			this.startCircle.node.classList.remove("draggable")
+			this.startCircle.node.classList.add("d-none")
+			this.endCircle.node.classList.remove("draggable")
+			this.endCircle.node.classList.add("d-none")
+		}
+		NodeDragHandler.snapDrag(this, drag)	
+		PathDragHandler.snapDrag(this, true, drag);
+		PathDragHandler.snapDrag(this, false, drag);
 	}
 
 	updateTheme(){
@@ -595,6 +615,7 @@ export class PathComponentInstance extends SVG.G {
 	
 	firstClick(snappedPoint){
 		if (this.#pointsSet===0) {
+			this.setDraggable(false)
 			this.#prePointArray[0][0] = snappedPoint.x;
 			this.#prePointArray[0][1] = snappedPoint.y;
 			this.#pointsSet = 1;
@@ -616,6 +637,7 @@ export class PathComponentInstance extends SVG.G {
 			
 			CanvasController.controller.activatePanning();
 			SnapController.controller.hideSnapPoints();
+			this.setDraggable(true)
 
 			if (runCB) {
 				this.#finishedPlacingCallback()
