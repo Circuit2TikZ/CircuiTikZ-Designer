@@ -629,7 +629,14 @@ export class MainController {
 						this.removeInstance(oldComponent);
 					}
 
-					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{this.#switchMode(MainController.modes.DRAG_PAN);});
+					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{
+						this.#switchMode(MainController.modes.DRAG_PAN);
+						if (newInstance) {
+							// only refire event if the component was sucessfully created
+							var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
+							addButton?.dispatchEvent(clickEvent);
+						}
+					});
 					if (newInstance instanceof PathComponentInstance) {
 						if (lastpoint) {
 							newInstance.firstClick(lastpoint);

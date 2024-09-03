@@ -109,14 +109,18 @@ export class NodeComponentInstance extends SVG.Use {
 			const endEventNameScoped = endEventName + ".drag";
 
 			const dragEndFunction = (/** @type {MouseEvent} */evt)=>{
-				dh.endDrag(evt);
-				CanvasController.controller.placingComponent=null;
-				this.#finishedPlacingCallback();
-				hotkeys.unbind("esc",dragCancelFunction)				
+				if (evt.button==0) {
+					dh.endDrag(evt);
+					CanvasController.controller.placingComponent=null;
+					this.#finishedPlacingCallback();
+					hotkeys.unbind("esc",dragCancelFunction)				
+				}
 			}
 
 			const dragCancelFunction = (/** @type {KeyboardEvent} */evt)=>{
-				dragEndFunction(evt)
+				dh.endDrag(evt);
+				CanvasController.controller.placingComponent=null;
+				hotkeys.unbind("esc",dragCancelFunction)
 				MainController.controller.removeInstance(this);	
 			}
 
