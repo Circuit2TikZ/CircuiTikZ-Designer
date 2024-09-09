@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, ComponentInstance, MainController, SelectionController } from "../internal";
+import { SnapController, ComponentInstance } from "../internal";
 
 /**
  * @typedef {object} PanningEventDetail
@@ -96,6 +96,7 @@ export class CanvasController {
 
 	// the first index a component can be placed at while still being drawn above the background grid and axis
 	#firstIndex = 5
+	#defs
 
 	/**
 	 * Create the canvas controller.
@@ -103,10 +104,12 @@ export class CanvasController {
 	 */
 	constructor(canvas) {
 		CanvasController.controller = this;
+		
 		this.canvas = canvas;
 		this.paper = SVG.SVG("#grid");
 		this.xAxis = SVG.SVG("#xAxis");
 		this.yAxis = SVG.SVG("#yAxis");
+		this.#defs = SVG.SVG("#backgroundDefs");		
 
 		// init viewBox
 		this.#onResizeCanvas();
@@ -218,8 +221,9 @@ export class CanvasController {
 	 * @param {SVG.Element} component 
 	 */
 	moveComponentToBack(component){
-		// for some reason, the position is wrong...
-		this.canvas.put(component,this.#firstIndex)
+		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
+		// this is super weird??		
+		this.canvas.put(component,11)
 	}
 
 	/**

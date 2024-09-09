@@ -14,7 +14,7 @@ export class SnapCursorController {
 	/** @type {SVG.Box} */
 	#cursorViewBox;
 	/** @type {SVG.Use} */
-	#cursor;
+	cursor;
 
 	/**
 	 * Called only once by index.js. Use {@link controller} to get the instance.
@@ -25,14 +25,14 @@ export class SnapCursorController {
 		SnapCursorController.#instance = this;
 
 		const cursorSymbol = new SVG.Symbol(document.getElementById("snapCursor"));
-		this.#cursor = new SVG.Use();
-		this.#cursor.id("snapCursor")
-		this.#cursor.use(cursorSymbol);
+		this.cursor = new SVG.Use();
+		this.cursor.id("snapCursorUse")
+		this.cursor.use(cursorSymbol);
 		this.#cursorViewBox = cursorSymbol.viewbox();
-		this.#cursor.width(this.#cursorViewBox.width);
-		this.#cursor.height(this.#cursorViewBox.height);
-		container.add(this.#cursor);
-		this.#cursor.hide();
+		this.cursor.width(this.#cursorViewBox.width);
+		this.cursor.height(this.#cursorViewBox.height);
+		container.add(this.cursor);
+		this.cursor.hide();
 	}
 
 	/**
@@ -50,7 +50,7 @@ export class SnapCursorController {
 	 * @param {SVG.Point} position - the new position
 	 */
 	moveTo(position) {
-		this.#cursor.move(position.x - this.#cursorViewBox.cx, position.y - this.#cursorViewBox.cy);
+		this.cursor.move(position.x - this.#cursorViewBox.cx, position.y - this.#cursorViewBox.cy);
 	}
 
 	/**
@@ -59,8 +59,8 @@ export class SnapCursorController {
 	 * @param {boolean} b - the visibility
 	 */
 	set visible(b) {
-		if (b) this.#cursor.show();
-		else this.#cursor.hide();
+		if (b) this.cursor.show();
+		else this.cursor.hide();
 	}
 
 	/**
@@ -69,6 +69,6 @@ export class SnapCursorController {
 	 * @returns {boolean} the visibility
 	 */
 	get visible() {
-		return this.#cursor.visible();
+		return this.cursor.visible();
 	}
 }

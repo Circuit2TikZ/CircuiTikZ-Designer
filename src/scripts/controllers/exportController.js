@@ -147,7 +147,7 @@ export class ExportController {
 		svgObj.removeChild(svgObj.getElementById("xAxis"))
 		svgObj.removeChild(svgObj.getElementById("yAxis"))
 		svgObj.removeChild(svgObj.getElementById("selectionRectangle"))
-		svgObj.removeChild(svgObj.getElementById("snapCursor"))
+		svgObj.removeChild(svgObj.getElementById("snapCursorUse"))
 
 		// delete path points for moving paths around
 		for (const element of svgObj.querySelectorAll(".draggable.pathPoint")) {
