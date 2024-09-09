@@ -186,25 +186,28 @@ export class PathComponentInstance extends SVG.G {
 	getFormEntries(){
 		let formEntries = []
 
-		let nameCallback = (/** @type {string}*/name)=>{
+		let nameCallback = (/** @type {string}*/name, /** @type {function(str):void}*/ errMsgCallback)=>{
 			if (name==="") {
 				this.tikzName = name
-				return ""
+				errMsgCallback("")
+				return
 			}
 
 			if (name.match(invalidNameRegEx)) {
-				return "Contains forbidden characters!"
+				errMsgCallback("Contains forbidden characters!")
+				return
 			}
 			
 			for (const instance of MainController.controller.instances) {
 				if (instance!=this) {
 					if (instance.tikzName==name) {
-						return "Name is already taken!"
+						errMsgCallback("Name is already taken!")
+						return
 					}
 				}
 			}
 			this.tikzName = name
-			return "";
+			errMsgCallback("")
 		}
 
 		let nameEntry = {
@@ -242,22 +245,21 @@ export class PathComponentInstance extends SVG.G {
 			propertyName:"Label",
 			inputType:"mathJax",
 			currentValue:this.#label,
-			changeCallback:(label,button)=>{
+			changeCallback:(label,button,errMsgCallback)=>{
 				if (this.#label===label) {
 					return
 				}
 				this.#label = label
-				button.disabled = true;
 
 				if (this.#labelSVG) {
 					this.#labelSVG.remove()
 				}
 
 				if (label!=="") {
+					button.disabled = true;
+					errMsgCallback("")
 					this.#generateLabelRender(label).catch(function (err) {
-						console.log(err);
-						//TODO change this to instead show an error message in the properties panel
-						this.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+						errMsgCallback(err.message)						
 					}).then(function () {
 						button.disabled = false;
 						Undo.addState()
@@ -640,8 +642,8 @@ export class PathComponentInstance extends SVG.G {
 			this.setDraggable(true)
 
 			if (runCB) {
-				this.#finishedPlacingCallback()
 				Undo.addState()
+				this.#finishedPlacingCallback()
 			}
 		}
 	}

@@ -108,7 +108,6 @@ export class PropertyController{
 			CanvasController.controller.moveComponentToBack(component)
 		})
 		this.#propertiesEntries.appendChild(zorderControls)
-		
 
 		for (const formEntry of formEntries) {
 			let formSettings = formMap[formEntry.inputType]
@@ -120,30 +119,36 @@ export class PropertyController{
 			label.innerText = formEntry.propertyName
 
 			let input = entryNode.querySelector("input");
+			let invalidDiv = entryNode.querySelector(".invalid-feedback");
+			
+			// check if the name changed and if so, add an undo state
+			let oldValue;
+			let newValue;
+
+			let changeValidStatus = (msg) =>{
+				if (invalidDiv) {
+					if (msg==="") {
+						newValue = input[formSettings.value]
+						invalidDiv.classList.add("d-none")
+						input.classList.remove("is-invalid")
+					}else{
+						invalidDiv.classList.remove("d-none")
+						invalidDiv.innerText = "Invalid! " + msg
+						input.classList.add("is-invalid")
+					}
+				}
+			}
 
 			switch (formEntry.inputType) {
 				case "string":
-					let invalidDiv = entryNode.querySelector("div");
 				
-					// check if the name changed and if so, add an undo state
-					let oldValue;
-					let newValue;
 					input.addEventListener("focusin",(ev)=>{
 						oldValue = input[formSettings.value]
 					})
 		
 					input[formSettings.value] = formEntry.currentValue
 					input.addEventListener("input",(ev)=>{
-						let invalidReason = formEntry.changeCallback(input[formSettings.value])
-						if (invalidReason==="") {
-							newValue = input[formSettings.value]
-							invalidDiv.classList.add("d-none")
-							input.classList.remove("is-invalid")
-						}else{
-							invalidDiv.classList.remove("d-none")
-							invalidDiv.innerText = "Invalid! " + invalidReason
-							input.classList.add("is-invalid")
-						}
+						formEntry.changeCallback(input[formSettings.value],changeValidStatus)
 					})
 	
 					input.addEventListener("focusout",(ev)=>{
@@ -161,12 +166,15 @@ export class PropertyController{
 				case "mathJax":
 					input.value = formEntry.currentValue
 					const submitButton = entryNode.querySelector("button");
+					const rerender = ()=>{
+						formEntry.changeCallback(input.value,submitButton,changeValidStatus)
+					}
 					submitButton.addEventListener("click",(ev)=>{
-						formEntry.changeCallback(input.value,submitButton)
+						rerender()
 					})
 					input.addEventListener("keydown",(/** @type {KeyboardEvent}*/ev)=>{						
-						if (ev.key==="Enter"&&!submitButton.diabled) {
-							formEntry.changeCallback(input.value,submitButton)	
+						if (ev.key==="Enter"&&!submitButton.disabled) {
+							rerender()	
 						}
 					})
 					break;
