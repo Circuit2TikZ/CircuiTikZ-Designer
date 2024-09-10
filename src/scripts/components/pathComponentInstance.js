@@ -521,6 +521,7 @@ export class PathComponentInstance extends SVG.G {
 	toJson() {
 		//TODO add additional options!?
 		let data = {
+			type:"path",
 			id:this.symbol.node.id,
 			start:{x:this.#prePointArray[0][0],y:this.#prePointArray[0][1]},
 			end:{x:this.#postPointArray[1][0],y:this.#postPointArray[1][1]},

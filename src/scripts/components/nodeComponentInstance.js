@@ -236,6 +236,7 @@ export class NodeComponentInstance extends SVG.Use {
 		//TODO add additional options!?
 		//necessary information: symbol_id,name,position,rotation,flip
 		let data = {
+			type:"node",
 			id:this.symbol.node.id,
 			position:this.getAnchorPoint().clone(),
 			rotation:this.#angleDeg,

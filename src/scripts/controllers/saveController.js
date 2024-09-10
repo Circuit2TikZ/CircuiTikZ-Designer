@@ -3,7 +3,7 @@
  */
 
 import { Modal } from "bootstrap";
-import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo } from "../internal";
+import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
@@ -46,24 +46,14 @@ export class SaveController {
 	}
 
 	save(){
-		let nodes = []
-		let paths = []
-		for (const component of MainController.controller.instances) {
-			if (component instanceof NodeComponentInstance) {
-				nodes.push(component.toJson())
-			}else{
-				paths.push(component.toJson())
+		let components = []
+		for (const component of CanvasController.controller.canvas.children()) {
+			if (component instanceof Line || component instanceof NodeComponentInstance || component instanceof PathComponentInstance) {
+				components.push(component.toJson())
 			}
 		}
 
-		let lines = []
-		for (const line of MainController.controller.lines) {
-			lines.push(line.toJson())
-		}
-
-		let all = {nodes:nodes,paths:paths,lines:lines}
-
-		MainController.controller.exportController.exportJSON(JSON.stringify(all,null,4))
+		MainController.controller.exportController.exportJSON(JSON.stringify(components,null,4))
 	}
 
 	load(){
@@ -120,22 +110,32 @@ export class SaveController {
 			SelectionController.controller.selectAll()
 			SelectionController.controller.removeSelection()
 		}
-
+		
 		let nodes = []
 		let paths = []
 		let lines = []
-
-		for (const node of obj.nodes) {
-			nodes.push(NodeComponentInstance.fromJson(node))
+		for (const component of obj.nodes) {
+			if (component.type==="line") {
+				lines.push(Line.fromJson(component))
+			}else if(component.type==="node"){
+				nodes.push(NodeComponentInstance.fromJson(component))
+			}else if(component.type==="path"){
+				paths.push(PathComponentInstance.fromJson(component))
+			}
 		}
+
+
+		// for (const node of obj.nodes) {
+		// 	nodes.push(NodeComponentInstance.fromJson(node))
+		// }
 		
-		for (const path of obj.paths) {
-			paths.push(PathComponentInstance.fromJson(path))
-		}
+		// for (const path of obj.paths) {
+		// 	paths.push(PathComponentInstance.fromJson(path))
+		// }
 
-		for (const line of obj.lines) {
-			lines.push(Line.fromJson(line))
-		}
+		// for (const line of obj.lines) {
+		// 	lines.push(Line.fromJson(line))
+		// }
 		
 		if (selectComponents) {
 			SelectionController.controller.deactivateSelection()

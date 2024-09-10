@@ -222,7 +222,8 @@ export class CanvasController {
 	 */
 	moveComponentToBack(component){
 		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
-		// this is super weird??		
+		// this is super weird??
+		// see this.canvas.node.childNodes		
 		this.canvas.put(component,11)
 	}
 

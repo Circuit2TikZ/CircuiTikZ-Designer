@@ -40,6 +40,8 @@ export class Line extends SVG.Polyline {
 	#mousePoint;
 
 	isSelected=false
+	
+	zIndex = 0
 
 	/**
 	 *
@@ -394,6 +396,7 @@ export class Line extends SVG.Polyline {
 		}
 
 		let data = {
+			type:"wire",
 			start:{x:this.#drawCommands[0].x,y:this.#drawCommands[0].y},
 			others:others
 		}
