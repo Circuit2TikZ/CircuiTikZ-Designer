@@ -114,28 +114,30 @@ export class SaveController {
 		let nodes = []
 		let paths = []
 		let lines = []
-		for (const component of obj.nodes) {
-			if (component.type==="line") {
-				lines.push(Line.fromJson(component))
-			}else if(component.type==="node"){
-				nodes.push(NodeComponentInstance.fromJson(component))
-			}else if(component.type==="path"){
-				paths.push(PathComponentInstance.fromJson(component))
+
+		if (obj.nodes || obj.paths || obj.lines) {
+			for (const node of obj.nodes) {
+				nodes.push(NodeComponentInstance.fromJson(node))
+			}
+			
+			for (const path of obj.paths) {
+				paths.push(PathComponentInstance.fromJson(path))
+			}
+	
+			for (const line of obj.lines) {
+				lines.push(Line.fromJson(line))
+			}
+		}else{
+			for (const component of obj) {
+				if (component.type==="line") {
+					lines.push(Line.fromJson(component))
+				}else if(component.type==="node"){
+					nodes.push(NodeComponentInstance.fromJson(component))
+				}else if(component.type==="path"){
+					paths.push(PathComponentInstance.fromJson(component))
+				}
 			}
 		}
-
-
-		// for (const node of obj.nodes) {
-		// 	nodes.push(NodeComponentInstance.fromJson(node))
-		// }
-		
-		// for (const path of obj.paths) {
-		// 	paths.push(PathComponentInstance.fromJson(path))
-		// }
-
-		// for (const line of obj.lines) {
-		// 	lines.push(Line.fromJson(line))
-		// }
 		
 		if (selectComponents) {
 			SelectionController.controller.deactivateSelection()
