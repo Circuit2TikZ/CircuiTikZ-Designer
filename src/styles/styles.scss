@@ -47,6 +47,10 @@ $danger: #c50f3c;
 	user-select: none;
 }
 
+#darkModeLabel, #darkModeSwitch{
+	cursor: pointer;
+}
+
 .vertical-line{
 	width: 1px; /* Line width */
 	min-width: 1px;
