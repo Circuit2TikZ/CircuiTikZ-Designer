@@ -3,7 +3,7 @@
  */
 
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController } from "../internal";
+import { SelectionController, MainController, CanvasController, NodeComponentInstance, PathComponentInstance, Line } from "../internal";
 import FileSaver from "file-saver";
 var pretty = require('pretty');
 
@@ -91,18 +91,17 @@ export class ExportController {
 
 		// actually export/create the string
 		{
-			const instanceLines = this.#mainController.instances.map((instance) => "\t" + instance.toTikzString());
-
-			const lineLines = this.#mainController.lines.map((instance) => "\t" + instance.toTikzString());
-
+			let circuitElements = []
+			for (const circuitElement of CanvasController.controller.canvas.children()) {
+				if (circuitElement instanceof NodeComponentInstance || circuitElement instanceof PathComponentInstance || circuitElement instanceof Line) {
+					circuitElements.push("\t"+circuitElement.toTikzString())
+				}
+			}
+			
 			const arr = [
 				"\\begin{tikzpicture}",
-				"\t% Instances/Symbols:",
-				...instanceLines,
-				"",
-				"\t% Lines:",
-				...lineLines,
-				"",
+				"\t% Paths, nodes and wires:",
+				...circuitElements,
 				"\\end{tikzpicture}",
 			];
 			this.#exportedContent.rows = arr.length;
