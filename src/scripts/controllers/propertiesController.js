@@ -40,24 +40,41 @@ export class PropertyController{
 		let lines = SelectionController.controller.currentlySelectedLines
 		this.#clearForm()
 
-		if (components.length==0) {
-			if (lines.length==0) {
-				// nothing selected, show grid properties
-				this.#setFormGrid()
-			}
-		}else if(components.length==1){
-			let component = components[0]			
-
-			this.#setForm(component,component.getFormEntries());
-		}else{
+		if (components.length+lines.length>1) {
 			this.#objectName.classList.remove("d-none")
 			this.#objectName.innerText = "Please select only one component to view its properties"
+		}else if (components.length+lines.length===0) {
+			this.#setFormGrid()
+		}else{
+			if (components.length===1) {
+				let component = components[0]
+				this.#setForm(component,component.getFormEntries());
+			} else {
+				//show line
+				let component = lines[0]	
+				this.#setLineForm(component);
+			}
 		}
+	}
+
+	#setLineForm(line){
+		this.#propertiesEntries.classList.remove("d-none")
+		this.#objectName.classList.remove("d-none")
+		this.#objectName.innerText = "Wire"
+
+		let zorderControls = document.getElementById("zorder-controls").cloneNode(true)
+		zorderControls.firstElementChild.addEventListener("click",()=>{
+			CanvasController.controller.bringComponentToFront(line)
+		})
+		zorderControls.lastElementChild.addEventListener("click",()=>{
+			CanvasController.controller.moveComponentToBack(line)
+		})
+		this.#propertiesEntries.appendChild(zorderControls)
 	}
 
 	/**
 	 * 
-	 * @param {FormEntry[]} formEntries 
+	 * @param {ComponentInstance||Line} component 
 	 * @param {FormEntry[]} formEntries 
 	 */
 	#setForm(component,formEntries){

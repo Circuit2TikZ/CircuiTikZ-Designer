@@ -77,6 +77,10 @@ export class Line extends SVG.Polyline {
 		}
 	}
 
+	getFormEntries(){
+		return []
+	}
+
 	/**
 	 * Redraw the line using the points array (`_array`). This sets the "points" attribute.
 	 */

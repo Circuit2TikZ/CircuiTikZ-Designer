@@ -550,7 +550,7 @@ export class PathComponentInstance extends SVG.G {
 			" to[" +
 			this.symbol.tikzName +
 			(this.tikzName===""?"":", name="+this.tikzName) +
-			(this.#label!==""?", l=$"+this.#label+"$":"") +
+			(this.#label!==""?", l={$"+this.#label+"$}":"") +
 			(this.#mirror?", mirror":"") +
 			(this.#invert?", invert":"") +
 			"] " +
