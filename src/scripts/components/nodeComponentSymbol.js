@@ -21,6 +21,9 @@ export class NodeComponentSymbol extends ComponentSymbol {
 	 */
 	constructor(symbolElement, baseInformation) {
 		super(symbolElement, baseInformation);
+		if (this._textPosition===null) {
+			this._textPosition = this._defaultAnchor.point
+		}
 	}
 
 	/**
