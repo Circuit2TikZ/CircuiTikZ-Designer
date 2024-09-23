@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, ComponentInstance } from "../internal";
+import { SnapController, ComponentInstance, Undo } from "../internal";
 
 /**
  * @typedef {object} PanningEventDetail
@@ -213,7 +213,11 @@ export class CanvasController {
 	 * @param {SVG.Element} component 
 	 */
 	bringComponentToFront(component){
+		let index = this.canvas.children().findIndex(c=>c===component);
 		this.canvas.put(component)
+		if (index!==this.canvas.children().findIndex(c=>c===component)) {
+			Undo.addState()
+		}
 	}
 
 	/**
@@ -221,10 +225,14 @@ export class CanvasController {
 	 * @param {SVG.Element} component 
 	 */
 	moveComponentToBack(component){
+		let index = this.canvas.children().findIndex(c=>c===component);
 		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
 		// this is super weird??
 		// see this.canvas.node.childNodes		
 		this.canvas.put(component,11)
+		if (index!==this.canvas.children().findIndex(c=>c===component)) {
+			Undo.addState()
+		}
 	}
 
 	/**

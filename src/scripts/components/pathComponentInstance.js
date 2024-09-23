@@ -295,18 +295,19 @@ export class PathComponentInstance extends SVG.G {
 			let height = svgElement.getAttribute("height")
 			height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
 
-			width = width + "ex"
-			height = height + "ex"
+			width = 10*width/2 + "pt" // change to pt to explicitly change the font size
+			height = 10*height/2 + "pt"
 			svgElement.setAttribute("width",width)
 			svgElement.setAttribute("height",height)
 			svgElement.setAttribute("overflow","visible")
 			
 			//also set the width and height for the svg container
 			this.#labelSVG = new SVG.ForeignObject()
+			this.#labelSVG.addClass("pointerNone")
 			this.#labelSVG.width(width)
 			this.#labelSVG.height(height)
 			this.#labelSVG.add(svgElement)
-			this.container.add(this.#labelSVG)
+			this.add(this.#labelSVG)
 			this.#updateLabelPosition()
 		})
 	}

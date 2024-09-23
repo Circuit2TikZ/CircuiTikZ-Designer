@@ -82,9 +82,6 @@ export class PropertyController{
 		this.#objectName.classList.remove("d-none")
 
 		this.#objectName.innerText = component.symbol.displayName
-
-		/** @type {MathJax} */
-		const MathJax = window.MathJax
 		
 		const formMap = {
 			"string":{

@@ -5,8 +5,9 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { rectRectIntersection, selectionColor, selectedBoxWidth } from "../utils/selectionHelper";
 
-import { NodeComponentSymbol,SnapPoint,NodeDragHandler,ContextMenu,MainController,CanvasController } from "../internal";
+import { NodeComponentSymbol,SnapPoint,NodeDragHandler,Undo,MainController,CanvasController } from "../internal";
 import hotkeys from "hotkeys-js";
+import { Point } from "@svgdotjs/svg.js";
 
 /**
  * @typedef {import("../controllers/propertiesController")} FormEntry
@@ -24,6 +25,10 @@ export class NodeComponentInstance extends SVG.Use {
 
 	/** @type {string} */
 	tikzName="";
+	/** @type {string} */
+	#label = ""
+	/** @type {SVG.Element} */
+	#labelSVG
 
 	/** @type {NodeDragHandler} */
 	#snapDragHandler;
@@ -219,6 +224,12 @@ export class NodeComponentInstance extends SVG.Use {
 		}else{
 			nodeComponent.tikzName = ""
 		}
+		if (serialized.label) {
+			nodeComponent.#label = serialized.label
+			nodeComponent.#generateLabelRender(serialized.label)
+		}else{
+			nodeComponent.#label = ""
+		}
 		nodeComponent.#updateTransform()
 		nodeComponent.#recalculateRelSnappingPoints()
 		nodeComponent.recalculateSnappingPoints()
@@ -246,6 +257,10 @@ export class NodeComponentInstance extends SVG.Use {
 			data.tikzName = this.tikzName
 		}
 
+		if (this.#label) {
+			data.label = this.#label
+		}
+
 		return data
 	}
 
@@ -268,7 +283,9 @@ export class NodeComponentInstance extends SVG.Use {
 			(this.tikzName ? "(" + this.tikzName + ") " : "") +
 			"at " +
 			this.#midAbs.toTikzString() +
-			" {};"
+			" {"+
+			(this.#angleDeg!==0?(this.#label?`\\rotatebox{${-this.#angleDeg}}{$${this.#label}$}`:""):(this.#label?"$"+this.#label+"$":""))+
+			"};"
 		);
 	}
 
@@ -308,9 +325,101 @@ export class NodeComponentInstance extends SVG.Use {
 			changeCallback:nameCallback
 		}
 
+		let labelEntry = {
+			originalObject:this,
+			propertyName:"Label",
+			inputType:"mathJax",
+			currentValue:this.#label,
+			changeCallback:(label,button,errMsgCallback)=>{
+				if (this.#label===label) {
+					return
+				}
+				this.#label = label
+
+				if (this.#labelSVG) {
+					this.#labelSVG.remove()
+				}
+
+				if (label!=="") {
+					button.disabled = true;
+					errMsgCallback("")
+					this.#generateLabelRender(label).catch(function (err) {
+						errMsgCallback(err.message)						
+					}).then(function () {
+						button.disabled = false;
+						Undo.addState()
+					});
+				}
+			}
+		}
+
 		formEntries.push(nameEntry)
+		formEntries.push(labelEntry)
 		return formEntries
 	}
+
+	/**
+	 * 
+	 * @param {string} label 
+	 * @returns {Promise}
+	 */
+	async #generateLabelRender(label){
+		MathJax.texReset();
+		return MathJax.tex2svgPromise(label,{}).then((/**@type {Element} */ node) =>{
+			/**@type {SVG.Container} */
+			let svgElement = node.querySelector("svg")
+			// slight padding of the label text
+			let padding_ex = 0.2
+			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
+
+			// increase the width and height of the svg element by the padding
+			let width = svgElement.getAttribute("width")
+			width = Number.parseFloat(width.split(0,width.length-2))+padding_ex*2
+			let height = svgElement.getAttribute("height")
+			height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
+
+			width = 10*width/2 + "pt" // change to pt to explicitly change the font size
+			height = 10*height/2 + "pt"
+			svgElement.setAttribute("width",width)
+			svgElement.setAttribute("height",height)
+			svgElement.setAttribute("overflow","visible")
+			
+			//also set the width and height for the svg container
+			this.#labelSVG = new SVG.ForeignObject()
+			this.#labelSVG.addClass("pointerNone")
+			this.#labelSVG.width(width)
+			this.#labelSVG.height(height)
+			this.#labelSVG.add(svgElement)
+			this.container.add(this.#labelSVG)
+			this.#updateLabelPosition()
+		})
+	}
+
+	#updateLabelPosition(){
+		// currently working only with 90 deg rotation steps
+		if (this.#label===""||!this.#labelSVG) {
+			return
+		}		
+
+		let textPos = this.symbol._textPosition
+		let labelBBox = this.#labelSVG.bbox()
+
+		// calculate where on the label the anchor point should be
+		let horizontalTextPosition = Math.round((textPos.x+this.relMid.x)/this.symbol.viewBox.w*2-1)
+		let verticalTextPosition = Math.round((textPos.y+this.relMid.y)/this.symbol.viewBox.h*2-1)
+		let labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
+		labelRef = labelRef.rotate(this.#angleDeg)
+		labelRef.x = (1-labelRef.x)/2*labelBBox.w
+		labelRef.y = (1-labelRef.y)/2*labelBBox.h
+		
+		// the text position should react to rotation
+		textPos = textPos.rotate(this.#angleDeg)
+		
+		// acutally move the label
+		let movePos = this.#midAbs.plus(textPos).minus(labelRef)
+		this.#labelSVG.move(movePos.x,movePos.y)
+	}
+
 	
 	/**
 	 * Moves the component delta units.
@@ -338,6 +447,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.#midAbs.y = y;
 		this.#updateTransform()
 		super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
+		this.#updateLabelPosition()
 
 		return this;
 	}
@@ -478,6 +588,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.#snapDragHandler = NodeDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
+		this.#labelSVG?.remove();
 		super.remove();
 		return this;
 	}

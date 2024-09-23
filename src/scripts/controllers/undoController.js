@@ -2,7 +2,7 @@
  * @module undo
  */
 
-import {MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Line} from "../internal";
+import {MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Line, CanvasController} from "../internal";
 
 /**
  * Class handling undo and redo via save states
@@ -16,29 +16,17 @@ export class Undo {
 	//TODO discuss if selections should be remembered or not???
 	static addState(){
 		// get json object
-		let nodes = []
-		let paths = []
-		for (const component of MainController.controller.instances) {
-			let componentObject = component.toJson()
-			componentObject.selected = SelectionController.controller.isComponentSelected(component)
-			if (component instanceof NodeComponentInstance) {
-				nodes.push(componentObject)
-			}else{
-				paths.push(componentObject)
+		let currentState = []
+		for (const component of CanvasController.controller.canvas.children()) {
+			if (component instanceof NodeComponentInstance || component instanceof PathComponentInstance) {
+				let componentObject = component.toJson()
+				componentObject.selected = SelectionController.controller.isComponentSelected(component)
+				currentState.push(componentObject)
+			}else if(component instanceof Line){
+				let componentObject = component.toJson()
+				componentObject.selected = SelectionController.controller.isLineSelected(component)
+				currentState.push(componentObject)
 			}
-		}
-
-		let lines = []
-		for (const line of MainController.controller.lines) {
-			let lineObject = line.toJson()
-			lineObject.selected = SelectionController.controller.isLineSelected(line)
-			lines.push(lineObject)
-		}
-
-		let currentState = {
-			nodes:nodes,
-			paths:paths,
-			lines:lines,
 		}
 
 		// push state on stack
@@ -85,24 +73,22 @@ export class Undo {
 		let allComponents = []
 		let lines = []
 
-		for (const node of state.nodes) {
-			let nodeComponent = NodeComponentInstance.fromJson(node)
-			if (node.selected) {
-				allComponents.push(nodeComponent)
-			}
-		}
-		
-		for (const path of state.paths) {
-			let pathComponent = PathComponentInstance.fromJson(path)
-			if (path.selected) {
-				allComponents.push(pathComponent)
-			}
-		}
-
-		for (const line of state.lines) {
-			let lineComponent = Line.fromJson(line)
-			if (line.selected) {
-				lines.push(lineComponent)
+		for (const component of state) {
+			if (component.type==="line") {
+				let lineComponent = Line.fromJson(component)
+				if (component.selected) {
+					lines.push(lineComponent)
+				}
+			}else if(component.type==="node"){
+				let nodeComponent = NodeComponentInstance.fromJson(component)
+				if (component.selected) {
+					allComponents.push(nodeComponent)
+				}
+			}else if(component.type==="path"){
+				let pathComponent = PathComponentInstance.fromJson(component)
+				if (component.selected) {
+					allComponents.push(pathComponent)
+				}
 			}
 		}
 
@@ -111,12 +97,6 @@ export class Undo {
 		}
 		if (lines.length>0) {
 			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
-		}
-
-		let currentState = {
-			nodes:state.nodes,
-			paths:state.paths,
-			lines:state.lines,
 		}
 	}
 }

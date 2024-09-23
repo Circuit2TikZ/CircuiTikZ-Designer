@@ -59,7 +59,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	_pins = [];
 	/** @type {TikZAnchor[]} */
 	_additionalAnchors = [];
-	/** @type {?TikZAnchor} */
+	/** @type {SVG.Point} */
 	_textPosition = null;
 	/** @type {?TikZAnchor} */
 	_defaultAnchor = null;
@@ -118,7 +118,7 @@ export class ComponentSymbol extends SVG.Symbol {
 		let textPosition =
 			baseInformation.componentInformation &&
 			getNamedTag(baseInformation.componentInformation, "textPosition", METADATA_NAMESPACE_URI);
-		this._textPosition = textPosition ? this.#parseAnchor(textPosition, this).point : null;
+		this._textPosition = textPosition ? this.#parseAnchor(textPosition, this).point : this._defaultAnchor.point;
 	}
 
 	/**

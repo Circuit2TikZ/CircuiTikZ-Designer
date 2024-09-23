@@ -366,17 +366,17 @@
 		</symbol>
 		<symbol id="node_vcc">
 			<metadata>
-				<ci:componentInformation type="node" displayName="VCC/VDD" tikzName="vcc" groupName="Grounds and supply voltages" refX="5.82259" refY="21.16495" viewBox="0 0 11.64513 21.4306">
+				<ci:componentInformation type="node" displayName="VCC/VDD" tikzName="vcc" groupName="Grounds and supply voltages" refX="5.82259" refY="21.43062" viewBox="0 0 11.64513 21.69627">
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.7153" rx="4.6580520000000005" ry="8.572239999999999" />
+			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.848135" rx="4.6580520000000005" ry="8.678507999999999" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
-					<path stroke-width="1.06267" d="m.53137 12.69896 5.29122-7.4077 5.29122 7.4077"/>
-					<path stroke-width=".53134" d="M5.82259 21.16495v-15.8737"/>
+					<path stroke-width="1.06267" d="m.53137 12.96463 5.29122-7.4077 5.29122 7.4077"/>
+					<path stroke-width=".53134" d="M5.82259 21.43062v-15.8737"/>
 				</g>
 			</g>
 		</symbol>
@@ -406,17 +406,17 @@
 		</symbol>
 		<symbol id="node_vee">
 			<metadata>
-				<ci:componentInformation type="node" displayName="VEE/VSS" tikzName="vee" groupName="Grounds and supply voltages" refX="5.82259" refY="4.04544" viewBox="0 0 11.64513 25.21035">
+				<ci:componentInformation type="node" displayName="VEE/VSS" tikzName="vee" groupName="Grounds and supply voltages" refX="5.82259" refY="4.04545" viewBox="0 0 11.64513 25.47602">
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.605175" rx="4.6580520000000005" ry="10.08414" />
+			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.73801" rx="4.6580520000000005" ry="10.190408" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
-					<path stroke-width="1.06267" d="m.53137 12.51143 5.29122 7.4077 5.29122-7.4077"/>
-					<path stroke-width=".53134" d="M5.82259 4.04544v15.8737"/>
+					<path stroke-width="1.06267" d="m.53137 12.51143 5.29122 7.40771 5.29122-7.4077"/>
+					<path stroke-width=".53134" d="M5.82259 4.04545v15.8737"/>
 				</g>
 			</g>
 		</symbol>
@@ -752,6 +752,7 @@
 						<ci:pin anchorName="shield" x="-5.290429999999999" y="5.290430000000002" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="-5.290429999999999" y="-5.290419999999998"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="10.58085" cy="10.58085" rx="8.46468" ry="8.46468" />
@@ -799,6 +800,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-5.29123"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="8.468325" cy="5.822565" rx="6.774660000000001" ry="4.6580520000000005" />
@@ -833,6 +835,7 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="5.29136" y="0" isDefault="false" />
 					</ci:pins>
+					<ci:textPosition x="0" y="-5.29123"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
@@ -860,16 +863,17 @@
 		</symbol>
 		<symbol id="node_iecplugR">
 			<metadata>
-				<ci:componentInformation type="node" displayName="IEC 60617 male plug (right side)" tikzName="iecplugR" groupName="Wiring" refX="4.04544" refY="4.04544" viewBox="0 0 15.15946 7.22237">
+				<ci:componentInformation type="node" displayName="IEC 60617 male plug (right side)" tikzName="iecplugR" groupName="Wiring" refX="4.04544" refY="5.55692" viewBox="0 0 15.15946 8.73385">
 					<ci:pins>
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="10.582710000000002" y="0" isDefault="false" />
 					</ci:pins>
+					<ci:textPosition x="10.582710000000002" y="-5.29122"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="4.366925" rx="6.063784" ry="3.4935400000000003" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
-				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z"/>
+				<path stroke-width="1.06267" d="M4.04544 2.91131h10.58271v5.29122h-10.58271Z"/>
 			</g>
 		</symbol>
 		<symbol id="path_ferrocap">
@@ -895,16 +899,17 @@
 		</symbol>
 		<symbol id="node_iecplugL">
 			<metadata>
-				<ci:componentInformation type="node" displayName="IEC 60617 male plug (left side)" tikzName="iecplugL" groupName="Wiring" refX="4.04544" refY="4.04544" viewBox="0 0 15.15946 7.22237">
+				<ci:componentInformation type="node" displayName="IEC 60617 male plug (left side)" tikzName="iecplugL" groupName="Wiring" refX="4.04544" refY="5.55692" viewBox="0 0 15.15946 8.73385">
 					<ci:pins>
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="10.582710000000002" y="0" isDefault="false" />
 					</ci:pins>
+					<ci:textPosition x="0" y="-5.29122"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="3.611185" rx="6.063784" ry="2.888948" />
+			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="4.366925" rx="6.063784" ry="3.4935400000000003" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
-				<path stroke-width="1.06267" d="M4.04544 1.39983h10.58271v5.29122h-10.58271Z"/>
+				<path stroke-width="1.06267" d="M4.04544 2.91131h10.58271v5.29122h-10.58271Z"/>
 			</g>
 		</symbol>
 		<symbol id="path_cute-inductor">
@@ -932,6 +937,7 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="5.29136" y="0" isDefault="false" />
 					</ci:pins>
+					<ci:textPosition x="5.29136" y="-5.29123"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
@@ -973,6 +979,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1020,6 +1027,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1055,6 +1063,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1092,6 +1101,7 @@
 						<ci:pin anchorName="w" x="-37.03903" y="0" isDefault="false" />
 						<ci:pin anchorName="e" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="-18.51952" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="19.050855" rx="16.646316" ry="15.240684" />
@@ -1136,6 +1146,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1178,6 +1189,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1221,6 +1233,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1341,6 +1354,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1381,6 +1395,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1420,6 +1435,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1467,6 +1483,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1517,6 +1534,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1564,6 +1582,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1614,6 +1633,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1664,6 +1684,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1708,6 +1729,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -1761,6 +1783,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -1808,6 +1831,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
@@ -1856,6 +1880,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
@@ -1901,6 +1926,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1943,6 +1969,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1985,6 +2012,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -2027,6 +2055,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -2074,6 +2103,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -2132,6 +2162,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -2185,6 +2216,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2231,6 +2263,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2275,6 +2308,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2317,6 +2351,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2358,6 +2393,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2403,6 +2439,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2443,6 +2480,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2486,6 +2524,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="11.548135" cy="29.633705" rx="9.238508000000001" ry="23.706964" />
@@ -2526,6 +2565,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2566,6 +2606,7 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2608,6 +2649,7 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2657,6 +2699,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2709,6 +2752,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2757,6 +2801,7 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2798,6 +2843,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2840,6 +2886,7 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2880,6 +2927,7 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2922,6 +2970,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2932,25 +2981,6 @@
 				<path fill="none" stroke-width="1.06267" d="M14.60638 19.18205v20.90334"/>
 				<path stroke="none" d="M23.87798 29.63372v-3.04907l6.81375 3.04907-6.81375 3.04908Z"/>
 				<path fill="none" stroke-width=".53134" d="M14.60638 19.44772h-14.34069m37.3047 10.186v-29.10236"/>
-			</g>
-		</symbol>
-		<symbol id="path_empty-gto">
-			<metadata>
-				<ci:componentInformation type="path" displayName="Empty GTO" tikzName="empty gto" shapeName="emptygtoshape" groupName="Diodes" refX="26.72226" refY="29.36805" viewBox="0 0 53.44448 43.12766">
-					<ci:pins>
-						<ci:pin anchorName="START" x="-26.45657" y="0" isDefault="false" />
-						<ci:pin anchorName="END" x="26.456560000000003" y="0" isDefault="false" />
-						<ci:pin anchorName="gate" x="26.456560000000003" y="-29.10236" isDefault="false" />
-					</ci:pins>
-					<ci:additionalAnchors>
-						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
-					</ci:additionalAnchors>
-				</ci:componentInformation>
-			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="21.56383" rx="21.377792" ry="17.251064" />
-			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
-				<path stroke-width="1.06267" d="m34.6593 29.36805-18.5195-13.22828v26.45657l18.5195-13.22829Zm0 13.22829v-26.45657"/>
-				<path stroke-width=".53134" d="M53.17882 14.81686v-14.55117m-18.51952 29.10236 18.51952-14.55119m0-7.27558-18.51953 14.55118m-18.51949 7.27559h-15.87411m34.3936 0h18.51953"/>
 			</g>
 		</symbol>
 		<symbol id="node_pigfete_solderdot">
@@ -2967,6 +2997,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3008,6 +3039,7 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3050,6 +3082,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3098,6 +3131,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3148,6 +3182,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3196,6 +3231,7 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3245,6 +3281,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3294,6 +3331,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3344,6 +3382,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3392,6 +3431,7 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3439,6 +3479,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3482,6 +3523,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3523,6 +3565,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3564,6 +3607,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3605,6 +3649,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3645,6 +3690,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6457999999999977" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="17.341675" cy="29.633705" rx="13.873339999999999" ry="23.706964" />
@@ -3686,6 +3732,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6457999999999977" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="17.341675" cy="29.633705" rx="13.873339999999999" ry="23.706964" />
@@ -3727,6 +3774,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.109465" cy="29.633705" rx="18.487572" ry="23.706964" />
@@ -3757,7 +3805,7 @@
 		</symbol>
 		<symbol id="node_ngfet">
 			<metadata>
-				<ci:componentInformation type="node" displayName="n-type graphene FET" tikzName="ngfet" groupName="Transistors" refX="32.27954" refY="29.63372" viewBox="0 0 44.0012 59.26741">
+				<ci:componentInformation type="node" displayName="n-type graphene FET" tikzName="ngfet" groupName="Transistors" refX="32.27954" refY="29.63372" viewBox="0 0 46.64625 59.26741">
 					<ci:pins>
 						<ci:pin anchorName="D" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="G" x="-31.74819" y="0" isDefault="false" />
@@ -3766,9 +3814,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="14.10105" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="22.0006" cy="29.633705" rx="17.60048" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="23.323125" cy="29.633705" rx="18.6585" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v14.81685m0 29.10237v14.81685m-11.456-36.64363 11.456-7.2756 11.456 7.2756v14.55119l-11.456 7.2756-11.456-7.2756Z"/>
 				<path fill="none" stroke-width="1.06267" d="M16.40546 22.09247v15.0825m4.41808-22.35809v29.6337"/>
@@ -3795,7 +3844,7 @@
 		</symbol>
 		<symbol id="node_pgfet">
 			<metadata>
-				<ci:componentInformation type="node" displayName="p-type graphene FET" tikzName="pgfet" groupName="Transistors" refX="32.27954" refY="29.63372" viewBox="0 0 44.0012 59.26741">
+				<ci:componentInformation type="node" displayName="p-type graphene FET" tikzName="pgfet" groupName="Transistors" refX="32.27954" refY="29.63372" viewBox="0 0 46.64625 59.26741">
 					<ci:pins>
 						<ci:pin anchorName="D" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="G" x="-31.74819" y="0" isDefault="false" />
@@ -3804,9 +3853,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="14.10105" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="22.0006" cy="29.633705" rx="17.60048" ry="23.706964" />
+			<ellipse stroke="none" fill="transparent" cx="23.323125" cy="29.633705" rx="18.6585" ry="23.706964" />
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="M32.27954.26569v14.81685m0 29.10237v14.81685m-11.456-36.64363 11.456-7.2756 11.456 7.2756v14.55119l-11.456 7.2756-11.456-7.2756Z"/>
 				<path fill="none" stroke-width="1.06267" d="M16.40546 22.09247v15.0825m4.41808-22.35809v29.6337"/>
@@ -3833,7 +3883,7 @@
 		</symbol>
 		<symbol id="node_diodetube">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 43.39253 75.14076">
+				<ci:componentInformation type="node" displayName="Tube diode" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 48.41851 75.14076">
 					<ci:pins>
 						<ci:pin anchorName="anode" x="0" y="-37.03903" isDefault="false" />
 						<ci:pin anchorName="cathode" x="-10.58245" y="37.03902" isDefault="false" />
@@ -3841,9 +3891,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="37.57038" rx="17.357012" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M.53135 37.5704v-8.46583c0-11.68921 9.47572-21.16493 21.16493-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -3873,7 +3924,7 @@
 		</symbol>
 		<symbol id="node_triode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Triode" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:pins>
 						<ci:pin anchorName="anode" x="0" y="-37.03903" isDefault="false" />
 						<ci:pin anchorName="cathode" x="-10.582460000000001" y="37.03902" isDefault="false" />
@@ -3882,9 +3933,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -3914,7 +3966,7 @@
 		</symbol>
 		<symbol id="node_tetrode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Tetrode" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:pins>
 						<ci:pin anchorName="anode" x="0" y="-37.03903" isDefault="false" />
 						<ci:pin anchorName="cathode" x="-10.582460000000001" y="37.03902" isDefault="false" />
@@ -3924,9 +3976,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -3961,7 +4014,7 @@
 		</symbol>
 		<symbol id="node_pentode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:pins>
 						<ci:pin anchorName="anode" x="0" y="-37.03903" isDefault="false" />
 						<ci:pin anchorName="cathode" x="-10.582460000000001" y="37.03902" isDefault="false" />
@@ -3972,9 +4025,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4004,7 +4058,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:pins>
 						<ci:pin anchorName="anode" x="0" y="-37.03903" isDefault="false" />
 						<ci:pin anchorName="cathode" x="-10.582460000000001" y="37.03902" isDefault="false" />
@@ -4014,9 +4068,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4046,7 +4101,7 @@
 		</symbol>
 		<symbol id="node_diodetube_filament">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode (filament)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 43.39253 75.14076">
+				<ci:componentInformation type="node" displayName="Tube diode (filament)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 48.41851 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 					</ci:tikzOptions>
@@ -4059,9 +4114,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="37.57038" rx="17.357012" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M.53135 37.5704v-8.46583c0-11.68921 9.47572-21.16493 21.16493-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4091,7 +4147,7 @@
 		</symbol>
 		<symbol id="node_triode_filament">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode (filament)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Triode (filament)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 					</ci:tikzOptions>
@@ -4105,9 +4161,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4134,7 +4191,7 @@
 		</symbol>
 		<symbol id="node_tetrode_filament">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode (filament)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Tetrode (filament)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 					</ci:tikzOptions>
@@ -4149,9 +4206,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4178,7 +4236,7 @@
 		</symbol>
 		<symbol id="node_pentode_filament">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode (filament)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode (filament)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 					</ci:tikzOptions>
@@ -4194,9 +4252,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4226,7 +4285,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode_filament">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 					</ci:tikzOptions>
@@ -4241,9 +4300,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4273,7 +4333,7 @@
 		</symbol>
 		<symbol id="node_diodetube_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode (nocathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.57038" viewBox="0 0 43.39253 67.73247">
+				<ci:componentInformation type="node" displayName="Tube diode (nocathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.57038" viewBox="0 0 48.41851 67.73247">
 					<ci:tikzOptions>
 						<ci:option key="nocathode" />
 					</ci:tikzOptions>
@@ -4283,9 +4343,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="33.866235" rx="17.357012" ry="27.092988000000005" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="33.866235" rx="19.367404" ry="27.092988000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53135 37.57038v-8.46582c0-11.68922 9.47572-21.16493 21.16493-21.16493s21.16494 9.47571 21.16494 21.16493v16.93165c0 11.68921-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47572-21.16493-21.16493Zm21.16493-37.03902v22.22365m-10.58245 0h21.16491"/>
 			</g>
@@ -4317,7 +4378,7 @@
 		</symbol>
 		<symbol id="node_triode_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode (nocathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 48.68417 67.73247">
+				<ci:componentInformation type="node" displayName="Triode (nocathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 53.71015 67.73247">
 					<ci:tikzOptions>
 						<ci:option key="nocathode" />
 					</ci:tikzOptions>
@@ -4328,9 +4389,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="33.866235" rx="19.473668000000004" ry="27.092988000000005" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M5.823 37.57038v-8.46582c0-11.68922 9.4757-21.16493 21.16492-21.16493s21.16494 9.47571 21.16494 21.16493v16.93165c0 11.68921-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47572-21.16493-21.16493Zm-5.29164 0h9.25996m3.48742 0h3.48741m3.4874 0h3.48742m3.48741 0h3.4874m3.48742 0h3.4874m3.48741 0h3.48742m-17.6775-37.03902v22.22365m-10.58247 0h21.16492"/>
 			</g>
@@ -4357,7 +4419,7 @@
 		</symbol>
 		<symbol id="node_tetrode_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode (nocathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 48.68417 67.73247">
+				<ci:componentInformation type="node" displayName="Tetrode (nocathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 53.71015 67.73247">
 					<ci:tikzOptions>
 						<ci:option key="nocathode" />
 					</ci:tikzOptions>
@@ -4369,9 +4431,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="33.866235" rx="19.473668000000004" ry="27.092988000000005" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M5.823 37.57038v-8.46582c0-11.68922 9.4757-21.16493 21.16492-21.16493s21.16494 9.47571 21.16494 21.16493v16.93165c0 11.68921-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47572-21.16493-21.16493Zm-5.29164 3.70385h9.25996m-9.25996-7.40769h9.25996m3.48742 0h3.48741m-3.48741 7.40769h3.48741m3.4874-7.40769h3.48742m-3.48742 7.40769h3.48742m3.48741-7.40769h3.4874m-3.4874 7.40769h3.4874m3.48742-7.40769h3.4874m-3.4874 7.40769h3.4874m3.48741-7.40769h3.48742m-3.48742 7.40769h3.48742m-17.6775-40.74287v22.22365m-10.58247 0h21.16492"/>
 			</g>
@@ -4395,7 +4458,7 @@
 		</symbol>
 		<symbol id="node_pentode_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode (nocathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 48.68417 67.73247">
+				<ci:componentInformation type="node" displayName="Pentode (nocathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 53.71015 67.73247">
 					<ci:tikzOptions>
 						<ci:option key="nocathode" />
 					</ci:tikzOptions>
@@ -4408,9 +4471,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="33.866235" rx="19.473668000000004" ry="27.092988000000005" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M5.823 37.57038v-8.46582c0-11.68922 9.4757-21.16493 21.16492-21.16493s21.16494 9.47571 21.16494 21.16493v16.93165c0 11.68921-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47572-21.16493-21.16493Zm-5.29164 7.40769h9.25996m-9.25996-14.81537h9.25996m-9.25996 7.40768h9.25996m3.48742-7.40768h3.48741m-3.48741 14.81537h3.48741m-3.48741-7.40769h3.48741m3.4874-7.40768h3.48742m-3.48742 14.81537h3.48742m-3.48742-7.40769h3.48742m3.48741-7.40768h3.4874m-3.4874 14.81537h3.4874m-3.4874-7.40769h3.4874m3.48742-7.40768h3.4874m-3.4874 14.81537h3.4874m-3.4874-7.40769h3.4874m3.48741-7.40768h3.48742m-3.48742 14.81537h3.48742m-3.48742-7.40769h3.48742m-17.6775-37.03902v22.22365m-10.58247 0h21.16492"/>
 			</g>
@@ -4437,7 +4501,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (nocathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 48.68417 67.73247">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (nocathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.57038" viewBox="0 0 53.71015 67.73247">
 					<ci:tikzOptions>
 						<ci:option key="nocathode" />
 					</ci:tikzOptions>
@@ -4449,9 +4513,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="33.866235" rx="19.473668000000004" ry="27.092988000000005" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.57038v-8.46582c0-11.68922 9.4757-21.16493 21.16492-21.16493s21.16494 9.47571 21.16494 21.16493v16.93165c0 11.68921-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47572-21.16493-21.16493Z"/>
@@ -4481,7 +4546,7 @@
 		</symbol>
 		<symbol id="node_diodetube_filament_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode (filament, nocathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 43.39253 75.14076">
+				<ci:componentInformation type="node" displayName="Tube diode (filament, nocathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 48.41851 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="nocathode" />
@@ -4494,9 +4559,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="37.57038" rx="17.357012" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M.53135 37.5704v-8.46583c0-11.68921 9.47572-21.16493 21.16493-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4524,7 +4590,7 @@
 		</symbol>
 		<symbol id="node_triode_filament_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode (filament, nocathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Triode (filament, nocathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="nocathode" />
@@ -4538,9 +4604,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4568,7 +4635,7 @@
 		</symbol>
 		<symbol id="node_tetrode_filament_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode (filament, nocathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Tetrode (filament, nocathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="nocathode" />
@@ -4583,9 +4650,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4615,7 +4683,7 @@
 		</symbol>
 		<symbol id="node_pentode_filament_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode (filament, nocathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode (filament, nocathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="nocathode" />
@@ -4631,9 +4699,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4663,7 +4732,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode_filament_nocathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament, nocathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament, nocathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="nocathode" />
@@ -4678,9 +4747,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4712,7 +4782,7 @@
 		</symbol>
 		<symbol id="node_diodetube_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode (fullcathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 43.39253 75.14076">
+				<ci:componentInformation type="node" displayName="Tube diode (fullcathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 48.41851 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="fullcathode" />
 					</ci:tikzOptions>
@@ -4724,9 +4794,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="37.57038" rx="17.357012" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M.53135 37.5704v-8.46583c0-11.68921 9.47572-21.16493 21.16493-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4756,7 +4827,7 @@
 		</symbol>
 		<symbol id="node_triode_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode (fullcathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Triode (fullcathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="fullcathode" />
 					</ci:tikzOptions>
@@ -4769,9 +4840,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4801,7 +4873,7 @@
 		</symbol>
 		<symbol id="node_tetrode_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode (fullcathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Tetrode (fullcathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="fullcathode" />
 					</ci:tikzOptions>
@@ -4815,9 +4887,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4847,7 +4920,7 @@
 		</symbol>
 		<symbol id="node_pentode_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode (fullcathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode (fullcathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="fullcathode" />
 					</ci:tikzOptions>
@@ -4862,9 +4935,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4894,7 +4968,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (fullcathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (fullcathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="fullcathode" />
 					</ci:tikzOptions>
@@ -4908,9 +4982,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4941,7 +5016,7 @@
 		</symbol>
 		<symbol id="node_diodetube_filament_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tube diode (filament, fullcathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 43.39253 75.14076">
+				<ci:componentInformation type="node" displayName="Tube diode (filament, fullcathode)" tikzName="diodetube" groupName="Tubes" refX="21.69628" refY="37.5704" viewBox="0 0 48.41851 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="fullcathode" />
@@ -4956,9 +5031,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="21.696265" cy="37.57038" rx="17.357012" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M.53135 37.5704v-8.46583c0-11.68921 9.47572-21.16493 21.16493-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -4985,7 +5061,7 @@
 		</symbol>
 		<symbol id="node_triode_filament_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Triode (filament, fullcathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Triode (filament, fullcathode)" tikzName="triode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="fullcathode" />
@@ -5001,9 +5077,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -5030,7 +5107,7 @@
 		</symbol>
 		<symbol id="node_tetrode_filament_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Tetrode (filament, fullcathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Tetrode (filament, fullcathode)" tikzName="tetrode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="fullcathode" />
@@ -5047,9 +5124,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -5076,7 +5154,7 @@
 		</symbol>
 		<symbol id="node_pentode_filament_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode (filament, fullcathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode (filament, fullcathode)" tikzName="pentode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="fullcathode" />
@@ -5094,9 +5172,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -5126,7 +5205,7 @@
 		</symbol>
 		<symbol id="node_pentode-suppressor-to-cathode_filament_fullcathode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament, fullcathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 48.68417 75.14076">
+				<ci:componentInformation type="node" displayName="Pentode with suppressor grid connected to cathode (filament, fullcathode)" tikzName="pentode suppressor to cathode" groupName="Tubes" refX="26.98792" refY="37.5704" viewBox="0 0 53.71015 75.14076">
 					<ci:tikzOptions>
 						<ci:option key="filament" />
 						<ci:option key="fullcathode" />
@@ -5143,9 +5222,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="24.342085" cy="37.57038" rx="19.473668000000004" ry="30.056304" />
+			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width="1.06267">
 					<path d="M5.823 37.5704v-8.46583c0-11.68921 9.4757-21.16493 21.16492-21.16493s21.16494 9.47572 21.16494 21.16493v16.93165c0 11.68922-9.47572 21.16493-21.16494 21.16493s-21.16493-9.47571-21.16493-21.16493Z"/>
@@ -5232,16 +5312,17 @@
 		</symbol>
 		<symbol id="node_dynode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Dynode" tikzName="dynode" groupName="Tubes" refX="11.11382" refY="42.861999999999995" viewBox="0 0 22.22761 43.12766">
+				<ci:componentInformation type="node" displayName="Dynode" tikzName="dynode" groupName="Tubes" refX="11.11382" refY="42.861999999999995" viewBox="0 0 27.27534 43.12766">
 					<ci:pins>
 						<ci:pin anchorName="top" x="0" y="-42.33064999999999" isDefault="false" />
 						<ci:pin anchorName="top right" x="10.582460000000001" y="-42.33064999999999" isDefault="false" />
 						<ci:pin anchorName="top left" x="-10.58246" y="-42.33064999999999" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="15.895869999999999" y="-21.165309999999995"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="11.113805" cy="21.56383" rx="8.891043999999999" ry="17.251064" />
+			<ellipse stroke="none" fill="transparent" cx="13.63767" cy="21.56383" rx="10.910136000000001" ry="17.251064" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke-width="1.06267" d="M.53136.53135h21.16492"/>
 				<path stroke-width=".53134" d="M.53136 15.58728c3.37416 5.84425 10.84702 7.84661 16.69127 4.47244 1.85698-1.07213 3.4003-2.61546 4.47244-4.47244m-10.58125 27.27472v-42.33065"/>
@@ -5278,6 +5359,7 @@
 						<ci:pin anchorName="top" x="-1.7763568394002505e-15" y="-26.45657" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="13.228279999999998" y="-13.22829"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="13.75962" cy="13.75962" rx="11.007696000000001" ry="11.007696000000001" />
@@ -5312,6 +5394,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="10.582460000000001" y="-15.874090000000002"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="11.113805" cy="16.405425" rx="8.891043999999999" ry="13.124340000000002" />
@@ -5356,6 +5439,7 @@
 						<ci:pin anchorName="waves" x="55.55875" y="-13.228290000000001" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="-13.228280000000002" y="-13.228290000000001"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.792025" cy="26.456575" rx="27.833620000000003" ry="21.165260000000004" />
@@ -5405,6 +5489,7 @@
 						<ci:pin anchorName="waves" x="-55.55875" y="-13.228290000000001" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="13.228279999999998" y="-13.228290000000001"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="41.27334" cy="26.456575" rx="33.018672" ry="21.165260000000004" />
@@ -5446,7 +5531,7 @@
 		</symbol>
 		<symbol id="node_waves">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Waves" tikzName="waves" groupName="RF components" refX="0" refY="0" viewBox="0 0 54.50171 52.91315">
+				<ci:componentInformation type="node" displayName="Waves" tikzName="waves" groupName="RF components" refX="0" refY="0" viewBox="0 0 54.50171 53.17882">
 					<ci:pins>
 						<ci:pin anchorName="left" x="-19.91684" y="0" isDefault="false" />
 						<ci:pin anchorName="right" x="19.91684" y="0" isDefault="false" />
@@ -5454,10 +5539,11 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="19.91684" y="19.91684"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="27.250855" cy="26.456575" rx="21.800684000000004" ry="21.165260000000004" />
-			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4" transform="matrix(1.32835 0 0 -1.32835 26.72226 26.4566)">
+			<ellipse stroke="none" fill="transparent" cx="27.250855" cy="26.58941" rx="21.800684000000004" ry="21.271528000000004" />
+			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4" transform="matrix(1.32835 0 0 -1.32835 26.72226 26.72226)">
 				<clipPath id="node_waves_a">
 					<path d="m-19.91684 0 40.82957 19.91684v-39.83368Z"/>
 				</clipPath>
@@ -5496,6 +5582,7 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="63.49560000000001" y="0" isDefault="false" />
 					</ci:pins>
+					<ci:textPosition x="31.747800000000005" y="-7.93703"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.036185" cy="8.468365" rx="27.228948000000003" ry="6.774692000000001" />
@@ -5537,6 +5624,7 @@
 						<ci:pin anchorName="right" x="26.45657" y="0" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="13.228280000000002" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="15.51666" cy="8.468365" rx="12.413328" ry="6.774692000000001" />
@@ -5576,6 +5664,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="0" y="-26.45657"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.238965" cy="14.91835" rx="15.391172000000001" ry="11.93468" />
@@ -5612,10 +5701,11 @@
 		</symbol>
 		<symbol id="node_antenna">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Legacy antenna (with tails)" tikzName="antenna" groupName="RF components" refX="10.24556" refY="76.12132" viewBox="0 0 27.51924 80.16672">
+				<ci:componentInformation type="node" displayName="Legacy antenna (with tails)" tikzName="antenna" groupName="RF components" refX="14.0253" refY="79.90106" viewBox="0 0 27.51924 80.16672">
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="5.2912300000000005" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="13.75962" cy="40.08336" rx="11.007696000000001" ry="32.066688" />
@@ -5657,6 +5747,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="5.29122" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="55.06869" cy="46.56467" rx="44.054952" ry="37.251736" />
@@ -5691,6 +5782,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="5.29122" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="56.487065" cy="46.56467" rx="45.189652" ry="37.251736" />
@@ -5727,6 +5819,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="30.47829" y="-6.34953"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="28.08377" cy="8.468365" rx="22.467016" ry="6.774692000000001" />
@@ -5761,6 +5854,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="31.7474" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.32048" cy="5.424065" rx="18.656384" ry="4.339252" />
@@ -5801,6 +5895,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -5845,6 +5940,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -5888,6 +5984,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -5931,6 +6028,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -5973,6 +6071,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6016,6 +6115,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6055,6 +6155,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6092,6 +6193,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6141,6 +6243,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.586255" cy="39.950525" rx="16.469004" ry="31.96042" />
@@ -6182,6 +6285,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.617945" cy="39.950525" rx="13.294356" ry="31.96042" />
@@ -6224,6 +6328,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.34245" cy="39.950525" rx="19.47396" ry="31.96042" />
@@ -6268,6 +6373,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.586255" cy="39.950525" rx="16.469004" ry="31.96042" />
@@ -6314,6 +6420,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.617945" cy="39.950525" rx="13.294356" ry="31.96042" />
@@ -6356,6 +6463,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.34245" cy="39.950525" rx="19.47396" ry="31.96042" />
@@ -6400,6 +6508,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.40542" cy="39.950525" rx="13.124336" ry="31.96042" />
@@ -6449,12 +6558,13 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="28.31098" cy="39.950525" rx="22.648784000000003" ry="31.96042" />
 			<defs>
-				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_a" d="M6.56538-2.2914c.16936 0 .3487 0 .3487-.19926s-.17934-.19925-.3487-.19925h-5.38979c-.16936 0-.3487 0-.3487.19925s.17934.19925.3487.19925h5.38979Z"/>
 				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_b" d="M4.07472-2.2914h2.77958c.13947 0 .32876 0 .32876-.19926s-.18929-.19925-.32876-.19925h-2.77958v-2.78954c0-.13948 0-.32877-.19925-.32877s-.19926.1893-.19926.32877v2.78954h-2.78954c-.13947 0-.32876 0-.32876.19925s.18929.19925.32876.19925h2.78954v2.78954c0 .13948 0 .32877.19926.32877s.19925-.1893.19925-.32877v-2.78954Z"/>
+				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_a" d="M6.56538-2.2914c.16936 0 .3487 0 .3487-.19926s-.17934-.19925-.3487-.19925h-5.38979c-.16936 0-.3487 0-.3487.19925s.17934.19925.3487.19925h5.38979Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M.53135 61.11586v-42.33064h15.87407v42.33064Zm23.81112-21.16532c0 8.7671 7.10697 15.87408 15.87408 15.87408s15.87408-7.10697 15.87408-15.87408-7.10697-15.87408-15.87408-15.87408-15.87408 7.10697-15.87408 15.87408Zm15.87408 0"/>
@@ -6561,8 +6671,8 @@
 			<ellipse stroke="none" fill="transparent" cx="45.241765" cy="42.861995" rx="36.193412" ry="34.289596" />
 			<defs>
 				<path id="node_en-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
-				<path id="node_en-amp_c" d="M5.3081-2.72578c.19128-.1076.2391-.1315.2391-.25106 0-.1315-.03587-.14346-.2391-.26301l-4.55492-2.6421c-.15542-.09563-.20324-.09563-.22715-.09563-.22715 0-.22715.22714-.22715.40647v5.17659c0 .17933 0 .40647.22715.40647.0239 0 .07173 0 .20324-.08368l4.57883-2.65405Zm-.41844-.26301-4.14844 2.40299v-4.79403l4.14844 2.39104Z"/>
 				<path id="node_en-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
+				<path id="node_en-amp_c" d="M5.3081-2.72578c.19128-.1076.2391-.1315.2391-.25106 0-.1315-.03587-.14346-.2391-.26301l-4.55492-2.6421c-.15542-.09563-.20324-.09563-.22715-.09563-.22715 0-.22715.22714-.22715.40647v5.17659c0 .17933 0 .40647.22715.40647.0239 0 .07173 0 .20324-.08368l4.57883-2.65405Zm-.41844-.26301-4.14844 2.40299v-4.79403l4.14844 2.39104Z"/>
 				<path id="node_en-amp_d" d="M6.07322-3.23985c-.64557-.81295-.78904-.99228-1.15965-1.29116-.66948-.53798-1.33898-.75317-1.94869-.75317-1.39875 0-2.30735 1.31506-2.30735 2.71382 0 1.37484.88469 2.70187 2.25953 2.70187s2.36712-1.08792 2.95293-2.04434c.64558.81296.78904.99228 1.15965 1.29116.66949.53798 1.33898.75318 1.9487.75318 1.39875 0 2.30734-1.31507 2.30734-2.71383 0-1.37484-.88468-2.70186-2.25953-2.70186s-2.36712 1.08792-2.95292 2.04433Zm.31084.40647c.49016-.86077 1.37484-2.06824 2.72578-2.06824 1.26725 0 1.91282 1.24334 1.91282 2.3193 0 1.17161-.801 2.13998-1.85305 2.13998-.6934 0-1.23138-.50212-1.48244-.75318-.29888-.32279-.57385-.6934-1.30311-1.63786Zm-.8249.51408c-.49017.86077-1.37485 2.06824-2.72579 2.06824-1.26724 0-1.91282-1.24334-1.91282-2.3193 0-1.1716.801-2.13998 1.85305-2.13998.6934 0 1.23138.50212 1.48244.75318.29888.32279.57385.6934 1.30311 1.63786Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
@@ -7275,6 +7385,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="0" y="-15.87408"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.40542" cy="16.40542" rx="13.124336" ry="13.124336" />
@@ -7314,6 +7425,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7351,6 +7463,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7388,6 +7501,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7425,6 +7539,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7470,6 +7585,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7518,6 +7634,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -8159,6 +8276,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
@@ -8200,6 +8318,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8252,6 +8371,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
@@ -8298,6 +8418,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8349,6 +8470,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8398,6 +8520,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8449,6 +8572,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8497,6 +8621,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8545,6 +8670,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8580,6 +8706,7 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />

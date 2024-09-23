@@ -5,6 +5,10 @@ svg.mainCanvas {
 	height: 100%;
 }
 
+.pointerNone{
+	pointer-events: none;
+}
+
 .draggable {
 	cursor: grab;
 }
