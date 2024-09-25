@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0]
+
+### Added
+
+- Properties window (shows information about currently selected component)
+- Changeable grid settings like grid size
+- Labeling via Mathjax (very close to Tex syntax)
+- Changeable settings for path components
+    - name
+    - label
+    - mirror/invert
+    - z-order via buttons
+- Changeable settings for node components
+    - name
+    - label
+    - z-order via buttons
+
+## Changed
+
+- Naming of components in component drawer
+- Preference loading logic
+- Local save state per tab
+- Placing components now automatically reselects the component after placing it &rarr; can rapidly place many of the same component
+- save file format. still backwards compatible
+
 ## [0.3.1]
 
 ### Changed
