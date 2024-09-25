@@ -69,8 +69,8 @@
 					<a role="button" class="toolbarButton material-symbols-outlined" id="undoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Undo (Ctrl/⌘+Z)">undo</a>
 					<a role="button" class="toolbarButton material-symbols-outlined" id="redoButton" data-bs-toggle="tooltip" data-bs-delay='{"show":500,"hide":250}' data-bs-placement="bottom" data-bs-title="Redo (Ctrl/⌘+Y)">redo</a>
 				</div>
-				<a class="col-md-auto navbar-brand unselectable position-relative mx-0" href=".">
-					<img src="../icons/favicon.svg" width="30" height="30" alt="Bootstrap" class="d-inline-block align-text-top">
+				<a class="col-md-auto navbar-brand unselectable position-relative m-0 p-0" href=".">
+					<img src="../icons/favicon.svg" style="width: 1em; height: 1em;" alt="Bootstrap" class="d-inline-block">
 					<span class="">CircuiTi<i>k</i>Z Designer</span>
 					<span class="badge text-bg-secondary version unselectable">
 						v0.0.0
@@ -142,83 +142,81 @@
 		</nav>
 		<!-- Site content -->
 		<div class="d-block flex-grow-1 w-100 overflow-hidden p-2">
-			<div class="container-fluid h-100 m-0 p-0">
-				<div class="row w-100 h-100 m-0">
-					<div class="col h-100 p-0 me-2" id="canvasContainer">
-						<!-- The actual canvas -->
-						<include src="pages/canvas.svg"></include>
-					</div>
-					<div class="col-4 bg-body-tertiary border border-secondary rounded px-0 d-flex flex-column h-100" id="properties">
-						<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
-						<hr class="m-0">
-						<div class="d-flex flex-column w-100 p-3 fs-5 gap-3" id="properties-content">
-							<span class="align-self-center text-center fs-4 mb-3" id="objectName">
-								Object name
-							</span>
-							<div class="d-none" id="grid-properties">
-								<div class="d-flex flex-column w-100 h-auto gap-3" >
-									<div class="form-check form-switch m-0 p-0 d-flex justify-content-between align-items-center">
-										<span class="form-check-label">Enable grid</span>
-										<input class="form-check-input m-0 fs-4" type="checkbox" role="switch" id="gridVisible">
+			<div class="d-flex w-100 h-100 m-0 gap-2" id="siteContent">
+				<div class="w-100 h-100 p-0" id="canvasContainer">
+					<!-- The actual canvas -->
+					<include src="pages/canvas.svg"></include>
+				</div>
+				<div class="bg-body-tertiary border border-secondary rounded px-0 d-flex flex-column h-100" id="properties">
+					<h5 class="fs-3 align-self-center mb-0 p-2" id="propertiesTitle">Properties</h5>
+					<hr class="m-0">
+					<div class="d-flex flex-column w-100 p-3 fs-5 gap-3" id="properties-content">
+						<span class="align-self-center text-center fs-4" id="objectName">
+							Object name
+						</span>
+						<div class="d-none" id="grid-properties">
+							<div class="d-flex flex-column w-100 h-auto gap-3" >
+								<div class="form-check form-switch m-0 p-0 d-flex justify-content-between align-items-center">
+									<span class="form-check-label">Enable grid</span>
+									<input class="form-check-input m-0 fs-4" type="checkbox" role="switch" id="gridVisible">
+								</div>
+								<div id="majorSlider" class="">
+									<div class="d-flex w-100 justify-content-between align-items-baseline">
+										<label for="majorSliderInput" class="form-label">Major grid size</label>
+										<span id="majorLabel">1</span>
 									</div>
-									<div id="majorSlider" class="">
-										<div class="d-flex w-100 justify-content-between align-items-baseline">
-											<label for="majorSliderInput" class="form-label">Major grid size</label>
-											<span id="majorLabel">1</span>
-										</div>
-										<input type="range" class="form-range" min="1" max="5" id="majorSliderInput">
+									<input type="range" class="form-range" min="1" max="5" id="majorSliderInput">
+								</div>
+								<div id="minorSlider" class="">
+									<div class="d-flex w-100 justify-content-between align-items-baseline">
+										<label for="minorSliderInput" class="form-label">Major grid subdivisions</label>
+										<span id="minorLabel">1</span>
 									</div>
-									<div id="minorSlider" class="">
-										<div class="d-flex w-100 justify-content-between align-items-baseline">
-											<label for="minorSliderInput" class="form-label">Major grid subdivisions</label>
-											<span id="minorLabel">1</span>
-										</div>
-										<input type="range" class="form-range" min="1" max="10" step="1" id="minorSliderInput">
-									</div>
-									<div class="w-100 border border-info-subtle bg-info-subtle text-info-emphasis rounded p-2 d-flex justify-content-between align-items-center gap-2">
-										<div class="flex-shrink-1">Current grid spacing:</div>
-										<span id="gridInfo" class="flex-shrink-0"></span>
-									</div>
+									<input type="range" class="form-range" min="1" max="10" step="1" id="minorSliderInput">
+								</div>
+								<div class="w-100 border border-info-subtle bg-info-subtle text-info-emphasis rounded p-2 d-flex justify-content-between align-items-center gap-2">
+									<div class="flex-shrink-1">Current grid spacing:</div>
+									<span id="gridInfo" class="flex-shrink-0"></span>
 								</div>
 							</div>
-							<div id="blueprints" class="d-none w-0 h-0">
-								<div id="zorder-controls" class="d-flex justify-content-between gap-3">
-									<button class="btn btn-primary flex-grow-1" id="bringToFront">
-										Bring to front
-									</button>
-									<button class="btn btn-primary flex-grow-1" id="pushToBack">
-										Push to back
-									</button>
-								</div>
-								<div id="blueprintInfo" class="d-flex gap-3 w-100 h-auto justify-content-between align-items-center blueprint border border-info-subtle bg-info-subtle text-info-emphasis rounded px-2 py-1 ">
-									<span class="text-end"></span>
-									<span class="text-end"></span>
-								</div>
-								<div id="blueprintText" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start blueprint">
-									<span class="form-label">Label</span>
-									<input type="text" class="form-control">
-									<div class="invalid-feedback d-none">Invalid</div>
-								</div>
-								<div id="blueprintCheck" class="d-flex w-100 h-auto justify-content-between align-items-center blueprint">
-									<span class="form-check-label">Label</span>
-									<input type="checkbox" class="form-check-input">
-								</div>
-								<div id="blueprintMathJax" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start blueprint">
-									<span class="form-label">Label</span>
-									<div class="d-flex flex-row w-100 gap-3">
-										<div class="input-group">
-											<span class="input-group-text">$</span>
-											<input type="text" class="form-control">
-											<span class="input-group-text">$</span>
-										</div>
-										<button type="button" class="btn btn-primary">Render</button>
+						</div>
+						<div id="blueprints" class="d-none w-0 h-0">
+							<div id="zorder-controls" class="d-flex justify-content-between gap-3">
+								<button class="btn btn-primary flex-grow-1" id="bringToFront">
+									Bring to front
+								</button>
+								<button class="btn btn-primary flex-grow-1" id="pushToBack">
+									Push to back
+								</button>
+							</div>
+							<div id="blueprintInfo" class="d-flex gap-3 w-100 h-auto justify-content-between align-items-center blueprint border border-info-subtle bg-info-subtle text-info-emphasis rounded px-2 py-1 ">
+								<span class="text-end"></span>
+								<span class="text-end"></span>
+							</div>
+							<div id="blueprintText" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start blueprint">
+								<span class="form-label">Label</span>
+								<input type="text" class="form-control">
+								<div class="invalid-feedback d-none">Invalid</div>
+							</div>
+							<div id="blueprintCheck" class="d-flex w-100 h-auto justify-content-between align-items-center blueprint">
+								<span class="form-check-label">Label</span>
+								<input type="checkbox" class="form-check-input">
+							</div>
+							<div id="blueprintMathJax" class="d-flex flex-column w-100 h-auto justify-content-start align-items-start blueprint">
+								<span class="form-label">Label</span>
+								<div class="d-flex flex-row w-100 gap-3">
+									<div class="input-group">
+										<span class="input-group-text">$</span>
+										<input type="text" class="form-control">
+										<span class="input-group-text">$</span>
 									</div>
-									<div class="invalid-feedback d-none">Invalid</div>
+									<button type="button" class="btn btn-primary">Render</button>
 								</div>
+								<div class="invalid-feedback d-none">Invalid</div>
 							</div>
-							<div class="d-flex flex-column w-100 gap-3 d-none" id="propertiesEntries">
-								
-							</div>
+						</div>
+						<div class="d-flex flex-column w-100 gap-3 d-none" id="propertiesEntries">
+							
 						</div>
 					</div>
 				</div>
@@ -464,8 +462,7 @@
 						</dl>
 						<hr>
 						<h1 class="fs-4">Keyboard Shortcuts</h1>
-						<table class="table table-striped ">
-							<caption>List of keyboard shortcuts</caption>
+						<table class="table table-striped">
 							<thead>
 								<tr>
 									<th scope="col">Category</th>

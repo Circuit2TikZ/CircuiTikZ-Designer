@@ -72,6 +72,20 @@ body {
 	padding: 0px;
 }
 
+@media only screen and (max-width: 768px) {
+	#canvasContainer{
+		height: 60% !important;
+	}
+	#properties{
+		width: 100% !important;
+		max-width: 100% !important;
+		height: 40% !important;
+	}
+	#siteContent{
+		flex-direction: column
+	}
+}
+
 // styles for other parts of the web app:
 @import "canvas.scss";
 @import "toolbarButtons.scss";
