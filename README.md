@@ -1,6 +1,6 @@
 # CircuiTi<i>k</i>Z-Designer
 
-A GUI for easy and fast drawing of circuits to be used with [circuitikz](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and include it in your LaTeX document!
+A GUI for easy and fast drawing of circuits to be used with [CircuiTikZ](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and include it in your LaTeX document!
 
 The official hosting of the current build can be found under https://circuit2tikz.tf.fau.de/designer/
 
