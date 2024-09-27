@@ -307,7 +307,7 @@ export class PathComponentInstance extends SVG.G {
 			this.#labelSVG.width(width)
 			this.#labelSVG.height(height)
 			this.#labelSVG.add(svgElement)
-			this.add(this.#labelSVG)
+			this.container.add(this.#labelSVG)
 			this.#updateLabelPosition()
 		})
 	}
@@ -797,7 +797,7 @@ export class PathComponentInstance extends SVG.G {
 		this.startCircle.move(this.#prePointArray[0][0]-this.circleRadius/2,this.#prePointArray[0][1]-this.circleRadius/2)
 		this.endCircle.move(this.#postPointArray[1][0]-this.circleRadius/2,this.#postPointArray[1][1]-this.circleRadius/2)
 
-		let bbox = this.bbox()
+		let bbox = this.bbox() // TODO this should ignore the label, otherwise the component flickers while moving it around when putting it inside the group
 		this.relMid = this.getAnchorPoint().minus(new SVG.Point(bbox.x,bbox.y))
 
 		// recalculate snapping points
