@@ -129,7 +129,7 @@ export class SaveController {
 			}
 		}else{
 			for (const component of obj) {
-				if (component.type==="line") {
+				if (component.type==="wire") {
 					lines.push(Line.fromJson(component))
 				}else if(component.type==="node"){
 					nodes.push(NodeComponentInstance.fromJson(component))
