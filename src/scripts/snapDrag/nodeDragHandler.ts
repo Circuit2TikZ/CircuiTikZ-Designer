@@ -37,15 +37,15 @@ import {SnapController, NodeComponentInstance, SelectionController, Undo, MainCo
  */
 export class NodeDragHandler {
 	/** @type {NodeComponentInstance} */
-	element;
+	element: NodeComponentInstance;
 
 	/** @type {DragHandler} */
-	#dragHandler;
+	#dragHandler: DragHandler;
 
 	/** @type {boolean} */
-	#isTemporaryDisabled = false;
+	#isTemporaryDisabled: boolean = false;
 	/** @type {boolean} */
-	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
+	#maybeContextmenu: boolean = false; // fixes contextmenu action on touchscreens
 
 	#startedDragging = false
 	#didDrag = false
@@ -59,7 +59,7 @@ export class NodeDragHandler {
 	 * @param {SVG.Element} element - the element to enable snap-dragging
 	 * @param {function(boolean): void} element.draggable
 	 */
-	constructor(element) {
+	constructor(element: SVG.Element) {
 		this.element = element;
 		this.element.remember("_snapDragHandler", this);
 		this.element.draggable(true);
@@ -79,10 +79,10 @@ export class NodeDragHandler {
 	 * @param {boolean} [enable] - `true` --> activate, `false` --> deactivate, `undefined` --> query
 	 * @returns {NodeDragHandler|null} the handler, if activated
 	 */
-	static snapDrag(element, enable) {
+	static snapDrag(element: SVG.Element, enable: boolean): NodeDragHandler | null {
 		
 		/** @type {NodeDragHandler|null} */
-		let snapDragHandler = element.remember("_snapDragHandler") ?? (enable ? new NodeDragHandler(element) : null);
+		let snapDragHandler: NodeDragHandler | null = element.remember("_snapDragHandler") ?? (enable ? new NodeDragHandler(element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
@@ -110,7 +110,7 @@ export class NodeDragHandler {
 	 *
 	 * @param {boolean} b - set to `true` to disable
 	 */
-	set temporaryDisabled(b) {
+	set temporaryDisabled(b: boolean) {
 		if (this.#isTemporaryDisabled !== b) this.#dragHandler.init(!(this.#isTemporaryDisabled = b));
 	}
 
@@ -119,7 +119,7 @@ export class NodeDragHandler {
 	 *
 	 * @returns {boolean} `true` means disabled
 	 */
-	get temporaryDisabled() {
+	get temporaryDisabled(): boolean {
 		return this.#isTemporaryDisabled;
 	}
 
@@ -129,7 +129,7 @@ export class NodeDragHandler {
 	 * Listener for the "dragstart" event. Changes the cursor symbol using the class "dragging".
 	 * @param {DragEvent} event
 	 */
-	#dragStart(event) {
+	#dragStart(event: DragEvent) {
 		this.#startedDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
@@ -144,7 +144,7 @@ export class NodeDragHandler {
 	 * @private
 	 * @param {DragEvent} event - the dragging event.
 	 */
-	#dragMove(event) {
+	#dragMove(event: DragEvent) {
 		this.#maybeContextmenu = false; // no contextmenu after any move
 
 		if (!this.#didDrag) {
@@ -156,12 +156,12 @@ export class NodeDragHandler {
 		event.preventDefault();
 
 		/** @type {SVG.Point} */
-		const relMid = this.element.relMid || this.element.symbol?.relMid || new SVG.Point(0, 0);
+		const relMid: SVG.Point = this.element.relMid || this.element.symbol?.relMid || new SVG.Point(0, 0);
 
 		const draggedPoint = new SVG.Point(event.detail.box.x + relMid.x, event.detail.box.y + relMid.y);
 
 		/** @type {SVG.Point[]} */
-		const snapPoints =
+		const snapPoints: SVG.Point[] =
 			this.element.relSnappingPoints && this.element.relSnappingPoints.length > 0
 				? this.element.relSnappingPoints
 				: [new SVG.Point(0, 0)];
@@ -204,7 +204,7 @@ export class NodeDragHandler {
 	 * Listener for the "dragend" event. Undo the cursor change from {@link "#dragStart"}.
 	 * @param {DragEvent} event
 	 */
-	#dragEnd(event, trackState=true) {
+	#dragEnd(event: DragEvent, trackState=true) {
 		if (!this.#startedDragging) {
 			return
 		}

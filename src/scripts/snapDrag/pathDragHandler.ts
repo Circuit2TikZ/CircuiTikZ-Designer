@@ -38,19 +38,19 @@ import {SnapController, Undo, PathComponentInstance, SelectionController, MainCo
 
 export class PathDragHandler {
 	/** @type {SVG.Element} */
-	element;
+	element: SVG.Element;
 	/** @type {PathComponentInstance} */
-	parentElement;
+	parentElement: PathComponentInstance;
 	/** @type {SVG.Point} */
-	relMid;
+	relMid: SVG.Point;
 	/** @type {boolean} */
-	moveStart;
+	moveStart: boolean;
 
 	/** @type {DragHandler} */
-	#dragHandler;
+	#dragHandler: DragHandler;
 
 	/** @type {boolean} */
-	#isTemporaryDisabled = false;
+	#isTemporaryDisabled: boolean = false;
 
 	#startedDragging = false
 	#didDrag = false
@@ -65,7 +65,7 @@ export class PathDragHandler {
 	 * @param {boolean} moveStart
 	 * @param {function(boolean): void} element.draggable
 	 */
-	constructor(element, moveStart) {
+	constructor(element: PathComponentInstance, moveStart: boolean) {
 		this.parentElement = element;
 		this.moveStart = moveStart
 		if (moveStart) {
@@ -95,9 +95,8 @@ export class PathDragHandler {
 	 * @param {boolean} [enable] - `true` --> activate, `false` --> deactivate, `undefined` --> query
 	 * @returns {PathDragHandler|null} the handler, if activated
 	 */
-	static snapDrag(parentElement, moveStart, enable) {
-		/** @type {SVG.Shape} */
-		let dragElement;
+	static snapDrag(parentElement: PathComponentInstance, moveStart: boolean, enable: boolean): PathDragHandler | null {
+		let dragElement: SVG.Shape;
 		if (moveStart) {
 			dragElement = parentElement.startCircle
 		}else{
@@ -105,7 +104,7 @@ export class PathDragHandler {
 		}
 
 		/** @type {PathDragHandler|null} */
-		let snapDragHandler = dragElement.remember("_snapDragHandler") ?? (enable ? new PathDragHandler(parentElement,moveStart) : null);
+		let snapDragHandler: PathDragHandler | null = dragElement.remember("_snapDragHandler") ?? (enable ? new PathDragHandler(parentElement,moveStart) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
@@ -133,7 +132,7 @@ export class PathDragHandler {
 	 *
 	 * @param {boolean} b - set to `true` to disable
 	 */
-	set temporaryDisabled(b) {
+	set temporaryDisabled(b: boolean) {
 		if (this.#isTemporaryDisabled !== b) this.#dragHandler.init(!(this.#isTemporaryDisabled = b));
 	}
 
@@ -142,7 +141,7 @@ export class PathDragHandler {
 	 *
 	 * @returns {boolean} `true` means disabled
 	 */
-	get temporaryDisabled() {
+	get temporaryDisabled(): boolean {
 		return this.#isTemporaryDisabled;
 	}
 
@@ -152,7 +151,7 @@ export class PathDragHandler {
 	 * Listener for the "dragstart" event. Changes the cursor symbol using the class "dragging".
 	 * @param {DragEvent} event
 	 */
-	#dragStart(event) {
+	#dragStart(event: DragEvent) {
 		this.#startedDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
@@ -164,7 +163,7 @@ export class PathDragHandler {
 	 * @private
 	 * @param {DragEvent} event - the dragging event.
 	 */
-	#dragMove(event) {
+	#dragMove(event: DragEvent) {
 		event.preventDefault();
 
 		if (!this.#didDrag) {
@@ -176,7 +175,7 @@ export class PathDragHandler {
 		const draggedPoint = new SVG.Point(event.detail.box.x + this.relMid.x, event.detail.box.y + this.relMid.y);
 
 		/** @type {SVG.Point[]} */
-		const snapPoints =
+		const snapPoints: SVG.Point[] =
 			this.element.relSnappingPoints && this.element.relSnappingPoints.length > 0
 				? this.element.relSnappingPoints
 				: [new SVG.Point(0, 0)];
@@ -196,7 +195,7 @@ export class PathDragHandler {
 	 * Listener for the "dragend" event. Undo the cursor change from {@link "#dragStart"}.
 	 * @param {DragEvent} event
 	 */
-	#dragEnd(event, trackState=true) {
+	#dragEnd(event: DragEvent, trackState=true) {
 		if (!this.#startedDragging) {
 			return
 		}

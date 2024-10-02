@@ -8,7 +8,7 @@ export const selectionColor = "#d44"
 	 * @param {[[number,number], [number,number]]|SVG.line} line1 
 	 * @param {[[number,number], [number,number]]|SVG.Line} line2 
 	 */
-export function linelineIntersection(line1, line2){
+export function linelineIntersection(line1: SVG.Line | number[][], line2: SVG.Line | number[][]){
 	let l1 = (line1 instanceof SVG.Line)? line1.array():line1;
 	let l2 = (line2 instanceof SVG.Line)? line2.array():line2;
 
@@ -18,12 +18,9 @@ export function linelineIntersection(line1, line2){
 	let u =-((l1[0][0]-l1[1][0])*(l1[0][1]-l2[0][1])-(l1[0][1]-l1[1][1])*(l1[0][0]-l2[0][0]))/det;
 	return t >= 0 && t <= 1 && u >= 0 && u <= 1
 }
-/**
- * 
- * @param {[[number,number], [number,number]]|SVG.Line} line
- * @param {SVG.Box} rect 
- */
-export function lineRectIntersection(line,rect){
+
+
+export function lineRectIntersection(line: SVG.Line | number[][],rect: SVG.Box){
 	let l = (line instanceof SVG.Line)? line.array():line;
 
 	let boxPoints = [
@@ -35,10 +32,11 @@ export function lineRectIntersection(line,rect){
 	];
 
 	for (let index = 0; index < boxPoints.length-1; index++) {
-		if (linelineIntersection(l, [boxPoints[index],boxPoints[index+1]])) {
+		if (linelineIntersection(line, [boxPoints[index],boxPoints[index+1]])) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -48,7 +46,7 @@ export function lineRectIntersection(line,rect){
  * @param {SVG.Box} rect2 
  * @returns {boolean}
  */
-export function rectRectIntersection(rect1,rect2){
+export function rectRectIntersection(rect1: { x: number; y: number; x2: number; y2: number; },rect2: SVG.Box): boolean{
 	let l1 = new SVG.Point(rect1.x,rect1.y)
 	let r1 = new SVG.Point(rect1.x2,rect1.y2)
 	let l2 = new SVG.Point(rect2.x,rect2.y)
@@ -76,7 +74,7 @@ export function rectRectIntersection(rect1,rect2){
  * @param {[number,number]|SVG.Point} point 
  * @param {SVG.Box} rect 
  */
-export function pointInsideRect(point, rect){
+export function pointInsideRect(point: SVG.Point, rect: SVG.Box): boolean{
 	let p = (point instanceof SVG.Point)? [point.x, point.y]:point;
 	return p[0]>=rect.x && p[0]<= rect.x2 && p[1]>=rect.y && p[1]<= rect.y2
 }

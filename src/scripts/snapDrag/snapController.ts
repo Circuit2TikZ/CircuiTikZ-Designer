@@ -12,14 +12,11 @@ import {CanvasController} from "../internal";
  * @class
  */
 export class SnapController {
-	/** @type {SnapController} */
-	static #instance;
+	static #instance: SnapController;
 
-	/** @type {SVG.Point[]} */
-	#snapPoints = [];
+	#snapPoints: SVG.Point[] = [];
 
-	/** @type {SVG.Use[]} */
-	#snapUse = [];
+	#snapUse: SVG.Use[] = [];
 
 	/**
 	 * Do not call this constructor directly. Use {@link controller} instead.
@@ -31,7 +28,7 @@ export class SnapController {
 	 *
 	 * @param {(...PointAlike)|[PointAlike[]]} points - can be either an array or multiple parameters
 	 */
-	addSnapPoints(...points) {
+	addSnapPoints(...points: (...PointAlike) => [PointAlike[]]) {
 		this.#snapPoints.push(...(Array.isArray(points[0]) ? points[0] : points));
 	}
 
@@ -40,9 +37,9 @@ export class SnapController {
 	 *
 	 * @param {(...PointAlike)|[PointAlike[]]} points - can be either an array or multiple parameters
 	 */
-	removeSnapPoints(...points) {
+	removeSnapPoints(...points: (...PointAlike) => [PointAlike[]]) {
 		/** @type {PointAlike[]} */
-		const pointArray = Array.isArray(points[0]) ? points[0] : points;
+		const pointArray: PointAlike[] = Array.isArray(points[0]) ? points[0] : points;
 		for (const point of pointArray) {
 			const idx = this.#snapPoints.indexOf(point);
 			if (idx >= 0) this.#snapPoints.splice(idx, 1);
@@ -85,7 +82,7 @@ export class SnapController {
 	 *
 	 * @returns {SnapController}
 	 */
-	static get controller() {
+	static get controller(): SnapController {
 		return SnapController.#instance || (SnapController.#instance = new SnapController());
 	}
 
@@ -97,11 +94,11 @@ export class SnapController {
 	 * @param {PointAlike[]} relSnapPoints - a list of positions relative to `pos` to snap; if there are no special anchors, use `[{x: 0, y: 0}]`
 	 * @returns {SVG.Point} - the snapped point
 	 */
-	snapPoint(pos, relSnapPoints) {
+	snapPoint(pos: PointAlike, relSnapPoints: PointAlike[]): SVG.Point {
 		// 1. Calculate grid snap points
 		const canvasController = CanvasController.controller;
 		/** @type {SVG.Number} */
-		let gridSpacing = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px");
+		let gridSpacing: SVG.Number = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px");
 		const maxSnapDistance = new SVG.Number(0.5, "cm").convertToUnit("px")
 		const movingSnapPoints = relSnapPoints.map((point) => new SVG.Point(pos.x + point.x, pos.y + point.y));
 
@@ -117,7 +114,7 @@ export class SnapController {
 			 * @param {SVG.Point} movSnapPoint - possible point to snap to (grid)
 			 * @returns {DistStruct}
 			 */
-			(prevVal, movSnapPoint) => {
+			(prevVal: DistStruct, movSnapPoint: SVG.Point): DistStruct => {
 				const x = Math.round(movSnapPoint.x/gridSpacing)*gridSpacing;
 				const y = Math.round(movSnapPoint.y/gridSpacing)*gridSpacing;
 				const gridPoint = new SVG.Point(x,y);
@@ -186,7 +183,7 @@ export class SnapController {
 	 * @param {DistStruct} [initialDistStruct] - useful, if you call this method multiple times
 	 * @returns {DistStruct}
 	 */
-	#getSnapDistStruct(movingSnapPoints, fixedSnapPoints, initialDistStruct) {
+	#getSnapDistStruct(movingSnapPoints: PointAlike[], fixedSnapPoints: SVG.Point[], initialDistStruct: DistStruct): DistStruct {
 		if (!initialDistStruct) initialDistStruct = { dist: Number.MAX_VALUE, vector: null };
 		return movingSnapPoints.reduce(
 			/**
@@ -194,14 +191,14 @@ export class SnapController {
 			 * @param {SVG.Point} relSnapPoint - snap point / anchor relative to box
 			 * @returns {DistStruct}
 			 */
-			(prevVal, movSnapPoint) =>
+			(prevVal: DistStruct, movSnapPoint): DistStruct =>
 				fixedSnapPoints.reduce(
 					/**
 					 * @param {DistStruct} prevVal - helper struct for finding snap point with lowest dist. to a grid point
 					 * @param {SVG.Point} fixSnapPoint - possible point to snap to (grid)
 					 * @returns {DistStruct}
 					 */
-					(prevVal, fixSnapPoint) => {
+					(prevVal: DistStruct, fixSnapPoint: SVG.Point): DistStruct => {
 						const vector = fixSnapPoint.minus(movSnapPoint);
 						const squaredDistance = vector.absSquared();
 						if (squaredDistance > prevVal.dist) return prevVal;

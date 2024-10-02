@@ -21,6 +21,7 @@ export class NodeComponentSymbol extends ComponentSymbol {
 	 */
 	constructor(symbolElement, baseInformation) {
 		super(symbolElement, baseInformation);
+		
 	}
 
 	/**

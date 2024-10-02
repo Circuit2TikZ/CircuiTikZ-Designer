@@ -9,30 +9,35 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
 /** @typedef {import("../internal").ComponentInstance} ComponentInstance */
 
+type SaveState = {
+	currentIndices: any[];
+	currentData: any[];
+}
+
 export class MainController {
 	/** @type {?MainController} */
-	static #instance = null;
+	static #instance: MainController | null = null;
 	// controllers
 	/** @type {?CanvasController} */
-	canvasController = null;
+	canvasController: CanvasController | null = null;
 	/** @type {?LineDrawer} */
-	lineDrawer = null;
+	lineDrawer: LineDrawer | null = null;
 	/** @type {?EraseController} */
-	eraseController = null;
+	eraseController: EraseController | null = null;
 	/** @type {?ExportController} */
-	exportController = null;
+	exportController: ExportController | null = null;
 	/** @type {?SaveController} */
-	saveController = null;
+	saveController: SaveController | null = null;
 
 	/** @type {SVG.Svg} */
-	symbolsSVG;
+	symbolsSVG: SVG.Svg;
 	/** @type {ComponentSymbol[]} */
-	symbols;
+	symbols: ComponentSymbol[];
 
 	darkMode = true;
 	#darkModeLast = true;
@@ -72,18 +77,20 @@ export class MainController {
 	};
 
 	/** @type {Promise} */
-	initPromise;
+	initPromise: Promise<any>;
 	/** @type {boolean} */
-	isInitDone = false;
+	isInitDone: boolean = false;
 
 	/** @type {ComponentInstance[]} */
-	instances = [];
+	instances: ComponentInstance[] = [];
 	/** @type {Line[]} */
-	lines = [];
+	lines: Line[] = [];
 
 	static appVersion = "0.0.0";
 
 	isMac = false
+	snapController: SnapController;
+	selectionController: SelectionController;
 
 	/**
 	 * Init the app.
@@ -95,7 +102,7 @@ export class MainController {
 
 		// dark mode init
 		const htmlElement = document.documentElement;		
-		const switchElement = document.getElementById('darkModeSwitch');
+		const switchElement = document.getElementById('darkModeSwitch') as HTMLInputElement;
 		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
 		this.#currentTheme = localStorage.getItem('circuitikz-designer-theme') || defaultTheme;
 		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
@@ -125,7 +132,7 @@ export class MainController {
 
 		this.exportController = new ExportController(this);
 		/** @type {HTMLButtonElement} */
-		const exportCircuiTikZButton = document.getElementById("exportCircuiTikZButton");
+		const exportCircuiTikZButton: HTMLButtonElement = document.getElementById("exportCircuiTikZButton") as HTMLButtonElement;
 		exportCircuiTikZButton.addEventListener(
 			"click",
 			this.exportController.exportCircuiTikZ.bind(this.exportController),
@@ -135,7 +142,7 @@ export class MainController {
 		);
 
 		/** @type {HTMLButtonElement} */
-		const exportSVGButton = document.getElementById("exportSVGButton");
+		const exportSVGButton: HTMLButtonElement = document.getElementById("exportSVGButton") as HTMLButtonElement;
 		exportSVGButton.addEventListener(
 			"click",
 			this.exportController.exportSVG.bind(this.exportController),
@@ -144,9 +151,9 @@ export class MainController {
 			}
 		);
 		
-		this.saveController = new SaveController(this);
+		this.saveController = new SaveController();
 		/** @type {HTMLButtonElement} */
-		const saveButton = document.getElementById("saveButton");
+		const saveButton: HTMLButtonElement = document.getElementById("saveButton") as HTMLButtonElement;
 		saveButton.addEventListener(
 			"click",
 			this.saveController.save.bind(this.saveController),
@@ -156,7 +163,7 @@ export class MainController {
 		);
 
 		/** @type {HTMLButtonElement} */
-		const loadButton = document.getElementById("loadButton");
+		const loadButton: HTMLButtonElement = document.getElementById("loadButton") as HTMLButtonElement;
 		loadButton.addEventListener(
 			"click",
 			this.saveController.load.bind(this.saveController),
@@ -179,8 +186,7 @@ export class MainController {
 			// Prevent "normal" browser menu
 			document.getElementById("canvas").addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
 
-			/** @type {Progress} */
-			let currentProgress = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
+			let currentProgress: SaveState = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
 		
 			if (Object.keys(currentProgress.currentData[this.#tabID]).length>0) {
 				this.saveController.loadFromJSON(currentProgress.currentData[this.#tabID])
@@ -194,7 +200,7 @@ export class MainController {
 			}
 
 			const htmlElement = document.documentElement;
-			const switchElement = document.getElementById('darkModeSwitch');
+			const switchElement = document.getElementById('darkModeSwitch') as HTMLInputElement;
 			switchElement.addEventListener('change', function () {
 				if (MainController.controller.darkMode = switchElement.checked) {
 					htmlElement.setAttribute('data-bs-theme', 'dark');
@@ -213,8 +219,8 @@ export class MainController {
 
 	async #loadMathJax(){
 		var promise = new Promise((resolve)=>{
-			if (!window.MathJax) {
-				window.MathJax = {
+			if (!("MathJax" in window)) {
+				(window as any).MathJax = {
 					tex: {
 						inlineMath: {'[+]': [['$', '$']]}
 					}
@@ -225,17 +231,11 @@ export class MainController {
 			document.head.appendChild(script);
 	
 			script.addEventListener('load', function() {
-				resolve();
+				resolve("");
 			}, false);
 		})
 		return promise
 	}
-	
-	/**
-	 * @typedef {Object} Progress
-	 * @property {Array} currentIndices
-	 * @property {Array} currentData
-	 */
 
 	/**
 	 * make it possible to open multiple tabs and all with different save States.
@@ -243,8 +243,7 @@ export class MainController {
 	#addSaveStateManagement(){
 		const objname = "circuitikz-designer-saveState"
 
-		/** @type {Progress} */
-		let defaultProgress = {
+		let defaultProgress: SaveState = {
 			currentIndices:[],
 			currentData:[]
 		}
@@ -253,8 +252,7 @@ export class MainController {
 		
 		// load localStorage or default if it doesn't exist
 		let storageString = localStorage.getItem(objname)
-		/** @type {Progress} */
-		let current = storageString?JSON.parse(storageString):defaultProgress
+		let current: SaveState = storageString?JSON.parse(storageString):defaultProgress
 
 		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
 		let sessionTabID = sessionStorage.getItem("circuitikz-designer-tabID")
@@ -275,7 +273,7 @@ export class MainController {
 		}
 
 		// save the assigned tab ID
-		sessionStorage.setItem("circuitikz-designer-tabID",this.#tabID)
+		sessionStorage.setItem("circuitikz-designer-tabID",this.#tabID.toString())
 
 		// adjust the saveData object to accomodate new data if necessary
 		if (current.currentData.length<=this.#tabID) {
@@ -288,8 +286,7 @@ export class MainController {
 		// prepare saveState for unloading
 		window.addEventListener("beforeunload",(ev)=>{
 			Undo.addState()
-			/** @type {Progress} */
-			let currentProgress = JSON.parse(localStorage.getItem(objname))
+			let currentProgress: SaveState = JSON.parse(localStorage.getItem(objname))
 			
 			currentProgress.currentIndices.splice(currentProgress.currentIndices.findIndex((value)=>value==MainController.controller.#tabID),1)
 			currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
@@ -447,7 +444,7 @@ export class MainController {
 	 * Getter for the singleton instance.
 	 * @returns {MainController}
 	 */
-	static get controller() {
+	static get controller(): MainController {
 		return MainController.#instance || (MainController.#instance = new MainController());
 	}
 
@@ -465,7 +462,7 @@ export class MainController {
 	async #initSymbolDB() {
 		// Fetch symbol DB
 		/** @type {HTMLLinkElement} */
-		const symbolDBlink = await waitForElementLoaded("symbolDBlink");
+		const symbolDBlink: HTMLLinkElement = await waitForElementLoaded("symbolDBlink");
 		const response = await fetch(symbolDBlink.href, {
 			method: "GET",
 			// must match symbolDBlink cors options in order to actually use the preloaded file
@@ -476,9 +473,9 @@ export class MainController {
 
 		// Parse & add to DOM
 		/** @type {XMLDocument} */
-		const symbolsDocument = new DOMParser().parseFromString(textContent, "image/svg+xml");
+		const symbolsDocument: XMLDocument = new DOMParser().parseFromString(textContent, "image/svg+xml");
 		/** @type {SVGSVGElement} */
-		const symbolsSVGSVGElement = document.adoptNode(symbolsDocument.firstElementChild);
+		const symbolsSVGSVGElement: SVGSVGElement = document.adoptNode(symbolsDocument.firstElementChild as SVGSVGElement);
 		symbolsSVGSVGElement.style.display = "none";
 		symbolsSVGSVGElement.setAttribute("id","symbolDB")
 		document.body.appendChild(symbolsSVGSVGElement);
@@ -486,9 +483,9 @@ export class MainController {
 		// Extract symbols
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement);
 		/** @type {SVG.Defs} */
-		const defs = this.symbolsSVG.defs();
+		const defs: SVG.Defs = this.symbolsSVG.defs();
 		/** @type {SVGSymbolElement[]} */
-		const symbols = Array.prototype.filter.call(defs.node.children, (def) => def instanceof SVGSymbolElement);
+		const symbols: SVGSymbolElement[] = Array.prototype.filter.call(defs.node.children, (def) => def instanceof SVGSymbolElement);
 		// let symbols = defs.children().filter((/** @type {SVG.Element} */def) => def instanceof SVG.Symbol);
 		this.symbols = symbols.flatMap((symbol) => {
 			const baseInfo = ComponentSymbol.getBaseInformation(symbol);
@@ -496,7 +493,7 @@ export class MainController {
 			try {
 				if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
 				else return new PathComponentSymbol(symbol, baseInfo);
-			} catch (/** @type {Error} */ e) {
+			} catch (e) {
 				console.log(e);
 				return [];
 			}
@@ -532,13 +529,11 @@ export class MainController {
 	 * Init the left add offcanvas.
 	 */
 	async #initAddComponentOffcanvas() {
-		/** @type {HTMLDivElement} */
-		const leftOffcanvas = document.getElementById("leftOffcanvas");
+		const leftOffcanvas: HTMLDivElement = document.getElementById("leftOffcanvas") as HTMLDivElement;
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
 		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
 
-		/** @type {HTMLAnchorElement} */
-		const addComponentButton = document.getElementById("addComponentButton");
+		const addComponentButton: HTMLAnchorElement = document.getElementById("addComponentButton") as HTMLAnchorElement;
 		addComponentButton.addEventListener(
 			"click",
 			(() => {
@@ -556,17 +551,10 @@ export class MainController {
 			}).bind(this),
 			{ passive: true }
 		);
-		/** @type {HTMLDivElement} */
-		const leftOffcanvasAccordion = document.getElementById("leftOffcanvasAccordion");
+		const leftOffcanvasAccordion: HTMLDivElement = document.getElementById("leftOffcanvasAccordion") as HTMLDivElement;
 
-		/** @type {Map<string, ComponentSymbol[]>} */
-		const groupedSymbols = this.symbols.reduce(
-			/**
-			 * @param {Map<string, ComponentSymbol[]>} groupedSymbols
-			 * @param {ComponentSymbol} symbol
-			 * @returns {Map<string, ComponentSymbol[]>}
-			 */
-			(groupedSymbols, symbol) => {
+		const groupedSymbols: Map<string, ComponentSymbol[]> = this.symbols.reduce(
+			(groupedSymbols: Map<string, ComponentSymbol[]>, symbol: ComponentSymbol): Map<string, ComponentSymbol[]> => {
 				const key = symbol.groupName || "Unsorted components";
 				let group = groupedSymbols.get(key);
 				if (group) group.push(symbol);
@@ -576,8 +564,7 @@ export class MainController {
 			new Map()
 		);
 
-		/** @type {SVGSVGElement[]} */
-		let iconsWithoutViewBox = [];
+		let iconsWithoutViewBox: SVGSVGElement[] = [];
 		let firstGroup = true;
 		for (const [groupName, symbols] of groupedSymbols.entries()) {
 			const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-");
@@ -592,7 +579,7 @@ export class MainController {
 			accordionItemButton.classList.add("accordion-button", firstGroup ? undefined : "collapsed");
 			accordionItemButton.innerText = groupName;
 			accordionItemButton.setAttribute("aria-controls", collapseGroupID);
-			accordionItemButton.setAttribute("aria-expanded", firstGroup);
+			accordionItemButton.setAttribute("aria-expanded", firstGroup.toString());
 			accordionItemButton.setAttribute("data-bs-target", "#" + collapseGroupID);
 			accordionItemButton.setAttribute("data-bs-toggle", "collapse");
 			accordionItemButton.type = "button";
@@ -606,14 +593,13 @@ export class MainController {
 			accordionItemBody.classList.add("accordion-body", "iconLibAccordionBody");
 
 			for (const symbol of symbols) {
-				/** @type {HTMLDivElement} */
-				const addButton = accordionItemBody.appendChild(document.createElement("div"));
+				const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"));
 				addButton.classList.add("libComponent");
 				addButton.setAttribute("searchData",[symbol.tikzName].concat(Array.from(symbol._tikzOptions.keys())).join(" "))
 				addButton.ariaRoleDescription = "button";
 				addButton.title = symbol.displayName || symbol.tikzName;
 
-				const listener = (ev) => {
+				const listener = (ev: MouseEvent) => {
 					ev.preventDefault();
 					this.#switchMode(MainController.modes.COMPONENT)
 					const oldComponent = this.canvasController.placingComponent;
@@ -657,8 +643,7 @@ export class MainController {
 				addButton.addEventListener("mouseup", listener);
 				addButton.addEventListener("touchstart", listener, { passive: false });
 
-				/** @type {SVGSVGElement} */
-				const svgIcon = addButton.appendChild(document.createElementNS(SVG.namespaces.svg, "svg"));
+				const svgIcon: SVGSVGElement = addButton.appendChild(document.createElementNS(SVG.namespaces.svg, "svg"));
 				if (symbol.viewBox) {
 					svgIcon.setAttributeNS(
 						null,
@@ -678,7 +663,7 @@ export class MainController {
 				const svgUse = svgIcon.appendChild(document.createElementNS(SVG.namespaces.svg, "use"));
 				svgUse.setAttributeNS(SVG.namespaces.xlink, "href", "#" + symbol.id());
 
-				if (!symbol.viewBox) iconsWithoutViewBox.append(svgIcon);
+				if (!symbol.viewBox) iconsWithoutViewBox.push(svgIcon);
 			}
 
 			firstGroup = false;
@@ -689,7 +674,7 @@ export class MainController {
 		 * @param {DOMRect|null|undefined} box
 		 * @returns {boolean}
 		 */
-		function isNullishBox(box) {
+		function isNullishBox(box: DOMRect | null | undefined): boolean {
 			return !box || (!box.x && !box.y && !box.width && !box.height);
 		}
 
@@ -698,14 +683,14 @@ export class MainController {
 
 		iconsWithoutViewBox.forEach(async (svgIcon) => {
 			/** @type {DOMRect} */
-			let box;
+			let box: DOMRect;
 			// wait for browser rendering and setting the bounding box
 			while (isNullishBox((box = svgIcon.getBBox({ clipped: false, fill: true, markers: true, stroke: true }))))
 				await new Promise((resolve) => requestAnimationFrame(resolve));
 
 			svgIcon.setAttributeNS(null, "viewBox", box.x + " " + box.y + " " + box.width + " " + box.height);
-			svgIcon.setAttributeNS(null, "width", box.width);
-			svgIcon.setAttributeNS(null, "height", box.height);
+			svgIcon.setAttributeNS(null, "width", box.width.toString());
+			svgIcon.setAttributeNS(null, "height", box.height.toString());
 		});
 	}
 
@@ -713,11 +698,11 @@ export class MainController {
 	 * filter the components in the left OffCanvas to only show what matches the search string (in a new accordeon item)
 	 * @param {Event} evt 
 	 */
-	filterComponents(evt){
+	filterComponents(evt: Event){
 		evt.preventDefault();
 		evt.stopPropagation();
 		
-		const element = document.getElementById('componentFilterInput');
+		const element = document.getElementById('componentFilterInput') as HTMLInputElement;
 		const feedbacktext = document.getElementById('invalid-feedback-text');
 		let text = element.value;
 		let regex = null;
@@ -735,10 +720,10 @@ export class MainController {
 		const accordion = document.getElementById("leftOffcanvasAccordion");
 
 		const accordionItems = accordion.getElementsByClassName("accordion-item");
-		Array.prototype.forEach.call(accordionItems,(/**@type {HTMLDivElement} */accordionItem,index)=>{
+		Array.prototype.forEach.call(accordionItems,(accordionItem: HTMLDivElement,index:number)=>{
 			const libComponents = accordionItem.getElementsByClassName("libComponent");
 			let showCount = 0;
-			Array.prototype.forEach.call(libComponents,(/**@type {HTMLDivElement} */libComponent)=>{
+			Array.prototype.forEach.call(libComponents,(libComponent: HTMLDivElement)=>{
 				if (text) {
 					if (!(regex.test(libComponent.title)||regex.test(libComponent.getAttribute("searchData")))) {
 						libComponent.classList.add("d-none");
@@ -774,7 +759,7 @@ export class MainController {
 	 *
 	 * @param {number} newMode - the new mode; one of {@link MainController.modes}
 	 */
-	#switchMode(newMode) {
+	#switchMode(newMode: number) {
 		if (newMode === this.mode) return;
 
 		switch (this.mode) {
@@ -873,11 +858,11 @@ export class MainController {
 	}
 
 	/**
-	 * add missing fill attributes to all symbol db entries where fill is undefined --> needs explicit setting, otherwise the color theme change does strange things
+	 * add missing fill attributes to all symbol db entries where fill is undefined --> needs explicit setting, otherwise the color theme change does strange things.
 	 * called once on initialization
 	 * @param {Element} node 
 	 */
-	#addFill(node){
+	#addFill(node: Element){
 		let hasFill = node.getAttribute("fill") !==null;
 		if (hasFill) {
 			return;
@@ -898,7 +883,7 @@ export class MainController {
 	 *
 	 * @param {ComponentInstance} newInstance - the instance to add
 	 */
-	addInstance(newInstance) {
+	addInstance(newInstance: ComponentInstance) {
 		this.instances.push(newInstance);
 		const snappingPoints = newInstance.snappingPoints || [];
 		if (snappingPoints.length > 0) this.snapController.addSnapPoints(snappingPoints);
@@ -909,7 +894,7 @@ export class MainController {
 	 *
 	 * @param {Line} newLine - the line to add
 	 */
-	addLine(newLine) {
+	addLine(newLine: Line) {
 		this.lines.push(newLine);
 	}
 
@@ -918,7 +903,7 @@ export class MainController {
 	 *
 	 * @param {ComponentInstance} instance - the instance to remove
 	 */
-	removeInstance(instance) {
+	removeInstance(instance: ComponentInstance) {
 		instance.remove();
 		const idx = this.instances.indexOf(instance);
 		if (idx >= 0) {
@@ -932,7 +917,7 @@ export class MainController {
 	 * Removes a line from {@link lines}.
 	 * @param {Line} line - the line to remove
 	 */
-	removeLine(line) {
+	removeLine(line: Line) {
 		line.remove();
 		const idx = this.lines.indexOf(line);
 		if (idx >= 0) this.lines.splice(idx, 1);

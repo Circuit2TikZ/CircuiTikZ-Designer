@@ -6,15 +6,160 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-/**
- * @typedef {object} ToUnit
- * @property {number} px
- * @property {number} in
- * @property {number} cm
- * @property {number} mm
- * @property {number} pt
- * @property {number} pc
- */
+declare module "@svgdotjs/svg.js" {
+	interface Number {
+		/**
+		 * Convert a SVGNumber to another unit. Does actually change the value.
+		 * @param unit - the unit to convert to
+		 * @returns {Number}
+		 */
+		convertToUnit(unit: "px" | "in" | "cm" | "mm" | "pt" | "pc"): Number;
+		/**
+		 * Converts number alike values to a plain `number` in the unit pixel.
+		 * @static
+		 * @param number
+		 * @returns {number} a plain `number` in px
+		 */
+		ensureInPx(number: string | number | Number): number;
+		/**
+		 * Divides this number by another svg number.
+		 * Returns a new instance.
+		 * @param number - the divisor
+		 * @returns the result
+		 */
+		divide(number: Number | number): Number;
+		/**
+		 * Subtracts another svg number.
+		 * Returns a new instance.
+		 * @param number - the subtrahend
+		 * @returns the result
+		 */
+		minus(number: Number | number): Number;
+		/**
+		 * Calculates the sum of this number and another svg number.
+		 * Returns a new instance.
+		 * @param number - the other summand
+		 * @returns the result
+		 */
+		plus(number: Number | number): Number;
+		/**
+		 * Multiplies this number with another svg number.
+		 * Returns a new instance.
+		 * @param number - the other operand
+		 * @returns the result
+		 */
+		times(number: Number | number): Number;
+		/**
+		 * Calculates the exponentiation using this number as base.
+		 * Returns a new instance.
+		 * @param exponent - the exponent
+		 * @returns the result
+		 */
+		pow(exponent: number): Number;
+		/**
+		 * Calculates the remainder (modulo) of an division.
+		 * Returns a new instance.
+		 * @param number - the divisor
+		 * @returns the result
+		 */
+		mod(number: number): Number;
+		/**
+		 * Checks if this svg number is greater than the other one.
+		 * @param number - the other number
+		 * @returns the result
+		 */
+		gt(number: Number | number): boolean;
+		/**
+		 * Checks if this svg number is greater than the other one or equal.
+		 * @param number - the other number
+		 * @returns the result
+		 */
+		gte(number: Number | number): boolean;
+		/**
+		 * Checks if this svg number is less than the other one.
+		 * @param number - the other number
+		 * @returns the result
+		 */
+		lt(number: Number | number): boolean;
+		/**
+		 * Checks if this svg number is less than the other one or equal.
+		 * @param number - the other number
+		 * @returns the result
+		 */
+		lte(number: Number | number): boolean;
+		/**
+		 * Checks if this svg number is equal the other one.
+		 * @param number - the other number
+		 * @returns the result
+		 */
+		eq(number: Number | number): boolean;
+	}
+
+	interface Point {
+		/**
+		 * Calculate the squared distance of two points.
+		 * @param other - the other point
+		 * @returns the squared distance (px^2)
+		 */
+		distanceSquared(other: Point): number;
+		/**
+		 * Calculate the distance of two points.
+		 * @param other - the other point
+		 * @returns the squared distance (px)
+		 */
+		distance(other: Point): number;
+		/**
+		 * Calculate the length of the vector resp. the distance from (0|0).
+		 * @returns the squared length (px^2)
+		 */
+		absSquared(): number;
+		/**
+		 * Calculate the length of the vector resp. the distance from (0|0).
+		 * @returns the length (px)
+		 */
+		abs(): number;
+		/**
+		 * Subtracts another svg point.
+		 * Returns a new instance.
+		 * @param other - the subtrahend
+		 * @returns the result
+		 */
+		minus(other: Point): Point;
+		/**
+		 * Calculates the sum of this and another svg point.
+		 * Returns a new instance.
+		 * @param other - the other summand
+		 * @returns the result
+		 */
+		plus(other: Point): Point;
+		/**
+		 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
+		 * rotation.
+		 * @param angle - rotation angle in degrees or radians
+		 * @param centerCoord - center of rotation
+		 * @param inRad - set to `true`, if the angle is in radians
+		 * @returns the result
+		 */
+		rotate(angle: number, centerCoord?: Point, inRad?: boolean): Point;
+		/**
+		 * Formats the point for usage with (Circui)TikZ.
+		 *
+		 * Converts from px to cm and rounds to 2 digits after the decimal point.
+		 * @returns the TikZ representation, e.g. "(0.1, 1.23)"
+		 */
+		toTikzString(): string;
+	}
+}
+
+
+type ToUnit = {
+	px: number;
+	in: number;
+	cm: number;
+	mm: number;
+	pt: number;
+	pc: number;
+}
 
 /**
  * Conversion constants from/to any svg unit.
@@ -78,7 +223,7 @@ const unitConvertMap = {
  *
  * @type {string[]}
  */
-const unitPriority = ["px", "in", "pt", "pc", "cm", "mm"];
+const unitPriority: string[] = ["px", "in", "pt", "pc", "cm", "mm"];
 
 /**
  * Convert two values to the same unit. The priority for unit is determined using {@link unitPriority}.
@@ -88,9 +233,9 @@ const unitPriority = ["px", "in", "pt", "pc", "cm", "mm"];
  * @param {SVG.Number | number} otherNumber - the second number
  * @returns {SVG.Number[]} an array of both numbers
  */
-function toSameUnit(thisNumber, otherNumber) {
+function toSameUnit(thisNumber: SVG.Number, otherNumber: SVG.Number | number): SVG.Number[] {
 	const thisNumberUnit = thisNumber.unit || "px"; // Empty == "px"
-	const otherNumberUnit = otherNumber.unit || "px";
+	const otherNumberUnit = otherNumber instanceof SVG.Number? otherNumber.unit : "px";
 
 	if (!(otherNumber instanceof SVG.Number)) {
 		thisNumber = new SVG.Number(thisNumber); // clone
@@ -119,9 +264,9 @@ SVG.extend(SVG.Number, {
 	 * @param {"px"|"in"|"cm"|"mm"|"pt"|"pc"} unit - the unit to convert to
 	 * @returns {SVG.Number}
 	 */
-	convertToUnit(unit) {
+	convertToUnit(unit: "px" | "in" | "cm" | "mm" | "pt" | "pc"): SVG.Number {
 		/** @type {ToUnit} */
-		const factors = unitConvertMap[this.unit || "px"] || null;
+		const factors: ToUnit = unitConvertMap[this.unit || "px"] || null;
 		const factor = factors?.[unit] ?? null;
 		if (factor !== null) return new SVG.Number(this.value * factor, unit);
 		else throw new Error("Invalid unit");
@@ -135,7 +280,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the divisor
 	 * @returns {SVG.Number} the result
 	 */
-	divide(number) {
+	divide(number: SVG.Number | number): SVG.Number {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		thisNumber.value /= otherNumber.value;
 		return thisNumber;
@@ -149,7 +294,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the subtrahend
 	 * @returns {SVG.Number} the result
 	 */
-	minus(number) {
+	minus(number: SVG.Number | number): SVG.Number {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		thisNumber.value -= otherNumber.value;
 		return thisNumber;
@@ -163,7 +308,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other summand
 	 * @returns {SVG.Number} the result
 	 */
-	plus(number) {
+	plus(number: SVG.Number | number): SVG.Number {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		thisNumber.value += otherNumber.value;
 		return thisNumber;
@@ -177,7 +322,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other operand
 	 * @returns {SVG.Number} the result
 	 */
-	times(number) {
+	times(number: SVG.Number | number): SVG.Number {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		thisNumber.value *= otherNumber.value;
 		return thisNumber;
@@ -191,7 +336,7 @@ SVG.extend(SVG.Number, {
 	 * @param {number} exponent - the exponent
 	 * @returns {SVG.Number} the result
 	 */
-	pow(exponent) {
+	pow(exponent: number): SVG.Number {
 		let thisNumber = new SVG.Number(this);
 		thisNumber.value **= exponent;
 		return thisNumber;
@@ -205,7 +350,7 @@ SVG.extend(SVG.Number, {
 	 * @param {number} number - the divisor
 	 * @returns {SVG.Number} the result
 	 */
-	mod(number) {
+	mod(number: number): SVG.Number {
 		let thisNumber = new SVG.Number(this);
 		thisNumber.value %= number;
 		return thisNumber;
@@ -218,7 +363,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other number
 	 * @returns {boolean} the result
 	 */
-	gt(number) {
+	gt(number: SVG.Number | number): boolean {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		return thisNumber.value > otherNumber.value;
 	},
@@ -230,7 +375,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other number
 	 * @returns {boolean} the result
 	 */
-	gte(number) {
+	gte(number: SVG.Number | number): boolean {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		return thisNumber.value >= otherNumber.value;
 	},
@@ -242,7 +387,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other number
 	 * @returns {boolean} the result
 	 */
-	lt(number) {
+	lt(number: SVG.Number | number): boolean {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		return thisNumber.value < otherNumber.value;
 	},
@@ -254,7 +399,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other number
 	 * @returns {boolean} the result
 	 */
-	lte(number) {
+	lte(number: SVG.Number | number): boolean {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		return thisNumber.value <= otherNumber.value;
 	},
@@ -266,7 +411,7 @@ SVG.extend(SVG.Number, {
 	 * @param {SVG.Number|number} number - the other number
 	 * @returns {boolean} the result
 	 */
-	eq(number) {
+	eq(number: SVG.Number | number): boolean {
 		let [thisNumber, otherNumber] = toSameUnit(this, number);
 		return thisNumber.value == otherNumber.value;
 	},
@@ -281,11 +426,19 @@ SVG.extend(SVG.Number, {
  * @param {string|Number|number|SVG.Number} number
  * @returns {number} a plain `number` in px
  */
-SVG.Number.ensureInPx = function (number) {
-	if (number instanceof SVG.Number) return number.convertToUnit("px").value;
-	let num = Number(number);
-	if (Number.isNaN(num)) return new SVG.Number(number).convertToUnit("px").value;
-	else return num;
+export function ensureInPx(nmbr: string | number | SVG.Number | SVGLength): number {
+	if (nmbr instanceof SVG.Number) return nmbr.convertToUnit("px").value;
+	let num = Number(nmbr);
+	if (Number.isNaN(num)){
+		if (typeof nmbr === "string") {
+			return new SVG.Number(nmbr).convertToUnit("px").value;
+		}else if(typeof nmbr === "number"){
+			return new SVG.Number(nmbr).convertToUnit("px").value;
+		}else{
+			nmbr.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX)
+			return nmbr.value;
+		}
+	} else return num;
 };
 
 SVG.extend(SVG.Point, {
@@ -296,7 +449,7 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the other point
 	 * @returns {number} the squared distance (px^2)
 	 */
-	distanceSquared(other) {
+	distanceSquared(other: SVG.Point): number {
 		return (this.x - other.x) ** 2 + (this.y - other.y) ** 2;
 	},
 
@@ -307,7 +460,7 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the other point
 	 * @returns {number} the squared distance (px)
 	 */
-	distance(other) {
+	distance(other: SVG.Point): number {
 		return Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2);
 	},
 
@@ -317,7 +470,7 @@ SVG.extend(SVG.Point, {
 	 * @this {SVG.Point}
 	 * @returns {number} the squared length (px^2)
 	 */
-	absSquared() {
+	absSquared(): number {
 		return this.x ** 2 + this.y ** 2;
 	},
 
@@ -327,7 +480,7 @@ SVG.extend(SVG.Point, {
 	 * @this {SVG.Point}
 	 * @returns {number} the length (px)
 	 */
-	abs() {
+	abs(): number {
 		return Math.sqrt(this.x ** 2 + this.y ** 2);
 	},
 
@@ -339,7 +492,7 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the subtrahend
 	 * @returns {SVG.Point} the result
 	 */
-	minus(other) {
+	minus(other: SVG.Point): SVG.Point {
 		return new SVG.Point(this.x - other.x, this.y - other.y);
 	},
 
@@ -351,7 +504,7 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the other summand
 	 * @returns {SVG.Point} the result
 	 */
-	plus(other) {
+	plus(other: SVG.Point): SVG.Point {
 		return new SVG.Point(this.x + other.x, this.y + other.y);
 	},
 
@@ -365,7 +518,7 @@ SVG.extend(SVG.Point, {
 	 * @param {boolean} [inRad=false] - set to `true`, if the angle is in radians
 	 * @returns {SVG.Point} the result
 	 */
-	rotate(angle, centerCoord, inRad = false) {
+	rotate(angle: number, centerCoord: SVG.Point, inRad: boolean = false): SVG.Point {
 		let result = centerCoord ? this.minus(centerCoord) : this.clone();
 
 		const oldX = result.x;
@@ -393,7 +546,7 @@ SVG.extend(SVG.Point, {
 	 * @this {SVG.Point}
 	 * @returns {string} the TikZ representation, e.g. "(0.1, 1.23)"
 	 */
-	toTikzString() {
+	toTikzString(): string {
 		let x = Number(this.x * unitConvertMap.px.cm)
 			.toFixed(2)
 			.replace(/\.?0+$/, "");

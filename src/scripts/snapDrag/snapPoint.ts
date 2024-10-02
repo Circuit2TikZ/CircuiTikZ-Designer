@@ -4,7 +4,7 @@
 
 import { Point, Matrix } from "@svgdotjs/svg.js";
 
-/** @typedef {Point|{x: number, y: number}|[number, number]} PointAlike */
+type PointAlike = Point | { x: number; y: number; } | [number, number];
 
 /**
  * @callback SnapPointChangeListener
@@ -21,21 +21,14 @@ import { Point, Matrix } from "@svgdotjs/svg.js";
  * @class
  */
 export class SnapPoint extends Point {
-	/** @type {?{nodeName: string}} */
-	#instance;
-	/** @type {?string} */
-	#anchorName;
-	/** @type {PointAlike} */
-	#midPoint;
-	/** @type {PointAlike} */
-	#relPosition;
-	/** @type {number} */
-	#angle;
-	/** @type {boolean} */
-	#inDegree;
+	#instance: { nodeName: string; } | null;
+	#anchorName: string | null;
+	#midPoint: PointAlike;
+	#relPosition: PointAlike;
+	#angle: number;
+	#inDegree: boolean;
 
-	/** @type {SnapPointChangeListener[]} */
-	#changeListeners = [];
+	#changeListeners: SnapPointChangeListener[] = [];
 	
 	// For understanding: mid and relPosition are given by reference: don't have to be updated for recalculate if their references are still valid.
 	// TODO Should change in the future since this could easily cause hard to find bugs
@@ -49,7 +42,7 @@ export class SnapPoint extends Point {
 	 * @param {number} [angle=0] - the angle to rotate the relPosition around the mid point
 	 * @param {boolean} [inDegree=false] - set to `true`, if the specified angle is in degrees instead of rad
 	 */
-	constructor(instance, anchorName, mid, relPosition, angle = 0, inDegree = false) {
+	constructor(instance: { nodeName?: string; mid?: PointAlike; } | null, anchorName: string | null, mid: PointAlike, relPosition: PointAlike, angle: number = 0, inDegree: boolean = false) {
 		super();
 		this.#instance = instance;
 		this.#anchorName = anchorName;
@@ -65,7 +58,7 @@ export class SnapPoint extends Point {
 	 * @param {?number} [angle] - the new angle, if changed
 	 * @param {?Point} [flip] - the flip vector
 	 */
-	recalculate(newMid, angle, flip) {
+	recalculate(newMid: Point | null, angle: number | null, flip: Point | null) {
 		if (newMid) this.#midPoint = newMid;
 		if (angle || angle === 0) this.#angle = angle;
 
@@ -89,7 +82,7 @@ export class SnapPoint extends Point {
 		for (const listener of this.#changeListeners) listener(this, oldX, oldY, false);
 	}
 
-	#asPoint(pointlike){
+	#asPoint(pointlike:PointAlike){
 		return Array.isArray(pointlike)? new Point(pointlike[0],pointlike[1]):new Point(Number(pointlike.x),Number(pointlike.y));
 	}
 
@@ -97,7 +90,7 @@ export class SnapPoint extends Point {
 	 * calculates the delta of this snapPoint from the instance anchor (point-anchor)
 	 * @returns {SVG.Point} 
 	 */
-	relToComponentAnchor(){
+	relToComponentAnchor(): Point{
 		return this.#asPoint(this.#relPosition).plus(this.#asPoint(this.#midPoint)).minus(this.#instance.getAnchorPoint())
 	}
 
@@ -115,7 +108,7 @@ export class SnapPoint extends Point {
 	 *
 	 * @param {SnapPointChangeListener} listener - the change listener
 	 */
-	addChangeListener(listener) {
+	addChangeListener(listener: SnapPointChangeListener) {
 		this.#changeListeners.push(listener);
 	}
 
@@ -124,7 +117,7 @@ export class SnapPoint extends Point {
 	 *
 	 * @param {SnapPointChangeListener} listener - the change listener
 	 */
-	removeChangeListener(listener) {
+	removeChangeListener(listener: SnapPointChangeListener) {
 		const index = this.#changeListeners.indexOf(listener);
 		if (index >= 0) this.#changeListeners.splice(index, 1);
 	}
@@ -137,7 +130,7 @@ export class SnapPoint extends Point {
 	 *
 	 * @returns {string} the TikZ representation, e.g. "(MyTransistor.G)" or "(0.1, 1.23)"
 	 */
-	toTikzString() {
+	toTikzString(): string {
 		return this.#instance?.nodeName && this.#anchorName
 			? `${this.#instance.nodeName}.${this.#anchorName}`
 			: super.toTikzString();

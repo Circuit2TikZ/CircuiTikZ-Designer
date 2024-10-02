@@ -164,7 +164,7 @@ export class CanvasController {
 		this.canvas.viewbox(box)
 		this.canvas.zoom(2,new SVG.Point())
 
-		let gridVisibleToggle = document.getElementById("gridVisible")
+		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
 
 		let storage = localStorage.getItem("circuit2tikz-designer-grid")
 		if(storage) {

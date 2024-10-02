@@ -5,12 +5,18 @@
 import { Point } from "@svgdotjs/svg.js"
 import { Line, MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Undo } from "../internal"
 
+type Clipboard = {
+	nodes: NodeComponentInstance[],
+	paths: PathComponentInstance[],
+	lines: Line[]
+}
+
 /**
  * Class handling copy, paste and cut
  * @class
  */
 export class CopyPaste {
-	static #clipboard = {}
+	static #clipboard: Clipboard|null = null
 
 	static copy(){
 		if (SelectionController.controller.hasSelection()) {
@@ -41,7 +47,7 @@ export class CopyPaste {
 
 	static paste(){
 		//TODO paste should pick up components instantly and move them to the mouse position
-		if (Object.keys(CopyPaste.#clipboard).length===0) {
+		if (this.#clipboard && Object.keys(CopyPaste.#clipboard).length===0) {
 			return
 		}
 		

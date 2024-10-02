@@ -5,7 +5,7 @@
 import { Modal, Tooltip } from "bootstrap";
 import { SelectionController, MainController, CanvasController, NodeComponentInstance, PathComponentInstance, Line } from "../internal";
 import FileSaver from "file-saver";
-var pretty = require('pretty');
+import pretty = require('pretty');
 
 /**
  * Contains export functions and controls the "exportModal" (~dialog).

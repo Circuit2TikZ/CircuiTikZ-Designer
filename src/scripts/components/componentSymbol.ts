@@ -3,66 +3,53 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-
+import { ensureInPx } from "../utils/impSVGNumber";
 import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
 
 /** @typedef {import("./componentInstance")} ComponentInstance */
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 
-/**
- * @typedef {object} TikZAnchor
- * @property {string} [name] - the anchor name; e.g. G for the gate of a transistor
- * @property {SVGLength} x - anchor x coordinate relative to the symbol mid/anchor; tikz-ish
- * @property {SVGLength} y - anchor y coordinate relative to the symbol mid; positive y is upward (!); tikz-ish
- * @property {SVG.Point} point - the point relative to the symbol = svg-ish
- * @property {boolean} isDefault - true, if the anchor is the default one for placing the node
- */
+type TikZAnchor = {
+	name?: string;
+	x: SVG.Number;
+	y: SVG.Number;
+	point?: SVG.Point;
+	isDefault: boolean;
+}
 
-/**
- * @typedef {object} SymbolBaseInformation
- * @property {?SVGMetadataElement} svgMetadataElement -
- * @property {?Element} componentInformation -
- * @property {boolean} isNode - `true`, if type=="node"
- * @property {boolean} isPath - `true`, if type=="path"
- * @property {?string} displayName - the name to show in the UI
- * @property {?string} tikzName - the tikz name used to draw, if found
- * @property {?string} shapeName - the shape name for path-style components, if found
- * @property {?string} groupName - the group the component belongs to, if set
- * @property {SVG.Point} mid - the point of the SVG Symbol, which corresponds to TikZs (0|0); anchors and pins are relative to this point
- * @property {?SVG.Box} viewBox - the viewBox/boundingBox, if set
- */
+type SymbolBaseInformation = {
+	svgMetadataElement?: SVGMetadataElement;
+	componentInformation?: Element;
+	isNode: boolean;
+	isPath: boolean;
+	displayName?: string;
+	tikzName?: string;
+	shapeName?: string;
+	groupName?: string;
+	mid: SVG.Point;
+	viewBox?: SVG.Box;
+}
 
 /**
  * Representation of a symbol. This class has sub classes describing path- and node-style symbols.
  * @class
  */
 export class ComponentSymbol extends SVG.Symbol {
-	/** @type {?SVGMetadataElement} */
-	svgMetadataElement;
+	svgMetadataElement: SVGMetadataElement | null;
 
-	/** @type {string} */
-	displayName;
-	/** @type {string} */
-	tikzName;
-	/** @type {?string} */
-	groupName;
+	displayName: string;
+	tikzName: string;
+	groupName: string | null;
 
-	/** @type {SVG.Point} */
-	relMid;
-	/** @type {?SVG.Box} */
-	viewBox;
+	relMid: SVG.Point;
+	viewBox: SVG.Box | null;
 
-	/** @type {Map<string,?string>} */
-	_tikzOptions;
-	/** @type {TikZAnchor[]} */
-	_pins = [];
-	/** @type {TikZAnchor[]} */
-	_additionalAnchors = [];
-	/** @type {SVG.Point} */
-	_textPosition = null;
-	/** @type {?TikZAnchor} */
-	_defaultAnchor = null;
+	_tikzOptions: Map<string, string | null>;
+	_pins: TikZAnchor[] = [];
+	_additionalAnchors: TikZAnchor[] = [];
+	_textPosition: SVG.Point = null;
+	_defaultAnchor: TikZAnchor | null = null;
 
 	/**
 	 * Creates a new symbol from a `SVGSymbolElement`.
@@ -71,7 +58,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {SymbolBaseInformation} [baseInformation] - base information if already extracted using {@link getBaseInformation}
 	 * @throws {Error} if the XML structure lacks the required metadata
 	 */
-	constructor(symbolElement, baseInformation) {
+	constructor(symbolElement: SVGSymbolElement, baseInformation: SymbolBaseInformation) {
 		super(symbolElement);
 		// this.node.instance = this; // Overwrite node circular reference of SVG.Symbol
 
@@ -118,7 +105,7 @@ export class ComponentSymbol extends SVG.Symbol {
 		let textPosition =
 			baseInformation.componentInformation &&
 			getNamedTag(baseInformation.componentInformation, "textPosition", METADATA_NAMESPACE_URI);
-		this._textPosition = textPosition ? this.#parseAnchor(textPosition, this).point : this._defaultAnchor.point;
+		this._textPosition = textPosition ? this.#parseAnchor(textPosition).point : this._defaultAnchor.point;
 	}
 
 	/**
@@ -126,9 +113,9 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {SVGSymbolElement} symbolElement - the element to extract the information from
 	 * @returns {SymbolBaseInformation} the extracted information
 	 */
-	static getBaseInformation(symbolElement) {
+	static getBaseInformation(symbolElement: SVGSymbolElement): SymbolBaseInformation {
 		/** @type {?SVGMetadataElement} */
-		const svgMetadataElement =
+		const svgMetadataElement: SVGMetadataElement | null =
 			Array.prototype.find.call(symbolElement.children, (e) => e instanceof SVGMetadataElement) ?? null;
 
 		// parse symbol
@@ -145,13 +132,13 @@ export class ComponentSymbol extends SVG.Symbol {
 		const groupName = componentInformation?.getAttribute("groupName") ?? null;
 
 		/** @type {SVG.Point} */
-		const mid = new SVG.Point(
-			SVG.Number.ensureInPx(componentInformation?.getAttribute("refX") || 0),
-			SVG.Number.ensureInPx(componentInformation?.getAttribute("refY") || 0)
+		const mid: SVG.Point = new SVG.Point(
+			ensureInPx(componentInformation?.getAttribute("refX") || 0),
+			ensureInPx(componentInformation?.getAttribute("refY") || 0)
 		);
 
 		/** @type {?SVG.Box} */
-		let viewBox;
+		let viewBox: SVG.Box | null;
 		if (componentInformation?.hasAttribute("viewBox"))
 			viewBox = new SVG.Box(componentInformation.getAttribute("viewBox"));
 		else if (symbolElement.hasAttribute("viewBox")) viewBox = new SVG.Box(symbolElement.getAttribute("viewBox"));
@@ -179,22 +166,21 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {Element} anchorElement - the element to parse
 	 * @returns {TikZAnchor} the parsed anchor
 	 */
-	#parseAnchor(anchorElement) {
+	#parseAnchor(anchorElement: Element): TikZAnchor {
 		const numberRegEx = /^(\d*\.)?\d+$/; // "1", ".1", "1.1"; but not "1."
-		/** @type {TikZAnchor} */
-		let anchor = {
+		let anchor:TikZAnchor = {
 			name: anchorElement.getAttribute("anchorName") || anchorElement.getAttribute("anchorname") || undefined,
-			x: anchorElement.getAttribute("x") ?? 0,
-			y: anchorElement.getAttribute("y") ?? 0,
-			isDefault: anchorElement.getAttribute("isDefault") || anchorElement.getAttribute("isdefault") || false,
+			x: new SVG.Number(anchorElement.getAttribute("x")),
+			y: new SVG.Number(anchorElement.getAttribute("y")),
+			isDefault: Boolean(anchorElement.getAttribute("isDefault")) || Boolean(anchorElement.getAttribute("isdefault")) || false,
 		};
-		if (typeof anchor.x === "string" && numberRegEx.test(anchor.x)) anchor.x = Number.parseFloat(anchor.x);
-		if (typeof anchor.y === "string" && numberRegEx.test(anchor.y)) anchor.y = Number.parseFloat(anchor.y);
+		if (typeof anchor.x === "string" && numberRegEx.test(anchor.x)) anchor.x = new SVG.Number(anchor.x);
+		if (typeof anchor.y === "string" && numberRegEx.test(anchor.y)) anchor.y = new SVG.Number(anchor.y);
 		if (typeof anchor.isDefault !== "boolean") anchor.isDefault = anchor.isDefault === "true";
 
 		anchor.point = new SVG.Point(
-			SVG.Number.ensureInPx(anchor.x),
-			SVG.Number.ensureInPx(anchor.y)
+			ensureInPx(anchor.x),
+			ensureInPx(anchor.y)
 		);
 
 		if (anchor.isDefault) this._defaultAnchor = anchor;
@@ -210,7 +196,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 * @returns {ComponentInstance} the new instance
 	 */
-	addInstanceToContainer(container, event, finishedPlacingCallback) {
+	addInstanceToContainer(container: SVG.Container, event: MouseEvent, finishedPlacingCallback: () => void): ComponentInstance {
 		throw new Error("Not implemented; use subclasses");
 	}
 
@@ -219,7 +205,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	 *
 	 * @returns {string} - the serialized options
 	 */
-	serializeTikzOptions() {
+	serializeTikzOptions(): string {
 		return Array.from(this._tikzOptions.entries(), ([key, value]) => (value ? key + "=" + value : key)).join(", ");
 	}
 }

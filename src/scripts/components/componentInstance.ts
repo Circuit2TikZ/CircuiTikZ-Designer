@@ -2,15 +2,20 @@
  * @module componentInstance
  */
 
-/** @typedef {import("../snapDrag/snapPoint")} SnapPoint */
-/** @typedef {import("../controllers/propertiesController")} FormEntry */
+import { ComponentSymbol } from "../internal";
+import * as SVG from "@svgdotjs/svg.js";
 
-/**
- * @interface ComponentInstance
- * @typedef ComponentInstance
- * @property {SnapPoint[]} snappingPoints
- * @property {string} tikzName
- */
+type SnapPoint = import("../snapDrag/snapPoint");
+type FormEntry = import("../controllers/propertiesController");
+
+abstract class ComponentInstance {
+	snappingPoints: SnapPoint[];
+	tikzName: string;
+
+	static createInstance(symbol:ComponentSymbol, container:SVG.Container, finishedPlacingCallback:()=>{}): ComponentInstance{
+		throw new Error("Only instantiate ComponentInstance subclasses!");	
+	}
+}
 
 /**
  * @function ComponentInstance.createInstance
@@ -102,14 +107,6 @@
  * @function ComponentInstance.rotate
  *
  * @param {number} angleDeg
- * @returns {ComponentInstance}
- */
-
-/**
- * Flip the component horizontally or vertically
- * @function ComponentInstance.flip
- *
- * @param {boolean} horizontal along which axis to flip
  * @returns {ComponentInstance}
  */
 

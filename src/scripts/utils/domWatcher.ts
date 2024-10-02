@@ -53,7 +53,7 @@ export async function waitForElementLoaded(id, doc = document) {
 		element = id;
 	} else {
 		// Minimum document state: DOM loaded
-		doc = await waitForDOMLoaded(doc, "interactive");
+		doc = await waitForDOMLoaded(doc, "interactive") as Document;
 		element = doc.getElementById(id);
 		if (!element) return element; // Not found
 	}
