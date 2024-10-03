@@ -27,6 +27,8 @@ export class NodeComponentInstance extends SVG.Use {
 	tikzName="";
 	/** @type {string} */
 	#label = ""
+	labelAnchor = "default"
+	labeldistance = 0
 	/** @type {SVG.Element} */
 	#labelSVG
 
@@ -269,9 +271,13 @@ export class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @returns {string}
 	 */
-	toTikzString() {
-		//don't change the order of flip and angleDeg!!! otherwise tikz render and UI are not the same
+	toTikzString(): string {
 		const optionsString = this.symbol.serializeTikzOptions();
+		let labelString = this.#label?`$${this.#label}$`:""
+		let rotateString = this.#angleDeg!==0?`\\rotatebox{${-this.#angleDeg}}{${labelString}}`:labelString
+		let flipString = this.#flip.x<0?(this.#flip.y<0?`\\ctikzflipxy{${rotateString}}`:`\\ctikzflipx{${rotateString}}`):(this.#flip.y<0?`\\ctikzflipy{${rotateString}}`:rotateString)
+		
+		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same
 		return (
 			"\\node[" +
 			this.symbol.tikzName +
@@ -284,7 +290,7 @@ export class NodeComponentInstance extends SVG.Use {
 			"at " +
 			this.#midAbs.toTikzString() +
 			" {"+
-			(this.#angleDeg!==0?(this.#label?`\\rotatebox{${-this.#angleDeg}}{$${this.#label}$}`:""):(this.#label?"$"+this.#label+"$":""))+
+			(this.#label?flipString:"")+
 			"};"
 		);
 	}
@@ -391,32 +397,79 @@ export class NodeComponentInstance extends SVG.Use {
 			this.#labelSVG.height(height)
 			this.#labelSVG.add(svgElement)
 			this.container.add(this.#labelSVG)
-			this.#updateLabelPosition()
+			this.updateLabelPosition()
 		})
 	}
 
-	#updateLabelPosition(){
+	updateLabelPosition(){		
 		// currently working only with 90 deg rotation steps
 		if (this.#label===""||!this.#labelSVG) {
 			return
 		}		
-
-		let textPos = this.symbol._textPosition
+		
+		// get relevant positions and bounding boxes
+		let textPos = this.symbol._textPosition.plus(this.#midAbs).transform(this.#getTransformMatrix())
 		let labelBBox = this.#labelSVG.bbox()
+		let componentBBox = this.bbox()
 
 		// calculate where on the label the anchor point should be
-		let horizontalTextPosition = Math.round((textPos.x+this.relMid.x)/this.symbol.viewBox.w*2-1)
-		let verticalTextPosition = Math.round((textPos.y+this.relMid.y)/this.symbol.viewBox.h*2-1)
-		let labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
-		labelRef = labelRef.rotate(this.#angleDeg)
-		labelRef.x = (1-labelRef.x)/2*labelBBox.w
-		labelRef.y = (1-labelRef.y)/2*labelBBox.h
+		let labelRef:SVG.Point;
+		let labelDist = this.labeldistance;
+		let offset = 3
+		switch (this.labelAnchor) {
+			case "default":
+				let clamp = function(value:number,min:number,max:number){
+					if (value<min) {
+						return min
+					}else if(value>max){
+						return max
+					}else{
+						return value
+					}
+				}
+				let horizontalTextPosition = clamp(Math.round(2*(componentBBox.cx-textPos.x)/componentBBox.w),-1,1)		
+				let verticalTextPosition = clamp(Math.round(2*(componentBBox.cy-textPos.y)/componentBBox.h),-1,1)	
+				labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
+				labelDist=0
+				offset=0
+				break;
+			case "center":
+				labelRef = new SVG.Point(0,0)
+				break;
+			case "north":
+				labelRef = new SVG.Point(0,1)
+				break;
+			case "south":
+				labelRef = new SVG.Point(0,-1)
+				break;
+			case "east":
+				labelRef = new SVG.Point(-1,0)
+				break;
+			case "west":
+				labelRef = new SVG.Point(1,0)
+				break;
+			case "north east":
+				labelRef = new SVG.Point(-1,1)
+				break;
+			case "north west":
+				labelRef = new SVG.Point(1,1)
+				break;
+			case "south east":
+				labelRef = new SVG.Point(-1,-1)
+				break;
+			case "south west":
+				labelRef = new SVG.Point(1,-1)
+				break;
+			default:
+				break;
+		}
 		
-		// the text position should react to rotation
-		textPos = textPos.rotate(this.#angleDeg)
+		let ref = labelRef.clone()
+		ref.x = (ref.x+1)/2*labelBBox.w+labelRef.x*offset
+		ref.y = (ref.y+1)/2*labelBBox.h+labelRef.y*offset
 		
 		// acutally move the label
-		let movePos = this.#midAbs.plus(textPos).minus(labelRef)
+		let movePos = textPos.minus(ref)
 		this.#labelSVG.move(movePos.x,movePos.y)
 	}
 
@@ -447,7 +500,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.#midAbs.y = y;
 		this.#updateTransform()
 		super.move(x - this.symbol.relMid.x, y - this.symbol.relMid.y);
-		this.#updateLabelPosition()
+		this.updateLabelPosition()
 
 		return this;
 	}

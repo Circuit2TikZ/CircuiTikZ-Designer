@@ -370,6 +370,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="0" y="-21.16493"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.848135" rx="4.6580520000000005" ry="8.678507999999999" />
@@ -410,6 +411,7 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
+					<ci:textPosition x="0" y="21.16493"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.73801" rx="4.6580520000000005" ry="10.190408" />
@@ -1101,7 +1103,7 @@
 						<ci:pin anchorName="w" x="-37.03903" y="0" isDefault="false" />
 						<ci:pin anchorName="e" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="-18.51952" y="0"/>
+					<ci:textPosition x="-25.29388" y="5.555620000000001"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="19.050855" rx="16.646316" ry="15.240684" />
@@ -1308,7 +1310,7 @@
 		</symbol>
 		<symbol id="node_gridnode">
 			<metadata>
-				<ci:componentInformation type="node" displayName="Grid node" tikzName="gridnode" groupName="Block diagram" refX="18.7852" refY="18.78521" viewBox="0 0 37.57038 37.57038">
+				<ci:componentInformation type="node" displayName="Grid node" tikzName="gridnode" groupName="Block diagram" refX="18.7852" refY="18.78521" viewBox="0 0 93.12894 37.57038">
 					<ci:pins>
 						<ci:pin anchorName="left" x="-18.51951" y="0" isDefault="false" />
 						<ci:pin anchorName="up" x="0" y="-18.51952" isDefault="false" />
@@ -1318,9 +1320,10 @@
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:additionalAnchors>
+					<ci:textPosition x="74.07806" y="9.25975"/>
 				</ci:componentInformation>
 			</metadata>
-			<ellipse stroke="none" fill="transparent" cx="18.78519" cy="18.78519" rx="15.028152" ry="15.028152" />
+			<ellipse stroke="none" fill="transparent" cx="46.56447" cy="18.78519" rx="37.251576" ry="15.028152" />
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path stroke="none" d="M.26569.26569h37.03902v37.03903h-37.03902Z"/>
 				<path stroke-width=".18897" d="m.26569.26569 37.03904 37.03904m-27.77928-37.03904 27.77928 27.77927m-27.77928-27.77927-9.25976 9.25977m18.51952-9.25977 18.51952 18.51952m-18.51952-18.51952-18.51952 18.51952m27.77927-18.51952 9.25977 9.25977m-9.25977-9.25977-27.77927 27.77927m37.03904-27.77927-37.03904 37.03904m9.25976 0-9.25976-9.25977m9.25976 9.25977 27.77928-27.77927m-18.51952 27.77927-18.51952-18.51952m18.51952 18.51952 18.51952-18.51952m-9.25977 18.51952-27.77927-27.77927m27.77927 27.77927 9.25977-9.25977"/>
@@ -2981,6 +2984,25 @@
 				<path fill="none" stroke-width="1.06267" d="M14.60638 19.18205v20.90334"/>
 				<path stroke="none" d="M23.87798 29.63372v-3.04907l6.81375 3.04907-6.81375 3.04908Z"/>
 				<path fill="none" stroke-width=".53134" d="M14.60638 19.44772h-14.34069m37.3047 10.186v-29.10236"/>
+			</g>
+		</symbol>
+		<symbol id="path_empty-gto">
+			<metadata>
+				<ci:componentInformation type="path" displayName="Empty GTO" tikzName="empty gto" shapeName="emptygtoshape" groupName="Diodes" refX="26.72226" refY="29.36805" viewBox="0 0 53.44448 43.12766">
+					<ci:pins>
+						<ci:pin anchorName="START" x="-26.45657" y="0" isDefault="false" />
+						<ci:pin anchorName="END" x="26.456560000000003" y="0" isDefault="false" />
+						<ci:pin anchorName="gate" x="26.456560000000003" y="-29.10236" isDefault="false" />
+					</ci:pins>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+					</ci:additionalAnchors>
+				</ci:componentInformation>
+			</metadata>
+			<ellipse stroke="none" fill="transparent" cx="26.72224" cy="21.56383" rx="21.377792" ry="17.251064" />
+			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
+				<path stroke-width="1.06267" d="m34.6593 29.36805-18.5195-13.22828v26.45657l18.5195-13.22829Zm0 13.22829v-26.45657"/>
+				<path stroke-width=".53134" d="M53.17882 14.81686v-14.55117m-18.51952 29.10236 18.51952-14.55119m0-7.27558-18.51953 14.55118m-18.51949 7.27559h-15.87411m34.3936 0h18.51953"/>
 			</g>
 		</symbol>
 		<symbol id="node_pigfete_solderdot">
@@ -6563,8 +6585,8 @@
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="28.31098" cy="39.950525" rx="22.648784000000003" ry="31.96042" />
 			<defs>
-				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_b" d="M4.07472-2.2914h2.77958c.13947 0 .32876 0 .32876-.19926s-.18929-.19925-.32876-.19925h-2.77958v-2.78954c0-.13948 0-.32877-.19925-.32877s-.19926.1893-.19926.32877v2.78954h-2.78954c-.13947 0-.32876 0-.32876.19925s.18929.19925.32876.19925h2.78954v2.78954c0 .13948 0 .32877.19926.32877s.19925-.1893.19925-.32877v-2.78954Z"/>
 				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_a" d="M6.56538-2.2914c.16936 0 .3487 0 .3487-.19926s-.17934-.19925-.3487-.19925h-5.38979c-.16936 0-.3487 0-.3487.19925s.17934.19925.3487.19925h5.38979Z"/>
+				<path id="node_double-bipole_circuitikz-quadpoles-style-inline_b" d="M4.07472-2.2914h2.77958c.13947 0 .32876 0 .32876-.19926s-.18929-.19925-.32876-.19925h-2.77958v-2.78954c0-.13948 0-.32877-.19925-.32877s-.19926.1893-.19926.32877v2.78954h-2.78954c-.13947 0-.32876 0-.32876.19925s.18929.19925.32876.19925h2.78954v2.78954c0 .13948 0 .32877.19926.32877s.19925-.1893.19925-.32877v-2.78954Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M.53135 61.11586v-42.33064h15.87407v42.33064Zm23.81112-21.16532c0 8.7671 7.10697 15.87408 15.87408 15.87408s15.87408-7.10697 15.87408-15.87408-7.10697-15.87408-15.87408-15.87408-15.87408 7.10697-15.87408 15.87408Zm15.87408 0"/>
@@ -6725,8 +6747,8 @@
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.62811" cy="37.57038" rx="30.902488" ry="30.056304" />
 			<defs>
-				<path id="node_fd-op-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
 				<path id="node_fd-op-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
+				<path id="node_fd-op-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="m76.7249 37.5704-31.4831-18.51952h31.4831-31.4831l-31.48313-18.51951v74.07805l31.48313-18.5195h31.4831-31.4831l31.4831-18.51952Z"/>
@@ -6885,8 +6907,8 @@
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="45.241765" cy="37.57038" rx="36.193412" ry="30.056304" />
 			<defs>
-				<path id="node_fd-inst-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
 				<path id="node_fd-inst-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
+				<path id="node_fd-inst-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M76.7249 37.5704v-22.22365l-62.96623-14.81538v74.07805l62.96623-14.81538Z"/>
