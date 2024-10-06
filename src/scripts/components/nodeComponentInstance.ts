@@ -5,13 +5,9 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { rectRectIntersection, selectionColor, selectedBoxWidth } from "../utils/selectionHelper";
 
-import { NodeComponentSymbol,SnapPoint,NodeDragHandler,Undo,MainController,CanvasController } from "../internal";
+import { NodeComponentSymbol,SnapPoint,NodeDragHandler,Undo,MainController,CanvasController, FormEntry } from "../internal";
 import hotkeys from "hotkeys-js";
 import { Point } from "@svgdotjs/svg.js";
-
-/**
- * @typedef {import("../controllers/propertiesController")} FormEntry
- */
 
 const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
@@ -20,58 +16,31 @@ const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
  * @implements {import("./componentInstance").ComponentInstance}
  */
 export class NodeComponentInstance extends SVG.Use {
-	/** @type {NodeComponentSymbol} */
-	symbol;
+	symbol: NodeComponentSymbol;
 
-	/** @type {string} */
-	tikzName="";
-	/** @type {string} */
-	#label = ""
+	tikzName: string="";
+	#label: string = ""
 	labelAnchor = "default"
 	labeldistance = 0
-	/** @type {SVG.Element} */
-	#labelSVG
+	#labelSVG: SVG.Element
 
-	/** @type {NodeDragHandler} */
-	#snapDragHandler;
+	#snapDragHandler: NodeDragHandler;
 
-	/** @type {SVG.Container} */
-	container;
+	container: SVG.Container;
 
-	/** @type {number} */
-	#angleDeg = 0;
-	/** @type {SVG.Point} */
-	#midAbs = new SVG.Point();
-	/** @type {SVG.Point} */
-	#flip = new SVG.Point(1,1);
-	/** @type {SVG.Box} */
-	boundingBox = new SVG.Box();
-	/** @type {SVG.Point} */
-	relMid = new SVG.Point();
-	/** @type {SnapPoint[]} */
-	snappingPoints;
-	/** @type {SVG.Point[]} */
-	relSnappingPoints;
+	#angleDeg: number = 0;
+	#midAbs: SVG.Point = new SVG.Point();
+	#flip: SVG.Point = new SVG.Point(1,1);
+	boundingBox: SVG.Box = new SVG.Box();
+	relMid: SVG.Point = new SVG.Point();
+	snappingPoints: SnapPoint[];
+	relSnappingPoints: SVG.Point[];
 
 	/** the rectangle which is shown when the component is selected
-	 * @type {?SVG.Rect}
 	 */
-	#selectionRectangle = null;
+	#selectionRectangle: SVG.Rect | null = null;
 
-	/**
-	 * @type {function():void}
-	 */
-	#finishedPlacingCallback  = ()=>{};
-
-	/**
-	 * @typedef {object} DragHandler
-	 * @property {SVG.Element} el
-	 * @property {SVG.Box} box
-	 * @property {SVG.Point} lastClick
-	 * @property {(ev: MouseEvent) => void} startDrag
-	 * @property {(ev: MouseEvent) => void} drag
-	 * @property {(ev: MouseEvent) => void} endDrag
-	 */
+	#finishedPlacingCallback: () => void  = (): void=>{};
 
 	/**
 	 * Creates a instance of a node-style component. Do not call this constructor directly. Use {@link createInstance}
@@ -82,7 +51,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {MouseEvent|TouchEvent} [event] - the event which triggered the adding
  	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	constructor(symbol, container, event, finishedPlacingCallback) {
+	constructor(symbol: NodeComponentSymbol, container: SVG.Container, event: MouseEvent | TouchEvent, finishedPlacingCallback: () => void) {
 		super();
 		this.#finishedPlacingCallback = finishedPlacingCallback;
 
@@ -108,27 +77,25 @@ export class NodeComponentInstance extends SVG.Use {
 
 			// 2nd: start dragging
 			/** @type {DragHandler} */
-			let dh = this.remember("_draggable");
+			let dh: DragHandler = this.remember("_draggable");
 
 			dh.startDrag(event);
 
 			const endEventName = event.type.includes("mouse") ? "mouseup" : "touchend";
 			const endEventNameScoped = endEventName + ".drag";
 
-			const dragEndFunction = (/** @type {MouseEvent} */evt)=>{
+			const dragEndFunction = (/** @type {MouseEvent} */evt: MouseEvent)=>{
 				if (evt.button==0) {
 					dh.endDrag(evt);
-					CanvasController.controller.placingComponent=null;
 					this.#finishedPlacingCallback();
 					hotkeys.unbind("esc",dragCancelFunction)				
 				}
 			}
 
-			const dragCancelFunction = (/** @type {KeyboardEvent} */evt)=>{
+			const dragCancelFunction = (/** @type {KeyboardEvent} */evt: KeyboardEvent)=>{
 				dh.endDrag(evt);
-				CanvasController.controller.placingComponent=null;
 				hotkeys.unbind("esc",dragCancelFunction)
-				MainController.controller.removeInstance(this);	
+				MainController.instance.removeComponent(this);	
 			}
 
 			hotkeys("esc",dragCancelFunction)
@@ -144,9 +111,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.updateTheme()
 	}
 
-	updateTheme(){
-
-	}
+	updateTheme(){}
 
 	isInsideSelectionRectangle(selectionRectangle){
 		return rectRectIntersection(selectionRectangle,this.bbox());
@@ -204,7 +169,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {MouseEvent} [event] - an optional (mouse/touch) event, which caused the element to be added
 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	static createInstance(symbol, container, event, finishedPlacingCallback) {
+	static createInstance(symbol: NodeComponentSymbol, container: SVG.Container, event: MouseEvent, finishedPlacingCallback: () => void) {
 		return new NodeComponentInstance(symbol, container, event, finishedPlacingCallback);
 	}
 
@@ -214,10 +179,9 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {object} serialized - the saved instance
 	 * @returns {NodeComponentInstance} the deserialized instance
 	 */
-	static fromJson(serialized) {
+	static fromJson(serialized: object): NodeComponentInstance {
 		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
-		/**@type {NodeComponentInstance} */
-		let nodeComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
+		let nodeComponent: NodeComponentInstance = symbol.addInstanceToContainer(CanvasController.instance.canvas,null,()=>{})
 		nodeComponent.moveTo(new SVG.Point(serialized.position))
 		nodeComponent.#angleDeg = serialized.rotation
 		nodeComponent.#flip= new SVG.Point(serialized.flip)
@@ -236,7 +200,7 @@ export class NodeComponentInstance extends SVG.Use {
 		nodeComponent.#recalculateRelSnappingPoints()
 		nodeComponent.recalculateSnappingPoints()
 
-		MainController.controller.addInstance(nodeComponent);
+		MainController.controller.addComponent(nodeComponent);
 		return nodeComponent;
 	}
 
@@ -245,7 +209,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @returns {object} the serialized instance
 	 */
-	toJson() {
+	toJson(): object {
 		//TODO add additional options!?
 		//necessary information: symbol_id,name,position,rotation,flip
 		let data = {
@@ -298,10 +262,10 @@ export class NodeComponentInstance extends SVG.Use {
 	/**
 	 * @returns {FormEntry[]}
 	 */
-	getFormEntries(){
+	getFormEntries(): FormEntry[]{
 		let formEntries = []
 
-		let nameCallback = (/** @type {string}*/name)=>{
+		let nameCallback = (/** @type {string}*/name: string)=>{
 			if (name==="") {
 				this.tikzName = name
 				return ""
@@ -369,11 +333,11 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {string} label 
 	 * @returns {Promise}
 	 */
-	async #generateLabelRender(label){
+	async #generateLabelRender(label: string): Promise<any>{
 		MathJax.texReset();
-		return MathJax.tex2svgPromise(label,{}).then((/**@type {Element} */ node) =>{
+		return MathJax.tex2svgPromise(label,{}).then((/**@type {Element} */ node: Element) =>{
 			/**@type {SVG.Container} */
-			let svgElement = node.querySelector("svg")
+			let svgElement: SVG.Container = node.querySelector("svg")
 			// slight padding of the label text
 			let padding_ex = 0.2
 			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
@@ -408,7 +372,7 @@ export class NodeComponentInstance extends SVG.Use {
 		}		
 		
 		// get relevant positions and bounding boxes
-		let textPos = this.symbol._textPosition.plus(this.#midAbs).transform(this.#getTransformMatrix())
+		let textPos = this.symbol._textPosition.point.plus(this.#midAbs).transform(this.#getTransformMatrix())
 		let labelBBox = this.#labelSVG.bbox()
 		let componentBBox = this.bbox()
 
@@ -480,7 +444,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {SVG.Point} delta - the relative movement
 	 * @returns {ComponentInstance}
 	 */
-	moveRel(delta){
+	moveRel(delta: SVG.Point): ComponentInstance{
 		return this.moveTo(this.#midAbs.plus(delta))
 	}
 
@@ -490,7 +454,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @param {SVG.Point} position - the new anchor position
 	 * @returns {NodeComponentInstance}
 	 */
-	moveTo(pos){
+	moveTo(pos): NodeComponentInstance{
 		return this.move(pos.x,pos.y)
 	}
 
@@ -523,7 +487,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @param {number} angleDeg - the angle to add to the current rotation (initially 0)
 	 */
-	rotate(angleDeg) {
+	rotate(angleDeg: number) {
 		this.#angleDeg += angleDeg;
 		this.#simplifyAngleDeg()
 		
@@ -537,7 +501,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * calculate the current transformation matrix for this component incorporating rotation and flipping
 	 * @returns {SVG.Matrix}
 	 */
-	#getTransformMatrix(){
+	#getTransformMatrix(): SVG.Matrix{
 		return new SVG.Matrix({
 			rotate:-this.#angleDeg,
 			origin:[this.#midAbs.x,this.#midAbs.y],
@@ -585,7 +549,7 @@ export class NodeComponentInstance extends SVG.Use {
 	* @param {boolean} horizontal along which axis to flip
 	* @returns {ComponentInstance}
 	*/
-	flip(horizontal){
+	flip(horizontal: boolean): ComponentInstance{
 		if (this.#angleDeg%180==0) {
 			if (horizontal) {
 				this.#flip.y*=-1;
@@ -637,7 +601,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @returns {this}
 	 */
-	remove() {
+	remove(): this {
 		this.#snapDragHandler = NodeDragHandler.snapDrag(this, false);
 		for (const point of this.snappingPoints) point.removeInstance();
 		this.hideBoundingBox();
@@ -651,7 +615,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 *
 	 * @returns {SVG.Box}
 	 */
-	bbox() {
+	bbox(): SVG.Box {
 		return this.boundingBox;
 	}
 }

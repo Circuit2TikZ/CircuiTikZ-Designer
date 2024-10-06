@@ -370,7 +370,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="0" y="-21.16493"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="0" y="-21.16493" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="10.848135" rx="4.6580520000000005" ry="8.678507999999999" />
@@ -411,7 +413,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="0" y="21.16493"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="0" y="21.16493" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="5.822565" cy="12.73801" rx="4.6580520000000005" ry="10.190408" />
@@ -754,7 +758,9 @@
 						<ci:pin anchorName="shield" x="-5.290429999999999" y="5.290430000000002" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="-5.290429999999999" y="-5.290419999999998"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="-5.290429999999999" y="-5.290419999999998" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="10.58085" cy="10.58085" rx="8.46468" ry="8.46468" />
@@ -801,8 +807,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-5.29123" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-5.29123"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="8.468325" cy="5.822565" rx="6.774660000000001" ry="4.6580520000000005" />
@@ -837,7 +843,9 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="5.29136" y="0" isDefault="false" />
 					</ci:pins>
-					<ci:textPosition x="0" y="-5.29123"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="0" y="-5.29123" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
@@ -870,7 +878,9 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="10.582710000000002" y="0" isDefault="false" />
 					</ci:pins>
-					<ci:textPosition x="10.582710000000002" y="-5.29122"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="10.582710000000002" y="-5.29122" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="4.366925" rx="6.063784" ry="3.4935400000000003" />
@@ -906,7 +916,9 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="10.582710000000002" y="0" isDefault="false" />
 					</ci:pins>
-					<ci:textPosition x="0" y="-5.29122"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="0" y="-5.29122" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="7.57973" cy="4.366925" rx="6.063784" ry="3.4935400000000003" />
@@ -939,7 +951,9 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="5.29136" y="0" isDefault="false" />
 					</ci:pins>
-					<ci:textPosition x="5.29136" y="-5.29123"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="5.29136" y="-5.29123" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="4.93405" cy="5.822565" rx="3.9472400000000003" ry="4.6580520000000005" />
@@ -980,8 +994,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-18.51952" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1028,8 +1042,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-18.51952" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1064,8 +1078,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-18.51952" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1103,7 +1117,9 @@
 						<ci:pin anchorName="w" x="-37.03903" y="0" isDefault="false" />
 						<ci:pin anchorName="e" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="-25.29388" y="5.555620000000001"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="-25.29388" y="5.555620000000001" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="19.050855" rx="16.646316" ry="15.240684" />
@@ -1147,8 +1163,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-18.51952" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-18.51952"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.050855" cy="19.050855" rx="15.240684" ry="15.240684" />
@@ -1190,8 +1206,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1234,8 +1250,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1319,8 +1335,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="74.07806" y="9.25975" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="74.07806" y="9.25975"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="46.56447" cy="18.78519" rx="37.251576" ry="15.028152" />
@@ -1356,8 +1372,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1397,8 +1413,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1437,8 +1453,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1485,8 +1501,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="7.105427357601002e-15" y="-34.39359999999999" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="7.105427357601002e-15" y="-34.39359999999999"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.92494" cy="34.92494" rx="27.939952" ry="27.939952" />
@@ -1536,8 +1552,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1584,8 +1600,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1635,8 +1651,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1686,8 +1702,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1731,8 +1747,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -1785,8 +1801,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -1833,8 +1849,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
@@ -1882,8 +1898,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.029635" cy="29.633705" rx="14.423708" ry="23.706964" />
@@ -1928,8 +1944,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -1971,8 +1987,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -2014,8 +2030,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -2057,8 +2073,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="18.16247" cy="29.633705" rx="14.529976" ry="23.706964" />
@@ -2105,8 +2121,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -2164,8 +2180,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.15196" cy="29.633705" rx="18.521568" ry="23.706964" />
@@ -2218,8 +2234,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2265,8 +2281,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2310,8 +2326,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2353,8 +2369,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2395,8 +2411,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2441,8 +2457,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2482,8 +2498,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2526,8 +2542,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="11.548135" cy="29.633705" rx="9.238508000000001" ry="23.706964" />
@@ -2567,8 +2583,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2609,7 +2625,9 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2652,7 +2670,9 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2701,8 +2721,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2754,8 +2774,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2804,7 +2824,9 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2845,8 +2867,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2889,7 +2911,9 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2930,7 +2954,9 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -2972,8 +2998,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3018,8 +3044,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3061,7 +3087,9 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3103,8 +3131,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3152,8 +3180,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3203,8 +3231,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3253,7 +3281,9 @@
 						<ci:pin anchorName="S" x="0" y="29.102370000000004" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3302,8 +3332,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3352,8 +3382,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3403,8 +3433,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3453,7 +3483,9 @@
 						<ci:pin anchorName="S" x="0" y="-29.10236" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3500,8 +3532,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.807895" cy="29.633705" rx="16.646316" ry="23.706964" />
@@ -3544,8 +3576,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000084" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3586,8 +3618,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000084" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3628,8 +3660,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000084" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3670,8 +3702,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000084" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000084" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.67506" cy="29.633705" rx="16.540048" ry="23.706964" />
@@ -3711,8 +3743,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6457999999999977" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6457999999999977" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="17.341675" cy="29.633705" rx="13.873339999999999" ry="23.706964" />
@@ -3753,8 +3785,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6457999999999977" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6457999999999977" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="17.341675" cy="29.633705" rx="13.873339999999999" ry="23.706964" />
@@ -3795,8 +3827,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="2.6458000000000013" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="2.6458000000000013" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.109465" cy="29.633705" rx="18.487572" ry="23.706964" />
@@ -3835,8 +3867,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="14.10105" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="14.10105" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.323125" cy="29.633705" rx="18.6585" ry="23.706964" />
@@ -3874,8 +3906,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="14.10105" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="14.10105" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.323125" cy="29.633705" rx="18.6585" ry="23.706964" />
@@ -3912,8 +3944,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
@@ -3954,8 +3986,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -3997,8 +4029,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4046,8 +4078,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4089,8 +4121,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4135,8 +4167,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
@@ -4182,8 +4214,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4227,8 +4259,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4273,8 +4305,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4321,8 +4353,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4364,8 +4396,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="33.866235" rx="19.367404" ry="27.092988000000005" />
@@ -4410,8 +4442,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
@@ -4452,8 +4484,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
@@ -4492,8 +4524,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
@@ -4534,8 +4566,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="33.866235" rx="21.48406" ry="27.092988000000005" />
@@ -4580,8 +4612,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
@@ -4625,8 +4657,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4671,8 +4703,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4720,8 +4752,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4768,8 +4800,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4815,8 +4847,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
@@ -4861,8 +4893,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4908,8 +4940,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -4956,8 +4988,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5003,8 +5035,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5052,8 +5084,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.45657" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.45657" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.209255" cy="37.57038" rx="19.367404" ry="30.056304" />
@@ -5098,8 +5130,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5145,8 +5177,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5193,8 +5225,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5243,8 +5275,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="26.456570000000003" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="26.456570000000003" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="26.855075" cy="37.57038" rx="21.48406" ry="30.056304" />
@@ -5341,7 +5373,9 @@
 						<ci:pin anchorName="top left" x="-10.58246" y="-42.33064999999999" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="15.895869999999999" y="-21.165309999999995"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="15.895869999999999" y="-21.165309999999995" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="13.63767" cy="21.56383" rx="10.910136000000001" ry="17.251064" />
@@ -5381,7 +5415,9 @@
 						<ci:pin anchorName="top" x="-1.7763568394002505e-15" y="-26.45657" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="13.228279999999998" y="-13.22829"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="13.228279999999998" y="-13.22829" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="13.75962" cy="13.75962" rx="11.007696000000001" ry="11.007696000000001" />
@@ -5416,7 +5452,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="10.582460000000001" y="-15.874090000000002"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="10.582460000000001" y="-15.874090000000002" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="11.113805" cy="16.405425" rx="8.891043999999999" ry="13.124340000000002" />
@@ -5461,7 +5499,9 @@
 						<ci:pin anchorName="waves" x="55.55875" y="-13.228290000000001" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="-13.228280000000002" y="-13.228290000000001"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="-13.228280000000002" y="-13.228290000000001" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.792025" cy="26.456575" rx="27.833620000000003" ry="21.165260000000004" />
@@ -5511,7 +5551,9 @@
 						<ci:pin anchorName="waves" x="-55.55875" y="-13.228290000000001" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="13.228279999999998" y="-13.228290000000001"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="13.228279999999998" y="-13.228290000000001" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="41.27334" cy="26.456575" rx="33.018672" ry="21.165260000000004" />
@@ -5560,8 +5602,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="19.91684" y="19.91684" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="19.91684" y="19.91684"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="27.250855" cy="26.58941" rx="21.800684000000004" ry="21.271528000000004" />
@@ -5604,7 +5646,9 @@
 						<ci:pin anchorName="left" x="0" y="0" isDefault="true" />
 						<ci:pin anchorName="right" x="63.49560000000001" y="0" isDefault="false" />
 					</ci:pins>
-					<ci:textPosition x="31.747800000000005" y="-7.93703"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="31.747800000000005" y="-7.93703" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="34.036185" cy="8.468365" rx="27.228948000000003" ry="6.774692000000001" />
@@ -5646,7 +5690,9 @@
 						<ci:pin anchorName="right" x="26.45657" y="0" isDefault="false" />
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="13.228280000000002" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="13.228280000000002" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="15.51666" cy="8.468365" rx="12.413328" ry="6.774692000000001" />
@@ -5686,7 +5732,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="0" y="-26.45657"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="0" y="-26.45657" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="19.238965" cy="14.91835" rx="15.391172000000001" ry="11.93468" />
@@ -5727,7 +5775,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="5.2912300000000005" y="-39.68485"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="5.2912300000000005" y="-39.68485" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="13.75962" cy="40.08336" rx="11.007696000000001" ry="32.066688" />
@@ -5769,7 +5819,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="5.29122" y="-39.68485"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="5.29122" y="-39.68485" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="55.06869" cy="46.56467" rx="44.054952" ry="37.251736" />
@@ -5804,7 +5856,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="5.29122" y="-39.68485"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="5.29122" y="-39.68485" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="56.487065" cy="46.56467" rx="45.189652" ry="37.251736" />
@@ -5841,7 +5895,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="30.47829" y="-6.34953"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="30.47829" y="-6.34953" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="28.08377" cy="8.468365" rx="22.467016" ry="6.774692000000001" />
@@ -5876,7 +5932,9 @@
 					<ci:pins>
 						<ci:pin anchorName="center" x="0" y="0" isDefault="true" />
 					</ci:pins>
-					<ci:textPosition x="31.7474" y="0"/>
+					<ci:additionalAnchors>
+						<ci:anchor anchorName="textPosition" x="31.7474" y="0" isDefault="false"/>
+					</ci:additionalAnchors>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="23.32048" cy="5.424065" rx="18.656384" ry="4.339252" />
@@ -5916,8 +5974,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -5961,8 +6019,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6005,8 +6063,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6049,8 +6107,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6092,8 +6150,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6136,8 +6194,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6176,8 +6234,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6214,8 +6272,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="39.950525" cy="39.950525" rx="31.96042" ry="31.96042" />
@@ -6264,8 +6322,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.586255" cy="39.950525" rx="16.469004" ry="31.96042" />
@@ -6306,8 +6364,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.617945" cy="39.950525" rx="13.294356" ry="31.96042" />
@@ -6349,8 +6407,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.34245" cy="39.950525" rx="19.47396" ry="31.96042" />
@@ -6394,8 +6452,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="20.586255" cy="39.950525" rx="16.469004" ry="31.96042" />
@@ -6441,8 +6499,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.617945" cy="39.950525" rx="13.294356" ry="31.96042" />
@@ -6484,8 +6542,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="24.34245" cy="39.950525" rx="19.47396" ry="31.96042" />
@@ -6529,8 +6587,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.40542" cy="39.950525" rx="13.124336" ry="31.96042" />
@@ -6579,8 +6637,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-39.68485" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-39.68485"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="28.31098" cy="39.950525" rx="22.648784000000003" ry="31.96042" />
@@ -6694,8 +6752,8 @@
 			<defs>
 				<path id="node_en-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
 				<path id="node_en-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
-				<path id="node_en-amp_c" d="M5.3081-2.72578c.19128-.1076.2391-.1315.2391-.25106 0-.1315-.03587-.14346-.2391-.26301l-4.55492-2.6421c-.15542-.09563-.20324-.09563-.22715-.09563-.22715 0-.22715.22714-.22715.40647v5.17659c0 .17933 0 .40647.22715.40647.0239 0 .07173 0 .20324-.08368l4.57883-2.65405Zm-.41844-.26301-4.14844 2.40299v-4.79403l4.14844 2.39104Z"/>
 				<path id="node_en-amp_d" d="M6.07322-3.23985c-.64557-.81295-.78904-.99228-1.15965-1.29116-.66948-.53798-1.33898-.75317-1.94869-.75317-1.39875 0-2.30735 1.31506-2.30735 2.71382 0 1.37484.88469 2.70187 2.25953 2.70187s2.36712-1.08792 2.95293-2.04434c.64558.81296.78904.99228 1.15965 1.29116.66949.53798 1.33898.75318 1.9487.75318 1.39875 0 2.30734-1.31507 2.30734-2.71383 0-1.37484-.88468-2.70186-2.25953-2.70186s-2.36712 1.08792-2.95292 2.04433Zm.31084.40647c.49016-.86077 1.37484-2.06824 2.72578-2.06824 1.26725 0 1.91282 1.24334 1.91282 2.3193 0 1.17161-.801 2.13998-1.85305 2.13998-.6934 0-1.23138-.50212-1.48244-.75318-.29888-.32279-.57385-.6934-1.30311-1.63786Zm-.8249.51408c-.49017.86077-1.37485 2.06824-2.72579 2.06824-1.26724 0-1.91282-1.24334-1.91282-2.3193 0-1.1716.801-2.13998 1.85305-2.13998.6934 0 1.23138.50212 1.48244.75318.29888.32279.57385.6934 1.30311 1.63786Z"/>
+				<path id="node_en-amp_c" d="M5.3081-2.72578c.19128-.1076.2391-.1315.2391-.25106 0-.1315-.03587-.14346-.2391-.26301l-4.55492-2.6421c-.15542-.09563-.20324-.09563-.22715-.09563-.22715 0-.22715.22714-.22715.40647v5.17659c0 .17933 0 .40647.22715.40647.0239 0 .07173 0 .20324-.08368l4.57883-2.65405Zm-.41844-.26301-4.14844 2.40299v-4.79403l4.14844 2.39104Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M13.75867 85.19266v-84.6613h62.9662v84.6613Z"/>
@@ -6747,8 +6805,8 @@
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.62811" cy="37.57038" rx="30.902488" ry="30.056304" />
 			<defs>
-				<path id="node_fd-op-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 				<path id="node_fd-op-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
+				<path id="node_fd-op-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width=".53134" d="m76.7249 37.5704-31.4831-18.51952h31.4831-31.4831l-31.48313-18.51951v74.07805l31.48313-18.5195h31.4831-31.4831l31.4831-18.51952Z"/>
@@ -6907,8 +6965,8 @@
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="45.241765" cy="37.57038" rx="36.193412" ry="30.056304" />
 			<defs>
-				<path id="node_fd-inst-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 				<path id="node_fd-inst-amp_a" d="M7.4919-2.19178c.14945 0 .44832 0 .44832-.29888 0-.30884-.28891-.30884-.44832-.30884h-6.08717c-.14944 0-.44832 0-.44832.29888 0 .30884.28892.30884.44832.30884h6.08718Z"/>
+				<path id="node_fd-inst-amp_b" d="M4.75218-2.19178h3.07845c.12952 0 .4284 0 .4284-.29888 0-.30884-.28892-.30884-.4284-.30884h-3.07845v-3.08842c0-.11955 0-.41843-.29888-.41843-.30884 0-.30884.28892-.30884.41843v3.08842h-3.07846c-.13947 0-.4284 0-.4284.30884 0 .29888.29889.29888.4284.29888h3.07846v3.08842c0 .11955 0 .41843.29888.41843.30884 0 .30884-.28892.30884-.41843v-3.08842Z"/>
 			</defs>
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<path fill="none" stroke-width="1.06267" d="M76.7249 37.5704v-22.22365l-62.96623-14.81538v74.07805l62.96623-14.81538Z"/>
@@ -7406,8 +7464,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="0" y="-15.87408" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="0" y="-15.87408"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="16.40542" cy="16.40542" rx="13.124336" ry="13.124336" />
@@ -7446,8 +7504,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7484,8 +7542,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7522,8 +7580,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7560,8 +7618,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7606,8 +7664,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -7655,8 +7713,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-23.28197" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-23.28197" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="29.368035" cy="21.69665" rx="23.494428" ry="17.35732" />
@@ -8297,8 +8355,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
@@ -8339,8 +8397,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8392,8 +8450,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="38.63531" cy="17.727935" rx="30.908248" ry="14.182348" />
@@ -8439,8 +8497,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8491,8 +8549,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8541,8 +8599,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="43.799635" cy="17.727935" rx="35.039708000000005" ry="14.182348" />
@@ -8593,8 +8651,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8642,8 +8700,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8691,8 +8749,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />
@@ -8727,8 +8785,8 @@
 					</ci:pins>
 					<ci:additionalAnchors>
 						<ci:anchor anchorName="center" x="0" y="0" isDefault="true" />
+						<ci:anchor anchorName="textPosition" x="-29.63133" y="0" isDefault="false"/>
 					</ci:additionalAnchors>
-					<ci:textPosition x="-29.63133" y="0"/>
 				</ci:componentInformation>
 			</metadata>
 			<ellipse stroke="none" fill="transparent" cx="37.304705" cy="17.727935" rx="29.843764" ry="14.182348" />

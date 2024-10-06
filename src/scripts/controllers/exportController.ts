@@ -3,7 +3,7 @@
  */
 
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController, CanvasController, NodeComponentInstance, PathComponentInstance, Line } from "../internal";
+import { SelectionController, MainController, CanvasController, NodeComponentInstance, PathComponentInstance, Line, CircuitikzComponent, CircuitComponent } from "../internal";
 import FileSaver from "file-saver";
 import pretty = require('pretty');
 
@@ -12,46 +12,41 @@ import pretty = require('pretty');
  * @class
  */
 export class ExportController {
-	/** @type {MainController} */
-	#mainController;
-	/** @type {HTMLDivElement}  */
-	#modalElement;
-	/** @type {Modal} */
-	#modal;
-	/** @type {HTMLHeadingElement} */
-	#heading;
-	/** @type {HTMLTextAreaElement} */
-	#exportedContent;
-	/** @type {HTMLInputElement} */
-	#fileBasename;
-	/** @type {HTMLInputElement} */
-	#fileExtension;
-	/** @type {HTMLUListElement} */
-	#fileExtensionDropdown;
-	/** @type {HTMLDivElement} */
-	#copyButton;
-	/** @type {HTMLButtonElement} */
-	#saveButton;
+	private static _instance: ExportController;
+	public static get instance(): ExportController {
+		if (!ExportController._instance) {
+			ExportController._instance = new ExportController()
+		}
+		return ExportController._instance;
+	}
 
-	#copyTooltip;
+	#modalElement: HTMLDivElement;
+	#modal: Modal;
+	#heading: HTMLHeadingElement;
+	#exportedContent: HTMLTextAreaElement;
+	#fileBasename: HTMLInputElement;
+	#fileExtension: HTMLInputElement;
+	#fileExtensionDropdown: HTMLUListElement;
+	#copyButton: HTMLDivElement;
+	#saveButton: HTMLButtonElement;
 
-	#defaultDisplay
+	#copyTooltip: Tooltip;
+
+	#defaultDisplay: string
 
 	/**
 	 * Init the ExportController
-	 * @param {MainController} mainController - needed for exporting instances & lines
 	 */
-	constructor(mainController) {
-		this.#mainController = mainController;
-		this.#modalElement = document.getElementById("exportModal");
+	private constructor() {
+		this.#modalElement = document.getElementById("exportModal") as HTMLDivElement;
 		this.#modal = new Modal(this.#modalElement);
-		this.#heading = document.getElementById("exportModalLabel");
-		this.#exportedContent = document.getElementById("exportedContent");
-		this.#fileBasename = document.getElementById("exportModalFileBasename");
-		this.#fileExtension = document.getElementById("exportModalFileExtension");
-		this.#fileExtensionDropdown = document.getElementById("exportModalFileExtensionDropdown");
-		this.#copyButton = document.getElementById("copyExportedContent");
-		this.#saveButton = document.getElementById("exportModalSave");
+		this.#heading = document.getElementById("exportModalLabel") as HTMLHeadingElement;
+		this.#exportedContent = document.getElementById("exportedContent") as HTMLTextAreaElement;
+		this.#fileBasename = document.getElementById("exportModalFileBasename") as HTMLInputElement;
+		this.#fileExtension = document.getElementById("exportModalFileExtension") as HTMLInputElement;
+		this.#fileExtensionDropdown = document.getElementById("exportModalFileExtensionDropdown") as HTMLUListElement;
+		this.#copyButton = document.getElementById("copyExportedContent") as HTMLDivElement;
+		this.#saveButton = document.getElementById("exportModalSave") as HTMLButtonElement;
 
 		
 		this.#defaultDisplay = this.#exportedContent.parentElement.style.display;
@@ -92,10 +87,8 @@ export class ExportController {
 		// actually export/create the string
 		{
 			let circuitElements = []
-			for (const circuitElement of CanvasController.controller.canvas.children()) {
-				if (circuitElement instanceof NodeComponentInstance || circuitElement instanceof PathComponentInstance || circuitElement instanceof Line) {
-					circuitElements.push("\t"+circuitElement.toTikzString())
-				}
+			for (const circuitElement of MainController.controller.circuitComponents) {
+				circuitElements.push("\t"+circuitElement.toTikzString())
 			}
 			
 			const arr = [
@@ -118,16 +111,16 @@ export class ExportController {
 		this.#heading.textContent = "Export SVG"
 		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
 		// prepare selection and bounding box
-		SelectionController.controller.selectAll()
-		let bbox = SelectionController.controller.getOverallBoundingBox()
-		SelectionController.controller.deactivateSelection()
+		SelectionController.instance.selectAll()
+		let bbox = SelectionController.instance.getOverallBoundingBox()
+		SelectionController.instance.deactivateSelection()
 
 		let colorTheme = MainController.controller.darkMode;
 		MainController.controller.darkMode = false;
 		MainController.controller.updateTheme()
 
 		//Get the canvas
-		let svgObj = document.getElementById("canvas").cloneNode(true)
+		let svgObj = document.getElementById("canvas").cloneNode(true) as SVGSVGElement
 		svgObj.removeAttribute("xmlns:svgjs")
 		svgObj.removeAttribute("class")
 		svgObj.removeAttribute("id")
@@ -139,7 +132,7 @@ export class ExportController {
 		
 		//remove not needed parts
 		/**@type {HTMLElement} */
-		let defs = svgObj.children[0]
+		let defs: HTMLElement = svgObj.children[0] as HTMLElement
 		defs.innerHTML = '';
 		// svgObj.removeChild(svgObj.children[0]) // defs for grid and axis
 		svgObj.removeChild(svgObj.getElementById("grid"))
@@ -156,9 +149,11 @@ export class ExportController {
 		// get all used node/symbol names
 		let symbolDB = document.getElementById("symbolDB")
 		let usedSymbols = []
-		for (const instance of MainController.controller.instances) {
-			let symbol = instance.symbol.node
-			usedSymbols.push(symbolDB.getElementById(symbol.id))
+		for (const instance of MainController.controller.circuitComponents) {
+			if (instance instanceof CircuitikzComponent) {
+				let symbol = instance.referenceSymbol.node
+				usedSymbols.push(symbolDB.getElementById(symbol.id))
+			}
 		}
 		// remove duplicates
 		usedSymbols = [...new Set(usedSymbols)]
@@ -196,7 +191,7 @@ export class ExportController {
 		MainController.controller.darkMode = colorTheme;
 		MainController.controller.updateTheme()
 		this.#export(extensions)
-		SelectionController.controller.activateSelection()
+		SelectionController.instance.activateSelection()
 	}
 
 	#export(extensions){

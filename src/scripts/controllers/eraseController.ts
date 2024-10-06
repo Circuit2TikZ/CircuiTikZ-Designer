@@ -4,28 +4,28 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import {Line} from "../internal";
-
-/** @typedef {import("../components/componentInstance").ComponentInstance} ComponentInstance */
-/** @typedef {import("./mainController").default} MainController */
+import {Line, MainController, ComponentInstance, CanvasController} from "../internal";
 
 /**
  * Controller for the erase function/mode.
- * @class
  */
 export class EraseController {
-	/** @type {MainController} */
-	#mainController;
-	/** @type {SVG.Svg} */
-	#canvas;
+	private static _instance: EraseController;
+	
+	#canvas: SVG.Svg;
 
 	/**
 	 * Init the EraseController
-	 * @param {MainController} mainController - needed for removing instances & lines
 	 */
-	constructor(mainController) {
-		this.#mainController = mainController;
-		this.#canvas = this.#mainController.canvasController.canvas;
+	private constructor() {
+		this.#canvas = CanvasController.instance.canvas;
+	}
+
+	public static get instance(): EraseController {
+		if (!EraseController._instance) {
+			EraseController._instance=new EraseController()
+		}
+		return EraseController._instance;
 	}
 
 	/**
@@ -58,8 +58,8 @@ export class EraseController {
 	 *
 	 * @param {MouseEvent} event
 	 */
-	#clickListener(event) {
-		let pt = this.#mainController.canvasController.pointerEventToPoint(event);
+	#clickListener(event: MouseEvent) {
+		let pt = CanvasController.eventToPoint(event);
 		this.#findAndErase(pt, [event.target]);
 	}
 
@@ -68,7 +68,7 @@ export class EraseController {
 	 *
 	 * @param {MouseEvent|TouchEvent} event
 	 */
-	#moveListener(event) {
+	#moveListener(event: MouseEvent | TouchEvent) {
 		// Drag --> Drag-erase
 		// (Left click || Touch-click) || (mousemove)
 		let clientPt =
@@ -83,7 +83,7 @@ export class EraseController {
 				clientPt.target || event.target,
 				document.elementFromPoint(clientPt.clientX, clientPt.clientY),
 			];
-			const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
+			const pt = CanvasController.eventToPoint(clientPt);
 			this.#findAndErase(pt, hitElements);
 		}
 	}
@@ -94,10 +94,10 @@ export class EraseController {
 	 * @param {SVG.Point} point - the point used to find a nearby line/instance
 	 * @param {EventTarget[]} targets - the (possible) targets of the event, which triggered the removal. Maybe the user clicked exactly on a line
 	 */
-	#findAndErase(point, targets) {
+	#findAndErase(point: SVG.Point, targets: EventTarget[]) {
 		let lowestDist = 10; // ~ 0.27 cm
 		/** @type {?ComponentInstance|Line} */
-		let foundElement = null;
+		let foundElement: (ComponentInstance | Line) | null = null;
 
 		// uniq, not null & is SVGElement
 		targets = [...new Set(targets.filter((target) => target instanceof SVGElement))];
@@ -110,8 +110,8 @@ export class EraseController {
 				if (
 					// @ts-ignore wr check if .instance exists
 					elm.instance && // @ts-ignore instance exists --> no error
-					(this.#mainController.instances.includes(elm.instance) || // @ts-ignore instance exists --> no error
-						this.#mainController.lines.includes(elm.instance))
+					(MainController.controller.instances.includes(elm.instance) || // @ts-ignore instance exists --> no error
+						MainController.controller.lines.includes(elm.instance))
 				) {
 					// @ts-ignore instance exists --> no error
 					foundElement = elm.instance;
@@ -124,7 +124,7 @@ export class EraseController {
 
 		if (!foundElement) {
 			// try to get line by location
-			for (const line of this.#mainController.lines) {
+			for (const line of MainController.controller.lines) {
 				const dist = line.pointDistance(point, lowestDist);
 				if (dist !== null && dist < lowestDist) {
 					lowestDist = dist;
@@ -134,10 +134,10 @@ export class EraseController {
 		}
 
 		if (foundElement && foundElement instanceof Line) {
-			this.#mainController.removeLine(foundElement);
+			MainController.controller.removeLine(foundElement);
 		} else if (foundElement) {
 			// @ts-ignore if its not a line, it must be a instance
-			this.#mainController.removeInstance(foundElement);
+			MainController.controller.removeInstance(foundElement);
 		}
 	}
 }

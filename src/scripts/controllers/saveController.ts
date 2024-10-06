@@ -3,38 +3,40 @@
  */
 
 import { Modal } from "bootstrap";
-import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController } from "../internal";
+import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
  * @class
  */
 export class SaveController {
-	/** @type {Modal} */
-	#loadModal;
-	#modalElement
+	private static _instance: SaveController;
+	public static get instance(): SaveController {
+		if (!SaveController._instance) {
+			SaveController._instance = new SaveController()
+		}
+		return SaveController._instance;
+	}
 
-	/** @type {HTMLInputElement} */
-	#loadInput;
-	/** @type {HTMLSpanElement} */
-	#loadMessage
+	#loadModal: Modal;
+	#modalElement: HTMLDivElement
 
-	/** @type {HTMLButtonElement} */
-	#loadButton
+	#loadInput: HTMLInputElement;
+	#loadMessage: HTMLSpanElement
 
-	/** @type {HTMLDivElement} */
-	#loadArea
-	/** @type {HTMLDivElement} */
-	#loadAreaBackground
+	#loadButton: HTMLButtonElement
 
-	constructor() {
-		this.#modalElement = document.getElementById("loadModal")
+	#loadArea: HTMLDivElement
+	#loadAreaBackground: HTMLDivElement
+
+	private constructor() {
+		this.#modalElement = document.getElementById("loadModal") as HTMLDivElement
 		this.#loadModal = new Modal(this.#modalElement)
-		this.#loadInput = document.getElementById("file-input")
+		this.#loadInput = document.getElementById("file-input") as HTMLInputElement
 		this.#loadMessage = document.getElementById("load-message")
-		this.#loadButton = document.getElementById("loadJSONButton")
-		this.#loadArea = document.getElementById("dragdroparea")
-		this.#loadAreaBackground = document.getElementById("dragdropbackground")
+		this.#loadButton = document.getElementById("loadJSONButton") as HTMLButtonElement
+		this.#loadArea = document.getElementById("dragdroparea") as HTMLDivElement
+		this.#loadAreaBackground = document.getElementById("dragdropbackground") as HTMLDivElement
 		
 		const opacity0 = ()=>{this.#loadAreaBackground.style.opacity = "0"}
 		
@@ -47,13 +49,13 @@ export class SaveController {
 
 	save(){
 		let components = []
-		for (const component of CanvasController.controller.canvas.children()) {
+		for (const component of CanvasController.instance.canvas.children()) {
 			if (component instanceof Line || component instanceof NodeComponentInstance || component instanceof PathComponentInstance) {
 				components.push(component.toJson())
 			}
 		}
 
-		MainController.controller.exportController.exportJSON(JSON.stringify(components,null,4))
+		ExportController.instance.exportJSON(JSON.stringify(components,null,4))
 	}
 
 	load(){
@@ -107,8 +109,8 @@ export class SaveController {
 	loadFromJSON(obj, selectComponents=false){
 		//delete current state if necessary		
 		if (document.getElementById("loadCheckRemove").checked) {
-			SelectionController.controller.selectAll()
-			SelectionController.controller.removeSelection()
+			SelectionController.instance.selectAll()
+			SelectionController.instance.removeSelection()
 		}
 		
 		let nodes = []
@@ -140,11 +142,24 @@ export class SaveController {
 		}
 		
 		if (selectComponents) {
-			SelectionController.controller.deactivateSelection()
-			SelectionController.controller.activateSelection()
-			SelectionController.controller.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
-			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.deactivateSelection()
+			SelectionController.instance.activateSelection()
+			SelectionController.instance.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectLines(lines,SelectionController.SelectionMode.RESET)
 		}
 		Undo.addState()
+	}
+
+	static fromJson(saveJson:ComponentSaveObject): CircuitComponent{
+		switch (saveJson.type) {
+			case "node":
+				return NodeComponent.fromJson(saveJson as NodeSaveObject)
+			case "path":
+				return PathComponent.fromJson(saveJson as PathSaveObject)
+			case "wire":
+				return Line.fromJson(saveJson as LineSaveObject)
+			default:
+				break;
+		}
 	}
 }

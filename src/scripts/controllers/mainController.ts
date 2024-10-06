@@ -9,10 +9,8 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
-
-/** @typedef {import("../internal").ComponentInstance} ComponentInstance */
 
 type SaveState = {
 	currentIndices: any[];
@@ -20,30 +18,27 @@ type SaveState = {
 }
 
 export class MainController {
-	/** @type {?MainController} */
-	static #instance: MainController | null = null;
-	// controllers
-	/** @type {?CanvasController} */
-	canvasController: CanvasController | null = null;
-	/** @type {?LineDrawer} */
-	lineDrawer: LineDrawer | null = null;
-	/** @type {?EraseController} */
-	eraseController: EraseController | null = null;
-	/** @type {?ExportController} */
-	exportController: ExportController | null = null;
-	/** @type {?SaveController} */
-	saveController: SaveController | null = null;
+	private static _instance: MainController;
+	public static get instance(): MainController {
+		if (!MainController._instance) {
+			MainController._instance = new MainController()
+		}
+		return MainController._instance;
+	}
 
-	/** @type {SVG.Svg} */
+	
+	// controllers
+	lineDrawer: LineDrawer | null = null;
+	canvasController:CanvasController
+
 	symbolsSVG: SVG.Svg;
-	/** @type {ComponentSymbol[]} */
 	symbols: ComponentSymbol[];
 
-	darkMode = true;
-	#darkModeLast = true;
-	#currentTheme = "dark";
+	public darkMode = true;
+	private darkModeLast = true;
+	private currentTheme = "dark";
 
-	#tabID=-1
+	private tabID=-1
 
 	/**
 	 * COMMENT/TODO: properly utilize the "component placing" mode:
@@ -58,33 +53,27 @@ export class MainController {
 	 * @readonly
 	 * @enum {number}
 	 */
-	static modes = {
+	static Modes = {
 		DRAG_PAN: 1,
 		DRAW_LINE: 2,
 		ERASE: 3,
 		COMPONENT: 4,
 	};
 
-	mode = MainController.modes.DRAG_PAN;
+	mode = MainController.Modes.DRAG_PAN;
 
-	#modeSwitchButtons = {
-		/** @type {?HTMLAnchorElement} */
+	private modeSwitchButtons = {
 		modeDragPan: null,
-		/** @type {?HTMLAnchorElement} */
 		modeDrawLine: null,
-		/** @type {?HTMLAnchorElement} */
 		modeEraser: null,
 	};
 
-	/** @type {Promise} */
 	initPromise: Promise<any>;
-	/** @type {boolean} */
 	isInitDone: boolean = false;
 
-	/** @type {ComponentInstance[]} */
-	instances: ComponentInstance[] = [];
-	/** @type {Line[]} */
-	lines: Line[] = [];
+	circuitComponents: CircuitComponent[] = [];
+	// instances: ComponentInstance[] = [];
+	// lines: Line[] = [];
 
 	static appVersion = "0.0.0";
 
@@ -95,7 +84,8 @@ export class MainController {
 	/**
 	 * Init the app.
 	 */
-	constructor() {
+	private constructor() {
+		MainController._instance = this
 		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0
 
 		this.#addSaveStateManagement()
@@ -104,13 +94,13 @@ export class MainController {
 		const htmlElement = document.documentElement;		
 		const switchElement = document.getElementById('darkModeSwitch') as HTMLInputElement;
 		const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-		this.#currentTheme = localStorage.getItem('circuitikz-designer-theme') || defaultTheme;
-		htmlElement.setAttribute('data-bs-theme', this.#currentTheme);
-		this.#darkModeLast=false;
-		this.darkMode = this.#currentTheme === 'dark';
+		this.currentTheme = localStorage.getItem('circuitikz-designer-theme') || defaultTheme;
+		htmlElement.setAttribute('data-bs-theme', this.currentTheme);
+		this.darkModeLast=false;
+		this.darkMode = this.currentTheme === 'dark';
 		switchElement.checked = this.darkMode;
 
-		this.snapController = SnapController.controller;
+		this.snapController = SnapController.instance;
 		let mathJaxPromise = this.#loadMathJax();
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
@@ -130,56 +120,55 @@ export class MainController {
 			fallbackPlacements:[] //always show them exactly where defined
 		}))
 
-		this.exportController = new ExportController(this);
-		/** @type {HTMLButtonElement} */
+		// init exporting
+		ExportController.instance;
 		const exportCircuiTikZButton: HTMLButtonElement = document.getElementById("exportCircuiTikZButton") as HTMLButtonElement;
 		exportCircuiTikZButton.addEventListener(
 			"click",
-			this.exportController.exportCircuiTikZ.bind(this.exportController),
+			ExportController.instance.exportCircuiTikZ.bind(ExportController.instance),
 			{
 				passive: true,
 			}
 		);
 
-		/** @type {HTMLButtonElement} */
 		const exportSVGButton: HTMLButtonElement = document.getElementById("exportSVGButton") as HTMLButtonElement;
 		exportSVGButton.addEventListener(
 			"click",
-			this.exportController.exportSVG.bind(this.exportController),
+			ExportController.instance.exportSVG.bind(ExportController.instance),
 			{
 				passive: true,
 			}
 		);
 		
-		this.saveController = new SaveController();
-		/** @type {HTMLButtonElement} */
+		// init save and load
+		SaveController.instance;
 		const saveButton: HTMLButtonElement = document.getElementById("saveButton") as HTMLButtonElement;
 		saveButton.addEventListener(
 			"click",
-			this.saveController.save.bind(this.saveController),
+			SaveController.instance.save.bind(SaveController.instance),
 			{
 				passive: true,
 			}
 		);
 
-		/** @type {HTMLButtonElement} */
 		const loadButton: HTMLButtonElement = document.getElementById("loadButton") as HTMLButtonElement;
 		loadButton.addEventListener(
 			"click",
-			this.saveController.load.bind(this.saveController),
+			SaveController.instance.load.bind(SaveController.instance),
 			{
 				passive: true,
 			}
 		);
 
 		canvasPromise.then(() => {
-			this.lineDrawer = new LineDrawer(this);
-			this.eraseController = new EraseController(this);
-			this.selectionController = new SelectionController(this);
-			new PropertyController();
+			this.lineDrawer = new LineDrawer(); // TODO remove line drawer. replace with component placer
+			EraseController.instance;
+			SelectionController.instance;
+			PropertyController.instance;
+			ComponentPlacer.instance;
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
-			new SnapCursorController(this.canvasController.canvas);
+			SnapCursorController.instance
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
 
@@ -188,31 +177,31 @@ export class MainController {
 
 			let currentProgress: SaveState = JSON.parse(localStorage.getItem('circuitikz-designer-saveState'))
 		
-			if (Object.keys(currentProgress.currentData[this.#tabID]).length>0) {
-				this.saveController.loadFromJSON(currentProgress.currentData[this.#tabID])
+			if (Object.keys(currentProgress.currentData[this.tabID]).length>0) {
+				SaveController.instance.loadFromJSON(currentProgress.currentData[this.tabID])
 			}else{
 				Undo.addState()
 			}
 
 			// prepare symbolDB for colorTheme
 			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
-				this.#addFill(g)
+				this.addFill(g)
 			}
 
 			const htmlElement = document.documentElement;
 			const switchElement = document.getElementById('darkModeSwitch') as HTMLInputElement;
 			switchElement.addEventListener('change', function () {
-				if (MainController.controller.darkMode = switchElement.checked) {
+				if (MainController.instance.darkMode = switchElement.checked) {
 					htmlElement.setAttribute('data-bs-theme', 'dark');
 					localStorage.setItem('circuitikz-designer-theme', 'dark');
 				} else {
 					htmlElement.setAttribute('data-bs-theme', 'light');
 					localStorage.setItem('circuitikz-designer-theme', 'light');
 				}
-				MainController.controller.updateTheme()
+				MainController.instance.updateTheme()
 			});
-			MainController.controller.updateTheme()
-			PropertyController.controller.update()
+			MainController.instance.updateTheme()
+			PropertyController.instance.update()
 			this.isInitDone = true;
 		});
 	}
@@ -257,26 +246,26 @@ export class MainController {
 		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
 		let sessionTabID = sessionStorage.getItem("circuitikz-designer-tabID")
 		if (sessionTabID) {
-			this.#tabID = Number.parseInt(sessionTabID)
-			current.currentIndices.push(this.#tabID)
+			this.tabID = Number.parseInt(sessionTabID)
+			current.currentIndices.push(this.tabID)
 		}
 		
 		// this is a new tab --> assign tab ID
-		if (this.#tabID<0) {
+		if (this.tabID<0) {
 			// populate first available slot
 			let index = 0
 			while (current.currentIndices.includes(index)) {
 				index++;
 			}
-			this.#tabID = index
-			current.currentIndices.push(this.#tabID)
+			this.tabID = index
+			current.currentIndices.push(this.tabID)
 		}
 
 		// save the assigned tab ID
-		sessionStorage.setItem("circuitikz-designer-tabID",this.#tabID.toString())
+		sessionStorage.setItem("circuitikz-designer-tabID",this.tabID.toString())
 
 		// adjust the saveData object to accomodate new data if necessary
-		if (current.currentData.length<=this.#tabID) {
+		if (current.currentData.length<=this.tabID) {
 			current.currentData.push({})
 		}
 		
@@ -288,8 +277,8 @@ export class MainController {
 			Undo.addState()
 			let currentProgress: SaveState = JSON.parse(localStorage.getItem(objname))
 			
-			currentProgress.currentIndices.splice(currentProgress.currentIndices.findIndex((value)=>value==MainController.controller.#tabID),1)
-			currentProgress.currentData[this.#tabID] = Undo.getCurrentState()
+			currentProgress.currentIndices.splice(currentProgress.currentIndices.findIndex((value)=>value==MainController.instance.tabID),1)
+			currentProgress.currentData[this.tabID] = Undo.getCurrentState()
 			localStorage.setItem(objname,JSON.stringify(currentProgress))
 			
 			// localStorage.clear() //use this here if the localStorage is fucked in development
@@ -306,15 +295,15 @@ export class MainController {
 
 		// rotate selection
 		hotkeys("ctrl+r,command+r",()=>{
-			this.selectionController.rotateSelection(-90);
-			if (this.selectionController.hasSelection()) {
+			SelectionController.instance.rotateSelection(-90);
+			if (SelectionController.instance.hasSelection()) {
 				Undo.addState()
 			}
 			return false;
 		})
 		hotkeys("ctrl+shift+r,command+shift+r",()=>{
-			this.selectionController.rotateSelection(90);
-			if (this.selectionController.hasSelection()) {
+			SelectionController.instance.rotateSelection(90);
+			if (SelectionController.instance.hasSelection()) {
 				Undo.addState()
 			}
 			return false;
@@ -322,15 +311,15 @@ export class MainController {
 
 		//flip selection
 		hotkeys("shift+x",()=>{
-			this.selectionController.flipSelection(true);
-			if (this.selectionController.hasSelection()) {
+			SelectionController.instance.flipSelection(true);
+			if (SelectionController.instance.hasSelection()) {
 				Undo.addState()
 			}
 			return false;
 		})
 		hotkeys("shift+y",()=>{
-			this.selectionController.flipSelection(false);
-			if (this.selectionController.hasSelection()) {
+			SelectionController.instance.flipSelection(false);
+			if (SelectionController.instance.hasSelection()) {
 				Undo.addState()
 			}
 			return false;
@@ -338,7 +327,7 @@ export class MainController {
 
 		// select everything
 		hotkeys("ctrl+a,command+a",()=>{
-			this.selectionController.selectAll();
+			SelectionController.instance.selectAll();
 			return false;
 		})
 
@@ -370,19 +359,19 @@ export class MainController {
 
 		//save/load
 		hotkeys("ctrl+s,command+s",()=>{
-			this.saveController.save()
+			SaveController.instance.save()
 			return false;
 		})
 		hotkeys("ctrl+o,command+o",()=>{
-			this.saveController.load()
+			SaveController.instance.load()
 			return false;
 		})
 		hotkeys("ctrl+e,command+e",()=>{
-			this.exportController.exportCircuiTikZ()
+			ExportController.instance.exportCircuiTikZ()
 			return false;
 		})
 		hotkeys("ctrl+shift+e,command+shift+e",()=>{
-			this.exportController.exportSVG()
+			ExportController.instance.exportSVG()
 			return false;
 		})
 
@@ -392,18 +381,18 @@ export class MainController {
 			return false;
 		})
 		hotkeys("esc",()=>{
-			this.#switchMode(MainController.modes.DRAG_PAN);
+			this.#switchMode(MainController.Modes.DRAG_PAN);
 			return false;
 		})
 		hotkeys("w",()=>{
-			this.#switchMode(MainController.modes.DRAW_LINE);
+			this.#switchMode(MainController.Modes.DRAW_LINE);
 			return false;
 		})
 		hotkeys("del, backspace",()=>{
-			if(!SelectionController.controller.hasSelection()){
-				this.#switchMode(MainController.modes.ERASE);
+			if(!SelectionController.instance.hasSelection()){
+				this.#switchMode(MainController.Modes.ERASE);
 			}else{
-				SelectionController.controller.removeSelection()
+				SelectionController.instance.removeSelection()
 				Undo.addState()
 			}
 			return false;
@@ -411,29 +400,29 @@ export class MainController {
 
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
-		var shortcutDict = {
-			"g":"Ground",
-			"alt+g,option+g":"Ground (tailless)",
-			"r":"Resistor (american)",
-			"c":"Capacitor",
-			"alt+c,option+c":"Curved (polarized) capacitor",
-			"l":"Inductor (american)",
-			"alt+l,option+l":"Inductor (cute)",
-			"d":"Empty diode",
-			"b":"NPN",
-			"alt+b,option+b":"PNP",
-			"n":"NMOS",
-			"alt+n,option+n":"PMOS",
-			"x":"Plain style crossing node",
-			"alt+x,option+x":"Jumper-style crossing node",
-			".":"Connected terminal",
-			"alt+.,option+.":"Unconnected terminal",
-		}
+		var shortcutDict: {shortcut:string,component:string}[] = [
+			{shortcut:"g",component:"Ground"},
+			{shortcut:"alt+g,option+g",component:"Ground (tailless)"},
+			{shortcut:"r",component:"Resistor (american)"},
+			{shortcut:"c",component:"Capacitor"},
+			{shortcut:"alt+c,option+c",component:"Curved (polarized) capacitor"},
+			{shortcut:"l",component:"Inductor (american)"},
+			{shortcut:"alt+l,option+l",component:"Inductor (cute)"},
+			{shortcut:"d",component:"Empty diode"},
+			{shortcut:"b",component:"NPN"},
+			{shortcut:"alt+b,option+b",component:"PNP"},
+			{shortcut:"n",component:"NMOS"},
+			{shortcut:"alt+n,option+n",component:"PMOS"},
+			{shortcut:"x",component:"Plain style crossing node"},
+			{shortcut:"alt+x,option+x",component:"Jumper-style crossing node"},
+			{shortcut:".",component:"Connected terminal"},
+			{shortcut:"alt+.,option+.",component:"Unconnected terminal"},
+		]
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
-		for (const [key, value] of Object.entries(shortcutDict)) {
-			hotkeys(key,()=>{
-				this.#switchMode(MainController.modes.DRAG_PAN); //switch to standard mode to avoid weird states
-				var componentButton = document.querySelector('[title="'+value+'"]')
+		for (const {shortcut,component} of shortcutDict) {
+			hotkeys(shortcut,()=>{
+				this.#switchMode(MainController.Modes.DRAG_PAN); //switch to standard mode to avoid weird states
+				var componentButton = document.querySelector('[title="'+component+'"]')
 				var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
 				componentButton?.dispatchEvent(clickEvent);
 			})
@@ -441,18 +430,10 @@ export class MainController {
 	}
 
 	/**
-	 * Getter for the singleton instance.
-	 * @returns {MainController}
-	 */
-	static get controller(): MainController {
-		return MainController.#instance || (MainController.#instance = new MainController());
-	}
-
-	/**
 	 * Init the canvas controller
 	 */
 	async #initCanvas() {
-		let canvasElement = await waitForElementLoaded("canvas");
+		let canvasElement: SVGSVGElement = await waitForElementLoaded("canvas");
 		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement));
 	}
 
@@ -461,7 +442,6 @@ export class MainController {
 	 */
 	async #initSymbolDB() {
 		// Fetch symbol DB
-		/** @type {HTMLLinkElement} */
 		const symbolDBlink: HTMLLinkElement = await waitForElementLoaded("symbolDBlink");
 		const response = await fetch(symbolDBlink.href, {
 			method: "GET",
@@ -472,9 +452,7 @@ export class MainController {
 		const textContent = await response.text();
 
 		// Parse & add to DOM
-		/** @type {XMLDocument} */
 		const symbolsDocument: XMLDocument = new DOMParser().parseFromString(textContent, "image/svg+xml");
-		/** @type {SVGSVGElement} */
 		const symbolsSVGSVGElement: SVGSVGElement = document.adoptNode(symbolsDocument.firstElementChild as SVGSVGElement);
 		symbolsSVGSVGElement.style.display = "none";
 		symbolsSVGSVGElement.setAttribute("id","symbolDB")
@@ -482,9 +460,7 @@ export class MainController {
 
 		// Extract symbols
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement);
-		/** @type {SVG.Defs} */
 		const defs: SVG.Defs = this.symbolsSVG.defs();
-		/** @type {SVGSymbolElement[]} */
 		const symbols: SVGSymbolElement[] = Array.prototype.filter.call(defs.node.children, (def) => def instanceof SVGSymbolElement);
 		// let symbols = defs.children().filter((/** @type {SVG.Element} */def) => def instanceof SVG.Symbol);
 		this.symbols = symbols.flatMap((symbol) => {
@@ -504,23 +480,23 @@ export class MainController {
 	 * Init the mode change buttons.
 	 */
 	#initModeButtons() {
-		this.#modeSwitchButtons.modeDragPan = document.getElementById("modeDragPan");
-		this.#modeSwitchButtons.modeDrawLine = document.getElementById("modeDrawLine");
-		this.#modeSwitchButtons.modeEraser = document.getElementById("modeEraser");
+		this.modeSwitchButtons.modeDragPan = document.getElementById("modeDragPan");
+		this.modeSwitchButtons.modeDrawLine = document.getElementById("modeDrawLine");
+		this.modeSwitchButtons.modeEraser = document.getElementById("modeEraser");
 
-		this.#modeSwitchButtons.modeDragPan.addEventListener(
+		this.modeSwitchButtons.modeDragPan.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.modes.DRAG_PAN),
+			() => this.#switchMode(MainController.Modes.DRAG_PAN),
 			{ passive: false }
 		);
-		this.#modeSwitchButtons.modeDrawLine.addEventListener(
+		this.modeSwitchButtons.modeDrawLine.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.modes.DRAW_LINE),
+			() => this.#switchMode(MainController.Modes.DRAW_LINE),
 			{ passive: false }
 		);
-		this.#modeSwitchButtons.modeEraser.addEventListener(
+		this.modeSwitchButtons.modeEraser.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.modes.ERASE),
+			() => this.#switchMode(MainController.Modes.ERASE),
 			{ passive: false }
 		);
 	}
@@ -537,7 +513,7 @@ export class MainController {
 		addComponentButton.addEventListener(
 			"click",
 			(() => {
-				this.#switchMode(MainController.modes.DRAG_PAN);
+				this.#switchMode(MainController.Modes.DRAG_PAN);
 				leftOffcanvasOC.toggle();				
 				if (leftOffcanvas.classList.contains("showing")) {
 					let searchBar = document.getElementById("componentFilterInput")
@@ -564,7 +540,6 @@ export class MainController {
 			new Map()
 		);
 
-		let iconsWithoutViewBox: SVGSVGElement[] = [];
 		let firstGroup = true;
 		for (const [groupName, symbols] of groupedSymbols.entries()) {
 			const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-");
@@ -601,41 +576,22 @@ export class MainController {
 
 				const listener = (ev: MouseEvent) => {
 					ev.preventDefault();
-					this.#switchMode(MainController.modes.COMPONENT)
-					const oldComponent = this.canvasController.placingComponent;
-					let lastpoint = null;
-					if (oldComponent) {
-						// if currently placing a component, use the new component instead and remove the old component
-						if (oldComponent instanceof PathComponentInstance) {
-							if (oldComponent.getPointsSet()>0) {
-								lastpoint = oldComponent.getStartPoint();
-							}else{
-								oldComponent.firstClick(CanvasController.controller.lastCanvasPoint);
-							}
-							oldComponent.secondClick(CanvasController.controller.lastCanvasPoint, false);//cleanly finish placing the oldComponent somewhere before deleting it
-						}
-						this.removeInstance(oldComponent);
+					this.#switchMode(MainController.Modes.COMPONENT)					
+
+					if (ComponentPlacer.instance.component) {
+						//TODO check here if path component and retrace steps
+						ComponentPlacer.instance.placeCancel()
 					}
 
-					const newInstance = symbol.addInstanceToContainer(this.canvasController.canvas, ev, ()=>{
-						this.#switchMode(MainController.modes.DRAG_PAN);
-						if (newInstance) {
-							// only refire event if the component was sucessfully created
-							var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
-							addButton?.dispatchEvent(clickEvent);
-						}
-					});
-					if (newInstance instanceof PathComponentInstance) {
-						if (lastpoint) {
-							newInstance.firstClick(lastpoint);
-							newInstance.moveTo(CanvasController.controller.lastCanvasPoint);
-						}
-					}else if(newInstance instanceof NodeComponentInstance){
-						let point = CanvasController.controller.lastCanvasPoint
-						newInstance.moveTo(point)
-					}
-					this.canvasController.placingComponent = newInstance;
-					this.addInstance(newInstance);
+					let newComponent: CircuitikzComponent
+					if (symbol.isNodeSymbol) {
+						newComponent = new NodeComponent(symbol)
+					}else{
+						newComponent = new PathComponent(symbol)
+					}					
+					ComponentPlacer.instance.placeComponent(newComponent)
+
+					// this.addComponent(newComponent);
 					
 					leftOffcanvasOC.hide();
 				};
@@ -643,60 +599,19 @@ export class MainController {
 				addButton.addEventListener("mouseup", listener);
 				addButton.addEventListener("touchstart", listener, { passive: false });
 
-				const svgIcon: SVGSVGElement = addButton.appendChild(document.createElementNS(SVG.namespaces.svg, "svg"));
+				let svgIcon = SVG.SVG().addTo(addButton)
 				if (symbol.viewBox) {
-					svgIcon.setAttributeNS(
-						null,
-						"viewBox",
-						symbol.viewBox.x +
-							" " +
-							symbol.viewBox.y +
-							" " +
-							symbol.viewBox.width +
-							" " +
-							symbol.viewBox.height
-					);
-					svgIcon.setAttributeNS(null, "width", symbol.viewBox.width);
-					svgIcon.setAttributeNS(null, "height", symbol.viewBox.height);
+					svgIcon.viewbox(symbol.viewBox).width(symbol.viewBox.width).height(symbol.viewBox.height)
 				}
-
-				const svgUse = svgIcon.appendChild(document.createElementNS(SVG.namespaces.svg, "use"));
-				svgUse.setAttributeNS(SVG.namespaces.xlink, "href", "#" + symbol.id());
-
-				if (!symbol.viewBox) iconsWithoutViewBox.push(svgIcon);
+				svgIcon.use(symbol.id())
 			}
 
 			firstGroup = false;
-		}
-
-		/**
-		 *
-		 * @param {DOMRect|null|undefined} box
-		 * @returns {boolean}
-		 */
-		function isNullishBox(box: DOMRect | null | undefined): boolean {
-			return !box || (!box.x && !box.y && !box.width && !box.height);
-		}
-
-		while (iconsWithoutViewBox.length > 0 && isNullishBox(iconsWithoutViewBox[0].getBBox()))
-			await new Promise((resolve) => requestAnimationFrame(resolve));
-
-		iconsWithoutViewBox.forEach(async (svgIcon) => {
-			/** @type {DOMRect} */
-			let box: DOMRect;
-			// wait for browser rendering and setting the bounding box
-			while (isNullishBox((box = svgIcon.getBBox({ clipped: false, fill: true, markers: true, stroke: true }))))
-				await new Promise((resolve) => requestAnimationFrame(resolve));
-
-			svgIcon.setAttributeNS(null, "viewBox", box.x + " " + box.y + " " + box.width + " " + box.height);
-			svgIcon.setAttributeNS(null, "width", box.width.toString());
-			svgIcon.setAttributeNS(null, "height", box.height.toString());
-		});
+		}		
 	}
 
 	/**
 	 * filter the components in the left OffCanvas to only show what matches the search string (in a new accordeon item)
-	 * @param {Event} evt 
 	 */
 	filterComponents(evt: Event){
 		evt.preventDefault();
@@ -756,57 +671,55 @@ export class MainController {
 
 	/**
 	 * Switches the mode. This deactivates the old controller and activates the new one.
-	 *
-	 * @param {number} newMode - the new mode; one of {@link MainController.modes}
 	 */
 	#switchMode(newMode: number) {
 		if (newMode === this.mode) return;
 
 		switch (this.mode) {
-			case MainController.modes.DRAG_PAN:
-				this.#modeSwitchButtons.modeDragPan.classList.remove("selected");
-				this.canvasController.deactivatePanning();
-				this.selectionController.deactivateSelection();
-				for (const instance of this.instances) {
+			case MainController.Modes.DRAG_PAN:
+				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
+				CanvasController.instance.deactivatePanning();
+				SelectionController.instance.deactivateSelection();
+				for (const instance of this.circuitComponents) {
 					if (instance.disableDrag) instance.disableDrag();
 				}
 				break;
-			case MainController.modes.DRAW_LINE:
-				this.#modeSwitchButtons.modeDrawLine.classList.remove("selected");
+			case MainController.Modes.DRAW_LINE:
+				this.modeSwitchButtons.modeDrawLine.classList.remove("selected");
 				this.lineDrawer.deactivate();
 				break;
-			case MainController.modes.ERASE:
-				this.#modeSwitchButtons.modeEraser.classList.remove("selected");
-				this.eraseController.deactivate();
+			case MainController.Modes.ERASE:
+				this.modeSwitchButtons.modeEraser.classList.remove("selected");
+				EraseController.instance.deactivate();
 				break;
-			case MainController.modes.COMPONENT:
-				this.#modeSwitchButtons.modeDragPan.classList.remove("selected");
-				this.canvasController.deactivatePanning();
+			case MainController.Modes.COMPONENT:
+				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
+				CanvasController.instance.deactivatePanning();
 				break;
 			default:
 				break;
 		}
 
 		switch (newMode) {
-			case MainController.modes.DRAG_PAN:
-				this.#modeSwitchButtons.modeDragPan.classList.add("selected");
-				this.canvasController.activatePanning();
-				this.selectionController.activateSelection();
-				for (const instance of this.instances) {
+			case MainController.Modes.DRAG_PAN:
+				this.modeSwitchButtons.modeDragPan.classList.add("selected");
+				CanvasController.instance.activatePanning();
+				SelectionController.instance.activateSelection();
+				for (const instance of this.circuitComponents) {
 					if (instance.enableDrag) instance.enableDrag();
 				}
 				break;
-			case MainController.modes.DRAW_LINE:
-				this.#modeSwitchButtons.modeDrawLine.classList.add("selected");
+			case MainController.Modes.DRAW_LINE:
+				this.modeSwitchButtons.modeDrawLine.classList.add("selected");
 				this.lineDrawer.activate();
 				break;
-			case MainController.modes.ERASE:
-				this.#modeSwitchButtons.modeEraser.classList.add("selected");
-				this.eraseController.activate();
+			case MainController.Modes.ERASE:
+				this.modeSwitchButtons.modeEraser.classList.add("selected");
+				EraseController.instance.activate();
 				break;
-			case MainController.modes.COMPONENT:
-				this.#modeSwitchButtons.modeDragPan.classList.add("selected");
-				this.canvasController.activatePanning();
+			case MainController.Modes.COMPONENT:
+				this.modeSwitchButtons.modeDragPan.classList.add("selected");
+				CanvasController.instance.activatePanning();
 				break;
 			default:
 				break;
@@ -816,7 +729,7 @@ export class MainController {
 	}
 
 	updateTheme(){
-		if (this.#darkModeLast==this.darkMode) {
+		if (this.darkModeLast==this.darkMode) {
 			return;
 		}
 		const light = "#fff"
@@ -843,18 +756,12 @@ export class MainController {
 			}
 		}
 
-		for (const line of this.lines) {
-			line.updateTheme()
+		for (const instance of this.circuitComponents) {
+			instance.updateTheme()
 		}
+		SelectionController.instance.updateTheme()
 
-		for (const instance of this.instances) {
-			if (instance instanceof PathComponentInstance) {
-				instance.updateTheme()
-			}
-		}
-		SelectionController.controller.updateTheme()
-
-		this.#darkModeLast = this.darkMode
+		this.darkModeLast = this.darkMode
 	}
 
 	/**
@@ -862,14 +769,14 @@ export class MainController {
 	 * called once on initialization
 	 * @param {Element} node 
 	 */
-	#addFill(node: Element){
+	private addFill(node: Element){
 		let hasFill = node.getAttribute("fill") !==null;
 		if (hasFill) {
 			return;
 		}
 		for (const element of node.children) {
 			if (element.nodeName === "g") {
-				this.#addFill(element)
+				this.addFill(element)
 			}else{
 				if (!element.getAttribute("fill")) {
 					element.setAttribute("fill","#000")
@@ -879,47 +786,24 @@ export class MainController {
 	}
 
 	/**
-	 * Adds a new instance to {@link instances} and adds its snapping points.
-	 *
-	 * @param {ComponentInstance} newInstance - the instance to add
+	 * Adds a new instance to {@link circuitComponents} and adds its snapping points.
 	 */
-	addInstance(newInstance: ComponentInstance) {
-		this.instances.push(newInstance);
-		const snappingPoints = newInstance.snappingPoints || [];
+	public addComponent(circuitComponent: CircuitComponent) {
+		this.circuitComponents.push(circuitComponent);
+		const snappingPoints = circuitComponent.snappingPoints || [];
 		if (snappingPoints.length > 0) this.snapController.addSnapPoints(snappingPoints);
 	}
 
 	/**
-	 * Adds a new line to {@link lines}.
-	 *
-	 * @param {Line} newLine - the line to add
+	 * Removes an instance from {@link instances} and also removes its snapping points.
 	 */
-	addLine(newLine: Line) {
-		this.lines.push(newLine);
-	}
-
-	/**
-	 * Removes a instance from {@link instances} and also removes its snapping points.
-	 *
-	 * @param {ComponentInstance} instance - the instance to remove
-	 */
-	removeInstance(instance: ComponentInstance) {
-		instance.remove();
-		const idx = this.instances.indexOf(instance);
+	public removeComponent(circuitComponent: CircuitComponent) {
+		circuitComponent.remove();
+		const idx = this.circuitComponents.indexOf(circuitComponent);
 		if (idx >= 0) {
-			this.instances.splice(idx, 1);
-			const snappingPoints = instance.snappingPoints || [];
+			this.circuitComponents.splice(idx, 1);
+			const snappingPoints = circuitComponent.snappingPoints || [];
 			if (snappingPoints.length > 0) this.snapController.removeSnapPoints(snappingPoints);
 		}
-	}
-
-	/**
-	 * Removes a line from {@link lines}.
-	 * @param {Line} line - the line to remove
-	 */
-	removeLine(line: Line) {
-		line.remove();
-		const idx = this.lines.indexOf(line);
-		if (idx >= 0) this.lines.splice(idx, 1);
 	}
 }

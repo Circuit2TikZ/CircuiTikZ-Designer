@@ -5,4 +5,4 @@
 
 import {MainController} from "./internal";
 
-window.mainController = MainController.controller;
+window.mainController = MainController.instance;

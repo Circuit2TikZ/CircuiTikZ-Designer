@@ -66,14 +66,14 @@ export class Line extends SVG.Polyline {
 
 		this.attr({
 			fill: "none",
-			stroke: MainController.controller.darkMode?"#fff":"#000",
+			stroke: MainController.instance.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
 	}
 
 	updateTheme(){
 		if (!this.isSelected) {
-			this.stroke(MainController.controller.darkMode?"#fff":"#000");
+			this.stroke(MainController.instance.darkMode?"#fff":"#000");
 		}
 	}
 
@@ -151,7 +151,7 @@ export class Line extends SVG.Polyline {
 
 	hideBoundingBox(){
 		this.attr({
-			"stroke":MainController.controller.darkMode?"#fff":"#000",
+			"stroke":MainController.instance.darkMode?"#fff":"#000",
 			// "stroke-width": "0.4pt",
 		});
 		this.isSelected = false;
@@ -371,14 +371,14 @@ export class Line extends SVG.Polyline {
 	 */
 	static fromJson(serialized) {
 		let line = new Line(new SVG.Point(serialized.start))
-		CanvasController.controller.canvas.add(line);
+		CanvasController.instance.canvas.add(line);
 		for (const point of serialized.others) {
 			let dir = point.dir==0?Line.Direction.STRAIGHT:point.dir==1?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
 			line.pushPoint(dir,new SVG.Point(point.x,point.y))
 		}
 		line.removeMousePoint()
 
-		MainController.controller.addLine(line)
+		MainController.instance.addComponent(line)
 		return line;
 	}
 

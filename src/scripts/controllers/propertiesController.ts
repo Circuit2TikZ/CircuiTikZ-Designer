@@ -4,19 +4,21 @@
 
 import { CanvasController, MainController, NodeComponentInstance, SelectionController, Undo } from "../internal";
 
-/**
- * @typedef {Object} FormEntry
- * @property {object} originalObject
- * @property {string} propertyName
- * @property {string} inputType
- * @property {any} currentValue
- * @property {function(newValue:any):string} changeCallback
- */
+export type FormEntry = {
+	originalObject: object;
+	propertyName: string;
+	inputType: string;
+	currentValue: any;
+}
 
 export class PropertyController{
-
-	/** @type {PropertyController} */
-	static controller;
+	private static _instance: PropertyController;
+	public static get instance(): PropertyController {
+		if (!PropertyController._instance) {
+			PropertyController._instance = new PropertyController()
+		}
+		return PropertyController._instance;
+	}
 
 	#propertiesContainer;
 	#objectName;
@@ -24,20 +26,18 @@ export class PropertyController{
 	#propertiesEntries
 	#propertiesTitle
 
-	constructor(){
+	private constructor(){
 		this.#propertiesContainer = document.getElementById("properties-content")
 		this.#objectName = document.getElementById("objectName")
 		this.#gridProperties = document.getElementById("grid-properties")
 		this.#propertiesEntries = document.getElementById("propertiesEntries")
 		this.#propertiesTitle = document.getElementById("propertiesTitle")
-
-		PropertyController.controller = this;
 	}
 
 	update(){
 		
-		let components = SelectionController.controller.currentlySelectedComponents
-		let lines = SelectionController.controller.currentlySelectedLines
+		let components = SelectionController.instance.currentlySelectedComponents
+		let lines = SelectionController.instance.currentlySelectedLines
 		this.#clearForm()
 
 		if (components.length+lines.length>1) {
@@ -64,10 +64,10 @@ export class PropertyController{
 
 		let zorderControls = document.getElementById("zorder-controls").cloneNode(true)
 		zorderControls.firstElementChild.addEventListener("click",()=>{
-			CanvasController.controller.bringComponentToFront(line)
+			CanvasController.instance.bringComponentToFront(line)
 		})
 		zorderControls.lastElementChild.addEventListener("click",()=>{
-			CanvasController.controller.moveComponentToBack(line)
+			CanvasController.instance.moveComponentToBack(line)
 		})
 		this.#propertiesEntries.appendChild(zorderControls)
 	}
@@ -116,10 +116,10 @@ export class PropertyController{
 
 		let zorderControls = document.getElementById("zorder-controls").cloneNode(true)
 		zorderControls.firstElementChild.addEventListener("click",()=>{
-			CanvasController.controller.bringComponentToFront(component)
+			CanvasController.instance.bringComponentToFront(component)
 		})
 		zorderControls.lastElementChild.addEventListener("click",()=>{
-			CanvasController.controller.moveComponentToBack(component)
+			CanvasController.instance.moveComponentToBack(component)
 		})
 		this.#propertiesEntries.appendChild(zorderControls)
 
@@ -179,7 +179,7 @@ export class PropertyController{
 					break;
 				case "mathJax":
 					input.value = formEntry.currentValue
-					const submitButton = entryNode.querySelector("button");
+					const submitButton = (entryNode as Element).querySelector("button");
 					const rerender = ()=>{
 						formEntry.changeCallback(input.value,submitButton,changeValidStatus)
 					}
@@ -232,24 +232,24 @@ export class PropertyController{
 		this.#propertiesTitle.innerText = "Grid settings"
 
 		let minorSlider = document.getElementById("minorSliderInput")
-		minorSlider.value = CanvasController.controller.majorGridSubdivisions
+		minorSlider.value = CanvasController.instance.majorGridSubdivisions
 
 		let majorSlider = document.getElementById("majorSliderInput")
-		majorSlider.value = CanvasController.controller.majorGridSizecm
+		majorSlider.value = CanvasController.instance.majorGridSizecm
 
 		minorSlider.addEventListener('input',(ev)=>{
-			this.#changeGrid(CanvasController.controller.majorGridSizecm, Number.parseFloat(minorSlider.value))
+			this.#changeGrid(CanvasController.instance.majorGridSizecm, Number.parseFloat(minorSlider.value))
 		})
 
 		majorSlider.addEventListener('input',(ev)=>{
-			this.#changeGrid(Number.parseFloat(majorSlider.value), CanvasController.controller.majorGridSubdivisions)
+			this.#changeGrid(Number.parseFloat(majorSlider.value), CanvasController.instance.majorGridSubdivisions)
 		})
 
-		this.#changeGrid(CanvasController.controller.majorGridSizecm, CanvasController.controller.majorGridSubdivisions)		
+		this.#changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)		
 	}
 
 	#changeGrid(majorSizecm, majorSubdivisions){
-		CanvasController.controller.changeGrid(majorSizecm, majorSubdivisions)
+		CanvasController.instance.changeGrid(majorSizecm, majorSubdivisions)
 
 		let majorLabel = document.getElementById("majorLabel")
 		majorLabel.innerText = majorSizecm+" cm"

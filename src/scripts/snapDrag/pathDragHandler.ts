@@ -74,7 +74,6 @@ export class PathDragHandler {
 			this.element = this.parentElement.endCircle;
 		}
 		let circleBbox = this.element.bbox()
-		/** @type {SVG.Point} */
 		this.relMid = new SVG.Point(circleBbox.w/2,circleBbox.h/2);
 		this.element.remember("_snapDragHandler", this);
 		this.element.draggable(true);
@@ -168,7 +167,7 @@ export class PathDragHandler {
 
 		if (!this.#didDrag) {
 			// only show snapping points if actually moving
-			SnapController.controller.showSnapPoints();
+			SnapController.instance.showSnapPoints();
 		}
 		this.#didDrag = true;
 		
@@ -176,13 +175,13 @@ export class PathDragHandler {
 
 		/** @type {SVG.Point[]} */
 		const snapPoints: SVG.Point[] =
-			this.element.relSnappingPoints && this.element.relSnappingPoints.length > 0
-				? this.element.relSnappingPoints
+			this.parentElement.relSnappingPoints && this.parentElement.relSnappingPoints.length > 0
+				? this.parentElement.relSnappingPoints
 				: [new SVG.Point(0, 0)];
 
 		let destination = event.detail.event?.shiftKey
 			? draggedPoint
-			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
+			: SnapController.instance.snapPoint(draggedPoint, snapPoints);
 
 		if (this.moveStart) {
 			this.parentElement.moveStartTo(destination)
@@ -205,7 +204,7 @@ export class PathDragHandler {
 			let ctrlCommand = event.detail.event.ctrlKey||(MainController.controller.isMac&&event.detail.event.metaKey)
 			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:ctrlCommand?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
 
-			SelectionController.controller.selectComponents([this.parentElement], selectionMode)
+			SelectionController.instance.selectComponents([this.parentElement], selectionMode)
 			trackState = false;
 		}
 

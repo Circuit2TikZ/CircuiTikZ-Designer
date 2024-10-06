@@ -19,10 +19,10 @@ export class CopyPaste {
 	static #clipboard: Clipboard|null = null
 
 	static copy(){
-		if (SelectionController.controller.hasSelection()) {
+		if (SelectionController.instance.hasSelection()) {
 			let nodes = []
 			let paths = []
-			for (const component of SelectionController.controller.currentlySelectedComponents) {
+			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				let componentObject = component.toJson()
 				componentObject.tikzName = ""
 				if (component instanceof NodeComponentInstance) {
@@ -33,7 +33,7 @@ export class CopyPaste {
 			}
 	
 			let lines = []
-			for (const line of SelectionController.controller.currentlySelectedLines) {
+			for (const line of SelectionController.instance.currentlySelectedLines) {
 				lines.push(line.toJson())
 			}
 	
@@ -51,8 +51,8 @@ export class CopyPaste {
 			return
 		}
 		
-		SelectionController.controller.deactivateSelection()
-		SelectionController.controller.activateSelection()
+		SelectionController.instance.deactivateSelection()
+		SelectionController.instance.activateSelection()
 
 		let allComponents = []
 		let lines = []
@@ -70,24 +70,24 @@ export class CopyPaste {
 		}
 
 		if (allComponents.length>0) {
-			SelectionController.controller.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
 		}
 		if (lines.length>0) {
-			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectLines(lines,SelectionController.SelectionMode.RESET)
 		}
 		//TODO get current mouse position
-		SelectionController.controller.moveSelectionTo(new Point(0,0))
+		SelectionController.instance.moveSelectionTo(new Point(0,0))
 		Undo.addState()
 	}
 
 	static cut(){
-		if (SelectionController.controller.hasSelection()) {
+		if (SelectionController.instance.hasSelection()) {
 			CopyPaste.copy();
 	
-			for (const component of SelectionController.controller.currentlySelectedComponents) {
+			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				MainController.controller.removeInstance(component)
 			}
-			for (const line of SelectionController.controller.currentlySelectedLines) {
+			for (const line of SelectionController.instance.currentlySelectedLines) {
 				MainController.controller.removeLine(line)
 			}
 			Undo.addState()

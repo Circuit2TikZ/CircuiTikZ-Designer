@@ -6,40 +6,21 @@ import * as SVG from "@svgdotjs/svg.js";
 
 import { MainController, FABcontroller, SnapController, SnapCursorController, Line, Undo, CanvasController } from "../internal";
 
-/**
- * @class
- */
 export class LineDrawer {
-	/** @type {MainController} */
-	#mainController;
-	/** @type {SVG.Svg} */
-	#canvas;
-	/** @type {boolean} */
-	#hasMouse;
+	#canvas: SVG.Svg;
+	#hasMouse: boolean;
 
-	/** @type {?Line} */
-	#newLine;
-	/** @type {SVG.Point} */
-	#lastPoint;
+	#newLine: Line | null;
+	#lastPoint: SVG.Point;
 
-	/** @type {boolean} */
-	#horizontalFirst = false;
-	/** @type {boolean} */
-	#holdDirectionSet = false;
-	/** @type {{up: boolean, right: boolean, down: boolean, left: boolean}} */
-	#lastLineDirection = { up: false, right: false, down: false, left: false };
-	/** @type {boolean} */
-	#wasAboveXAxis;
-	/** @type {boolean} */
-	#wasRightOfYAxis;
+	#horizontalFirst: boolean = false;
+	#holdDirectionSet: boolean = false;
+	#lastLineDirection: { up: boolean; right: boolean; down: boolean; left: boolean; } = { up: false, right: false, down: false, left: false };
+	#wasAboveXAxis: boolean;
+	#wasRightOfYAxis: boolean;
 
-	/**
-	 *
-	 * @param {MainController} mainController
-	 */
-	constructor(mainController) {
-		this.#mainController = mainController;
-		this.#canvas = this.#mainController.canvasController.canvas;
+	constructor() {
+		this.#canvas = CanvasController.instance.canvas;
 		this.#hasMouse = matchMedia("(pointer:fine)").matches;
 	}
 
@@ -57,7 +38,7 @@ export class LineDrawer {
 		this.#canvas.off("touchmove", this.#moveListener);
 		this.#canvas.off("touchend", this.#clickListener);
 		this.#canvas.off("click", this.#clickListener);
-		SnapCursorController.controller.visible = false;
+		SnapCursorController.instance.visible = false;
 		SnapController.controller.hideSnapPoints();
 		this.#canvas.node.classList.remove("selectPoint");
 	}
@@ -76,7 +57,7 @@ export class LineDrawer {
 		this.#canvas.on("touchmove", this.#moveListener, this);
 		this.#canvas.on("mousemove", this.#moveListener, this);
 		this.#canvas.node.classList.add("selectPoint");
-		SnapCursorController.controller.visible = this.#hasMouse;
+		SnapCursorController.instance.visible = this.#hasMouse;
 		SnapController.controller.showSnapPoints();
 
 		// init FAB
@@ -101,7 +82,7 @@ export class LineDrawer {
 	 *
 	 * @param {MouseEvent|TouchEvent} event
 	 */
-	#clickListener(event) {
+	#clickListener(event: MouseEvent | TouchEvent) {
 		//
 		let clientPt =
 			event instanceof MouseEvent
@@ -113,18 +94,18 @@ export class LineDrawer {
 					? event.changedTouches[0]
 					: null;
 		if (!clientPt) return;
-		const pt = CanvasController.controller.pointerEventToPoint(clientPt);
+		const pt = CanvasController.eventToPoint(event);
 		
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 
 		if (!this.#lastPoint) {
-			SnapCursorController.controller.visible = false;
+			SnapCursorController.instance.visible = false;
 			this.#newLine = new Line(snappedPoint);
 			this.#lastPoint = snappedPoint;
 			this.#canvas.add(this.#newLine);
 		} else {
 			if (this.#lastPoint.x === snappedPoint.x && this.#lastPoint.y === snappedPoint.y) return;
-			let ctrlCommand = event.ctrlKey||(MainController.controller.isMac&&event.metaKey)
+			let ctrlCommand = event.ctrlKey||(MainController.instance.isMac&&event.metaKey)
 			let dir = ctrlCommand?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
 			this.#newLine.pushPoint(dir, snappedPoint);
 			const secondLastPoint = this.#lastPoint;
@@ -165,7 +146,7 @@ export class LineDrawer {
 		if (this.#newLine) this.#newLine.remove();
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
-		SnapCursorController.controller.visible = this.#hasMouse;
+		SnapCursorController.instance.visible = this.#hasMouse;
 	}
 
 	/**
@@ -175,14 +156,14 @@ export class LineDrawer {
 		this.#newLine.removeMousePoint();
 		// only add a new line if it has more than one point (necessary sind cancel and accept button show even at one point)
 		if (this.#newLine.array().length>1) {
-			this.#mainController.addLine(this.#newLine);
+			MainController.instance.addComponent(this.#newLine);
 		}else{
 			this.#newLine.remove();
 		}
 
 		this.#resetVars();
 		FABcontroller.controller.visible = false;
-		SnapCursorController.controller.visible = this.#hasMouse;
+		SnapCursorController.instance.visible = this.#hasMouse;
 		Undo.addState()
 	}
 
@@ -204,7 +185,7 @@ export class LineDrawer {
 	 * Listener for mouse movements. Does update the "SnapCursor" or the currently drawn line.
 	 * @param {MouseEvent|TouchEvent} event
 	 */
-	#moveListener(event) {
+	#moveListener(event: MouseEvent | TouchEvent) {
 		// (mousemove) || (TouchMove)
 		let clientPt =
 			event instanceof MouseEvent
@@ -213,10 +194,10 @@ export class LineDrawer {
 					? event.touches[0]
 					: null;
 		if (!clientPt) return;
-		const pt = this.#mainController.canvasController.pointerEventToPoint(clientPt);
+		const pt = CanvasController.eventToPoint(event);
 		const snappedPoint = event.shiftKey ? pt : SnapController.controller.snapPoint(pt, [{ x: 0, y: 0 }]);
 		if (!this.#newLine) {
-			SnapCursorController.controller.moveTo(snappedPoint);
+			SnapCursorController.instance.moveTo(snappedPoint);
 		} else {
 			// try to get quadrant change
 			const isAboveXAxis = snappedPoint.y < this.#lastPoint.y;
@@ -247,7 +228,7 @@ export class LineDrawer {
 			else if ((this.#lastLineDirection.down && isAboveXAxis) || (this.#lastLineDirection.up && !isAboveXAxis))
 				this.#horizontalFirst = true;
 
-			let dir = event.ctrlKey||(MainController.controller.isMac&&event.metaKey)?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
+			let dir = event.ctrlKey||(MainController.instance.isMac&&event.metaKey)?Line.Direction.STRAIGHT:this.#horizontalFirst?Line.Direction.HORIZONTAL_VERTICAL:Line.Direction.VERTICAL_HORIZONTAL
 			this.#newLine.updateMousePoint(dir, snappedPoint);
 		}
 	}

@@ -17,14 +17,14 @@ export class Undo {
 	static addState(){
 		// get json object
 		let currentState = []
-		for (const component of CanvasController.controller.canvas.children()) {
+		for (const component of CanvasController.instance.canvas.children()) {
 			if (component instanceof NodeComponentInstance || component instanceof PathComponentInstance) {
 				let componentObject = component.toJson()
-				componentObject.selected = SelectionController.controller.isComponentSelected(component)
+				componentObject.selected = SelectionController.instance.isComponentSelected(component)
 				currentState.push(componentObject)
 			}else if(component instanceof Line){
 				let componentObject = component.toJson()
-				componentObject.selected = SelectionController.controller.isLineSelected(component)
+				componentObject.selected = SelectionController.instance.isLineSelected(component)
 				currentState.push(componentObject)
 			}
 		}
@@ -93,10 +93,10 @@ export class Undo {
 		}
 
 		if (allComponents.length>0) {
-			SelectionController.controller.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
 		}
 		if (lines.length>0) {
-			SelectionController.controller.selectLines(lines,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectLines(lines,SelectionController.SelectionMode.RESET)
 		}
 	}
 }

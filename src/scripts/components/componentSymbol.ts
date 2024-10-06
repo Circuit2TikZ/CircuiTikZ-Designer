@@ -5,12 +5,11 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { ensureInPx } from "../utils/impSVGNumber";
 import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
-
-/** @typedef {import("./componentInstance")} ComponentInstance */
+import { CircuitikzComponent } from "./CircuitComponent";
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 
-type TikZAnchor = {
+export type TikZAnchor = {
 	name?: string;
 	x: SVG.Number;
 	y: SVG.Number;
@@ -33,7 +32,6 @@ type SymbolBaseInformation = {
 
 /**
  * Representation of a symbol. This class has sub classes describing path- and node-style symbols.
- * @class
  */
 export class ComponentSymbol extends SVG.Symbol {
 	svgMetadataElement: SVGMetadataElement | null;
@@ -44,11 +42,12 @@ export class ComponentSymbol extends SVG.Symbol {
 
 	relMid: SVG.Point;
 	viewBox: SVG.Box | null;
+	isNodeSymbol:boolean;
 
 	_tikzOptions: Map<string, string | null>;
 	_pins: TikZAnchor[] = [];
 	_additionalAnchors: TikZAnchor[] = [];
-	_textPosition: SVG.Point = null;
+	_textPosition: TikZAnchor |null = null;
 	_defaultAnchor: TikZAnchor | null = null;
 
 	/**
@@ -66,6 +65,8 @@ export class ComponentSymbol extends SVG.Symbol {
 		if (!baseInformation) baseInformation = ComponentSymbol.getBaseInformation(symbolElement);
 		if (!baseInformation.svgMetadataElement || !baseInformation.displayName || !baseInformation.tikzName)
 			throw new Error("Missing metadata for creating the component");
+
+		this.isNodeSymbol = baseInformation.isNode
 
 		this.svgMetadataElement = baseInformation.svgMetadataElement;
 		this.displayName = baseInformation.displayName;
@@ -102,10 +103,9 @@ export class ComponentSymbol extends SVG.Symbol {
 			: [];
 		this._additionalAnchors = additionalAnchorArray.map(this.#parseAnchor, this);
 
-		let textPosition =
-			baseInformation.componentInformation &&
-			getNamedTag(baseInformation.componentInformation, "textPosition", METADATA_NAMESPACE_URI);
-		this._textPosition = textPosition ? this.#parseAnchor(textPosition).point : this._defaultAnchor.point;
+		this._textPosition = this._additionalAnchors.find((tikzanchor)=>{
+			tikzanchor.name=="textPosition"
+		})??this._defaultAnchor;
 	}
 
 	/**
@@ -196,8 +196,10 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 * @returns {ComponentInstance} the new instance
 	 */
-	addInstanceToContainer(container: SVG.Container, event: MouseEvent, finishedPlacingCallback: () => void): ComponentInstance {
-		throw new Error("Not implemented; use subclasses");
+	addInstanceToContainer(container: SVG.Container, event: MouseEvent, finishedPlacingCallback: () => void): CircuitikzComponent {
+		if (this.svgMetadataElement.isnod) {
+			throw new Error("Not implemented; use subclasses");
+		}
 	}
 
 	/**

@@ -3,13 +3,21 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
+import { CanvasController } from "../internal";
 
 /**
  * Realizes an in canvas cursor. Can be used to visualize the point to snap to.
  * @class
  */
 export class SnapCursorController {
-	static #instance: SnapCursorController | null;
+	private static _instance: SnapCursorController;
+	public static get instance(): SnapCursorController {
+		if (!SnapCursorController._instance) {
+			SnapCursorController._instance = new SnapCursorController()
+		}
+		return SnapCursorController._instance;
+	}
+
 	#cursorViewBox: SVG.Box;
 	cursor: SVG.Use;
 
@@ -18,9 +26,7 @@ export class SnapCursorController {
 	 *
 	 * @param {SVG.Container} container
 	 */
-	constructor(container: SVG.Container) {
-		SnapCursorController.#instance = this;
-
+	private constructor() {
 		const cursorSymbol = new SVG.Symbol(document.getElementById("snapCursor"));
 		this.cursor = new SVG.Use();
 		this.cursor.id("snapCursorUse")
@@ -28,17 +34,8 @@ export class SnapCursorController {
 		this.#cursorViewBox = cursorSymbol.viewbox();
 		this.cursor.width(this.#cursorViewBox.width);
 		this.cursor.height(this.#cursorViewBox.height);
-		container.add(this.cursor);
+		CanvasController.instance.canvas.add(this.cursor);
 		this.cursor.hide();
-	}
-
-	/**
-	 * Returns the instance
-	 *
-	 * @returns {SnapCursorController}
-	 */
-	static get controller(): SnapCursorController {
-		return SnapCursorController.#instance;
 	}
 
 	/**

@@ -7,45 +7,35 @@ import "@svgdotjs/svg.draggable.js";
 
 import {SnapController, NodeComponentInstance, SelectionController, Undo, MainController} from "../internal";
 
-/**
- * @typedef {object} DragHandler
- * @property {SVG.Shape} el
- * @property {SVG.Box} box
- * @property {SVG.Point} lastClick
- *
- * @property {function(Event): void} drag
- * @property {function(Event): void} startDrag
- * @property {function(Event): void} endDrag
- * @property {function (number, number): SVG.Element} move
- */
+type DragHandler = {
+	el: SVG.Element;
+	box: SVG.Box;
+	lastClick: SVG.Point;
+	drag(event:Event): void;
+	startDrag(event:Event): void;
+	endDrag(event:Event): void;
+	move(x:number, y:number): SVG.Element;
+	init(enabled:boolean):void
+}
 
-/**
- * @typedef {object} DragMoveEventDetail
- * @property {SVG.Box} box
- * @property {MouseEvent|TouchEvent} event
- * @property {DragHandler} handler - the instance of the svg.draggable.js handler
- * @see CustomEvent
- */
+type DragMoveEventDetail = {
+	box:SVG.Box
+	event: MouseEvent|TouchEvent
+	handler: DragHandler
+}
 
-/**
- * @typedef {CustomEvent<DragMoveEventDetail>} DragEvent
- */
+type DragEvent = CustomEvent<DragMoveEventDetail>;
 
 /**
  * Handler/controller enabling components to be draggable and snap to the grid and to other components.
  * @class
  */
 export class NodeDragHandler {
-	/** @type {NodeComponentInstance} */
 	element: NodeComponentInstance;
-
-	/** @type {DragHandler} */
 	#dragHandler: DragHandler;
 
-	/** @type {boolean} */
-	#isTemporaryDisabled: boolean = false;
-	/** @type {boolean} */
-	#maybeContextmenu: boolean = false; // fixes contextmenu action on touchscreens
+	#isTemporaryDisabled = false;
+	#maybeContextmenu = false; // fixes contextmenu action on touchscreens
 
 	#startedDragging = false
 	#didDrag = false
@@ -59,7 +49,7 @@ export class NodeDragHandler {
 	 * @param {SVG.Element} element - the element to enable snap-dragging
 	 * @param {function(boolean): void} element.draggable
 	 */
-	constructor(element: SVG.Element) {
+	constructor(element: NodeComponentInstance) {
 		this.element = element;
 		this.element.remember("_snapDragHandler", this);
 		this.element.draggable(true);
@@ -79,9 +69,8 @@ export class NodeDragHandler {
 	 * @param {boolean} [enable] - `true` --> activate, `false` --> deactivate, `undefined` --> query
 	 * @returns {NodeDragHandler|null} the handler, if activated
 	 */
-	static snapDrag(element: SVG.Element, enable: boolean): NodeDragHandler | null {
+	static snapDrag(element: NodeComponentInstance, enable: boolean): NodeDragHandler | null {
 		
-		/** @type {NodeDragHandler|null} */
 		let snapDragHandler: NodeDragHandler | null = element.remember("_snapDragHandler") ?? (enable ? new NodeDragHandler(element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
@@ -166,10 +155,10 @@ export class NodeDragHandler {
 				? this.element.relSnappingPoints
 				: [new SVG.Point(0, 0)];
 
-		let componentInSelection = SelectionController.controller.currentlySelectedComponents.includes(this.element)
+		let componentInSelection = SelectionController.instance.currentlySelectedComponents.includes(this.element)
 		if (componentInSelection) {
 			const componentAnchor = this.element.getAnchorPoint()
-			for (const component of SelectionController.controller.currentlySelectedComponents) {
+			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				if(component!=this.element){
 					for (const snappingPoint of component.snappingPoints) {
 						snapPoints.push(snappingPoint.relToComponentAnchor().plus(component.getAnchorPoint()).minus(componentAnchor))
@@ -177,7 +166,7 @@ export class NodeDragHandler {
 				}
 			}
 	
-			for (const line of SelectionController.controller.currentlySelectedLines) {
+			for (const line of SelectionController.instance.currentlySelectedLines) {
 				for(const endPoint of line.getEndPoints()){
 					snapPoints.push(endPoint.minus(componentAnchor))
 				}
@@ -186,11 +175,11 @@ export class NodeDragHandler {
 
 		let destination = event.detail.event?.shiftKey
 			? draggedPoint
-			: SnapController.controller.snapPoint(draggedPoint, snapPoints);
+			: SnapController.instance.snapPoint(draggedPoint, snapPoints);
 
 		if (componentInSelection){
-			SelectionController.controller.moveSelectionRel(destination.minus(this.element.getAnchorPoint()))
-			for (const element of SelectionController.controller.currentlySelectedComponents) {
+			SelectionController.instance.moveSelectionRel(destination.minus(this.element.getAnchorPoint()))
+			for (const element of SelectionController.instance.currentlySelectedComponents) {
 				if (element instanceof NodeComponentInstance) {
 					element.recalculateSnappingPoints()
 				}
@@ -214,7 +203,7 @@ export class NodeDragHandler {
 			let ctrlCommand = event.detail.event.ctrlKey||(MainController.controller.isMac&&event.detail.event.metaKey)
 			let selectionMode = event.detail.event.shiftKey?SelectionController.SelectionMode.ADD:ctrlCommand?SelectionController.SelectionMode.SUB:SelectionController.SelectionMode.RESET;
 
-			SelectionController.controller.selectComponents([this.element], selectionMode)
+			SelectionController.instance.selectComponents([this.element], selectionMode)
 			trackState = false;			
 		}
 

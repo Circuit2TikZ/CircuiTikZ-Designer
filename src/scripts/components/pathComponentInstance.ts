@@ -13,65 +13,44 @@ const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
  * @implements {import("./componentInstance").ComponentInstance}
  */
 export class PathComponentInstance extends SVG.G {
-	/** @type {PathComponentSymbol} */
-	symbol;
-	/** @type {SVG.Use} */
-	symbolUse;
+	symbol: PathComponentSymbol;
+	symbolUse: SVG.Use;
+	container: SVG.Container
 
-	/** @type {string} */
-	tikzName = ""
+	tikzName: string = ""
 
-	/** @type {string} */
-	#label = ""
-	/** @type {SVG.Element} */
-	#labelSVG
+	#label: string = ""
+	#labelSVG: SVG.Element
 
-	/** @type {boolean} */
-	static #hasMouse = matchMedia("(pointer:fine)").matches;
+	static #hasMouse: boolean = matchMedia("(pointer:fine)").matches;
 
-	/** @type {SVG.PointArray} */
-	#prePointArray;
-	/** @type {SVG.PointArray} */
-	#postPointArray;
-	/** @type {SVG.Line} */
-	#preLine;
-	/** @type {SVG.Line} */
-	#postLine;
-	/** @type {0|1|2} */
-	#pointsSet = 0;
+	#prePointArray: SVG.PointArray;
+	#postPointArray: SVG.PointArray;
+	#preLine: SVG.Line;
+	#postLine: SVG.Line;
+	#pointsSet: 0 | 1 | 2 = 0;
 
-	/** @type {SVG.Point} */
-	#midAbs;
-	/** @type {SVG.Point} */
-	relMid;
-	/** @type {number} */
-	#rotationAngle;
-	/** @type {SnapPoint[]} */
-	snappingPoints;
-	/** @type {SVG.Point[]} */
-	relSnappingPoints = [];
+	#midAbs: SVG.Point;
+	relMid: SVG.Point;
+	#rotationAngle: number;
+	snappingPoints: SnapPoint[];
+	relSnappingPoints: SVG.Point[] = [];
 
-	/**@type {boolean} */
-	#mirror = false;
-	/**@type {boolean} */
-	#invert = false;
+	#mirror: boolean = false;
+	#invert: boolean = false;
 
-	/**
-	 * @type {?SVG.Rect}
-	 */
-	#selectionRectangle = null;
+	#selectionRectangle: SVG.Rect | null = null;
 
-	/** @type {NodeDragHandler} */
-	#snapDragHandler;
+	#snapDragHandler: NodeDragHandler;
 
 	circleRadius = 20
-	startCircle;
-	endCircle;
+	startCircle:SVG.Circle;
+	endCircle:SVG.Circle;
 
 	/**
 	 * @type {function():void}
 	 */
-	#finishedPlacingCallback  = ()=>{};
+	#finishedPlacingCallback: () => void  = (): void=>{};
 
 	/**
 	 * Add a instance of an (path) symbol to an container.
@@ -80,7 +59,7 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {SVG.Container} container - the container/canvas to add the symbol to
  	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	constructor(symbol, container, finishedPlacingCallback) {
+	constructor(symbol: PathComponentSymbol, container: SVG.Container, finishedPlacingCallback: () => void) {
 		super();
 		this.hide(); // is shown AFTER first click/touch
 		this.#finishedPlacingCallback = finishedPlacingCallback;
@@ -106,20 +85,20 @@ export class PathComponentInstance extends SVG.G {
 		this.#preLine = this.line(this.#prePointArray);
 		this.#preLine.attr({
 			fill: "none",
-			stroke: MainController.controller.darkMode?"#fff":"#000",
+			stroke: MainController.instance.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
 		this.#postLine = this.line(this.#postPointArray);
 		this.#postLine.attr({
 			fill: "none",
-			stroke: MainController.controller.darkMode?"#fff":"#000",
+			stroke: MainController.instance.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
 
 		this.container.node.classList.add("selectPoint");
-		SnapCursorController.controller.visible = PathComponentInstance.#hasMouse;
+		SnapCursorController.instance.visible = PathComponentInstance.#hasMouse;
 		SnapController.controller.showSnapPoints();
-		CanvasController.controller.deactivatePanning();
+		CanvasController.instance.deactivatePanning();
 		this.container.on(["mousemove", "touchmove"], this.#moveListener, this);
 		this.container.on(["click", "touchstart", "touchend"], this.#clickListener, this);
 		this.cancelPlacement = this.cancelPlacement.bind(this);
@@ -151,7 +130,7 @@ export class PathComponentInstance extends SVG.G {
 	 * 
 	 * @param {boolean} drag if the component should be draggable or not
 	 */
-	setDraggable(drag){
+	setDraggable(drag: boolean){
 		this.startCircle.draggable(drag)
 		this.endCircle.draggable(drag)
 		if (drag) {
@@ -174,8 +153,8 @@ export class PathComponentInstance extends SVG.G {
 
 	updateTheme(){
 		if (!this.#selectionRectangle) {
-			this.#preLine.stroke(MainController.controller.darkMode?"#fff":"#000")
-			this.#postLine.stroke(MainController.controller.darkMode?"#fff":"#000")
+			this.#preLine.stroke(MainController.instance.darkMode?"#fff":"#000")
+			this.#postLine.stroke(MainController.instance.darkMode?"#fff":"#000")
 		}
 	}
 
@@ -183,10 +162,10 @@ export class PathComponentInstance extends SVG.G {
 	 * Provide all information necessary to build a properties panel for this component
 	 * @returns {FormEntry[]}
 	 */
-	getFormEntries(){
+	getFormEntries(): FormEntry[]{
 		let formEntries = []
 
-		let nameCallback = (/** @type {string}*/name, /** @type {function(str):void}*/ errMsgCallback)=>{
+		let nameCallback = (/** @type {string}*/name: string, /** @type {function(str):void}*/ errMsgCallback: (arg0: str) => void)=>{
 			if (name==="") {
 				this.tikzName = name
 				errMsgCallback("")
@@ -280,11 +259,10 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {string} label 
 	 * @returns {Promise}
 	 */
-	async #generateLabelRender(label){
+	async #generateLabelRender(label: string): Promise<any>{
 		MathJax.texReset();
-		return MathJax.tex2svgPromise(label).then((/**@type {Element} */ node) =>{
-			/**@type {SVG.Container} */
-			let svgElement = node.querySelector("svg")
+		return MathJax.tex2svgPromise(label).then((/**@type {Element} */ node: Element) =>{
+			let svgElement: SVGSVGElement = node.querySelector("svg")
 			// slight padding of the label text
 			let padding_ex = 0.2
 			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
@@ -398,7 +376,7 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {MouseEvent} [_event] - an optional (mouse/touch) event, which caused the element to be added
 	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
 	 */
-	static createInstance(symbol, container, _event, finishedPlacingCallback) {
+	static createInstance(symbol: PathComponentSymbol, container: SVG.Container, _event: MouseEvent, finishedPlacingCallback: () => void) {
 		return new PathComponentInstance(symbol, container, finishedPlacingCallback);
 	}
 
@@ -489,10 +467,10 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {object} serialized - the saved instance
 	 * @returns {PathComponentInstance} the deserialized instance
 	 */
-	static fromJson(serialized) {
+	static fromJson(serialized: object): PathComponentInstance {
 		let symbol = MainController.controller.symbols.find((value,index,symbols)=>value.node.id==serialized.id)
 		/**@type {PathComponentInstance} */
-		let pathComponent = symbol.addInstanceToContainer(CanvasController.controller.canvas,null,()=>{})
+		let pathComponent: PathComponentInstance = symbol.addInstanceToContainer(CanvasController.instance.canvas,null,()=>{})
 		pathComponent.firstClick(new SVG.Point(serialized.start))
 		pathComponent.#mirror = serialized.mirror
 		pathComponent.#invert = serialized.invert
@@ -510,7 +488,7 @@ export class PathComponentInstance extends SVG.G {
 			pathComponent.tikzName = ""
 		}
 
-		MainController.controller.addInstance(pathComponent);
+		MainController.controller.addComponent(pathComponent);
 		return pathComponent
 	}
 
@@ -519,7 +497,7 @@ export class PathComponentInstance extends SVG.G {
 	 *
 	 * @returns {object} the serialized instance
 	 */
-	toJson() {
+	toJson(): object {
 		//TODO add additional options!?
 		let data = {
 			type:"path",
@@ -544,7 +522,7 @@ export class PathComponentInstance extends SVG.G {
 	 * Stringifies the component in TikZ syntax.
 	 * @returns {string}
 	 */
-	toTikzString() {
+	toTikzString(): string {
 		return (
 			"\\draw " +
 			this.snappingPoints[0].toTikzString() +
@@ -565,7 +543,7 @@ export class PathComponentInstance extends SVG.G {
 	 *
 	 * @returns {this}
 	 */
-	remove() {
+	remove(): this {
 		NodeDragHandler.snapDrag(this,false)
 		PathDragHandler.snapDrag(this,false)
 		PathDragHandler.snapDrag(this,false)
@@ -580,7 +558,7 @@ export class PathComponentInstance extends SVG.G {
 	 * Listener for the first and second click/touch. Used for initial adding of the component.
 	 * @param {MouseEvent|TouchEvent} event
 	 */
-	#clickListener(event) {
+	#clickListener(event: MouseEvent | TouchEvent) {
 		if (!this) {
 			// the component has already been deleted
 			return;
@@ -593,7 +571,7 @@ export class PathComponentInstance extends SVG.G {
 		event.touches[0].identifier === event.changedTouches[0].identifier;
 		if (isTouchEvent && !isTouchStart && !isTouchEnd) return; // invalid; maybe more then one finger on screen
 		
-		const snappedPoint = CanvasController.controller.pointerEventToPoint(event);
+		const snappedPoint = CanvasController.eventToPoint(event);
 		
 		if (this.#pointsSet===0 && (!isTouchEvent || isTouchStart)) {
 			// first click / touch
@@ -605,7 +583,7 @@ export class PathComponentInstance extends SVG.G {
 		}
 	}
 
-	cancelPlacement(/**@type {KeyboardEvent} */event){
+	cancelPlacement(/**@type {KeyboardEvent} */event: KeyboardEvent){
 		if (this.#pointsSet<2 && event.key=="Escape") {
 			let point = new SVG.Point();
 			if (this.#pointsSet===0) {
@@ -624,7 +602,7 @@ export class PathComponentInstance extends SVG.G {
 			this.#prePointArray[0][1] = snappedPoint.y;
 			this.#pointsSet = 1;
 			this.show();
-			SnapCursorController.controller.visible = false;
+			SnapCursorController.instance.visible = false;
 		}
 	}
 	
@@ -636,10 +614,10 @@ export class PathComponentInstance extends SVG.G {
 			document.removeEventListener("keydown", this.cancelPlacement)
 			this.container.node.classList.remove("selectPoint");
 			this.#pointsSet = 2;
-			CanvasController.controller.placingComponent=null;
+			CanvasController.instance.placingComponent=null;
 			this.#recalcPointsEnd(snappedPoint);
 			
-			CanvasController.controller.activatePanning();
+			CanvasController.instance.activatePanning();
 			SnapController.controller.hideSnapPoints();
 			this.setDraggable(true)
 
@@ -666,8 +644,8 @@ export class PathComponentInstance extends SVG.G {
 	 * Redraw the component on mouse move. Used for initial adding of the component.
 	 * @param {MouseEvent|TouchEvent} event
 	 */
-	#moveListener(event) {
-		const snappedPoint = CanvasController.controller.pointerEventToPoint(event);
+	#moveListener(event: MouseEvent | TouchEvent) {
+		const snappedPoint = CanvasController.eventToPoint(event);
 		this.moveTo(snappedPoint)
 	}
 
@@ -677,7 +655,7 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {SVG.Point} delta - the relative movement
 	 * @returns {ComponentInstance}
 	 */
-	moveRel(delta){
+	moveRel(delta: SVG.Point): ComponentInstance{
 		this.moveTo(this.#midAbs.plus(delta))
 	}
 
@@ -687,9 +665,9 @@ export class PathComponentInstance extends SVG.G {
 	 * @param {SVG.Point} position - the new anchor position
 	 * @returns {PathComponentInstance}
 	 */
-	moveTo(position){
+	moveTo(position: SVG.Point): PathComponentInstance{
 		if (this.#pointsSet === 0 && PathComponentInstance.#hasMouse) {
-			SnapCursorController.controller.moveTo(position);
+			SnapCursorController.instance.moveTo(position);
 		} else if (this.#pointsSet === 1) {
 			this.#recalcPointsEnd(position);
 		} else{
@@ -717,13 +695,14 @@ export class PathComponentInstance extends SVG.G {
 
 		// recalculate other points
 		this.#recalcPointsEnd(endPoint);
+		return this
 	}
 
 	flip(horizontal){
 		let direction = horizontal?1:0
 
 		// every flip makes the mirroring change state
-		this.#mirror ^= true
+		this.#mirror = !this.#mirror
 		
 		let start = this.getStartPoint()
 		let end = this.getEndPoint()
@@ -733,13 +712,14 @@ export class PathComponentInstance extends SVG.G {
 		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
 
 		this.#recalcPointsEnd(new SVG.Point(this.#postPointArray[1][0],this.#postPointArray[1][1]))
+		return this
 	}
 
 	/**
 	 * 
 	 * @param {SVG.Point} position 
 	 */
-	moveStartTo(position){
+	moveStartTo(position: SVG.Point){
 		this.#prePointArray[0][0] = position.x
 		this.#prePointArray[0][1] = position.y
 
@@ -750,7 +730,7 @@ export class PathComponentInstance extends SVG.G {
 	 * 
 	 * @param {SVG.Point} position 
 	 */
-	moveEndTo(position){
+	moveEndTo(position: SVG.Point){
 		this.#recalcPointsEnd(position)
 	}
 
@@ -758,7 +738,7 @@ export class PathComponentInstance extends SVG.G {
 	 * Recalculates the points after an movement
 	 * @param {SVG.Point} endPoint
 	 */
-	#recalcPointsEnd(endPoint) {
+	#recalcPointsEnd(endPoint: SVG.Point) {
 		this.#postPointArray[1][0] = endPoint.x;
 		this.#postPointArray[1][1] = endPoint.y;
 
