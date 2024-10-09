@@ -121,17 +121,23 @@ declare module "@svgdotjs/svg.js" {
 		/**
 		 * Subtracts another svg point.
 		 * Returns a new instance.
-		 * @param other - the subtrahend
-		 * @returns the result
 		 */
-		minus(other: Point): Point;
+		sub(other: Point): Point;
 		/**
 		 * Calculates the sum of this and another svg point.
 		 * Returns a new instance.
-		 * @param other - the other summand
-		 * @returns the result
 		 */
-		plus(other: Point): Point;
+		add(other: Point): Point;
+		/**
+		 * Calculates the multiplication of this point and another svg point or number (elementwise).
+		 * Returns a new instance.
+		 */
+		mul(other: Point|number): Point;
+		/**
+		 * Calculates the division of this point by a number.
+		 * Returns a new instance.
+		 */
+		div(other: number): Point;
 		/**
 		 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
 		 * rotation.
@@ -492,7 +498,7 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the subtrahend
 	 * @returns {SVG.Point} the result
 	 */
-	minus(other: SVG.Point): SVG.Point {
+	sub(other: SVG.Point): SVG.Point {
 		return new SVG.Point(this.x - other.x, this.y - other.y);
 	},
 
@@ -504,8 +510,26 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point} other - the other summand
 	 * @returns {SVG.Point} the result
 	 */
-	plus(other: SVG.Point): SVG.Point {
+	add(other: SVG.Point): SVG.Point {
 		return new SVG.Point(this.x + other.x, this.y + other.y);
+	},
+	/**
+	 * Calculates the multiplication of this point and another svg point or number (elementwise).
+	 * Returns a new instance.
+	 */
+	mul(other: SVG.Point|number): SVG.Point {
+		if (other instanceof SVG.Point) {
+			return new SVG.Point(this.x * other.x, this.y * other.y);
+		}else{
+			return new SVG.Point(this.x * other, this.y * other);
+		}
+	},
+	/**
+	 * Calculates the division of this point by a number.
+	 * Returns a new instance.
+	 */
+	div(other: number): SVG.Point {
+		return new SVG.Point(this.x / other, this.y / other);
 	},
 
 	/**
@@ -519,7 +543,7 @@ SVG.extend(SVG.Point, {
 	 * @returns {SVG.Point} the result
 	 */
 	rotate(angle: number, centerCoord: SVG.Point, inRad: boolean = false): SVG.Point {
-		let result = centerCoord ? this.minus(centerCoord) : this.clone();
+		let result = centerCoord ? this.sub(centerCoord) : this.clone();
 
 		const oldX = result.x;
 		const oldY = result.y;

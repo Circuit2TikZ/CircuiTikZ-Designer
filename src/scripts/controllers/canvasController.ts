@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, ComponentInstance, Undo, CircuitComponent, SnapPoint } from "../internal";
+import { SnapController, Undo, SnapPoint } from "../internal";
 
 type PanningEventDetail = {
 	box:SVG.Box
@@ -29,50 +29,50 @@ export class CanvasController {
 	/**
 	 * Static variable holding the instance.
 	 */
-	static instance: CanvasController;
+	public static instance: CanvasController;
 	/**
 	 * The (root) SVG Element. All lines and components are children of this element.
 	 */
-	canvas: SVG.Svg;
+	public canvas: SVG.Svg;
 	/**
 	 * The background (grid)
 	 */
-	paper: SVG.Rect;
+	public paper: SVG.Rect;
 	/**
 	 * The line marking the x axis
 	 */
-	xAxis: SVG.Line;
+	public xAxis: SVG.Line;
 	/**
 	 * The line marking the y axis
 	 */
-	yAxis: SVG.Line;
+	public yAxis: SVG.Line;
 
 
 	/** Distance between major grid lines
 	 */
-	majorGridSizecm = 1;
+	public majorGridSizecm = 1;
 	/** How many minor grid lines are drawn for every major grid line
 	 */
-	majorGridSubdivisions = 4;
-	gridVisible = true
+	public majorGridSubdivisions = 4;
+	public gridVisible = true
 
 	/**
 	 * Needed for window size changes to reconstruct the old zoom level.
 	 */
-	#canvasBounds: DOMRect | null = null;
+	private canvasBounds: DOMRect | null = null;
 
-	#invScreenCTM: SVG.Matrix | null = null;
+	private invScreenCTM: SVG.Matrix | null = null;
 
 	/** zoom parameters; small zoomFactor for more granular control
 	 */
-	zoomFactor = 0.1;
-	zoomMin = 0.25;
-	zoomMax = 10;
+	private zoomFactor = 0.1;
+	private zoomMin = 0.25;
+	private zoomMax = 10;
 
 	/**
-	 * the last snapped to point on the canvas
+	 * the last point on the canvas
 	 */
-	lastCanvasPoint = new SVG.Point(0,0)
+	public lastCanvasPoint = new SVG.Point(0,0)
 
 	/**
 	 * Create the canvas controller.
@@ -90,45 +90,37 @@ export class CanvasController {
 		this.yAxis = SVG.SVG("#yAxis") as SVG.Line;	
 
 		// init viewBox
-		this.#onResizeCanvas();
+		this.onResizeCanvas();
 
 		// observe page size change
-		new ResizeObserver(this.#onResizeCanvas.bind(this)).observe(this.canvas.node);
+		new ResizeObserver(this.onResizeCanvas.bind(this)).observe(this.canvas.node);
 
 		// init pan & zoom
 		this.activatePanning();
 
 		// Drag picture with mouse
-		canvas.on("panning", this.#movePaper, this, { passive: false });
+		canvas.on("panning", this.movePaper, this, { passive: false });
 
 		// Mouse wheel OR pinch zoom
 		// Wheel zoom is fired before the actual change and has no detail.box and is thus ignored. It will be handled by wheel.panZoom.
-		canvas.on("zoom", this.#movePaper, this, { passive: true });
+		canvas.on("zoom", this.movePaper, this, { passive: true });
 
-		canvas.on(["mousemove","touchmove"],(/**@type {MouseEvent}*/evt: MouseEvent)=>{
-			this.lastCanvasPoint = CanvasController.eventToPoint(evt);
+		canvas.on("mousemove",(evt: MouseEvent)=>{
+			this.lastCanvasPoint = CanvasController.eventToPoint(evt,false);
 		})
-
-		// Modify point, viewbox and zoom functions to cache the inverse screen CTM (document -> viewport coords)
-		/**
-		 * @param {number|SVG.Point|[number, number]|{ x: number, y: number }} [x]
-		 * @param {number} [y]
-		 * @returns {SVG.Point}
-		 */
-		this.canvas.point = (x: number | SVG.Point | [number, number] | { x: number; y: number; }, y: number): SVG.Point => {
-			if (!this.#invScreenCTM) this.#invScreenCTM = this.canvas.screenCTM().inverseO();
-			return new SVG.Point(x, y).transformO(this.#invScreenCTM);
-		};
+		canvas.on("touchmove",(evt: TouchEvent)=>{
+			this.lastCanvasPoint = CanvasController.eventToPoint(evt,false);
+		})
 
 		const oldViewBoxFunction = this.canvas.viewbox;
 		this.canvas.viewbox = (...args) => {
-			if (arguments.length > 0) this.#invScreenCTM = null;
+			if (arguments.length > 0) this.invScreenCTM = null;
 			return oldViewBoxFunction.apply(this.canvas, args);
 		};
 
 		const oldZoomFunction = this.canvas.zoom;
 		this.canvas.zoom = (...args) => {
-			if (arguments.length > 0) this.#invScreenCTM = null;
+			if (arguments.length > 0) this.invScreenCTM = null;
 			return oldZoomFunction.apply(this.canvas, args);
 		};
 				
@@ -174,11 +166,11 @@ export class CanvasController {
 			}else{
 				this.paper.addClass("d-none")
 			}
-			this.#saveSettings()
+			this.saveSettings()
 		})
 	}
 
-	#saveSettings(){
+	private saveSettings(){
 		localStorage.setItem("circuit2tikz-designer-grid",JSON.stringify({
 			majorGridSizecm:this.majorGridSizecm,
 			majorGridSubdivisions:this.majorGridSubdivisions,
@@ -190,7 +182,7 @@ export class CanvasController {
 	 * 
 	 * @param {SVG.Element} component 
 	 */
-	bringComponentToFront(component: SVG.Element){
+	public bringComponentToFront(component: SVG.Element){
 		let index = this.canvas.children().findIndex(c=>c===component);
 		this.canvas.put(component)
 		if (index!==this.canvas.children().findIndex(c=>c===component)) {
@@ -202,7 +194,7 @@ export class CanvasController {
 	 * 
 	 * @param {SVG.Element} component 
 	 */
-	moveComponentToBack(component: SVG.Element){
+	public moveComponentToBack(component: SVG.Element){
 		let index = this.canvas.children().findIndex(c=>c===component);
 		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
 		// this is super weird??
@@ -218,9 +210,9 @@ export class CanvasController {
 	 *
 	 * Removes listeners from the canvas.
 	 */
-	deactivatePanning() {
+	public deactivatePanning() {
 		// this listener must be inserted after the normal panZoom listeners --> unregister first
-		this.canvas.off("wheel.panZoom", this.#movePaper);
+		this.canvas.off("wheel.panZoom", this.movePaper);
 		// re-init pan & zoom
 		this.canvas.panZoom({
 			panning: false, // still enabled for two finger & wheel zoom panning
@@ -236,7 +228,7 @@ export class CanvasController {
 		// Listens for same event as svg.panzoom.js, but is added thereafter. Thus this gets called after panzoom is
 		// done moving the picture.
 		// @param {WheelEvent} evt
-		this.canvas.on("wheel.panZoom", this.#movePaper, this, { passive: true });
+		this.canvas.on("wheel.panZoom", this.movePaper, this, { passive: true });
 	}
 
 	/**
@@ -245,9 +237,9 @@ export class CanvasController {
 	 *
 	 * Adds listeners to the canvas.
 	 */
-	activatePanning() {
+	public activatePanning() {
 		// this listener must be inserted after the normal panZoom listeners --> unregister first
-		this.canvas.off("wheel.panZoom", this.#movePaper);
+		this.canvas.off("wheel.panZoom", this.movePaper);
 		// init pan & zoom
 		this.canvas.panZoom({
 			panning: true,
@@ -263,7 +255,7 @@ export class CanvasController {
 		// Listens for same event as svg.panzoom.js, but is added thereafter. Thus this gets called after panzoom is
 		// done moving the picture.
 		// @param {WheelEvent} evt
-		this.canvas.on("wheel.panZoom", this.#movePaper, this, { passive: true });
+		this.canvas.on("wheel.panZoom", this.movePaper, this, { passive: true });
 	}
 
 	/**
@@ -273,23 +265,22 @@ export class CanvasController {
 	 * @param {boolean} snap if the pointer should check if snapping should be done
 	 * @returns {SVG.Point}
 	 */
-	static eventToPoint(event: PointerEvent | MouseEvent | TouchEvent, snap: boolean = true): SVG.Point {
+	public static eventToPoint(event: PointerEvent | MouseEvent | TouchEvent, snap: boolean = true): SVG.Point {
 		//                touchstart/-move             touchend             mouse*
 		//               /----------------\    /-----------------------\    /---\
 		// clientXY = event.touches?.[0] ?? event.changedTouches?.[0] ?? event;
-		let clientXY: number[] = []
+		let clientXY: SVG.Point
 		if (event instanceof TouchEvent) {
 			let touch = event.touches.item(0) ?? event.changedTouches.item(0)
-			clientXY = [touch.clientX, touch.clientY]
+			clientXY = new SVG.Point(touch.clientX, touch.clientY)
 		} else {
-			clientXY = [event.clientX, event.clientY]
+			clientXY = new SVG.Point(event.clientX, event.clientY)
 		}
-		let pt = CanvasController.instance.canvas.point(clientXY[0], clientXY[1]);
-		let shift = false
-		if (event instanceof MouseEvent) {
-			shift = event.shiftKey
+		if (!CanvasController.instance.invScreenCTM) {
+			CanvasController.instance.invScreenCTM = CanvasController.instance.canvas.screenCTM().inverseO()
 		}
-		return shift || !snap
+		let pt = new SVG.Point(clientXY.x, clientXY.y).transformO(CanvasController.instance.invScreenCTM)
+		return event instanceof MouseEvent&&event.shiftKey || !snap
 				? pt
 				: SnapController.instance.snapPoint(pt, [pt as SnapPoint]);
 	}
@@ -299,7 +290,7 @@ export class CanvasController {
 	 * @param {number} majorSizecm the distance between two major grid lines in cm
 	 * @param {int} majorSubdivisions how many minor grid lines are drawn per major grid line (>=1)
 	 */
-	changeGrid(majorSizecm: number, majorSubdivisions: int){
+	public changeGrid(majorSizecm: number, majorSubdivisions: number){
 		this.majorGridSubdivisions = majorSubdivisions;
 		this.majorGridSizecm = majorSizecm;
 		let minorGridDistance = majorSizecm/majorSubdivisions;
@@ -322,7 +313,7 @@ export class CanvasController {
 		majorGrid.children[0]?.setAttribute("height",majorDistanceNum);
 		majorGrid.children[1]?.setAttribute("d",`M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`);
 
-		this.#saveSettings()
+		this.saveSettings()
 	}
 
 	/**
@@ -330,18 +321,18 @@ export class CanvasController {
 	 *
 	 * Corrects the canvas viewBox. Also calls `#movePaper` to fix the axis.
 	 */
-	#onResizeCanvas() {
+	private onResizeCanvas() {
 		const newCanvasBounds = this.canvas.node.getBoundingClientRect();
 		/** @type {SVG.Box} */
-		const oldViewbox: SVG.Box = this.canvas.viewbox() || { x: 0, y: 0 };
-		const zoom = !this.#canvasBounds
+		const oldViewbox: SVG.Box = this.canvas.viewbox() || new SVG.Box();
+		const zoom = !this.canvasBounds
 			? 1
 			: Math.max(
 					0.25,
 					Math.min(
 						10,
-						this.#canvasBounds.width / oldViewbox.width,
-						this.#canvasBounds.height / oldViewbox.height
+						this.canvasBounds.width / oldViewbox.width,
+						this.canvasBounds.height / oldViewbox.height
 					)
 				);
 
@@ -352,21 +343,23 @@ export class CanvasController {
 			newCanvasBounds.height / zoom
 		);
 		this.canvas.viewbox(newViewbox);
-		this.#movePaper(newViewbox); // fixes axis
 
-		this.#canvasBounds = newCanvasBounds;
+		let customEvent = new CustomEvent<PanningEventDetail>("",{
+			detail: {
+				box:newViewbox,
+				event:null
+			}
+		})
+		this.movePaper(customEvent); // fixes axis
+
+		this.canvasBounds = newCanvasBounds;
 	}
 
 	/**
 	 * Move paper/grid and axis on zoom/pan.
-	 *
-	 * @param {CustomEvent<PanningEventDetail|WheelZoomEventDetail|PinchZoomEventDetail>|SVG.Box} [evt] - the event of svg.panzoom.js or an box if called manually
 	 */
-	#movePaper(evt: CustomEvent<PanningEventDetail | WheelZoomEventDetail | PinchZoomEventDetail>|SVG.Box) {
-		/** @type {SVG.Box} */
-		if (evt?.detail && ! evt.detail.box) return; // is wheel zoom --> fired before actual zoom
-		const box = evt?.detail?.box ?? (evt && typeof evt.x2 === "number" ? evt : this.canvas.viewbox());
-
+	private movePaper(evt: CustomEvent<PanningEventDetail> | CustomEvent<WheelZoomEventDetail> | CustomEvent<PinchZoomEventDetail>) {
+		let box: SVG.Box = this.canvas.viewbox()
 		this.paper.move(box.x, box.y);
 		this.xAxis.attr({ x1: box.x, x2: box.x2 });
 		this.yAxis.attr({ y1: box.y, y2: box.y2 });

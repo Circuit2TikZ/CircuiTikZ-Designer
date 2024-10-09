@@ -161,7 +161,7 @@ export class NodeDragHandler {
 			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				if(component!=this.element){
 					for (const snappingPoint of component.snappingPoints) {
-						snapPoints.push(snappingPoint.relToComponentAnchor().plus(component.getAnchorPoint()).minus(componentAnchor))
+						snapPoints.push(snappingPoint.relToComponentAnchor().add(component.getAnchorPoint()).sub(componentAnchor))
 					}
 				}
 			}
@@ -178,7 +178,7 @@ export class NodeDragHandler {
 			: SnapController.instance.snapPoint(draggedPoint, snapPoints);
 
 		if (componentInSelection){
-			SelectionController.instance.moveSelectionRel(destination.minus(this.element.getAnchorPoint()))
+			SelectionController.instance.moveSelectionRel(destination.sub(this.element.getAnchorPoint()))
 			for (const element of SelectionController.instance.currentlySelectedComponents) {
 				if (element instanceof NodeComponentInstance) {
 					element.recalculateSnappingPoints()

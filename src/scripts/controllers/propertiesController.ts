@@ -37,22 +37,17 @@ export class PropertyController{
 	update(){
 		
 		let components = SelectionController.instance.currentlySelectedComponents
-		let lines = SelectionController.instance.currentlySelectedLines
 		this.#clearForm()
 
-		if (components.length+lines.length>1) {
+		if (components.length>1) {
 			this.#objectName.classList.remove("d-none")
 			this.#objectName.innerText = "Please select only one component to view its properties"
-		}else if (components.length+lines.length===0) {
+		}else if (components.length===0) {
 			this.#setFormGrid()
 		}else{
 			if (components.length===1) {
 				let component = components[0]
-				this.#setForm(component,component.getFormEntries());
-			} else {
-				//show line
-				let component = lines[0]	
-				this.#setLineForm(component);
+				// this.#setForm(component,component.getFormEntries());
 			}
 		}
 	}

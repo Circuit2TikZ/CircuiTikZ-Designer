@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, MainController, SaveController, SnapController, SnapPoint, Undo } from "../internal";
+import { CanvasController, CircuitComponent, MainController, SaveController, SelectionController, SnapController, SnapPoint, Undo } from "../internal";
 import hotkeys from "hotkeys-js";
 
 export class ComponentPlacer{
@@ -13,8 +13,6 @@ export class ComponentPlacer{
 
 	}
 
-	private lastMousePoint = new SVG.Point(0,0)
-
 	public static get instance(){
 		if (!ComponentPlacer._instance) {
 			ComponentPlacer._instance = new ComponentPlacer()
@@ -22,44 +20,42 @@ export class ComponentPlacer{
 		return ComponentPlacer._instance
 	}
 
-	private snappedPositition(ev:MouseEvent): SVG.Point{
-		let pt = new SVG.Point(ev.clientX, ev.clientY);		
-		pt = pt.transform(ComponentPlacer.instance.component.visualization.screenCTM().inverseO());
-		
-		let snappingPoints = ComponentPlacer.instance.component.snappingPoints
-		return SnapController.instance.snapPoint(pt,snappingPoints.concat([new SVG.Point() as SnapPoint]))
+	public static pointFromEvent(ev:MouseEvent, component: CircuitComponent): SVG.Point{
+		let pt = CanvasController.eventToPoint(ev,false)
+		// let pt:SVG.Point = new SVG.Point(ev.clientX, ev.clientY).transform(component.visualization.screenCTM().inverseO())	
+		let shiftKey = ev.shiftKey
+		return shiftKey?pt:SnapController.instance.snapPoint(pt,component.getPlacingSnappingPoints())
 	}
 
 	public placeStep(ev:MouseEvent){
 		if (ev.button==0) {
-			let pt = ComponentPlacer.instance.snappedPositition(ev)	
-			ComponentPlacer.instance.lastMousePoint = pt
-			if (ComponentPlacer.instance.component.placeStep(pt)) {
+			let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
+			if (ComponentPlacer.instance.component.placeStep(pt,ev)) {
 				ComponentPlacer.instance.placeFinish(ev)
 			}
 		}
 	}
 
 	public placeMove(ev:MouseEvent){
-		let pt = ComponentPlacer.instance.snappedPositition(ev)	
-		ComponentPlacer.instance.lastMousePoint = pt
-		ComponentPlacer.instance.component.placeMove(pt)
+		let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
+		ComponentPlacer.instance.component.placeMove(pt,ev)
 	}
 
 	public placeFinish(ev:MouseEvent){
-		ComponentPlacer.instance.component.placeFinish()
-		ComponentPlacer.instance.cleanUp()
-		// Undo.addState()
-		
-		// restart component placement for just finished component
-		ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+		if (ev.button==0) {
+			ComponentPlacer.instance.component.placeFinish()
+			ComponentPlacer.instance.cleanUp()
+			// Undo.addState()
+			
+			// restart component placement for just finished component
+			ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+		}
 	}
 
 	public placeCancel(ev?: KeyboardEvent){
-		let finishedPlacing = false
-		while (!finishedPlacing) {
-			finishedPlacing = ComponentPlacer.instance._component.placeStep(ComponentPlacer.instance.lastMousePoint)
-		}
+		console.log("cancel");
+		
+		ComponentPlacer.instance.component.placeFinish()
 		MainController.instance.removeComponent(ComponentPlacer.instance.component)
 		ComponentPlacer.instance._component = null
 		ComponentPlacer.instance.cleanUp()
@@ -67,6 +63,7 @@ export class ComponentPlacer{
 
 	private cleanUp(){
 		//remove event listeners
+		SnapController.instance.hideSnapPoints()
 		let canvas = CanvasController.instance.canvas
 		canvas.off("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.off("mouseup",ComponentPlacer.instance.placeStep)
@@ -77,11 +74,12 @@ export class ComponentPlacer{
 	public placeComponent(component: CircuitComponent){
 		ComponentPlacer.instance._component = component		
 		let canvas = CanvasController.instance.canvas
+		SnapController.instance.showSnapPoints()
 
 		canvas.on("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.on("mouseup",ComponentPlacer.instance.placeStep)
 		canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
 		hotkeys("esc",{keyup: true, keydown:false},ComponentPlacer.instance.placeCancel)
-		ComponentPlacer.instance.component.placeMove(ComponentPlacer.instance.lastMousePoint)
+		ComponentPlacer.instance.component.placeMove(CanvasController.instance.lastCanvasPoint)
 	}
 }

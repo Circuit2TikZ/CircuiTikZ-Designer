@@ -28,13 +28,12 @@ export class SnapCursorController {
 	 */
 	private constructor() {
 		const cursorSymbol = new SVG.Symbol(document.getElementById("snapCursor"));
-		this.cursor = new SVG.Use();
+		this.cursor = CanvasController.instance.canvas.use(cursorSymbol)
 		this.cursor.id("snapCursorUse")
-		this.cursor.use(cursorSymbol);
 		this.#cursorViewBox = cursorSymbol.viewbox();
 		this.cursor.width(this.#cursorViewBox.width);
 		this.cursor.height(this.#cursorViewBox.height);
-		CanvasController.instance.canvas.add(this.cursor);
+		// CanvasController.instance.canvas.add(this.cursor);
 		this.cursor.hide();
 	}
 

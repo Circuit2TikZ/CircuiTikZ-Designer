@@ -1,6 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { CanvasController, ComponentSymbol, FormEntry, Line, MainController, NodeComponent, PathComponent, SaveController, SnapPoint } from "../internal";
+import { FormEntry, MainController, SnapPoint } from "../internal";
+import { rectRectIntersection } from "../utils/selectionHelper";
 
 export enum LabelAnchor {
 	default="default",
@@ -15,51 +16,16 @@ export enum LabelAnchor {
 	southwest="south west"
 }
 
-export enum LineDirection {
-	Straight = "--",
-	HV = "-|",
-	VH = "|-"
-}
-
-export type LineSegment = {
-	position: SVG.Point
-	direction: LineDirection
-}
-
 export type Label = {
 	value:string
-	anchor:LabelAnchor
+	anchor?:LabelAnchor
 	labelDistance?:number
+	rendering?: SVG.Element
 }
 
 export type ComponentSaveObject = {
 	type: string
 	selected?:boolean
-}
-
-export type LineSaveObject = ComponentSaveObject &  {
-	start: SVG.Point
-	segments: LineSegment[]
-}
-
-export type CircuitikzSaveObject = ComponentSaveObject & {
-	id: string
-	name?:string
-	label?:Label
-}
-
-export type NodeSaveObject = CircuitikzSaveObject & {
-	position:SVG.Point
-	rotation?:number
-	flipX?:boolean
-	flipY?:boolean
-}
-
-export type PathSaveObject = CircuitikzSaveObject & {
-	start:SVG.Point
-	end:SVG.Point
-	mirror?:boolean
-	invert?:boolean
 }
 
 /**
@@ -75,7 +41,13 @@ export abstract class CircuitComponent{
 	 */
 	public relPosition: SVG.Point;
 	public rotationDeg: number;
-	public flipState:SVG.Point;
+	public flipState:SVG.Point = new SVG.Point(1,1);
+
+	public constructor(){
+		this.position = new SVG.Point()
+		this.relPosition = new SVG.Point()
+		MainController.instance.addComponent(this)
+	}
 
 	protected _bbox: SVG.Box;
 	public get bbox(): SVG.Box {
@@ -84,19 +56,33 @@ export abstract class CircuitComponent{
 
 	public visualization: SVG.Element;
 	public snappingPoints: SnapPoint[];
+	public abstract getPlacingSnappingPoints():SnapPoint[]
+
+	public abstract draggable(drag: boolean):void
 
 	// manipulation on canvas
 	public abstract moveTo(position:SVG.Point):void
 	public moveRel(delta:SVG.Point):void{
-		this.moveTo(this.position.plus(delta))
+		this.moveTo(this.position.add(delta))
 	}
 	public abstract rotate(angleDeg:number):void
 	public abstract flip(horizontal:boolean):void
 
-	public abstract showSelected(show:boolean):void
+	protected abstract updateTransform():void
 
-	public abstract isInsideSelectionRectangle(selectionRectangle:SVG.Box):boolean
-	public abstract updateTheme():void
+	protected abstract recalculateSelectionVisuals():void
+
+	public abstract viewSelected(show:boolean):void
+
+	public isInsideSelectionRectangle(selectionRectangle:SVG.Box):boolean{
+		return rectRectIntersection(this.bbox, selectionRectangle)
+	}
+	public updateTheme(){}
+
+	public simplifyRotationAngle(){
+		while (this.rotationDeg > 180) this.rotationDeg -= 360;
+		while (this.rotationDeg <= -180) this.rotationDeg += 360;
+	}
 
 	public abstract toJson(): ComponentSaveObject
 	public abstract toTikzString():string
@@ -124,12 +110,11 @@ export abstract class CircuitComponent{
 	public abstract remove():void
 
 	finishedPlacing = false;
-	public abstract placeMove(pos: SVG.Point): void
+	public abstract placeMove(pos: SVG.Point, ev?:Event): void
 	/**
 	 * return true when the component is finished placing down
-	 * @param pos 
 	 */
-	public abstract placeStep(pos: SVG.Point): boolean
+	public abstract placeStep(pos: SVG.Point, ev?:Event): boolean
 	public abstract placeFinish():void // call this to force the placement to finish
 	
 	// public abstract getSnappingPoints() : SnapPoint[]

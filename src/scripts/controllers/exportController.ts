@@ -87,7 +87,7 @@ export class ExportController {
 		// actually export/create the string
 		{
 			let circuitElements = []
-			for (const circuitElement of MainController.controller.circuitComponents) {
+			for (const circuitElement of MainController.instance.circuitComponents) {
 				circuitElements.push("\t"+circuitElement.toTikzString())
 			}
 			
@@ -115,9 +115,9 @@ export class ExportController {
 		let bbox = SelectionController.instance.getOverallBoundingBox()
 		SelectionController.instance.deactivateSelection()
 
-		let colorTheme = MainController.controller.darkMode;
-		MainController.controller.darkMode = false;
-		MainController.controller.updateTheme()
+		let colorTheme = MainController.instance.darkMode;
+		MainController.instance.darkMode = false;
+		MainController.instance.updateTheme()
 
 		//Get the canvas
 		let svgObj = document.getElementById("canvas").cloneNode(true) as SVGSVGElement
@@ -139,20 +139,26 @@ export class ExportController {
 		svgObj.removeChild(svgObj.getElementById("xAxis"))
 		svgObj.removeChild(svgObj.getElementById("yAxis"))
 		svgObj.removeChild(svgObj.getElementById("selectionRectangle"))
+
 		svgObj.removeChild(svgObj.getElementById("snapCursorUse"))
 
 		// delete path points for moving paths around
 		for (const element of svgObj.querySelectorAll(".draggable.pathPoint")) {
 			element.remove()
 		}
+
+		// delete path points for moving paths around
+		for (const element of svgObj.querySelectorAll("use")) {
+			element.removeAttribute("class")
+		}
 		
 		// get all used node/symbol names
 		let symbolDB = document.getElementById("symbolDB")
 		let usedSymbols = []
-		for (const instance of MainController.controller.circuitComponents) {
+		for (const instance of MainController.instance.circuitComponents) {
 			if (instance instanceof CircuitikzComponent) {
 				let symbol = instance.referenceSymbol.node
-				usedSymbols.push(symbolDB.getElementById(symbol.id))
+				usedSymbols.push(document.getElementById(symbol.id))
 			}
 		}
 		// remove duplicates
@@ -188,8 +194,8 @@ export class ExportController {
 		this.#exportedContent.rows = textContent.split("\n").length
 		this.#exportedContent.value = textContent;
 		const extensions = [".svg", ".txt"];
-		MainController.controller.darkMode = colorTheme;
-		MainController.controller.updateTheme()
+		MainController.instance.darkMode = colorTheme;
+		MainController.instance.updateTheme()
 		this.#export(extensions)
 		SelectionController.instance.activateSelection()
 	}

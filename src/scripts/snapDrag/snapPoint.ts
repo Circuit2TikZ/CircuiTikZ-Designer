@@ -13,6 +13,7 @@ export class SnapPoint extends Point {
 	private componentReference: CircuitComponent; // to which component this snapPoint belongs
 	private anchorName: string; // the name of the snap point (i.e. G, D, S, center...)
 	private relPosition: Point; // the position of this snapPoint relative to the component center
+	private relPositionTransformed: Point; // the position of this snapPoint relative to the component center
 	
 	constructor(componentReference: CircuitComponent, anchorName: string, relPosition: Point) {
 		super();
@@ -22,25 +23,25 @@ export class SnapPoint extends Point {
 		this.recalculate();
 	}
 
-	
-
-	/**
-	 * Recalculate the position if the position or angle of the instance changed.
-	 *
-	 * @param {?Point} [newMid] - the anchor/mid point, if changed; no need to set if the point instance hasn't changed
-	 * @param {?number} [angle] - the new angle, if changed
-	 * @param {?Point} [flip] - the flip vector
-	 */
 	public recalculate(transformMatrix?: Matrix) {
 		if (!transformMatrix) {
-			transformMatrix = this.componentReference.getTransformMatrix()
-		}		
-		let pt = this.relPosition.transform(transformMatrix)
-		this.x = pt.x
-		this.y = pt.y
+			transformMatrix = new Matrix({
+				rotate:-this.componentReference.rotationDeg,
+				scaleX:this.componentReference.flipState.x,
+				scaleY:this.componentReference.flipState.y
+			})
+		}
+		
+		this.relPositionTransformed = this.relPosition.transform(transformMatrix)
+		this.x = this.relPositionTransformed.x + this.componentReference.position.x
+		this.y = this.relPositionTransformed.y + this.componentReference.position.y
+	}
+
+	public updateRelPosition(relPosition:Point){
+		this.relPosition = relPosition
 	}
 
 	public relToComponentAnchor(): Point{
-		return this.minus(this.componentReference.position)
+		return this.relPositionTransformed
 	}
 }

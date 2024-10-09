@@ -3,9 +3,13 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { Line, NodeComponentInstance, ComponentInstance, MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
+import { NodeComponentInstance, MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
 
-/** @typedef {import("../controllers/canvasController").default} CanvasController */
+export enum SelectionMode {
+	RESET,
+	ADD,
+	SUB
+}
 
 /**
  * Controller holding selection information and handling selecting/deselecting
@@ -14,29 +18,14 @@ import { Line, NodeComponentInstance, ComponentInstance, MainController, Propert
 export class SelectionController {
 	private static _instance: SelectionController;
 
-	//information about the selection
-	/**
-	 * if selection should add or subtract
-	 * @readonly
-	 * @enum {number}
-	 */
-	static SelectionMode = {
-		RESET:1,
-		ADD:2,
-		SUB:3,
-	};
 	private selectionMode: number
-	private circuitComponents: CircuitComponent[] = [];
-	private lines: Line[] = [];
 	private selectionStartPosition: SVG.Point
 	private selectionRectangle: SVG.Rect
 	private currentlyDragging: boolean
-	currentlySelectedComponents: CircuitComponent[]
+	public currentlySelectedComponents: CircuitComponent[]
 	private selectionEnabled: boolean
 
-
 	private constructor() {
-		this.circuitComponents = MainController.instance.circuitComponents;
 		this.selectionStartPosition = new SVG.Point()
 		this.selectionRectangle = CanvasController.instance.canvas.rect(0,0).move(0,0);
 		this.selectionRectangle.attr("stroke-width","0.5pt")
@@ -46,32 +35,26 @@ export class SelectionController {
 		this.selectionEnabled = true
 		this.currentlySelectedComponents = []
 		this.currentlyDragging = false
-		this.selectionMode = SelectionController.SelectionMode.RESET
+		this.selectionMode = SelectionMode.RESET
 
 		//TODO selection only enables when state of program is drag pan
 		
-		CanvasController.instance.canvas.on("mousedown",(/**@type {MouseEvent}*/evt: MouseEvent)=>{
-			if (evt.button===2&&this.currentlyDragging) {
-				// currently dragging a selection rectangle but right mouse button clicked -> cancel selection rectangle
-				this.currentlyDragging = false;
-				this.selectionRectangle.attr("width",0);
-				this.selectionRectangle.attr("height",0);
-			}
+		CanvasController.instance.canvas.on("mousedown",(evt: MouseEvent)=>{
 
 			if (evt.button===0&&this.selectionEnabled) {
-				let shift = evt.shiftKey||evt.detail.shiftKey
-				let ctrl = evt.ctrlKey||(MainController.instance.isMac&&evt.metaKey)||evt.detail.ctrlKey||(MainController.instance.isMac&&evt.detail.metaKey)
+				let shift = evt.shiftKey//||evt.detail.shiftKey
+				let ctrl = evt.ctrlKey||(MainController.instance.isMac&&evt.metaKey)||(MainController.instance.isMac&&evt.metaKey)
 				if (shift) {
 					if (ctrl) {
-						this.selectionMode = SelectionController.SelectionMode.RESET
+						this.selectionMode = SelectionMode.RESET
 					}else{
-						this.selectionMode = SelectionController.SelectionMode.ADD;
+						this.selectionMode = SelectionMode.ADD;
 					}
 				}else{
 					if (ctrl) {
-						this.selectionMode = SelectionController.SelectionMode.SUB;
+						this.selectionMode = SelectionMode.SUB;
 					}else{
-						this.selectionMode = SelectionController.SelectionMode.RESET
+						this.selectionMode = SelectionMode.RESET
 					}
 				}
 				
@@ -100,14 +83,14 @@ export class SelectionController {
 				this.selectionRectangle.attr("width",dx);
 				this.selectionRectangle.attr("height",dy);
 
-				this.#showSelection();
+				this.previewSelection();
 			}
 
 		})
 		CanvasController.instance.canvas.on("mouseup",(/**@type {MouseEvent}*/evt: MouseEvent)=>{
 			if (evt.button===0) {
 				if (this.currentlyDragging) {
-					this.#updateSelection();
+					this.updateSelection();
 					this.currentlyDragging=false;
 					this.selectionRectangle.attr("width",0);
 					this.selectionRectangle.attr("height",0);
@@ -131,48 +114,48 @@ export class SelectionController {
 		return SelectionController._instance;
 	}
 
-	updateTheme(){
+	public updateTheme(){
 		this.selectionRectangle.stroke(MainController.instance.darkMode?"#fff":"#000")
 	}
 
-	#showSelection(){
+	private previewSelection(){
 		let selectionBox = this.selectionRectangle.bbox();
-		for (const instance of this.circuitComponents) {
+		for (const component of MainController.instance.circuitComponents) {
 			let cond=false;
-			if (this.selectionMode==SelectionController.SelectionMode.RESET) {
-				cond = instance.isInsideSelectionRectangle(selectionBox)
-			}else if (this.selectionMode==SelectionController.SelectionMode.ADD) {
-				cond = instance.isInsideSelectionRectangle(selectionBox)||this.currentlySelectedComponents.includes(instance)
+			if (this.selectionMode==SelectionMode.RESET) {
+				cond = component.isInsideSelectionRectangle(selectionBox)
+			}else if (this.selectionMode==SelectionMode.ADD) {
+				cond = component.isInsideSelectionRectangle(selectionBox)||this.currentlySelectedComponents.includes(component)
 			}else{
-				cond = !instance.isInsideSelectionRectangle(selectionBox)&&this.currentlySelectedComponents.includes(instance)
+				cond = !component.isInsideSelectionRectangle(selectionBox)&&this.currentlySelectedComponents.includes(component)
 			}
-			instance.showSelected(cond)
+			component.viewSelected(cond)
 		}
 	}
 
-	#updateSelection(){
+	private updateSelection(){
 		let selectionBox = this.selectionRectangle.bbox();
-		for (const instance of this.circuitComponents) {
-			if (this.selectionMode==SelectionController.SelectionMode.RESET) {
-				if (instance.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedComponents.includes(instance)) {
-						this.currentlySelectedComponents.push(instance)
+		for (const component of MainController.instance.circuitComponents) {
+			if (this.selectionMode==SelectionMode.RESET) {
+				if (component.isInsideSelectionRectangle(selectionBox)) {
+					if (!this.currentlySelectedComponents.includes(component)) {
+						this.currentlySelectedComponents.push(component)
 					}
 				}else{
-					let idx = this.currentlySelectedComponents.indexOf(instance)
+					let idx = this.currentlySelectedComponents.indexOf(component)
 					if (idx>-1) {
 						this.currentlySelectedComponents.splice(idx,1)
 					}
 				}
-			}else if(this.selectionMode==SelectionController.SelectionMode.ADD){
-				if (instance.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedComponents.includes(instance)) {
-						this.currentlySelectedComponents.push(instance)
+			}else if(this.selectionMode==SelectionMode.ADD){
+				if (component.isInsideSelectionRectangle(selectionBox)) {
+					if (!this.currentlySelectedComponents.includes(component)) {
+						this.currentlySelectedComponents.push(component)
 					}
 				}
 			}else{
-				if (instance.isInsideSelectionRectangle(selectionBox)) {
-					let idx = this.currentlySelectedComponents.indexOf(instance)
+				if (component.isInsideSelectionRectangle(selectionBox)) {
+					let idx = this.currentlySelectedComponents.indexOf(component)
 					if (idx>-1) {
 						this.currentlySelectedComponents.splice(idx,1)
 					}
@@ -181,38 +164,38 @@ export class SelectionController {
 		}
 	}
 
-	activateSelection(){
+	public activateSelection(){
 		this.selectionEnabled = true;
 	}
 
-	deactivateSelection(){
+	public deactivateSelection(){
 		this.selectionEnabled = false;
 		this.selectionRectangle.attr("width",0);
 		this.selectionRectangle.attr("height",0);
-		this.selectionMode = SelectionController.SelectionMode.RESET;
+		this.selectionMode = SelectionMode.RESET;
 		this.currentlySelectedComponents = []
-		this.#showSelection();
-		this.#updateSelection();
+		this.previewSelection();
+		this.updateSelection();
 	}
 
-	showSelection(){
+	public showSelection(){
 		for (const component of this.currentlySelectedComponents) {
-			component.showSelected(true)
+			component.viewSelected(true)
 		}
 	}
 
-	hideSelection(){
+	public hideSelection(){
 		for (const component of this.currentlySelectedComponents) {
-			component.showSelected(false)
+			component.viewSelected(false)
 		}
 	}
 
-	selectComponents(components, mode){
+	public selectComponents(components: CircuitComponent[], mode:SelectionMode){
 		this.hideSelection();
 
-		if (mode === SelectionController.SelectionMode.RESET) {
+		if (mode === SelectionMode.RESET) {
 			this.currentlySelectedComponents=components
-		}else if(mode === SelectionController.SelectionMode.ADD){
+		}else if(mode === SelectionMode.ADD){
 			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
 			this.currentlySelectedComponents = [...new Set(this.currentlySelectedComponents)]
 		}else{
@@ -229,16 +212,16 @@ export class SelectionController {
 		PropertyController.instance.update()
 	}
 
-	selectAll(){
+	public selectAll(){
 		this.currentlySelectedComponents = []
-		for (const instance of this.circuitComponents) {
+		for (const instance of MainController.instance.circuitComponents) {
 			this.currentlySelectedComponents.push(instance)
 		}
 
 		this.showSelection();
 	}
 
-	isComponentSelected(component: CircuitComponent){
+	public isComponentSelected(component: CircuitComponent){
 		return this.currentlySelectedComponents.includes(component)
 	}
 
@@ -246,7 +229,7 @@ export class SelectionController {
 	 * 
 	 * @returns {SVG.Box}
 	 */
-	getOverallBoundingBox(): SVG.Box{
+	public getOverallBoundingBox(): SVG.Box{
 		let bbox:SVG.Box = null
 		for (const component of this.currentlySelectedComponents) {
 			if (bbox==null) {
@@ -262,7 +245,7 @@ export class SelectionController {
 	 * 
 	 * @param {Number} angleDeg rotation in degrees (only 90 degree multiples, also negative)
 	 */
-	rotateSelection(angleDeg: number){
+	public rotateSelection(angleDeg: number){
 		//get overall center
 		if (!this.hasSelection()) {
 			return
@@ -273,24 +256,13 @@ export class SelectionController {
 		
 		//rotate all components/lines individually around their center
 		//get individual center and rotate that around overall center
-		//move individual components/lines to new rotated center
-		for (const line of this.currentlySelectedLines) {
-			let center = new SVG.Point(line.bbox().cx,line.bbox().cy)
-			line.rotate(angleDeg);
-			let move = center.rotate(angleDeg,overallCenter,false).minus(center)
-			line.moveRel(move)
-		}
+		//move individual components/lines to new rotated center		
 		
 		for (const component of this.currentlySelectedComponents) {
-			/**@type {SVG.Point} */
-			let center: SVG.Point = component.getAnchorPoint()
 			component.rotate(angleDeg);
-			let move = center.rotate(angleDeg,overallCenter,false)
-
+			let move = component.position.rotate(angleDeg,overallCenter,false)
 			component.moveTo(move)
-			if (component instanceof NodeComponentInstance) {
-				component.recalculateSnappingPoints();
-			}
+			component.recalculateSnappingPoints()
 		}
 	}
 
@@ -298,7 +270,7 @@ export class SelectionController {
 	 * 
 	 * @param {boolean} horizontal if flipping horizontally or vertically
 	 */
-	flipSelection(horizontal: boolean){
+	public flipSelection(horizontal: boolean){
 		//get overall center
 		
 		if (!this.hasSelection()) {
@@ -315,15 +287,10 @@ export class SelectionController {
 		//move individual components/lines to new flipped center
 
 		for (const component of this.currentlySelectedComponents) {
-			/**@type {SVG.Point} */
-			let center: SVG.Point = component.getAnchorPoint()
-			let diffToCenter = center.minus(overallCenter);
+			let diffToCenter = component.position.sub(overallCenter);
 			component.flip(horizontal)
 			component.moveRel(new SVG.Point(diffToCenter.x*flipX,diffToCenter.y*flipY))
-
-			if (component instanceof NodeComponentInstance) {
-				component.recalculateSnappingPoints();
-			}
+			component.recalculateSnappingPoints()
 		}
 	}
 
@@ -331,7 +298,7 @@ export class SelectionController {
 	 * move the selection by delta
 	 * @param {SVG.Point} delta the amount to move the selection by
 	 */
-	moveSelectionRel(delta: SVG.Point){
+	public moveSelectionRel(delta: SVG.Point){
 		for (const element of this.currentlySelectedComponents) {
 			element.moveRel(delta)
 		}
@@ -341,13 +308,13 @@ export class SelectionController {
 	 * move the center of the selection to the new position
 	 * @param {SVG.Point} position the new position
 	 */
-	moveSelectionTo(position: SVG.Point){
+	public moveSelectionTo(position: SVG.Point){
 		let overallBBox = this.getOverallBoundingBox()
 		let overallCenter = new SVG.Point(overallBBox.cx,overallBBox.cy)
-		this.moveSelectionRel(position.minus(overallCenter))
+		this.moveSelectionRel(position.sub(overallCenter))
 	}
 
-	removeSelection(){
+	public removeSelection(){
 		for (const component of this.currentlySelectedComponents) {
 			MainController.instance.removeComponent(component)
 		}
@@ -360,7 +327,7 @@ export class SelectionController {
 	 * checks if anything is selected
 	 * @returns true or false
 	 */
-	hasSelection(){
+	public hasSelection(){
 		return this.currentlySelectedComponents.length>0
 	}
 }

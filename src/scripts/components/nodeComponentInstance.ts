@@ -275,7 +275,7 @@ export class NodeComponentInstance extends SVG.Use {
 				return "Contains forbidden characters!"
 			}
 			
-			for (const instance of MainController.controller.instances) {
+			for (const instance of MainController.instance.instances) {
 				if (instance!=this) {
 					if (instance.tikzName==name) {
 						return "Name is already taken!"
@@ -372,7 +372,7 @@ export class NodeComponentInstance extends SVG.Use {
 		}		
 		
 		// get relevant positions and bounding boxes
-		let textPos = this.symbol._textPosition.point.plus(this.#midAbs).transform(this.#getTransformMatrix())
+		let textPos = this.symbol._textPosition.point.add(this.#midAbs).transform(this.#getTransformMatrix())
 		let labelBBox = this.#labelSVG.bbox()
 		let componentBBox = this.bbox()
 
@@ -433,7 +433,7 @@ export class NodeComponentInstance extends SVG.Use {
 		ref.y = (ref.y+1)/2*labelBBox.h+labelRef.y*offset
 		
 		// acutally move the label
-		let movePos = textPos.minus(ref)
+		let movePos = textPos.sub(ref)
 		this.#labelSVG.move(movePos.x,movePos.y)
 	}
 
@@ -445,7 +445,7 @@ export class NodeComponentInstance extends SVG.Use {
 	 * @returns {ComponentInstance}
 	 */
 	moveRel(delta: SVG.Point): ComponentInstance{
-		return this.moveTo(this.#midAbs.plus(delta))
+		return this.moveTo(this.#midAbs.add(delta))
 	}
 
 	/**
@@ -533,7 +533,7 @@ export class NodeComponentInstance extends SVG.Use {
 		this.boundingBox = this.boundingBox.transform(m)
 
 		// set relMid for external use
-		this.relMid = this.#midAbs.minus(new SVG.Point(this.boundingBox.x,this.boundingBox.y))
+		this.relMid = this.#midAbs.sub(new SVG.Point(this.boundingBox.x,this.boundingBox.y))
 
 		this.#recalculateSelectionRect();
 	}

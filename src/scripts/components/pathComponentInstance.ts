@@ -298,7 +298,7 @@ export class PathComponentInstance extends SVG.G {
 		const breakVertical = 70
 		const breakHorizontal = 21
 
-		let pathDiff = this.getEndPoint().minus(this.getStartPoint())
+		let pathDiff = this.getEndPoint().sub(this.getStartPoint())
 		// at which angle the path is drawn
 		let pathAngle = Math.atan2(pathDiff.y, pathDiff.x);   //radians
 		pathAngle = 180*pathAngle/Math.PI;  //degrees
@@ -358,8 +358,8 @@ export class PathComponentInstance extends SVG.G {
 		})
 		
 		// acutally move and rotate the label to the correct position
-		let compRef = this.#midAbs.plus(referenceOffset)
-		let movePos = compRef.minus(labelRef)
+		let compRef = this.#midAbs.add(referenceOffset)
+		let movePos = compRef.sub(labelRef)
 		this.#labelSVG.move(movePos.x,movePos.y)
 		.transform({
 			rotate:-rotAngle,
@@ -425,7 +425,7 @@ export class PathComponentInstance extends SVG.G {
 		if (!this.#selectionRectangle) {
 			let box = this.symbolUse.bbox();
 			// use the saved position instead of the bounding box (bbox position fails in safari)
-			let moveVec = this.#midAbs.minus(this.symbol.relMid)
+			let moveVec = this.#midAbs.sub(this.symbol.relMid)
 
 			this.#selectionRectangle = this.container.rect(box.w,box.h)
 													.move(moveVec.x,moveVec.y)
@@ -656,7 +656,7 @@ export class PathComponentInstance extends SVG.G {
 	 * @returns {ComponentInstance}
 	 */
 	moveRel(delta: SVG.Point): ComponentInstance{
-		this.moveTo(this.#midAbs.plus(delta))
+		this.moveTo(this.#midAbs.add(delta))
 	}
 
 	/**
@@ -671,9 +671,9 @@ export class PathComponentInstance extends SVG.G {
 		} else if (this.#pointsSet === 1) {
 			this.#recalcPointsEnd(position);
 		} else{
-			let diff = position.minus(this.getAnchorPoint())
-			let startPoint = diff.plus(this.getStartPoint())
-			let endPoint = diff.plus(this.getEndPoint())
+			let diff = position.sub(this.getAnchorPoint())
+			let startPoint = diff.add(this.getStartPoint())
+			let endPoint = diff.add(this.getEndPoint())
 			this.#prePointArray[0][0] = startPoint.x
 			this.#prePointArray[0][1] = startPoint.y
 			this.#recalcPointsEnd(endPoint)
@@ -706,8 +706,8 @@ export class PathComponentInstance extends SVG.G {
 		
 		let start = this.getStartPoint()
 		let end = this.getEndPoint()
-		let diffstart = this.#midAbs.minus(start)
-		let diffend = this.#midAbs.minus(end)
+		let diffstart = this.#midAbs.sub(start)
+		let diffend = this.#midAbs.sub(end)
 		this.#prePointArray[0][direction] += 2*(horizontal?diffstart.y:diffstart.x)
 		this.#postPointArray[1][direction] += 2*(horizontal?diffend.y:diffend.x)
 
@@ -745,7 +745,7 @@ export class PathComponentInstance extends SVG.G {
 		this.#midAbs.x = (this.#prePointArray[0][0] + endPoint.x) / 2;
 		this.#midAbs.y = (this.#prePointArray[0][1] + endPoint.y) / 2;
 
-		const tl = this.#midAbs.minus(this.symbol.relMid);
+		const tl = this.#midAbs.sub(this.symbol.relMid);
 		const angle = Math.atan2(this.#prePointArray[0][1] - endPoint.y, endPoint.x - this.#prePointArray[0][0]);
 		this.#rotationAngle = (angle * 180) / Math.PI;
 
@@ -778,7 +778,7 @@ export class PathComponentInstance extends SVG.G {
 		this.endCircle.move(this.#postPointArray[1][0]-this.circleRadius/2,this.#postPointArray[1][1]-this.circleRadius/2)
 
 		let bbox = this.bbox() // TODO this should ignore the label, otherwise the component flickers while moving it around when putting it inside the group
-		this.relMid = this.getAnchorPoint().minus(new SVG.Point(bbox.x,bbox.y))
+		this.relMid = this.getAnchorPoint().sub(new SVG.Point(bbox.x,bbox.y))
 
 		// recalculate snapping points
 		let flipVector = new SVG.Point(1,this.#mirror?-1:1)
@@ -786,7 +786,7 @@ export class PathComponentInstance extends SVG.G {
 		this.relSnappingPoints = []
 		for (const sp of this.snappingPoints){
 			sp.recalculate(null, angle, flipVector);
-			this.relSnappingPoints.push(sp.minus(ref))
+			this.relSnappingPoints.push(sp.sub(ref))
 		}
 
 		this.#updateLabelPosition()

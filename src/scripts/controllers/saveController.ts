@@ -3,7 +3,7 @@
  */
 
 import { Modal } from "bootstrap";
-import { MainController,NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent } from "../internal";
+import { NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent, SelectionMode, LineComponent } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
@@ -79,7 +79,8 @@ export class SaveController {
 				var reader = new FileReader();
 				reader.readAsText(file, "UTF-8");
 				reader.onload = (evt) => {
-					this.loadFromJSON(JSON.parse(evt.target.result), true);
+					let inputstring = evt.target.result instanceof ArrayBuffer?"":evt.target.result
+					this.loadFromJSON(JSON.parse(inputstring), true);
 					this.#loadModal.hide()
 				}
 				reader.onerror = (evt) => {
@@ -106,46 +107,37 @@ export class SaveController {
 		});
 	}
 
-	loadFromJSON(obj, selectComponents=false){
+	loadFromJSON(obj:any, selectComponents=false){
 		//delete current state if necessary		
-		if (document.getElementById("loadCheckRemove").checked) {
+		if ((document.getElementById("loadCheckRemove") as HTMLInputElement).checked) {
 			SelectionController.instance.selectAll()
 			SelectionController.instance.removeSelection()
 		}
 		
-		let nodes = []
-		let paths = []
-		let lines = []
+		let components = []
 
 		if (obj.nodes || obj.paths || obj.lines) {
 			for (const node of obj.nodes) {
-				nodes.push(NodeComponentInstance.fromJson(node))
+				components.push(NodeComponent.fromJson(node as NodeSaveObject))
 			}
 			
 			for (const path of obj.paths) {
-				paths.push(PathComponentInstance.fromJson(path))
+				components.push(PathComponent.fromJson(path as PathSaveObject))
 			}
 	
 			for (const line of obj.lines) {
-				lines.push(Line.fromJson(line))
+				components.push(LineComponent.fromJson(line as LineSaveObject))
 			}
 		}else{
 			for (const component of obj) {
-				if (component.type==="wire") {
-					lines.push(Line.fromJson(component))
-				}else if(component.type==="node"){
-					nodes.push(NodeComponentInstance.fromJson(component))
-				}else if(component.type==="path"){
-					paths.push(PathComponentInstance.fromJson(component))
-				}
+				components.push(SaveController.fromJson(component))
 			}
 		}
 		
 		if (selectComponents) {
 			SelectionController.instance.deactivateSelection()
 			SelectionController.instance.activateSelection()
-			SelectionController.instance.selectComponents(nodes.concat(paths),SelectionController.SelectionMode.RESET)
-			SelectionController.instance.selectLines(lines,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectComponents(components,SelectionMode.RESET)
 		}
 		Undo.addState()
 	}
@@ -157,7 +149,7 @@ export class SaveController {
 			case "path":
 				return PathComponent.fromJson(saveJson as PathSaveObject)
 			case "wire":
-				return Line.fromJson(saveJson as LineSaveObject)
+				return LineComponent.fromJson(saveJson as LineSaveObject)
 			default:
 				break;
 		}

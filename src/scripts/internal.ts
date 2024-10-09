@@ -22,6 +22,7 @@ export * from "./components/nodeComponent";
 export * from "./components/pathComponentSymbol";
 export * from "./components/pathComponentInstance";
 export * from "./components/pathComponent";
+export * from "./components/lineComponent";
 // lines
 export * from "./lines/line";
 export * from "./lines/lineDrawer";

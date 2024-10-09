@@ -9,7 +9,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent} from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent} from "../internal";
 import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
 
 type SaveState = {
@@ -381,16 +381,17 @@ export class MainController {
 			return false;
 		})
 		hotkeys("esc",()=>{
-			this.#switchMode(MainController.Modes.DRAG_PAN);
+			this.switchMode(MainController.Modes.DRAG_PAN);
 			return false;
 		})
 		hotkeys("w",()=>{
-			this.#switchMode(MainController.Modes.DRAW_LINE);
+			this.switchMode(MainController.Modes.DRAW_LINE);
+			ComponentPlacer.instance.placeComponent(new LineComponent())
 			return false;
 		})
 		hotkeys("del, backspace",()=>{
 			if(!SelectionController.instance.hasSelection()){
-				this.#switchMode(MainController.Modes.ERASE);
+				this.switchMode(MainController.Modes.ERASE);
 			}else{
 				SelectionController.instance.removeSelection()
 				Undo.addState()
@@ -421,7 +422,7 @@ export class MainController {
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		for (const {shortcut,component} of shortcutDict) {
 			hotkeys(shortcut,()=>{
-				this.#switchMode(MainController.Modes.DRAG_PAN); //switch to standard mode to avoid weird states
+				this.switchMode(MainController.Modes.DRAG_PAN); //switch to standard mode to avoid weird states
 				var componentButton = document.querySelector('[title="'+component+'"]')
 				var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
 				componentButton?.dispatchEvent(clickEvent);
@@ -467,8 +468,9 @@ export class MainController {
 			const baseInfo = ComponentSymbol.getBaseInformation(symbol);
 			if (baseInfo.isNode === baseInfo.isPath) return []; // type not correctly set
 			try {
-				if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
-				else return new PathComponentSymbol(symbol, baseInfo);
+				return new ComponentSymbol(symbol,baseInfo)
+				// if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
+				// else return new PathComponentSymbol(symbol, baseInfo);
 			} catch (e) {
 				console.log(e);
 				return [];
@@ -486,17 +488,17 @@ export class MainController {
 
 		this.modeSwitchButtons.modeDragPan.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.Modes.DRAG_PAN),
+			() => this.switchMode(MainController.Modes.DRAG_PAN),
 			{ passive: false }
 		);
 		this.modeSwitchButtons.modeDrawLine.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.Modes.DRAW_LINE),
+			() => this.switchMode(MainController.Modes.DRAW_LINE),
 			{ passive: false }
 		);
 		this.modeSwitchButtons.modeEraser.addEventListener(
 			"click",
-			() => this.#switchMode(MainController.Modes.ERASE),
+			() => this.switchMode(MainController.Modes.ERASE),
 			{ passive: false }
 		);
 	}
@@ -513,7 +515,7 @@ export class MainController {
 		addComponentButton.addEventListener(
 			"click",
 			(() => {
-				this.#switchMode(MainController.Modes.DRAG_PAN);
+				this.switchMode(MainController.Modes.DRAG_PAN);
 				leftOffcanvasOC.toggle();				
 				if (leftOffcanvas.classList.contains("showing")) {
 					let searchBar = document.getElementById("componentFilterInput")
@@ -576,7 +578,7 @@ export class MainController {
 
 				const listener = (ev: MouseEvent) => {
 					ev.preventDefault();
-					this.#switchMode(MainController.Modes.COMPONENT)					
+					this.switchMode(MainController.Modes.COMPONENT)					
 
 					if (ComponentPlacer.instance.component) {
 						//TODO check here if path component and retrace steps
@@ -590,8 +592,6 @@ export class MainController {
 						newComponent = new PathComponent(symbol)
 					}					
 					ComponentPlacer.instance.placeComponent(newComponent)
-
-					// this.addComponent(newComponent);
 					
 					leftOffcanvasOC.hide();
 				};
@@ -672,7 +672,7 @@ export class MainController {
 	/**
 	 * Switches the mode. This deactivates the old controller and activates the new one.
 	 */
-	#switchMode(newMode: number) {
+	switchMode(newMode: number) {
 		if (newMode === this.mode) return;
 
 		switch (this.mode) {
@@ -681,12 +681,11 @@ export class MainController {
 				CanvasController.instance.deactivatePanning();
 				SelectionController.instance.deactivateSelection();
 				for (const instance of this.circuitComponents) {
-					if (instance.disableDrag) instance.disableDrag();
+					instance.draggable(false);
 				}
 				break;
 			case MainController.Modes.DRAW_LINE:
 				this.modeSwitchButtons.modeDrawLine.classList.remove("selected");
-				this.lineDrawer.deactivate();
 				break;
 			case MainController.Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected");
@@ -706,12 +705,11 @@ export class MainController {
 				CanvasController.instance.activatePanning();
 				SelectionController.instance.activateSelection();
 				for (const instance of this.circuitComponents) {
-					if (instance.enableDrag) instance.enableDrag();
+					instance.draggable(true);
 				}
 				break;
 			case MainController.Modes.DRAW_LINE:
 				this.modeSwitchButtons.modeDrawLine.classList.add("selected");
-				this.lineDrawer.activate();
 				break;
 			case MainController.Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected");
@@ -790,20 +788,19 @@ export class MainController {
 	 */
 	public addComponent(circuitComponent: CircuitComponent) {
 		this.circuitComponents.push(circuitComponent);
-		const snappingPoints = circuitComponent.snappingPoints || [];
-		if (snappingPoints.length > 0) this.snapController.addSnapPoints(snappingPoints);
 	}
 
 	/**
 	 * Removes an instance from {@link instances} and also removes its snapping points.
 	 */
 	public removeComponent(circuitComponent: CircuitComponent) {
-		circuitComponent.remove();
+		if (circuitComponent.snappingPoints){
+			this.snapController.removeSnapPoints(circuitComponent.snappingPoints);
+		} 
 		const idx = this.circuitComponents.indexOf(circuitComponent);
-		if (idx >= 0) {
+		if (idx>-1) {
 			this.circuitComponents.splice(idx, 1);
-			const snappingPoints = circuitComponent.snappingPoints || [];
-			if (snappingPoints.length > 0) this.snapController.removeSnapPoints(snappingPoints);
+			circuitComponent.remove();
 		}
 	}
 }
