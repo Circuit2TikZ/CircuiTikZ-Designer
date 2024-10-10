@@ -9,12 +9,17 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, ComponentInstance, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent} from "../internal";
-import { ComponentSymbol, NodeComponentSymbol, PathComponentSymbol, NodeComponentInstance, PathComponentInstance, LineDrawer, Line } from "../internal";
+import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
 
 type SaveState = {
-	currentIndices: any[];
-	currentData: any[];
+	currentIndices: number[];
+	currentData: ComponentSaveObject[][];
+}
+
+export enum Modes {
+	DRAG_PAN,
+	COMPONENT,
+	ERASE
 }
 
 export class MainController {
@@ -28,7 +33,6 @@ export class MainController {
 
 	
 	// controllers
-	lineDrawer: LineDrawer | null = null;
 	canvasController:CanvasController
 
 	symbolsSVG: SVG.Svg;
@@ -48,19 +52,8 @@ export class MainController {
 	 * 
 	 * This mode will not be shown to the user (show drag_pan instead)
 	 */
-	
-	/**
-	 * @readonly
-	 * @enum {number}
-	 */
-	static Modes = {
-		DRAG_PAN: 1,
-		DRAW_LINE: 2,
-		ERASE: 3,
-		COMPONENT: 4,
-	};
 
-	mode = MainController.Modes.DRAG_PAN;
+	mode = Modes.DRAG_PAN;
 
 	private modeSwitchButtons = {
 		modeDragPan: null,
@@ -161,7 +154,6 @@ export class MainController {
 		);
 
 		canvasPromise.then(() => {
-			this.lineDrawer = new LineDrawer(); // TODO remove line drawer. replace with component placer
 			EraseController.instance;
 			SelectionController.instance;
 			PropertyController.instance;
@@ -231,6 +223,7 @@ export class MainController {
 	 */
 	#addSaveStateManagement(){
 		const objname = "circuitikz-designer-saveState"
+		const tabname = "circuitikz-designer-tabID"
 
 		let defaultProgress: SaveState = {
 			currentIndices:[],
@@ -244,7 +237,7 @@ export class MainController {
 		let current: SaveState = storageString?JSON.parse(storageString):defaultProgress
 
 		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
-		let sessionTabID = sessionStorage.getItem("circuitikz-designer-tabID")
+		let sessionTabID = sessionStorage.getItem(tabname)
 		if (sessionTabID) {
 			this.tabID = Number.parseInt(sessionTabID)
 			current.currentIndices.push(this.tabID)
@@ -262,11 +255,11 @@ export class MainController {
 		}
 
 		// save the assigned tab ID
-		sessionStorage.setItem("circuitikz-designer-tabID",this.tabID.toString())
+		sessionStorage.setItem(tabname,this.tabID.toString())
 
 		// adjust the saveData object to accomodate new data if necessary
 		if (current.currentData.length<=this.tabID) {
-			current.currentData.push({})
+			current.currentData.push([])
 		}
 		
 		// save the current state of tabs
@@ -281,7 +274,10 @@ export class MainController {
 			currentProgress.currentData[this.tabID] = Undo.getCurrentState()
 			localStorage.setItem(objname,JSON.stringify(currentProgress))
 			
-			// localStorage.clear() //use this here if the localStorage is fucked in development
+			//use this here if the localStorage is fucked in development
+			// localStorage.removeItem(objname)
+			// localStorage.removeItem(tabname)
+
 			//TODO add manual way to clear the localStorage
 		})
 	}
@@ -295,32 +291,48 @@ export class MainController {
 
 		// rotate selection
 		hotkeys("ctrl+r,command+r",()=>{
-			SelectionController.instance.rotateSelection(-90);
-			if (SelectionController.instance.hasSelection()) {
-				Undo.addState()
+			if (this.mode==Modes.COMPONENT) {
+				ComponentPlacer.instance.placeRotate(-90)
+			}else{
+				if (SelectionController.instance.hasSelection()) {
+					SelectionController.instance.rotateSelection(-90);
+					Undo.addState()
+				}
 			}
 			return false;
 		})
 		hotkeys("ctrl+shift+r,command+shift+r",()=>{
-			SelectionController.instance.rotateSelection(90);
-			if (SelectionController.instance.hasSelection()) {
-				Undo.addState()
+			if (this.mode==Modes.COMPONENT) {
+				ComponentPlacer.instance.placeRotate(90)
+			}else{
+				SelectionController.instance.rotateSelection(90);
+				if (SelectionController.instance.hasSelection()) {
+					Undo.addState()
+				}
 			}
 			return false;
 		})
 
 		//flip selection
 		hotkeys("shift+x",()=>{
-			SelectionController.instance.flipSelection(true);
-			if (SelectionController.instance.hasSelection()) {
-				Undo.addState()
+			if (this.mode==Modes.COMPONENT) {
+				ComponentPlacer.instance.placeFlip(true)
+			}else{
+				if (SelectionController.instance.hasSelection()) {
+					SelectionController.instance.flipSelection(true);
+					Undo.addState()
+				}
 			}
 			return false;
 		})
 		hotkeys("shift+y",()=>{
-			SelectionController.instance.flipSelection(false);
-			if (SelectionController.instance.hasSelection()) {
-				Undo.addState()
+			if (this.mode==Modes.COMPONENT) {
+				ComponentPlacer.instance.placeFlip(false)
+			}else{
+				if (SelectionController.instance.hasSelection()) {
+					SelectionController.instance.flipSelection(false);
+					Undo.addState()
+				}
 			}
 			return false;
 		})
@@ -381,17 +393,17 @@ export class MainController {
 			return false;
 		})
 		hotkeys("esc",()=>{
-			this.switchMode(MainController.Modes.DRAG_PAN);
+			this.switchMode(Modes.DRAG_PAN);
 			return false;
 		})
 		hotkeys("w",()=>{
-			this.switchMode(MainController.Modes.DRAW_LINE);
+			this.switchMode(Modes.COMPONENT);
 			ComponentPlacer.instance.placeComponent(new LineComponent())
 			return false;
 		})
 		hotkeys("del, backspace",()=>{
 			if(!SelectionController.instance.hasSelection()){
-				this.switchMode(MainController.Modes.ERASE);
+				this.switchMode(Modes.ERASE);
 			}else{
 				SelectionController.instance.removeSelection()
 				Undo.addState()
@@ -422,7 +434,7 @@ export class MainController {
 		// when a valid shortcut button is pressed, simulate a click on the corresponding button for the component
 		for (const {shortcut,component} of shortcutDict) {
 			hotkeys(shortcut,()=>{
-				this.switchMode(MainController.Modes.DRAG_PAN); //switch to standard mode to avoid weird states
+				this.switchMode(Modes.DRAG_PAN); //switch to standard mode to avoid weird states
 				var componentButton = document.querySelector('[title="'+component+'"]')
 				var clickEvent = new MouseEvent('mouseup',{view:window,bubbles:true,cancelable:true,});
 				componentButton?.dispatchEvent(clickEvent);
@@ -488,17 +500,21 @@ export class MainController {
 
 		this.modeSwitchButtons.modeDragPan.addEventListener(
 			"click",
-			() => this.switchMode(MainController.Modes.DRAG_PAN),
+			() => this.switchMode(Modes.DRAG_PAN),
 			{ passive: false }
 		);
 		this.modeSwitchButtons.modeDrawLine.addEventListener(
 			"click",
-			() => this.switchMode(MainController.Modes.DRAW_LINE),
+			() => {
+				this.switchMode(Modes.COMPONENT)
+				this.modeSwitchButtons.modeDrawLine.classList.add("selected");
+				ComponentPlacer.instance.placeComponent(new LineComponent())
+			},
 			{ passive: false }
 		);
 		this.modeSwitchButtons.modeEraser.addEventListener(
 			"click",
-			() => this.switchMode(MainController.Modes.ERASE),
+			() => this.switchMode(Modes.ERASE),
 			{ passive: false }
 		);
 	}
@@ -515,7 +531,7 @@ export class MainController {
 		addComponentButton.addEventListener(
 			"click",
 			(() => {
-				this.switchMode(MainController.Modes.DRAG_PAN);
+				this.switchMode(Modes.DRAG_PAN);
 				leftOffcanvasOC.toggle();				
 				if (leftOffcanvas.classList.contains("showing")) {
 					let searchBar = document.getElementById("componentFilterInput")
@@ -578,7 +594,7 @@ export class MainController {
 
 				const listener = (ev: MouseEvent) => {
 					ev.preventDefault();
-					this.switchMode(MainController.Modes.COMPONENT)					
+					this.switchMode(Modes.COMPONENT)					
 
 					if (ComponentPlacer.instance.component) {
 						//TODO check here if path component and retrace steps
@@ -672,11 +688,13 @@ export class MainController {
 	/**
 	 * Switches the mode. This deactivates the old controller and activates the new one.
 	 */
-	switchMode(newMode: number) {
-		if (newMode === this.mode) return;
-
-		switch (this.mode) {
-			case MainController.Modes.DRAG_PAN:
+	switchMode(newMode: Modes) {
+		if (newMode == this.mode) return;
+		let oldMode = this.mode
+		this.mode=newMode
+		
+		switch (oldMode) {
+			case Modes.DRAG_PAN:
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
 				CanvasController.instance.deactivatePanning();
 				SelectionController.instance.deactivateSelection();
@@ -684,15 +702,14 @@ export class MainController {
 					instance.draggable(false);
 				}
 				break;
-			case MainController.Modes.DRAW_LINE:
-				this.modeSwitchButtons.modeDrawLine.classList.remove("selected");
-				break;
-			case MainController.Modes.ERASE:
+			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected");
 				EraseController.instance.deactivate();
 				break;
-			case MainController.Modes.COMPONENT:
+			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
+				this.modeSwitchButtons.modeDrawLine.classList.remove("selected");
+				ComponentPlacer.instance.placeCancel()
 				CanvasController.instance.deactivatePanning();
 				break;
 			default:
@@ -700,7 +717,7 @@ export class MainController {
 		}
 
 		switch (newMode) {
-			case MainController.Modes.DRAG_PAN:
+			case Modes.DRAG_PAN:
 				this.modeSwitchButtons.modeDragPan.classList.add("selected");
 				CanvasController.instance.activatePanning();
 				SelectionController.instance.activateSelection();
@@ -708,22 +725,17 @@ export class MainController {
 					instance.draggable(true);
 				}
 				break;
-			case MainController.Modes.DRAW_LINE:
-				this.modeSwitchButtons.modeDrawLine.classList.add("selected");
-				break;
-			case MainController.Modes.ERASE:
+			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected");
 				EraseController.instance.activate();
 				break;
-			case MainController.Modes.COMPONENT:
+			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.add("selected");
 				CanvasController.instance.activatePanning();
 				break;
 			default:
 				break;
 		}
-
-		this.mode = newMode;
 	}
 
 	updateTheme(){
@@ -794,7 +806,7 @@ export class MainController {
 	 * Removes an instance from {@link instances} and also removes its snapping points.
 	 */
 	public removeComponent(circuitComponent: CircuitComponent) {
-		if (circuitComponent.snappingPoints){
+		if (circuitComponent.snappingPoints&&circuitComponent.snappingPoints.length>0){
 			this.snapController.removeSnapPoints(circuitComponent.snappingPoints);
 		} 
 		const idx = this.circuitComponents.indexOf(circuitComponent);

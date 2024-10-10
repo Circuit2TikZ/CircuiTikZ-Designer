@@ -7,7 +7,6 @@ import { NodeComponentInstance,PathComponentInstance,Line,SelectionController,Un
 
 /**
  * Controller for saving and loading the progress in json format
- * @class
  */
 export class SaveController {
 	private static _instance: SaveController;
@@ -18,33 +17,33 @@ export class SaveController {
 		return SaveController._instance;
 	}
 
-	#loadModal: Modal;
-	#modalElement: HTMLDivElement
+	private loadModal: Modal;
+	private modalElement: HTMLDivElement
 
-	#loadInput: HTMLInputElement;
-	#loadMessage: HTMLSpanElement
+	private loadInput: HTMLInputElement;
+	private loadMessage: HTMLSpanElement
 
-	#loadButton: HTMLButtonElement
+	private loadButton: HTMLButtonElement
 
-	#loadArea: HTMLDivElement
-	#loadAreaBackground: HTMLDivElement
+	private loadArea: HTMLDivElement
+	private loadAreaBackground: HTMLDivElement
 
 	private constructor() {
-		this.#modalElement = document.getElementById("loadModal") as HTMLDivElement
-		this.#loadModal = new Modal(this.#modalElement)
-		this.#loadInput = document.getElementById("file-input") as HTMLInputElement
-		this.#loadMessage = document.getElementById("load-message")
-		this.#loadButton = document.getElementById("loadJSONButton") as HTMLButtonElement
-		this.#loadArea = document.getElementById("dragdroparea") as HTMLDivElement
-		this.#loadAreaBackground = document.getElementById("dragdropbackground") as HTMLDivElement
+		this.modalElement = document.getElementById("loadModal") as HTMLDivElement
+		this.loadModal = new Modal(this.modalElement)
+		this.loadInput = document.getElementById("file-input") as HTMLInputElement
+		this.loadMessage = document.getElementById("load-message")
+		this.loadButton = document.getElementById("loadJSONButton") as HTMLButtonElement
+		this.loadArea = document.getElementById("dragdroparea") as HTMLDivElement
+		this.loadAreaBackground = document.getElementById("dragdropbackground") as HTMLDivElement
 		
-		const opacity0 = ()=>{this.#loadAreaBackground.style.opacity = "0"}
+		const opacity0 = ()=>{this.loadAreaBackground.style.opacity = "0"}
 		
-		this.#loadArea.addEventListener("dragenter",(ev)=>{
-			this.#loadAreaBackground.style.opacity = "0.3"
+		this.loadArea.addEventListener("dragenter",(ev)=>{
+			this.loadAreaBackground.style.opacity = "0.3"
 		})
-		this.#loadArea.addEventListener("dragleave",opacity0)
-		this.#loadArea.addEventListener("drop",opacity0)
+		this.loadArea.addEventListener("dragleave",opacity0)
+		this.loadArea.addEventListener("drop",opacity0)
 	}
 
 	save(){
@@ -60,20 +59,20 @@ export class SaveController {
 
 	load(){
 		//open modal for file selection
-		this.#loadModal.show()
+		this.loadModal.show()
 
 		const changeText = (()=>{			
 			
-			let file = this.#loadInput.files[0];
+			let file = this.loadInput.files[0];
 			if (file) {
-				this.#loadMessage.textContent = this.#loadInput.value.split("\\").pop()
+				this.loadMessage.textContent = this.loadInput.value.split("\\").pop()
 			}else{
-				this.#loadMessage.textContent = "No file selected"
+				this.loadMessage.textContent = "No file selected"
 			}
 		}).bind(this);
 
 		const loadFile = (()=>{			
-			let file = this.#loadInput.files[0];
+			let file = this.loadInput.files[0];
 
 			if (file) {
 				var reader = new FileReader();
@@ -81,27 +80,27 @@ export class SaveController {
 				reader.onload = (evt) => {
 					let inputstring = evt.target.result instanceof ArrayBuffer?"":evt.target.result
 					this.loadFromJSON(JSON.parse(inputstring), true);
-					this.#loadModal.hide()
+					this.loadModal.hide()
 				}
 				reader.onerror = (evt) => {
-					this.#loadMessage.textContent = "error reading file";
+					this.loadMessage.textContent = "error reading file";
 				}
 			}
 
 		}).bind(this);
 
-		this.#loadInput.addEventListener("change",changeText)
+		this.loadInput.addEventListener("change",changeText)
 
-		this.#loadButton.addEventListener("click",loadFile)
+		this.loadButton.addEventListener("click",loadFile)
 
 		const hideListener = (() => {
-			this.#loadInput.removeEventListener("change", changeText);
-			this.#loadButton.removeEventListener("click", loadFile);
+			this.loadInput.removeEventListener("change", changeText);
+			this.loadButton.removeEventListener("click", loadFile);
 			// "once" is not always supported:
-			this.#modalElement.removeEventListener("hidden.bs.modal", hideListener);
+			this.modalElement.removeEventListener("hidden.bs.modal", hideListener);
 		}).bind(this);
 
-		this.#modalElement.addEventListener("hidden.bs.modal", hideListener, {
+		this.modalElement.addEventListener("hidden.bs.modal", hideListener, {
 			passive: true,
 			once: true,
 		});

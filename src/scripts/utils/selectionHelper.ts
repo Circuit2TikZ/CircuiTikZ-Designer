@@ -1,7 +1,15 @@
 import * as SVG from "@svgdotjs/svg.js";
+import { CanvasController } from "../internal";
 
 export const selectedBoxWidth = "0.4pt"
 export const selectionColor = "#d44"
+
+export const pathPointRadius = 10
+export function pathPointSVG(){
+	let circle = CanvasController.instance.canvas.circle(pathPointRadius*2).fill("transparent")
+	circle.node.classList.add("pathPoint")
+	return circle
+}
 
 /**
 	 * 

@@ -2,7 +2,7 @@
  * @module undo
  */
 
-import {MainController, SelectionController, SaveController, ComponentSaveObject} from "../internal";
+import {MainController, SelectionController, SaveController, ComponentSaveObject, SelectionMode} from "../internal";
 
 /**
  * Class handling undo and redo via save states
@@ -69,7 +69,7 @@ export class Undo {
 		}
 
 		if (components.length>0) {
-			SelectionController.instance.selectComponents(components,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectComponents(components,SelectionMode.RESET)
 		}
 	}
 }

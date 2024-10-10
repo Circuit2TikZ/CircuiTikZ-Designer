@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, FormEntry, MainController, SnapController, SnapCursorController, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor, pathPointRadius } from "../utils/selectionHelper";
 
 export type PathSaveObject = CircuitikzSaveObject & {
 	start:{x:number, y:number}
@@ -23,7 +23,6 @@ export class PathComponent extends CircuitikzComponent{
 
 	private selectionRectangle: SVG.Rect = null;
 
-	private circleRadius = 20
 	private startCircle:SVG.Circle;
 	private endCircle:SVG.Circle;
 
@@ -64,12 +63,10 @@ export class PathComponent extends CircuitikzComponent{
 		this.visualization.add(this.endLine)
 		this.visualization.hide()
 		
-		this.startCircle = CanvasController.instance.canvas.circle(this.circleRadius).fill("transparent")
-		this.startCircle.node.classList.add("pathPoint")
+		this.startCircle = pathPointSVG()
 		this.visualization.add(this.startCircle)
 		
-		this.endCircle = CanvasController.instance.canvas.circle(this.circleRadius).fill("transparent")
-		this.endCircle.node.classList.add("pathPoint")
+		this.endCircle = pathPointSVG()
 		this.visualization.add(this.endCircle)
 	}
 
@@ -139,8 +136,8 @@ export class PathComponent extends CircuitikzComponent{
 		let startEnd = this.relSymbolStart.rotate(this.rotationDeg).add(this.position)
 		let endStart = this.relSymbolEnd.rotate(this.rotationDeg).add(this.position)
 
-		this.startCircle.move(this.posStart.x-this.circleRadius/2,this.posStart.y-this.circleRadius/2)
-		this.endCircle.move(this.posEnd.x-this.circleRadius/2,this.posEnd.y-this.circleRadius/2)
+		this.startCircle.move(this.posStart.x-pathPointRadius/2,this.posStart.y-pathPointRadius/2)
+		this.endCircle.move(this.posEnd.x-pathPointRadius/2,this.posEnd.y-pathPointRadius/2)
 
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
@@ -343,6 +340,7 @@ export class PathComponent extends CircuitikzComponent{
 		SnapCursorController.instance.visible = false
 		SnapController.instance.hideSnapPoints();
 		SnapController.instance.addSnapPoints(this.snappingPoints)
+		this.updateTransform()
 		this.recalculateSnappingPoints()
 		this.draggable(true)
 	}
@@ -357,8 +355,6 @@ export class PathComponent extends CircuitikzComponent{
 		pathComponent.posStart = new SVG.Point(saveObject.start)
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced=2
-		pathComponent.placeFinish()
-		pathComponent.visualization.show()
 
 		// TODO
 		// if (saveObject.mirror) {
@@ -377,8 +373,8 @@ export class PathComponent extends CircuitikzComponent{
 		}else{
 			pathComponent.label = {value: ""}
 		}
-		pathComponent.updateTransform()
-		pathComponent.recalculateSnappingPoints()
+		pathComponent.placeFinish()
+		pathComponent.visualization.show()
 
 		return pathComponent;
 	}

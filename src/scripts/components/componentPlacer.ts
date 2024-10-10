@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, MainController, SaveController, SelectionController, SnapController, SnapPoint, Undo } from "../internal";
+import { CanvasController, CircuitComponent, MainController, Modes, SaveController, SelectionController, SnapController, SnapPoint, Undo } from "../internal";
 import hotkeys from "hotkeys-js";
 
 export class ComponentPlacer{
@@ -24,7 +24,7 @@ export class ComponentPlacer{
 		let pt = CanvasController.eventToPoint(ev,false)
 		// let pt:SVG.Point = new SVG.Point(ev.clientX, ev.clientY).transform(component.visualization.screenCTM().inverseO())	
 		let shiftKey = ev.shiftKey
-		return shiftKey?pt:SnapController.instance.snapPoint(pt,component.getPlacingSnappingPoints())
+		return shiftKey?pt:SnapController.instance.snapPoint(pt,component.getPlacingSnappingPoints().map(point=>point.relToComponentAnchor()))
 	}
 
 	public placeStep(ev:MouseEvent){
@@ -38,27 +38,41 @@ export class ComponentPlacer{
 
 	public placeMove(ev:MouseEvent){
 		let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
+		// CanvasController.instance.canvas.circle(2).fill("green").move(pt.x-1,pt.y-1)
 		ComponentPlacer.instance.component.placeMove(pt,ev)
 	}
 
-	public placeFinish(ev:MouseEvent){
-		if (ev.button==0) {
-			ComponentPlacer.instance.component.placeFinish()
-			ComponentPlacer.instance.cleanUp()
-			// Undo.addState()
-			
-			// restart component placement for just finished component
-			ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+	public placeRotate(angleDeg:number){
+		if (ComponentPlacer.instance.component) {
+			ComponentPlacer.instance.component.placeRotate(angleDeg)
 		}
 	}
 
-	public placeCancel(ev?: KeyboardEvent){
-		console.log("cancel");
-		
+	public placeFlip(horizontal:boolean){
+		if (ComponentPlacer.instance.component) {
+			ComponentPlacer.instance.component.placeFlip(horizontal)
+		}
+	}
+
+	public placeFinish(ev:MouseEvent){
 		ComponentPlacer.instance.component.placeFinish()
-		MainController.instance.removeComponent(ComponentPlacer.instance.component)
-		ComponentPlacer.instance._component = null
 		ComponentPlacer.instance.cleanUp()
+		// Undo.addState()
+		
+		// restart component placement for just finished component
+		ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+
+	}
+
+	public placeCancel(ev?: KeyboardEvent){
+		let component = ComponentPlacer.instance.component
+		if (component) {
+			component.placeFinish()
+			MainController.instance.removeComponent(component)
+			ComponentPlacer.instance._component = null
+		}	
+		ComponentPlacer.instance.cleanUp()
+		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}
 
 	private cleanUp(){
@@ -67,19 +81,20 @@ export class ComponentPlacer{
 		let canvas = CanvasController.instance.canvas
 		canvas.off("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.off("mouseup",ComponentPlacer.instance.placeStep)
-		canvas.off("dblclick",ComponentPlacer.instance.placeFinish)
-		hotkeys.unbind("esc",ComponentPlacer.instance.placeCancel)
+		// canvas.off("dblclick",ComponentPlacer.instance.placeFinish)
+		// hotkeys.unbind("esc",ComponentPlacer.instance.placeCancel)
 	}
 
 	public placeComponent(component: CircuitComponent){
+		MainController.instance.switchMode(Modes.COMPONENT)
 		ComponentPlacer.instance._component = component		
 		let canvas = CanvasController.instance.canvas
 		SnapController.instance.showSnapPoints()
 
 		canvas.on("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.on("mouseup",ComponentPlacer.instance.placeStep)
-		canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
-		hotkeys("esc",{keyup: true, keydown:false},ComponentPlacer.instance.placeCancel)
+		// canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
+		// hotkeys("esc",{keyup: true, keydown:false},ComponentPlacer.instance.placeCancel)
 		ComponentPlacer.instance.component.placeMove(CanvasController.instance.lastCanvasPoint)
 	}
 }

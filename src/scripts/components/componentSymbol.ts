@@ -5,7 +5,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { ensureInPx } from "../utils/impSVGNumber";
 import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
-import { CircuitikzComponent } from "./CircuitComponent";
+import { CircuitikzComponent } from "../internal";
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 

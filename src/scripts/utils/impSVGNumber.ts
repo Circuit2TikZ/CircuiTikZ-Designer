@@ -148,11 +148,11 @@ declare module "@svgdotjs/svg.js" {
 		 */
 		rotate(angle: number, centerCoord?: Point, inRad?: boolean): Point;
 		/**
-		 * Formats the point for usage with (Circui)TikZ.
+		 * Checks if to points are equal up to a given epsilon(how far the Xs and Ys can be apart to still count as being equal)
 		 *
-		 * Converts from px to cm and rounds to 2 digits after the decimal point.
-		 * @returns the TikZ representation, e.g. "(0.1, 1.23)"
+		 * @returns true if the points are equal
 		 */
+		eq(other:Point, eps?:number):boolean
 		toTikzString(): string;
 	}
 }
@@ -560,6 +560,22 @@ SVG.extend(SVG.Point, {
 		}
 
 		return result;
+	},
+	/**
+	 * Checks if to points are equal up to a given epsilon(how far the Xs and Ys can be apart to still count as being equal)
+	 *
+	 * @param other the other point
+	 * @param [eps=1e-7] how far the points can be apart
+	 * @returns true if the points are equal
+	 */
+	eq(other:SVG.Point, eps:number=1e-7):boolean{
+		if (this.x < other.x-eps || this.x > other.x+eps) {
+			return false
+		}
+		if (this.y < other.y-eps || this.y > other.y+eps) {
+			return false
+		}
+		return true
 	},
 
 	/**

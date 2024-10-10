@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, FormEntry, MainController, SelectionController, SnapCursorController, SnapPoint } from "../internal"
+import { CanvasController, CircuitComponent, ComponentSaveObject, FormEntry, MainController, SelectionController, SnapController, SnapCursorController, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pointInsideRect, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, selectionColor } from "../utils/selectionHelper";
 
 export enum LineDirection {
 	Straight = "--",
@@ -30,7 +30,8 @@ export class LineComponent extends CircuitComponent{
 
 	private isSelected=false
 
-	private draggingLineWidth=20
+	private draggingLineWidth=10
+	private adjustmentPoints:SVG.Element[]=[]
 	
 	constructor(){
 		super()
@@ -63,27 +64,65 @@ export class LineComponent extends CircuitComponent{
 		}
 	}
 
+	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
+		this.snappingPoints[0].updateRelPosition(this.cornerPoints[0].sub(this.position))
+		this.snappingPoints[1].updateRelPosition(this.cornerPoints.at(-1).sub(this.position))
+		super.recalculateSnappingPoints(new SVG.Matrix())
+	}
+
 	public getPlacingSnappingPoints(): SnapPoint[] {
-		return [new SVG.Point() as SnapPoint]
+		return this.finishedPlacing?this.snappingPoints:[new SnapPoint(this,"center",new SVG.Point())]
 	}
 	public draggable(drag: boolean): void {
-		// if (drag) {
-		// 	this.draggableLine.node.classList.add("draggable")
-		// } else {
-		// 	this.draggableLine.node.classList.remove("draggable")
-		// }
-		// this.draggableLine.draggable(drag)
-		// AdjustDragHandler.snapDrag(this,this.draggableLine,drag,{
-		// 	dragMove:(pos)=>{
-		// 		if (SelectionController.instance.isComponentSelected(this)) {
-		// 			SelectionController.instance.moveSelectionRel(pos.sub(this.position))
-		// 		}else{
-		// 			this.moveTo(pos)
-		// 		}
-		// 		this.recalculateSnappingPoints()
-		// 	},
-		// })
-		SnapDragHandler.snapDrag(this,drag)
+		if (drag) {
+			this.draggableLine.node.classList.add("draggable")
+		} else {
+			this.draggableLine.node.classList.remove("draggable")
+		}
+		SnapDragHandler.snapDrag(this,drag,this.draggableLine)
+
+		let dirs:SVG.Point[] = []
+		for (let index = 0; index < this.lineDirections.length; index++) {
+			let rel = this.cornerPoints[index+1].sub(this.cornerPoints[index])
+			dirs[index] = this.lineDirections[index] == LineDirection.VH?
+			new SVG.Point(0,Math.sign(rel.y)):
+			new SVG.Point(Math.sign(rel.x),0)
+		}
+
+		for (let index = 0; index < this.adjustmentPoints.length; index++) {
+			const element = this.adjustmentPoints[index];
+			if (drag) {
+				element.node.classList.add("draggable")
+				element.node.classList.remove("d-none")
+			}else{
+				element.node.classList.remove("draggable")
+				element.node.classList.add("d-none")
+			}
+			AdjustDragHandler.snapDrag(this,element,drag,{
+				dragMove:(pos,ev)=>{
+					if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
+						if (index>0) {
+							this.lineDirections[index-1]=LineDirection.Straight
+						}
+						this.lineDirections[index]=LineDirection.Straight
+					}else{
+						if (index>0) {
+							dirs[index-1] = this.directionVecFromPos(pos.sub(this.cornerPoints[index-1]),dirs[index-1])
+							this.lineDirections[index-1]=this.lineDirectionFromDirectionVec(dirs[index-1],ev)
+						}
+						if (index<this.adjustmentPoints.length-1) {
+							let rel = pos.sub(this.cornerPoints[index+1])
+							dirs[index] = this.directionVecFromPos(rel,dirs[index])
+							let dir = dirs[index].x!=0?new SVG.Point(0,rel.y):new SVG.Point(rel.x,0)
+							this.lineDirections[index]=this.lineDirectionFromDirectionVec(dir,ev)
+						}
+					}
+					this.cornerPoints[index].x=pos.x
+					this.cornerPoints[index].y=pos.y
+					this.updateTransform()
+				}
+			})
+		}
 	}
 	public moveTo(position: SVG.Point): void {
 		for (let index = 0; index < this.cornerPoints.length; index++) {
@@ -117,18 +156,23 @@ export class LineComponent extends CircuitComponent{
 		}
 	}
 	protected updateTransform(): void {
+		for (let index = 0; index < this.adjustmentPoints.length; index++) {
+			this.adjustmentPoints[index].move(this.cornerPoints[index].x-pathPointRadius,this.cornerPoints[index].y-pathPointRadius)
+		}
+
 		let pointArray = new SVG.PointArray(this.cornerPoints[0].toArray())
 		for (let index = 0; index < this.lineDirections.length; index++) {
 			const direction = this.lineDirections[index];
 			const lastPoint = this.cornerPoints[index];
 			const point = this.cornerPoints[index+1];
 			if (direction==LineDirection.HV) {
-				pointArray.push(new SVG.Point(lastPoint.x,point.y).toArray())
-			} else if(direction==LineDirection.VH){
 				pointArray.push(new SVG.Point(point.x,lastPoint.y).toArray())
+			} else if(direction==LineDirection.VH){
+				pointArray.push(new SVG.Point(lastPoint.x,point.y).toArray())
 			}
 			pointArray.push(point.toArray())
 		}
+
 		this.line.clear()
 		this.line.plot(pointArray)
 		this.draggableLine.clear()
@@ -139,7 +183,7 @@ export class LineComponent extends CircuitComponent{
 		this.position.x = this._bbox.cx
 		this.position.y = this._bbox.cy
 
-		this.relPosition = this.position.sub(new SVG.Point())
+		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 	}
 	protected recalculateSelectionVisuals(): void {}
 
@@ -213,6 +257,10 @@ export class LineComponent extends CircuitComponent{
 	}
 	public remove(): void {
 		this.visualization.remove()
+		this.viewSelected(false)
+		if (this.finishedPlacing) {
+			this.draggable(false)
+		}
 	}
 	public placeMove(pos: SVG.Point, ev?:MouseEvent): void {
 		SnapCursorController.instance.moveTo(pos)
@@ -220,26 +268,36 @@ export class LineComponent extends CircuitComponent{
 			let lastPoint = this.cornerPoints.at(-2)
 			let relToLastPoint = pos.sub(lastPoint)
 
-			if (relToLastPoint.x*this.lastPlacingDirection.x<0) {
-				this.lastPlacingDirection.x=0
-				this.lastPlacingDirection.y=Math.sign(relToLastPoint.y)
-			}else if(relToLastPoint.y*this.lastPlacingDirection.y<0){
-				this.lastPlacingDirection.x=Math.sign(relToLastPoint.x)
-				this.lastPlacingDirection.y=0
-			}
-
-			if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
-				this.lineDirections[this.lineDirections.length-1]=LineDirection.Straight
-			}else if (this.lastPlacingDirection.x!=0) {
-				this.lineDirections[this.lineDirections.length-1]=LineDirection.VH
-			}else if(this.lastPlacingDirection.y!=0){
-				this.lineDirections[this.lineDirections.length-1]=LineDirection.HV
-			}
+			this.lastPlacingDirection=this.directionVecFromPos(relToLastPoint,this.lastPlacingDirection)
+			this.lineDirections[this.lineDirections.length-1]=this.lineDirectionFromDirectionVec(this.lastPlacingDirection,ev)
 
 			this.cornerPoints[this.cornerPoints.length-1] = pos
 			this.updateTransform()
 		}
 	}
+
+	private directionVecFromPos(relPos:SVG.Point,lastDirection:SVG.Point):SVG.Point{
+		var dir = lastDirection.clone()
+		if (relPos.x*lastDirection.x<0) {
+			dir.x=0
+			dir.y=Math.sign(relPos.y)
+		}else if(relPos.y*lastDirection.y<0){
+			dir.x=Math.sign(relPos.x)
+			dir.y=0
+		}
+		return dir
+	}
+
+	private lineDirectionFromDirectionVec(directionVec:SVG.Point,ev?:MouseEvent):LineDirection{
+		if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
+			return LineDirection.Straight
+		}else if (directionVec.x!=0) {
+			return LineDirection.HV
+		}else if(directionVec.y!=0){
+			return LineDirection.VH
+		}
+	}
+
 	public placeStep(pos: SVG.Point): boolean {
 		SnapCursorController.instance.visible=false
 		if (this.cornerPoints.length>0) {
@@ -260,17 +318,45 @@ export class LineComponent extends CircuitComponent{
 		
 		return false
 	}
+
 	public placeFinish(): void {
+		if (this.finishedPlacing) {
+			return
+		}
+		
 		SnapCursorController.instance.visible=false
 		if (this.cornerPoints.length>0) {
 			this.placeStep(this.cornerPoints.at(-1))
 		}else{
 			MainController.instance.removeComponent(this)
+			return;
 		}
+
+		if (this.cornerPoints.length==2&&this.cornerPoints[0].eq(this.cornerPoints[1])) {
+			MainController.instance.removeComponent(this)
+			return;
+		}
+		
 		this.cornerPoints.pop()
 		this.lineDirections.pop()
+		this.snappingPoints = [new SnapPoint(this,"START",this.cornerPoints[0].sub(this.position)),
+								new SnapPoint(this,"END",this.cornerPoints.at(-1).sub(this.position))]
+		SnapController.instance.addSnapPoints(this.snappingPoints)
+		
+		for (const cornerPoint of this.cornerPoints) {
+			let element = pathPointSVG().move(cornerPoint.x-pathPointRadius,cornerPoint.y-pathPointRadius)
+			this.visualization.add(element)
+			this.adjustmentPoints.push(element)
+		}
+		
 		this.draggable(true)
+		this.updateTransform()
+		this.recalculateSnappingPoints()
+
+
+		this.finishedPlacing = true
 	}
+
 	public static fromJson(saveObject: LineSaveObject): LineComponent {
 		let lineComponent: LineComponent = new LineComponent()
 		lineComponent.cornerPoints.push(new SVG.Point(saveObject.start))
@@ -279,8 +365,6 @@ export class LineComponent extends CircuitComponent{
 			lineComponent.lineDirections.push(segment.direction)
 		}
 		lineComponent.placeFinish()
-		lineComponent.updateTransform()
-		lineComponent.recalculateSnappingPoints()
 
 		return lineComponent;
 	}

@@ -3,12 +3,11 @@
  */
 
 import { Point } from "@svgdotjs/svg.js"
-import { Line, MainController, NodeComponentInstance, PathComponentInstance, SelectionController, Undo } from "../internal"
+import { ComponentSaveObject, MainController, SaveController, SelectionController, SelectionMode, Undo } from "../internal"
 
 type Clipboard = {
-	nodes: NodeComponentInstance[],
-	paths: PathComponentInstance[],
-	lines: Line[]
+	components:ComponentSaveObject[]
+	selectionPos:Point
 }
 
 /**
@@ -16,38 +15,31 @@ type Clipboard = {
  * @class
  */
 export class CopyPaste {
-	static #clipboard: Clipboard|null = null
+	private static clipboard: Clipboard|null = null
 
-	static copy(){
+	public static copy(){
 		if (SelectionController.instance.hasSelection()) {
-			let nodes = []
-			let paths = []
+			let components:ComponentSaveObject[] = []
 			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				let componentObject = component.toJson()
-				componentObject.tikzName = ""
-				if (component instanceof NodeComponentInstance) {
-					nodes.push(componentObject)
-				}else{
-					paths.push(componentObject)
+				if (Object.hasOwn(componentObject,"name")) {
+					(componentObject as any).name = ""
 				}
+
+				components.push(componentObject)
 			}
+
+			let bbox = SelectionController.instance.getOverallBoundingBox()
 	
-			let lines = []
-			for (const line of SelectionController.instance.currentlySelectedLines) {
-				lines.push(line.toJson())
-			}
-	
-			CopyPaste.#clipboard = {
-				nodes:nodes,
-				paths:paths,
-				lines:lines,
+			CopyPaste.clipboard = {
+				components:components,
+				selectionPos: new Point(bbox.x,bbox.y)
 			}
 		}
 	}
 
-	static paste(){
-		//TODO paste should pick up components instantly and move them to the mouse position
-		if (this.#clipboard && Object.keys(CopyPaste.#clipboard).length===0) {
+	public static paste(){
+		if (CopyPaste.clipboard && Object.keys(CopyPaste.clipboard).length===0) {
 			return
 		}
 		
@@ -55,40 +47,24 @@ export class CopyPaste {
 		SelectionController.instance.activateSelection()
 
 		let allComponents = []
-		let lines = []
 
-		for (const node of CopyPaste.#clipboard.nodes) {
-			allComponents.push(NodeComponentInstance.fromJson(node))
-		}
-		
-		for (const path of CopyPaste.#clipboard.paths) {
-			allComponents.push(PathComponentInstance.fromJson(path))
-		}
-
-		for (const line of CopyPaste.#clipboard.lines) {
-			lines.push(Line.fromJson(line))
+		for (const component of CopyPaste.clipboard.components) {
+			allComponents.push(SaveController.fromJson(component))
 		}
 
 		if (allComponents.length>0) {
-			SelectionController.instance.selectComponents(allComponents,SelectionController.SelectionMode.RESET)
+			SelectionController.instance.selectComponents(allComponents,SelectionMode.RESET)
 		}
-		if (lines.length>0) {
-			SelectionController.instance.selectLines(lines,SelectionController.SelectionMode.RESET)
-		}
-		//TODO get current mouse position
-		SelectionController.instance.moveSelectionTo(new Point(0,0))
+		SelectionController.instance.moveSelectionTo(CopyPaste.clipboard.selectionPos.add(new Point(20,20)))
 		Undo.addState()
 	}
 
-	static cut(){
+	public static cut(){
 		if (SelectionController.instance.hasSelection()) {
 			CopyPaste.copy();
 	
 			for (const component of SelectionController.instance.currentlySelectedComponents) {
-				MainController.controller.removeInstance(component)
-			}
-			for (const line of SelectionController.instance.currentlySelectedLines) {
-				MainController.controller.removeLine(line)
+				MainController.instance.removeComponent(component)
 			}
 			Undo.addState()
 		}

@@ -20,67 +20,67 @@ export class ExportController {
 		return ExportController._instance;
 	}
 
-	#modalElement: HTMLDivElement;
-	#modal: Modal;
-	#heading: HTMLHeadingElement;
-	#exportedContent: HTMLTextAreaElement;
-	#fileBasename: HTMLInputElement;
-	#fileExtension: HTMLInputElement;
-	#fileExtensionDropdown: HTMLUListElement;
-	#copyButton: HTMLDivElement;
-	#saveButton: HTMLButtonElement;
+	private modalElement: HTMLDivElement;
+	private modal: Modal;
+	private heading: HTMLHeadingElement;
+	private exportedContent: HTMLTextAreaElement;
+	private fileBasename: HTMLInputElement;
+	private fileExtension: HTMLInputElement;
+	private fileExtensionDropdown: HTMLUListElement;
+	private copyButton: HTMLDivElement;
+	private saveButton: HTMLButtonElement;
 
-	#copyTooltip: Tooltip;
+	private copyTooltip: Tooltip;
 
-	#defaultDisplay: string
+	private defaultDisplay: string
 
 	/**
 	 * Init the ExportController
 	 */
 	private constructor() {
-		this.#modalElement = document.getElementById("exportModal") as HTMLDivElement;
-		this.#modal = new Modal(this.#modalElement);
-		this.#heading = document.getElementById("exportModalLabel") as HTMLHeadingElement;
-		this.#exportedContent = document.getElementById("exportedContent") as HTMLTextAreaElement;
-		this.#fileBasename = document.getElementById("exportModalFileBasename") as HTMLInputElement;
-		this.#fileExtension = document.getElementById("exportModalFileExtension") as HTMLInputElement;
-		this.#fileExtensionDropdown = document.getElementById("exportModalFileExtensionDropdown") as HTMLUListElement;
-		this.#copyButton = document.getElementById("copyExportedContent") as HTMLDivElement;
-		this.#saveButton = document.getElementById("exportModalSave") as HTMLButtonElement;
+		this.modalElement = document.getElementById("exportModal") as HTMLDivElement;
+		this.modal = new Modal(this.modalElement);
+		this.heading = document.getElementById("exportModalLabel") as HTMLHeadingElement;
+		this.exportedContent = document.getElementById("exportedContent") as HTMLTextAreaElement;
+		this.fileBasename = document.getElementById("exportModalFileBasename") as HTMLInputElement;
+		this.fileExtension = document.getElementById("exportModalFileExtension") as HTMLInputElement;
+		this.fileExtensionDropdown = document.getElementById("exportModalFileExtensionDropdown") as HTMLUListElement;
+		this.copyButton = document.getElementById("copyExportedContent") as HTMLDivElement;
+		this.saveButton = document.getElementById("exportModalSave") as HTMLButtonElement;
 
 		
-		this.#defaultDisplay = this.#exportedContent.parentElement.style.display;
+		this.defaultDisplay = this.exportedContent.parentElement.style.display;
 
 		let copyButtonDefaultTooltipText = "Copy to clipboard!"
-		this.#copyButton.addEventListener("hidden.bs.tooltip",(evt)=>{
-			this.#copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
-			this.#copyTooltip.dispose();
-			this.#copyTooltip = new Tooltip(this.#copyButton);
+		this.copyButton.addEventListener("hidden.bs.tooltip",(evt)=>{
+			this.copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
+			this.copyTooltip.dispose();
+			this.copyTooltip = new Tooltip(this.copyButton);
 		})
-		this.#copyButton.setAttribute("data-bs-toggle","tooltip");
-		this.#copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
-		this.#copyTooltip = new Tooltip(this.#copyButton);
+		this.copyButton.setAttribute("data-bs-toggle","tooltip");
+		this.copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
+		this.copyTooltip = new Tooltip(this.copyButton);
 	}
 
-	exportJSON(text){
-		this.#heading.textContent = "Save JSON"
+	exportJSON(text:string){
+		this.heading.textContent = "Save JSON"
 		// don't show json content. Should this stay like this or can we just show the json?
 		// this.#exportedContent.parentElement.style.display = "none";
 		// create extension select list
 		const extensions = [".json", ".txt"];
 
-		this.#exportedContent.rows = Math.max(text.split("\n").length,2);
-		this.#exportedContent.value = text;
+		this.exportedContent.rows = Math.max(text.split("\n").length,2);
+		this.exportedContent.value = text;
 
-		this.#export(extensions)
+		this.export(extensions)
 	}
 
 	/**
 	 * Shows the exportModal with the CitcuiTikZ code.
 	 */
 	exportCircuiTikZ() {
-		this.#heading.innerHTML = "Export CircuiTi<i>k</i>Z code"
-		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
+		this.heading.innerHTML = "Export CircuiTi<i>k</i>Z code"
+		this.exportedContent.parentElement.style.display = this.defaultDisplay;
 		// create extension select list
 		const extensions = [".tikz", ".tex", ".pgf"];
 
@@ -97,19 +97,19 @@ export class ExportController {
 				...circuitElements,
 				"\\end{tikzpicture}",
 			];
-			this.#exportedContent.rows = arr.length;
-			this.#exportedContent.value = arr.join("\n");
+			this.exportedContent.rows = arr.length;
+			this.exportedContent.value = arr.join("\n");
 		}
 
-		this.#export(extensions)
+		this.export(extensions)
 	}
 
 	/**
 	 * Shows the exportModal with the SVG code.
 	 */
 	exportSVG() {
-		this.#heading.textContent = "Export SVG"
-		this.#exportedContent.parentElement.style.display = this.#defaultDisplay;
+		this.heading.textContent = "Export SVG"
+		this.exportedContent.parentElement.style.display = this.defaultDisplay;
 		// prepare selection and bounding box
 		SelectionController.instance.selectAll()
 		let bbox = SelectionController.instance.getOverallBoundingBox()
@@ -191,56 +191,56 @@ export class ExportController {
 		tempDiv.appendChild(svgObj);
 		let textContent = pretty(tempDiv.innerHTML, {ocd: true});
 		
-		this.#exportedContent.rows = textContent.split("\n").length
-		this.#exportedContent.value = textContent;
+		this.exportedContent.rows = textContent.split("\n").length
+		this.exportedContent.value = textContent;
 		const extensions = [".svg", ".txt"];
 		MainController.instance.darkMode = colorTheme;
 		MainController.instance.updateTheme()
-		this.#export(extensions)
+		this.export(extensions)
 		SelectionController.instance.activateSelection()
 	}
 
-	#export(extensions){
+	private export(extensions:string[]){
 
 		// copy text and adjust tooltip for feedback
 		const copyText = () => {
-			navigator.clipboard.writeText(this.#exportedContent.value)
+			navigator.clipboard.writeText(this.exportedContent.value)
 			.then(()=>{
-				this.#copyButton.setAttribute("data-bs-title","Copied!");
-				this.#copyTooltip.dispose();
-				this.#copyTooltip = new Tooltip(this.#copyButton);
-				this.#copyTooltip.show()
+				this.copyButton.setAttribute("data-bs-title","Copied!");
+				this.copyTooltip.dispose();
+				this.copyTooltip = new Tooltip(this.copyButton);
+				this.copyTooltip.show()
 			});
 		}
 		// create listeners
 		const saveFile = (() => {
 			FileSaver.saveAs(
-				new Blob([this.#exportedContent.value], { type: "text/x-tex;charset=utf-8" }),
-				(this.#fileBasename.value.trim() || "Circuit") + this.#fileExtension.value
+				new Blob([this.exportedContent.value], { type: "text/x-tex;charset=utf-8" }),
+				(this.fileBasename.value.trim() || "Circuit") + this.fileExtension.value
 			);
 		}).bind(this);
 		const hideListener = (() => {
-			this.#exportedContent.value = ""; // free memory
-			this.#copyButton.removeEventListener("click", copyText);
-			this.#saveButton.removeEventListener("click", saveFile);
-			this.#fileExtensionDropdown.replaceChildren();
+			this.exportedContent.value = ""; // free memory
+			this.copyButton.removeEventListener("click", copyText);
+			this.saveButton.removeEventListener("click", saveFile);
+			this.fileExtensionDropdown.replaceChildren();
 			// "once" is not always supported:
-			this.#modalElement.removeEventListener("hidden.bs.modal", hideListener);
+			this.modalElement.removeEventListener("hidden.bs.modal", hideListener);
 		}).bind(this);
 
-		this.#modalElement.addEventListener("hidden.bs.modal", hideListener, {
+		this.modalElement.addEventListener("hidden.bs.modal", hideListener, {
 			passive: true,
 			once: true,
 		});
 
 		// create extension select list
-		this.#fileExtension.value = extensions[0];
-		this.#fileExtensionDropdown.replaceChildren(
+		this.fileExtension.value = extensions[0];
+		this.fileExtensionDropdown.replaceChildren(
 			...extensions.map((ext) => {
 				const link = document.createElement("a");
 				link.textContent = ext;
 				link.classList.add("dropdown-item");
-				link.addEventListener("click", () => (this.#fileExtension.value = ext), {
+				link.addEventListener("click", () => (this.fileExtension.value = ext), {
 					passive: true,
 				});
 				const listElement = document.createElement("li");
@@ -250,9 +250,9 @@ export class ExportController {
 		);
 
 		// add listeners & show modal
-		this.#copyButton.addEventListener("click", copyText, { passive: true });
-		this.#saveButton.addEventListener("click", saveFile, { passive: true });
+		this.copyButton.addEventListener("click", copyText, { passive: true });
+		this.saveButton.addEventListener("click", saveFile, { passive: true });
 
-		this.#modal.show();
+		this.modal.show();
 	}
 }

@@ -2,8 +2,8 @@ import * as SVG from "@svgdotjs/svg.js";
 import { CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, SnapPoint, Undo, CanvasController } from "../internal";
 
 export type DragCallbacks = {
-	dragStart?():void
-	dragMove?(pos: SVG.Point):void
+	dragStart?(pos: SVG.Point, ev?:MouseEvent):void
+	dragMove?(pos: SVG.Point, ev?:MouseEvent):void
 	dragEnd?():void
 }
 
@@ -26,24 +26,39 @@ type DragMoveEventDetail = {
 
 type DragEvent = CustomEvent<DragMoveEventDetail>;
 
+function getOtherRelSnappingPoints(component:CircuitComponent){
+	let snapPoints:SVG.Point[]=[]
+	for (const selectedComponent of SelectionController.instance.currentlySelectedComponents) {
+		if(selectedComponent!=component){
+			for (const snappingPoint of selectedComponent.snappingPoints) {
+				snapPoints.push(snappingPoint.relToComponentAnchor().add(selectedComponent.position).sub(component.position))
+			}
+		}
+	}
+	return snapPoints
+}
+
 export class SnapDragHandler{
 	private componentReference: CircuitComponent
+	private element:SVG.Element
 
 	private startedDragging = false;
 	private didDrag = false;
+	private componentInSelection=false
 
-	constructor(componentReference:CircuitComponent) {
+	constructor(componentReference:CircuitComponent, element:SVG.Element) {
 		this.componentReference = componentReference
-		this.componentReference.visualization.remember("_snapDragHandler", this);
-		this.componentReference.visualization.draggable(true);
+		this.element = element
+		this.element.remember("_snapDragHandler", this);
+		this.element.draggable(true);
 
-		this.componentReference.visualization.on("dragstart", this.dragStart, this, { passive: true });
-		this.componentReference.visualization.on("dragmove.namespace", this.dragMove, this);
-		this.componentReference.visualization.on("dragend", this.dragEnd, this, { passive: true });
+		this.element.on("dragstart", this.dragStart, this, { passive: true });
+		this.element.on("dragmove.namespace", this.dragMove, this);
+		this.element.on("dragend", this.dragEnd, this, { passive: true });
 	}
 
-	static snapDrag(componentReference:CircuitComponent, enable: boolean): SnapDragHandler | null {
-		let snapDragHandler: SnapDragHandler | null = componentReference.visualization.remember("_snapDragHandler") ?? (enable ? new SnapDragHandler(componentReference) : null);
+	static snapDrag(componentReference:CircuitComponent, enable: boolean, element:SVG.Element = componentReference.visualization): SnapDragHandler | null {
+		let snapDragHandler: SnapDragHandler | null = element.remember("_snapDragHandler") ?? (enable ? new SnapDragHandler(componentReference,element) : null);
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
@@ -55,16 +70,17 @@ export class SnapDragHandler{
 	}
 
 	removeHandler() {
-		this.componentReference.visualization.off("dragstart", this.dragStart);
-		this.componentReference.visualization.off("dragmove.namespace", this.dragMove);
-		this.componentReference.visualization.off("dragend", this.dragEnd);
-		this.componentReference.visualization.draggable(false);
+		this.element.off("dragstart", this.dragStart);
+		this.element.off("dragmove.namespace", this.dragMove);
+		this.element.off("dragend", this.dragEnd);
+		this.element.draggable(false);
 	}
 
 	private dragStart(ev:DragEvent){
 		this.startedDragging = true;
-		this.componentReference.visualization.node.classList.add("dragging");
-		this.componentReference.visualization.parent().node.classList.add("dragging");
+		this.element.node.classList.add("dragging");
+		this.element.parent().node.classList.add("dragging");
+		this.componentInSelection = SelectionController.instance.isComponentSelected(this.componentReference)
 	}
 	private dragMove(ev:DragEvent){
 		if (!this.didDrag) {
@@ -83,35 +99,20 @@ export class SnapDragHandler{
 		// emulate as if the component is always dragged from its center (i.e. the position vector)
 		const draggedPoint = new SVG.Point(box.x + relMid.x, box.y + relMid.y);
 
-		let snapPoints: SVG.Point[] = this.componentReference.getPlacingSnappingPoints()
-			// this.componentReference.snappingPoints && this.componentReference.snappingPoints.length > 0
-			// 	? this.componentReference.snappingPoints.concat([new SVG.Point(0, 0) as SnapPoint])
-			// 	: [new SVG.Point(0, 0)];
+		let relSnapPoints: SVG.Point[] = this.componentReference.getPlacingSnappingPoints().map(point=>point.relToComponentAnchor())
 
 		// add more snapping points if the component is part of the selection
-		let componentInSelection = SelectionController.instance.isComponentSelected(this.componentReference)
-		if (componentInSelection) {
-			const componentAnchor = this.componentReference.position
-			for (const component of SelectionController.instance.currentlySelectedComponents) {
-				if(component!=this.componentReference){
-					for (const snappingPoint of component.snappingPoints) {
-						snapPoints.push(snappingPoint.relToComponentAnchor().add(component.position).sub(componentAnchor))
-					}
-				}
-			}
+		if (this.componentInSelection) {
+			relSnapPoints.push(...getOtherRelSnappingPoints(this.componentReference))
 		}
 
 		// calculate where the selection/component should be placed
 		let shiftKey = ev.detail.event.shiftKey
-		let relSnapPoints = snapPoints.map(point=>point instanceof SnapPoint?point.relToComponentAnchor():point)
 		let destination = shiftKey?draggedPoint:SnapController.instance.snapPoint(draggedPoint,relSnapPoints)
 
-		if (componentInSelection){
+		if (this.componentInSelection){
 			//move the whole selection to the destination
 			SelectionController.instance.moveSelectionRel(destination.sub(this.componentReference.position))
-			for (const element of SelectionController.instance.currentlySelectedComponents) {
-				element.recalculateSnappingPoints()
-			}
 		}else{
 			this.componentReference.moveTo(destination)
 		}
@@ -133,8 +134,8 @@ export class SnapDragHandler{
 		// reset drag states
 		this.didDrag = false;
 		this.startedDragging = false;
-		this.componentReference.visualization.node.classList.remove("dragging");
-		this.componentReference.visualization.parent().node.classList.remove("dragging");
+		this.element.node.classList.remove("dragging");
+		this.element.parent().node.classList.remove("dragging");
 		SnapController.instance.hideSnapPoints();
 
 		// TODO support touch screens again
@@ -144,11 +145,17 @@ export class SnapDragHandler{
 				clientX: clientXY.clientX,
 				clientY: clientXY.clientY,
 			});
-			Promise.resolve().then(() => this.componentReference.visualization.node.dispatchEvent(contextMenuEvent));
+			Promise.resolve().then(() => this.element.node.dispatchEvent(contextMenuEvent));
 		}
 
 		// only recalculate snapping points after movement is done! (since they are part of the movement which would lead to eratic behaviour)
-		this.componentReference.recalculateSnappingPoints();
+		if (this.componentInSelection) {
+			for (const component of SelectionController.instance.currentlySelectedComponents) {
+				component.recalculateSnappingPoints()
+			}
+		}else{
+			this.componentReference.recalculateSnappingPoints();
+		}
 
 		if (trackState) {
 			Undo.addState()
@@ -160,19 +167,14 @@ export class AdjustDragHandler{
 	private dragCallbacks?: DragCallbacks
 	private element: SVG.Element
 	private componentReference: CircuitComponent
-	private relMid: SVG.Point;
 
-	private moveSelection = false;
 	private startedDragging = false;
 	private didDrag = false;
 
-	constructor(componentReference:CircuitComponent, element: SVG.Element, moveSelection=false, callbacks?: DragCallbacks) {
+	constructor(componentReference:CircuitComponent, element: SVG.Element, callbacks: DragCallbacks) {
 		this.element = element
 		this.componentReference = componentReference
-		this.moveSelection = moveSelection
 		this.dragCallbacks = callbacks
-		let circleBbox = element.bbox()
-		this.relMid = new SVG.Point(circleBbox.w/2,circleBbox.h/2);
 		this.element.remember("_adjustDragHandler", this);
 		this.element.draggable(true);
 
@@ -181,8 +183,8 @@ export class AdjustDragHandler{
 		this.element.on("dragend", this.dragEnd, this, { passive: true });
 	}
 
-	static snapDrag(componentReference:CircuitComponent, element:SVG.Element, enable: boolean, moveSelection=false, callbacks?:DragCallbacks): AdjustDragHandler | null {
-		let adjustDragHandler: AdjustDragHandler | null = element.remember("_adjustDragHandler") ?? (enable ? new AdjustDragHandler(componentReference, element, moveSelection, callbacks) : null);
+	static snapDrag(componentReference:CircuitComponent, element:SVG.Element, enable: boolean, callbacks:DragCallbacks={}): AdjustDragHandler | null {
+		let adjustDragHandler: AdjustDragHandler | null = element.remember("_adjustDragHandler") ?? (enable ? new AdjustDragHandler(componentReference, element, callbacks) : null);
 		if (enable === false && adjustDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
@@ -216,7 +218,10 @@ export class AdjustDragHandler{
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
 		if (this.dragCallbacks && this.dragCallbacks.dragStart) {
-			this.dragCallbacks.dragStart()
+			const draggedPoint = new SVG.Point(event.detail.box.cx, event.detail.box.cy);
+			let shiftKey = event.detail.event.shiftKey
+			let destination = shiftKey?draggedPoint:SnapController.instance.snapPoint(draggedPoint,[new SVG.Point()])
+			this.dragCallbacks.dragStart(destination,event.detail.event)
 		}
 	}
 
@@ -229,7 +234,6 @@ export class AdjustDragHandler{
 	dragMove(event: DragEvent) {
 		event.preventDefault();
 		
-		
 		if (!this.didDrag) {
 			// only show snapping points if actually moving
 			SnapController.instance.showSnapPoints();
@@ -238,12 +242,11 @@ export class AdjustDragHandler{
 		
 		const draggedPoint = new SVG.Point(event.detail.box.cx, event.detail.box.cy);
 
-		let destination = event.detail.event?.shiftKey
-		? draggedPoint
-		: SnapController.instance.snapPoint(draggedPoint, [new SVG.Point(0, 0)]);
+		let shiftKey = event.detail.event.shiftKey
+		let destination = shiftKey?draggedPoint:SnapController.instance.snapPoint(draggedPoint,[new SVG.Point()])
 
 		if (this.dragCallbacks && this.dragCallbacks.dragMove) {
-			this.dragCallbacks.dragMove(destination)
+			this.dragCallbacks.dragMove(destination,event.detail.event)
 		}
 	}
 

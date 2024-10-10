@@ -111,6 +111,8 @@ export abstract class CircuitComponent{
 
 	finishedPlacing = false;
 	public abstract placeMove(pos: SVG.Point, ev?:Event): void
+	public placeRotate(angleDeg: number): void {}
+	public placeFlip(horizontal: boolean): void {}
 	/**
 	 * return true when the component is finished placing down
 	 */

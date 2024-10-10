@@ -306,7 +306,7 @@ export class SelectionController {
 
 	/**
 	 * move the center of the selection to the new position
-	 * @param {SVG.Point} position the new position
+	 * @param position the new position
 	 */
 	public moveSelectionTo(position: SVG.Point){
 		let overallBBox = this.getOverallBoundingBox()
@@ -325,7 +325,6 @@ export class SelectionController {
 
 	/**
 	 * checks if anything is selected
-	 * @returns true or false
 	 */
 	public hasSelection(){
 		return this.currentlySelectedComponents.length>0

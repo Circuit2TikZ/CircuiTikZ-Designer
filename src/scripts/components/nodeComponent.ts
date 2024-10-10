@@ -40,7 +40,7 @@ export class NodeComponent extends CircuitikzComponent{
 	}
 
 	public getPlacingSnappingPoints(): SnapPoint[] {
-		return this.snappingPoints.concat(new SVG.Point() as SnapPoint)
+		return this.snappingPoints.concat(new SnapPoint(this,"center",new SVG.Point()))
 	}
 
 	protected updateTransform(){
@@ -210,6 +210,12 @@ export class NodeComponent extends CircuitikzComponent{
 	public placeMove(pos: SVG.Point): void {
 		this.moveTo(pos)
 	}
+	public placeRotate(angleDeg: number): void {
+		this.rotate(angleDeg)
+	}
+	public placeFlip(horizontal: boolean): void {
+		this.flip(horizontal)
+	}
 	public placeStep(pos: SVG.Point): boolean {
 		this.moveTo(pos)
 		return true
@@ -227,7 +233,6 @@ export class NodeComponent extends CircuitikzComponent{
 		let symbol = MainController.instance.symbols.find((value,index,symbols)=>value.node.id==saveObject.id)
 		let nodeComponent: NodeComponent = new NodeComponent(symbol)// symbol.addInstanceToContainer(CanvasController.instance.canvas,null,()=>{})
 		nodeComponent.moveTo(new SVG.Point(saveObject.position))
-		nodeComponent.placeFinish()
 
 		if (saveObject.rotation) {
 			nodeComponent.rotationDeg = saveObject.rotation
@@ -249,14 +254,16 @@ export class NodeComponent extends CircuitikzComponent{
 		}else{
 			nodeComponent.label = {value: ""}
 		}
-		nodeComponent.updateTransform()
-		nodeComponent.recalculateSnappingPoints()
+		nodeComponent.placeFinish()
 
 		return nodeComponent;
 	}
 
 	public copyForPlacement(): NodeComponent {
-		return new NodeComponent(this.referenceSymbol)
+		let newComponent = new NodeComponent(this.referenceSymbol)
+		newComponent.rotationDeg = this.rotationDeg;
+		newComponent.flipState = this.flipState.clone()
+		return newComponent
 	}
 
 	// public updateLabelPosition(): void {
