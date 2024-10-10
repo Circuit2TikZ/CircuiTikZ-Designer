@@ -45,10 +45,16 @@ export abstract class CircuitComponent{
 
 	public editableProperties:EditableProperty<any>[]=[]
 
+	public displayName:string
+
 	public constructor(){
 		this.position = new SVG.Point()
 		this.relPosition = new SVG.Point()
 		MainController.instance.addComponent(this)
+
+		this.displayName="Circuit Component"
+
+		//TODO add z-order controls as editableProperty
 	}
 
 	protected _bbox: SVG.Box;

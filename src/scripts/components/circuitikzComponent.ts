@@ -1,5 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, ComponentSaveObject, ComponentSymbol, Label } from "../internal";
+import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, Label, LabelProperty, MainController, TextProperty } from "../internal";
+
+const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
 export type CircuitikzSaveObject = ComponentSaveObject & {
 	id: string
@@ -10,16 +12,61 @@ export type CircuitikzSaveObject = ComponentSaveObject & {
 export abstract class CircuitikzComponent extends CircuitComponent{
 	public referenceSymbol: ComponentSymbol;
 	protected symbolUse: SVG.Use;
-	protected label: Label;
-	protected name: string;
+
+	// change these out with EditableProperties
+	protected label: LabelProperty;
+	protected name: TextProperty;
 
 	constructor(symbol:ComponentSymbol){
 		super()
+		this.displayName=symbol.displayName
 		this.referenceSymbol = symbol
-		this.label = {
-			value:""
+		
+		let infoIDProperty = new InfoProperty(this)
+		infoIDProperty.label = "ID"
+		infoIDProperty.setValue(symbol.tikzName)
+		this.editableProperties.push(infoIDProperty)
+
+		let tikzOptions = Array.from(this.referenceSymbol._tikzOptions.keys()).join(", ")
+		if (tikzOptions) {
+			let infoOptionsProperty = new InfoProperty(this)
+			infoOptionsProperty.label = "Options"
+			infoOptionsProperty.setValue(tikzOptions)
+			this.editableProperties.push(infoOptionsProperty)
 		}
-		this.name=""
+
+		this.name = new TextProperty(this)
+		this.name.label = "Name"
+		this.name.setValue("")
+		this.name.addChangeListener((ev)=>{
+			if (ev.value==="") {
+				this.name.changeInvalidStatus("")
+				return
+			}
+			if (ev.value.match(invalidNameRegEx)) {
+				this.name.changeInvalidStatus("Contains forbidden characters!")
+				return 
+			}
+			for (const component of MainController.instance.circuitComponents) {
+				if (component instanceof CircuitikzComponent && component!=this) {
+					if (ev.value!==""&&component.name.getValue()==ev.value) {
+						this.name.setValue(ev.previousValue,false)
+						this.name.changeInvalidStatus("Name is already taken!")
+						return
+					}
+				}
+			}
+			this.name.changeInvalidStatus("")
+		})
+		this.editableProperties.push(this.name)
+
+		this.label = new LabelProperty(this)
+		this.label.label = "Label"
+		this.label.setValue({value:""})
+		this.label.addChangeListener((ev)=>{
+			//TODO render text and position text
+		})
+		this.editableProperties.push(this.label)
 	}
 
 	// public async generateLabelRender(label:string):Promise<any>{

@@ -7,8 +7,21 @@ export type ChangeEvent<T> = {
 
 export abstract class EditableProperty<T>{
 	protected _value: T;
-	public abstract get value(): T
-	public abstract set value(value: T)
+
+	public abstract getValue():T
+	public abstract setValue(value:T, updateHTML?:boolean):void
+
+	protected labelElement:HTMLElement
+	protected _label:string
+	public get label(): string{
+		return this._label
+	}
+	public set label(value: string){
+		this._label = value
+		if (this.labelElement) {
+			this.labelElement.innerHTML = value
+		}
+	}
 
 	private changeListeners:{(event:ChangeEvent<T>):void}[]
 	protected container:HTMLElement
@@ -17,16 +30,12 @@ export abstract class EditableProperty<T>{
 	protected lastValue:T
 
 	public constructor(componentReference:CircuitComponent){
+		this.changeListeners = []
 		this.componentReference = componentReference
-		this.buildHTML()
 		this.lastValue = null
 	}
 
-	protected abstract buildHTML():void
-
-	public getHTML():HTMLElement{
-		return this.container
-	}
+	public abstract buildHTML():HTMLElement
 
 	public show(show:boolean){
 		if (show) {
@@ -52,7 +61,7 @@ export abstract class EditableProperty<T>{
 		if (newVal === this.lastValue) {
 			return
 		}
-		this.value = newVal
+		this.setValue(newVal)
 		let changeEvent:ChangeEvent<T> = {
 			previousValue:this.lastValue,
 			value:newVal

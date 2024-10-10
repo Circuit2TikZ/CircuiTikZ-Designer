@@ -47,9 +47,10 @@ export class SaveController {
 	}
 
 	save(){
+		//TODO sync MainController.instance.components order with svg order
 		let components = []
 		for (const component of CanvasController.instance.canvas.children()) {
-			if (component instanceof Line || component instanceof NodeComponentInstance || component instanceof PathComponentInstance) {
+			if (component instanceof CircuitComponent) {
 				components.push(component.toJson())
 			}
 		}

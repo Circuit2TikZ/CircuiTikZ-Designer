@@ -13,6 +13,8 @@ export * from "./controllers/propertiesController";
 // properties
 export * from "./properties/editableProperty"
 export * from "./properties/labelProperty"
+export * from "./properties/textProperty"
+export * from "./properties/infoProperty"
 // components
 export * from "./components/circuitComponent";
 export * from "./components/circuitikzComponent";

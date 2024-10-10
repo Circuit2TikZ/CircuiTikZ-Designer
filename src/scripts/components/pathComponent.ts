@@ -245,11 +245,11 @@ export class PathComponent extends CircuitikzComponent{
 			end:{x:this.posEnd.x,y:this.posEnd.y},
 		}
 
-		if (this.name) {
-			data.name = this.name
+		if (this.name.getValue()) {
+			data.name = this.name.getValue()
 		}
-		if (this.label) {
-			data.label = this.label
+		if (this.label.getValue()) {
+			data.label = this.label.getValue()
 		}
 		// TODO
 		// if (this.mirror) {
@@ -267,8 +267,8 @@ export class PathComponent extends CircuitikzComponent{
 			this.posStart.toTikzString() +
 			" to[" +
 			this.referenceSymbol.tikzName +
-			(this.name===""?"":", name="+this.name) +
-			(this.label.value!==""?", l={$"+this.label.value+"$}":"") +
+			(this.name.getValue()===""?"":", name="+this.name.getValue()) +
+			(this.label.getValue().value!==""?", l={$"+this.label.getValue().value+"$}":"") +
 			// (this.#mirror?", mirror":"") +
 			// (this.#invert?", invert":"") +
 			"] " +
@@ -364,14 +364,14 @@ export class PathComponent extends CircuitikzComponent{
 		// }
 
 		if (saveObject.name) {
-			pathComponent.name = saveObject.name
+			pathComponent.name.setValue(saveObject.name)
 		}
 
 		if (saveObject.label) {
-			pathComponent.label = saveObject.label
+			pathComponent.label.setValue(saveObject.label)
 			// pathComponent.generateLabelRender(saveObject.label.value)
 		}else{
-			pathComponent.label = {value: ""}
+			pathComponent.label.setValue({value: ""})
 		}
 		pathComponent.placeFinish()
 		pathComponent.visualization.show()

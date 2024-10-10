@@ -157,18 +157,18 @@ export class NodeComponent extends CircuitikzComponent{
 		if (this.flipState.y<0) {
 			data.flipY = true
 		}
-		if (this.name) {
-			data.name = this.name
+		if (this.name.getValue()) {
+			data.name = this.name.getValue()
 		}
-		if (this.label) {
-			data.label = this.label
+		if (this.label.getValue()) {
+			data.label = this.label.getValue()
 		}
 
 		return data
 	}
 	public toTikzString(): string {
 		const optionsString = this.referenceSymbol.serializeTikzOptions();
-		let labelString = this.label.value?`$${this.label.value}$`:""
+		let labelString = this.label.getValue().value?`$${this.label.getValue().value}$`:""
 		let rotateString = this.rotationDeg!==0?`\\rotatebox{${-this.rotationDeg}}{${labelString}}`:labelString
 		let flipString = this.flipState.x<0?(this.flipState.y<0?`\\ctikzflipxy{${rotateString}}`:`\\ctikzflipx{${rotateString}}`):(this.flipState.y<0?`\\ctikzflipy{${rotateString}}`:rotateString)
 		
@@ -181,11 +181,11 @@ export class NodeComponent extends CircuitikzComponent{
 			(this.flipState.x < 0 ? `, xscale=-1` : "") +
 			(this.flipState.y < 0 ? `, yscale=-1` : "") +
 			"] " +
-			(this.name ? "(" + this.name + ") " : "") +
+			(this.name.getValue() ? "(" + this.name.getValue() + ") " : "") +
 			"at " +
 			this.position.toTikzString() +
 			" {"+
-			(this.label.value?flipString:"")+
+			(this.label.getValue().value?flipString:"")+
 			"};"
 		);
 	}
@@ -245,14 +245,14 @@ export class NodeComponent extends CircuitikzComponent{
 		}
 
 		if (saveObject.name) {
-			nodeComponent.name = saveObject.name
+			nodeComponent.name.setValue(saveObject.name)
 		}
 
 		if (saveObject.label) {
-			nodeComponent.label = saveObject.label
+			nodeComponent.label.setValue(saveObject.label)
 			// nodeComponent.generateLabelRender(saveObject.label.value)
 		}else{
-			nodeComponent.label = {value: ""}
+			nodeComponent.label.setValue({value: ""})
 		}
 		nodeComponent.placeFinish()
 
