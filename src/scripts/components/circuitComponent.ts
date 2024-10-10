@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { FormEntry, MainController, SnapPoint } from "../internal";
+import { EditableProperty, FormEntry, MainController, SnapPoint } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 export enum LabelAnchor {
@@ -42,6 +42,8 @@ export abstract class CircuitComponent{
 	public relPosition: SVG.Point;
 	public rotationDeg: number;
 	public flipState:SVG.Point = new SVG.Point(1,1);
+
+	public editableProperties:EditableProperty<any>[]=[]
 
 	public constructor(){
 		this.position = new SVG.Point()

@@ -10,6 +10,9 @@ export * from "./controllers/selectionController";
 export * from "./controllers/undoController";
 export * from "./controllers/copyController";
 export * from "./controllers/propertiesController";
+// properties
+export * from "./properties/editableProperty"
+export * from "./properties/labelProperty"
 // components
 export * from "./components/circuitComponent";
 export * from "./components/circuitikzComponent";

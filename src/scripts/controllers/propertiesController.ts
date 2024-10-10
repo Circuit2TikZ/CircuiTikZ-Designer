@@ -37,13 +37,13 @@ export class PropertyController{
 	update(){
 		
 		let components = SelectionController.instance.currentlySelectedComponents
-		this.#clearForm()
+		this.clearForm()
 
 		if (components.length>1) {
 			this.#objectName.classList.remove("d-none")
 			this.#objectName.innerText = "Please select only one component to view its properties"
 		}else if (components.length===0) {
-			this.#setFormGrid()
+			this.setFormGrid()
 		}else{
 			if (components.length===1) {
 				let component = components[0]
@@ -222,41 +222,41 @@ export class PropertyController{
 		
 	}
 	
-	#setFormGrid(){
+	private setFormGrid(){
 		this.#gridProperties.classList.remove("d-none")
 		this.#propertiesTitle.innerText = "Grid settings"
 
-		let minorSlider = document.getElementById("minorSliderInput")
-		minorSlider.value = CanvasController.instance.majorGridSubdivisions
+		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
+		minorSlider.value = CanvasController.instance.majorGridSubdivisions.toString()
 
-		let majorSlider = document.getElementById("majorSliderInput")
-		majorSlider.value = CanvasController.instance.majorGridSizecm
+		let majorSlider = document.getElementById("majorSliderInput") as HTMLInputElement
+		majorSlider.value = CanvasController.instance.majorGridSizecm.toString()
 
 		minorSlider.addEventListener('input',(ev)=>{
-			this.#changeGrid(CanvasController.instance.majorGridSizecm, Number.parseFloat(minorSlider.value))
+			this.changeGrid(CanvasController.instance.majorGridSizecm, Number.parseFloat(minorSlider.value))
 		})
 
 		majorSlider.addEventListener('input',(ev)=>{
-			this.#changeGrid(Number.parseFloat(majorSlider.value), CanvasController.instance.majorGridSubdivisions)
+			this.changeGrid(Number.parseFloat(majorSlider.value), CanvasController.instance.majorGridSubdivisions)
 		})
 
-		this.#changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)		
+		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)		
 	}
 
-	#changeGrid(majorSizecm, majorSubdivisions){
+	private changeGrid(majorSizecm: number, majorSubdivisions: number){
 		CanvasController.instance.changeGrid(majorSizecm, majorSubdivisions)
 
 		let majorLabel = document.getElementById("majorLabel")
 		majorLabel.innerText = majorSizecm+" cm"
 
 		let minorLabel = document.getElementById("minorLabel")		
-		minorLabel.innerText = majorSubdivisions
+		minorLabel.innerText = majorSubdivisions.toString()
 
 		let gridInfo = document.getElementById("gridInfo")		
 		gridInfo.innerText = (majorSizecm/majorSubdivisions).toLocaleString(undefined, {maximumFractionDigits:2}) + " cm"
 	}
 
-	#clearForm(){
+	private clearForm(){
 		this.#propertiesTitle.innerText = "Properties"
 		this.#gridProperties.classList.add("d-none")
 		this.#propertiesEntries.classList.add("d-none")
