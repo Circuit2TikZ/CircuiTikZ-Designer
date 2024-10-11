@@ -4,28 +4,32 @@ export class TextProperty extends EditableProperty<string>{
 	private input:HTMLInputElement
 	private invalidDiv:HTMLDivElement
 	
-	public buildHTML(): HTMLElement {
-		this.container?.remove()
-		this.container = document.createElement("div") as HTMLDivElement
-		this.container.classList.add("d-flex", "flex-column", "w-100", "h-auto", "justify-content-start", "align-items-start")
+	public buildHTML(container:HTMLElement): void {
+		let row = document.createElement("div") as HTMLDivElement
+		row.classList.add("row","g-2", "my-2")
 
 		let span = document.createElement("span") as HTMLSpanElement
-		span.classList.add("form-label")
+		span.classList.add("col-3","form-label")
 		span.innerHTML = this._label??""
-		this.container.appendChild(span)
-
-		this.input = document.createElement("input") as HTMLInputElement
-		this.input.classList.add("form-control")
-		this.input.setAttribute("type","text")
-		this.input.value = this._value??""
-		this.container.appendChild(this.input)
-
-		this.invalidDiv = document.createElement("div") as HTMLDivElement
-		this.invalidDiv.classList.add("invalid-feedback", "d-none")
-		this.container.appendChild(this.invalidDiv)
+		row.appendChild(span)
+		
+		let inputDiv = document.createElement("div") as HTMLDivElement
+		inputDiv.classList.add("col","col-md-12")
+		{
+			this.input = document.createElement("input") as HTMLInputElement
+			this.input.classList.add("w-100","form-control")
+			this.input.setAttribute("type","text")
+			this.input.value = this._value??""
+			inputDiv.appendChild(this.input)
+			
+			this.invalidDiv = document.createElement("div") as HTMLDivElement
+			this.invalidDiv.classList.add("col-12","invalid-feedback", "d-none")
+			inputDiv.appendChild(this.invalidDiv)
+		}
+		row.appendChild(inputDiv)
 
 		this.input.addEventListener("focusin",(ev)=>{
-			this.lastValue = ""
+			this.lastValue = this._value??""
 		})
 		this.input.addEventListener("input",(ev)=>{
 			this.updateValue(this.input.value)
@@ -36,7 +40,7 @@ export class TextProperty extends EditableProperty<string>{
 				Undo.addState()
 			}
 		})
-		return this.container
+		container.appendChild(row)
 	}
 
 	public changeInvalidStatus(msg:string){

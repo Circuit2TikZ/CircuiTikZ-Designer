@@ -56,7 +56,7 @@ export class PropertyController{
 		this.objectName.innerText = component.displayName
 		
 		for (const property of component.editableProperties) {
-			this.propertiesEntries.appendChild(property.buildHTML())
+			property.buildHTML(this.propertiesEntries)
 		}
 					
 		// if (component instanceof NodeComponentInstance) {

@@ -24,7 +24,6 @@ export abstract class EditableProperty<T>{
 	}
 
 	private changeListeners:{(event:ChangeEvent<T>):void}[]
-	protected container:HTMLElement
 	protected componentReference:CircuitComponent
 
 	protected lastValue:T
@@ -35,15 +34,7 @@ export abstract class EditableProperty<T>{
 		this.lastValue = null
 	}
 
-	public abstract buildHTML():HTMLElement
-
-	public show(show:boolean){
-		if (show) {
-			this.container.classList.remove("d-none")
-		}else{
-			this.container.classList.add("d-none")
-		}
-	}
+	public abstract buildHTML(container:HTMLElement):void
 
 	public addChangeListener(changeListener:(ev:ChangeEvent<T>)=>void){
 		this.changeListeners.push(changeListener)

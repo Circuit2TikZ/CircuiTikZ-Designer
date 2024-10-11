@@ -1,27 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { EditableProperty, FormEntry, MainController, SnapPoint } from "../internal";
+import { EditableProperty, FormEntry, LabelAnchor, MainController, SnapPoint } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
-
-export enum LabelAnchor {
-	default="default",
-	center="center",
-	north="north",
-	south="south",
-	east="east",
-	west="west",
-	northeast="north east",
-	northwest="north west",
-	southeast="south east",
-	southwest="south west"
-}
-
-export type Label = {
-	value:string
-	anchor?:LabelAnchor
-	labelDistance?:number
-	rendering?: SVG.Element
-}
 
 export type ComponentSaveObject = {
 	type: string

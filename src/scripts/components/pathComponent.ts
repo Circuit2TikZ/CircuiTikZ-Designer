@@ -378,4 +378,9 @@ export class PathComponent extends CircuitikzComponent{
 
 		return pathComponent;
 	}
+
+	public updateLabelPosition(): void {
+		console.log("update label posititon");
+		
+	}
 }

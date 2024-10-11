@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, FormEntry, MainController, SnapController, SnapPoint } from "../internal"
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, FormEntry, LabelAnchor, MainController, SnapController, SnapPoint } from "../internal"
 import { SnapDragHandler } from "../snapDrag/dragHandlers";
 import { selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
@@ -266,7 +266,77 @@ export class NodeComponent extends CircuitikzComponent{
 		return newComponent
 	}
 
-	// public updateLabelPosition(): void {
-	// 	throw new Error("Method not implemented.");
-	// }
+	public updateLabelPosition(): void {
+		// currently working only with 90 deg rotation steps
+		if (!this.label.getValue()||this.label.getValue().value===""||!this.label.getValue().rendering) {
+			return
+		}
+		let label = this.label.getValue()
+		let labelSVG = this.label.getValue().rendering
+		
+		// get relevant positions and bounding boxes
+		let textPos = this.referenceSymbol._textPosition.point.add(this.position).transform(this.getTransformMatrix())
+		let labelBBox = labelSVG.bbox()
+		let componentBBox = this.visualization.bbox()
+
+		// calculate where on the label the anchor point should be
+		let labelRef:SVG.Point;
+		let labelDist = label.labelDistance??0;
+		let offset = 3
+		switch (label.anchor) {
+			case LabelAnchor.default:
+				let clamp = function(value:number,min:number,max:number){
+					if (value<min) {
+						return min
+					}else if(value>max){
+						return max
+					}else{
+						return value
+					}
+				}
+				let horizontalTextPosition = clamp(Math.round(2*(componentBBox.cx-textPos.x)/componentBBox.w),-1,1)		
+				let verticalTextPosition = clamp(Math.round(2*(componentBBox.cy-textPos.y)/componentBBox.h),-1,1)	
+				labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
+				labelDist=0
+				offset=0
+				break;
+			case LabelAnchor.center:
+				labelRef = new SVG.Point(0,0)
+				break;
+			case LabelAnchor.north:
+				labelRef = new SVG.Point(0,1)
+				break;
+			case LabelAnchor.south:
+				labelRef = new SVG.Point(0,-1)
+				break;
+			case LabelAnchor.east:
+				labelRef = new SVG.Point(-1,0)
+				break;
+			case LabelAnchor.west:
+				labelRef = new SVG.Point(1,0)
+				break;
+			case LabelAnchor.northeast:
+				labelRef = new SVG.Point(-1,1)
+				break;
+			case LabelAnchor.northwest:
+				labelRef = new SVG.Point(1,1)
+				break;
+			case LabelAnchor.southeast:
+				labelRef = new SVG.Point(-1,-1)
+				break;
+			case LabelAnchor.southwest:
+				labelRef = new SVG.Point(1,-1)
+				break;
+			default:
+				break;
+		}
+		
+		let ref = labelRef.clone()
+		ref.x = (ref.x+1)/2*labelBBox.w+labelRef.x*offset
+		ref.y = (ref.y+1)/2*labelBBox.h+labelRef.y*offset
+		
+		// acutally move the label
+		let movePos = textPos.sub(ref)
+		labelSVG.move(movePos.x,movePos.y)
+	}
 }

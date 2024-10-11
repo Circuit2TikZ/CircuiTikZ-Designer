@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, Label, LabelProperty, MainController, TextProperty } from "../internal";
+import { CanvasController, CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, Label, LabelProperty, MainController, TextProperty } from "../internal";
 
 const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
@@ -64,40 +64,55 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 		this.label.label = "Label"
 		this.label.setValue({value:""})
 		this.label.addChangeListener((ev)=>{
-			//TODO render text and position text
+			if (ev.value.value) {
+				if (!ev.previousValue||ev.previousValue.value!=ev.value.value) {
+					//rerender
+					this.generateLabelRender()
+				}else{
+					this.updateLabelPosition()
+				}
+			}
 		})
 		this.editableProperties.push(this.label)
 	}
 
-	// public async generateLabelRender(label:string):Promise<any>{
-	// 	MathJax.texReset();
-	// 	return MathJax.tex2svgPromise(label,{}).then((/**@type {Element} */ node: Element) =>{
-	// 		let svgElement: SVGSVGElement = node.querySelector("svg")
-	// 		// slight padding of the label text
-	// 		let padding_ex = 0.2
-	// 		svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
+	public async generateLabelRender():Promise<any>{
+		// @ts-ignore
+		window.MathJax.texReset();
+		// @ts-ignore
+		return window.MathJax.tex2svgPromise(this.label.getValue().value,{}).then((node: Element) =>{
+			let svgElement: SVGSVGElement = node.querySelector("svg")
+			// slight padding of the label text
+			let padding_ex = 0.2
+			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
 
-	// 		// increase the width and height of the svg element by the padding
-	// 		let width = svgElement.getAttribute("width")
-	// 		width = Number.parseFloat(width.split(0,width.length-2))+padding_ex*2
-	// 		let height = svgElement.getAttribute("height")
-	// 		height = Number.parseFloat(height.split(0,height.length-2))+padding_ex*2
+			// increase the width and height of the svg element by the padding
+			let widthStr = svgElement.getAttribute("width")
+			let width = Number.parseFloat(widthStr.slice(0,widthStr.length-2))+padding_ex*2
+			let heightStr = svgElement.getAttribute("height")
+			let height = Number.parseFloat(heightStr.slice(0,heightStr.length-2))+padding_ex*2
 
-	// 		width = 10*width/2 // change to pt to explicitly change the font size
-	// 		height = 10*height/2
-	// 		svgElement.setAttribute("width",width.toString()+"pt")
-	// 		svgElement.setAttribute("height",height.toString()+"pt")
-	// 		svgElement.setAttribute("overflow","visible")
+			width = 10*width/2 // change to pt to explicitly change the font size
+			height = 10*height/2
+			widthStr = width.toString()+"pt"
+			heightStr = height.toString()+"pt"
+			svgElement.setAttribute("width",widthStr)
+			svgElement.setAttribute("height",heightStr)
+			svgElement.setAttribute("overflow","visible")
 			
-	// 		//also set the width and height for the svg container
-	// 		this.label.rendering = new SVG.ForeignObject()
-	// 		this.label.rendering.addClass("pointerNone")
-	// 		this.label.rendering.width(width)
-	// 		this.label.rendering.height(height)
-	// 		this.label.rendering.add(new SVG.Element(svgElement))
-	// 		CanvasController.instance.canvas.add(this.label.rendering)
-	// 		this.updateLabelPosition()
-	// 	})
-	// }
-	// public abstract updateLabelPosition():void
+			//also set the width and height for the svg container
+
+			let currentLabel = this.label.getValue()
+			currentLabel.rendering?.remove()
+			let rendering = new SVG.ForeignObject()
+			rendering.addClass("pointerNone")
+			rendering.width(widthStr)
+			rendering.height(heightStr)
+			rendering.add(new SVG.Element(svgElement))
+			CanvasController.instance.canvas.add(rendering)
+			currentLabel.rendering = rendering
+			this.updateLabelPosition()
+		})
+	}
+	public abstract updateLabelPosition():void
 }
