@@ -15,7 +15,7 @@ export class ZOrderProperty extends EditableProperty<number>{
 		frontDiv.classList.add("col-6","mt-0")
 		let bringFront = document.createElement("button") as HTMLButtonElement
 		bringFront.classList.add("w-100","btn","btn-primary")
-		bringFront.innerHTML = "Bring forward"
+		bringFront.innerHTML = "Bring to front"
 		frontDiv.appendChild(bringFront)
 		row.appendChild(frontDiv)
 
@@ -23,7 +23,7 @@ export class ZOrderProperty extends EditableProperty<number>{
 		backDiv.classList.add("col-6","mt-0")
 		let pushBack = document.createElement("button") as HTMLButtonElement
 		pushBack.classList.add("w-100","btn","btn-primary")
-		pushBack.innerHTML = "Push back"
+		pushBack.innerHTML = "Push to back"
 		backDiv.appendChild(pushBack)
 		row.appendChild(backDiv)
 

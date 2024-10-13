@@ -96,8 +96,8 @@ export class PathLabelProperty extends EditableProperty<PathLabel>{
 			this.distanceInput.classList.add("form-range","w-25","flex-grow-1","h-100","px-2","border")
 			this.distanceInput.id="labelDistanceSlider"
 			this.distanceInput.type="range"
-			this.distanceInput.min="0"
-			this.distanceInput.max="1"
+			this.distanceInput.min="-1"
+			this.distanceInput.max="2"
 			this.distanceInput.step="0.01"
 			this.distanceInput.value = (this._value?this._value.distance.value??0:0).toString()
 			distanceDiv.appendChild(this.distanceInput)

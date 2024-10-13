@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, Undo, SnapPoint, CircuitComponent } from "../internal";
+import { SnapController, Undo, SnapPoint, CircuitComponent, MainController } from "../internal";
 
 type PanningEventDetail = {
 	box:SVG.Box
@@ -179,24 +179,29 @@ export class CanvasController {
 	}
 
 	public bringComponentToFront(component: CircuitComponent){
-		let element = component.visualization
-		let index = this.canvas.children().findIndex(c=>c===element);
-		this.canvas.put(element)
-		if (index!==this.canvas.children().findIndex(c=>c===element)) {
-			Undo.addState()
+		if (MainController.instance.circuitComponents.length<2) {
+			return
 		}
+		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
+		if (idx<0||idx==MainController.instance.circuitComponents.length-1) {
+			return
+		}
+		component.visualization.insertAfter(MainController.instance.circuitComponents.at(-1).visualization)
+		MainController.instance.circuitComponents.push(...MainController.instance.circuitComponents.splice(idx,1))
+		Undo.addState()
 	}
 
 	public moveComponentToBack(component: CircuitComponent){
-		let element = component.visualization
-		let index = this.canvas.children().findIndex(c=>c===element);
-		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
-		// this is super weird??
-		// see this.canvas.node.childNodes		
-		this.canvas.put(element,11)
-		if (index!==this.canvas.children().findIndex(c=>c===element)) {
-			Undo.addState()
+		if (MainController.instance.circuitComponents.length<2) {
+			return
 		}
+		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
+		if (idx<1) {
+			return
+		}
+		component.visualization.insertBefore(MainController.instance.circuitComponents[0].visualization)
+		MainController.instance.circuitComponents = MainController.instance.circuitComponents.splice(idx,1).concat(MainController.instance.circuitComponents)
+		Undo.addState()
 	}
 
 	/**

@@ -47,14 +47,9 @@ export class SaveController {
 	}
 
 	save(){
-		//TODO make this more efficient/ or rather sync svg and MainController.instance.circuitComponents
 		let components = []
-		for (const svgElement of CanvasController.instance.canvas.children()) {
-			for (const component of MainController.instance.circuitComponents) {
-				if (svgElement==component.visualization) {
-					components.push(component.toJson())
-				}
-			}
+		for (const component of MainController.instance.circuitComponents) {
+			components.push(component.toJson())
 		}
 
 		ExportController.instance.exportJSON(JSON.stringify(components,null,4))
