@@ -172,7 +172,9 @@ export class SelectionController {
 		this.selectionRectangle.attr("height",0);
 		this.selectionMode = SelectionMode.RESET;
 		this.currentlySelectedComponents = []
-		this.hideSelection()
+		for (const component of MainController.instance.circuitComponents) {
+			component.viewSelected(false)
+		}
 	}
 
 	public showSelection(){

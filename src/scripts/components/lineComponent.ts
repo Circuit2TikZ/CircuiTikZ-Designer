@@ -361,9 +361,19 @@ export class LineComponent extends CircuitComponent{
 	public static fromJson(saveObject: LineSaveObject): LineComponent {
 		let lineComponent: LineComponent = new LineComponent()
 		lineComponent.cornerPoints.push(new SVG.Point(saveObject.start))
-		for (const segment of saveObject.segments) {
-			lineComponent.cornerPoints.push(new SVG.Point(segment.position))
-			lineComponent.lineDirections.push(segment.direction)
+		if (Object.hasOwn(saveObject,"segments")) {
+			for (const segment of saveObject.segments) {
+				lineComponent.cornerPoints.push(new SVG.Point(segment.position))
+				lineComponent.lineDirections.push(segment.direction)
+			}
+		}else{
+			// @ts-ignore backwards compatibility
+			for (const point of saveObject.others) {
+				let dir = point.dir==0?LineDirection.Straight:point.dir==1?LineDirection.HV:LineDirection.VH
+				// @ts-ignore backwards compatibility
+				lineComponent.cornerPoints.push(new SVG.Point(point.x,point.y))
+				lineComponent.lineDirections.push(dir)
+			}
 		}
 		lineComponent.placeFinish()
 

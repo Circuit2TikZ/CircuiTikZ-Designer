@@ -47,7 +47,7 @@ export class SaveController {
 	}
 
 	save(){
-		//TODO make this more efficient
+		//TODO make this more efficient/ or rather sync svg and MainController.instance.circuitComponents
 		let components = []
 		for (const svgElement of CanvasController.instance.canvas.children()) {
 			for (const component of MainController.instance.circuitComponents) {
@@ -132,7 +132,9 @@ export class SaveController {
 			}
 		}else{
 			for (const component of obj) {
-				components.push(SaveController.fromJson(component))
+				let c = SaveController.fromJson(component)
+				components.push(c);
+				c.updateTheme()
 			}
 		}
 		

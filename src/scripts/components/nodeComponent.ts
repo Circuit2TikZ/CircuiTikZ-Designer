@@ -120,7 +120,7 @@ export class NodeComponent extends CircuitikzComponent{
 		}))
 
 		this.updateLabelPosition()
-		this._bbox = this.visualization.bbox()
+		this._bbox = this.symbolUse.bbox().transform(this.getTransformMatrix())
 
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
@@ -285,7 +285,7 @@ export class NodeComponent extends CircuitikzComponent{
 			"at " +
 			this.position.toTikzString() +
 			" {}"+
-			(label?labelNodeStr:"")
+			(label.value?labelNodeStr:"")
 			+";"
 		);
 	}
@@ -349,8 +349,13 @@ export class NodeComponent extends CircuitikzComponent{
 		}
 
 		if (saveObject.label) {
-			saveObject.label.distance=new SVG.Number(saveObject.label.distance)
-			nodeComponent.label.setValue(saveObject.label)
+			if (Object.hasOwn(saveObject.label,"value")) {
+				saveObject.label.distance=new SVG.Number(saveObject.label.distance)
+				nodeComponent.label.setValue(saveObject.label)
+			}else{
+				// @ts-ignore
+				nodeComponent.label.setValue({value:saveObject.label})
+			}
 			nodeComponent.generateLabelRender(nodeComponent.label.getValue())
 		}else{
 			nodeComponent.label.setValue({value: ""})
