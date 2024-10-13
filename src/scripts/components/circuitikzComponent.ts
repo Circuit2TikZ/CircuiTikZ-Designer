@@ -1,12 +1,17 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, Label, LabelProperty, MainController, TextProperty } from "../internal";
+import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, TextProperty } from "../internal";
 
 const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
 export type CircuitikzSaveObject = ComponentSaveObject & {
 	id: string
 	name?:string
-	label?:Label
+}
+
+export type Label = {
+	value: string
+	rendering?: SVG.Element
+	distance?: SVG.Number
 }
 
 export abstract class CircuitikzComponent extends CircuitComponent{
@@ -14,7 +19,6 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 	protected symbolUse: SVG.Use;
 
 	// change these out with EditableProperties
-	protected label: LabelProperty;
 	protected name: TextProperty;
 
 	constructor(symbol:ComponentSymbol){
@@ -59,28 +63,13 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			this.name.changeInvalidStatus("")
 		})
 		this.editableProperties.push(this.name)
-
-		this.label = new LabelProperty(this)
-		this.label.label = "Label"
-		this.label.setValue({value:""})
-		this.label.addChangeListener((ev)=>{
-			if (ev.value.value) {
-				if (!ev.previousValue||ev.previousValue.value!=ev.value.value) {
-					//rerender
-					this.generateLabelRender()
-				}else{
-					this.updateLabelPosition()
-				}
-			}
-		})
-		this.editableProperties.push(this.label)
 	}
 
-	public async generateLabelRender():Promise<any>{
+	public async generateLabelRender(label:Label):Promise<any>{
 		// @ts-ignore
 		window.MathJax.texReset();
 		// @ts-ignore
-		return window.MathJax.tex2svgPromise(this.label.getValue().value,{}).then((node: Element) =>{
+		return window.MathJax.tex2svgPromise(label.value,{}).then((node: Element) =>{
 			let svgElement: SVGSVGElement = node.querySelector("svg")
 			// slight padding of the label text
 			let padding_ex = 0.2
@@ -102,16 +91,16 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			
 			//also set the width and height for the svg container
 
-			let currentLabel = this.label.getValue()
+			let currentLabel = label
 			currentLabel.rendering?.remove()
 			let rendering = new SVG.ForeignObject()
 			rendering.addClass("pointerNone")
 			rendering.width(widthStr)
 			rendering.height(heightStr)
 			rendering.add(new SVG.Element(svgElement))
-			CanvasController.instance.canvas.add(rendering)
+			this.visualization.add(rendering)
 			currentLabel.rendering = rendering
-			this.updateLabelPosition()
+			this.updateTransform()
 		})
 	}
 	public abstract updateLabelPosition():void

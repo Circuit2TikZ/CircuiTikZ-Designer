@@ -1,6 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, MainController, Modes, SaveController, SelectionController, SnapController, SnapPoint, Undo } from "../internal";
-import hotkeys from "hotkeys-js";
+import { CanvasController, CircuitComponent, MainController, Modes, PropertyController, SnapController, Undo} from "../internal";
 
 export class ComponentPlacer{
 	private static _instance: ComponentPlacer
@@ -38,7 +37,6 @@ export class ComponentPlacer{
 
 	public placeMove(ev:MouseEvent){
 		let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
-		// CanvasController.instance.canvas.circle(2).fill("green").move(pt.x-1,pt.y-1)
 		ComponentPlacer.instance.component.placeMove(pt,ev)
 	}
 
@@ -57,7 +55,7 @@ export class ComponentPlacer{
 	public placeFinish(ev:MouseEvent){
 		ComponentPlacer.instance.component.placeFinish()
 		ComponentPlacer.instance.cleanUp()
-		// Undo.addState()
+		Undo.addState()
 		
 		// restart component placement for just finished component
 		ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
@@ -90,6 +88,7 @@ export class ComponentPlacer{
 		ComponentPlacer.instance._component = component		
 		let canvas = CanvasController.instance.canvas
 		SnapController.instance.showSnapPoints()
+		PropertyController.instance.update()
 
 		canvas.on("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.on("mouseup",ComponentPlacer.instance.placeStep)

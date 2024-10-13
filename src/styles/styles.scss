@@ -1,5 +1,6 @@
 $material-symbols-font-path: "../../node_modules/material-symbols/";
 @import "material-symbols/outlined";
+// TODO clean up all css
 
 // Bootstrap
 // preset bootstrap (scss) variables:
@@ -51,20 +52,23 @@ $danger: #c50f3c;
 	cursor: pointer;
 }
 
-.vertical-line{
-	width: 1px; /* Line width */
-	min-width: 1px;
-	background-color: var(--bs-secondary-color); /* Line color */
-	align-self: stretch;
-}
+// .vertical-line{
+// 	width: 1px; /* Line width */
+// 	min-width: 1px;
+// 	background-color: var(--bs-secondary-color); /* Line color */
+// 	align-self: stretch;
+// }
 
-#darkModeLabel{
-	@extend %floatingToolbarButton
+
+#loadingSpinner > div{
+	margin-top: -50%;
+	margin-left: -50%;
 }
 
 // main content:
 html,
 body {
+	min-width: 300px;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
@@ -72,19 +76,41 @@ body {
 	padding: 0px;
 }
 
-@media only screen and (max-width: 768px) {
-	#canvasContainer{
-		height: 60% !important;
-	}
-	#properties{
-		width: 100% !important;
-		max-width: 100% !important;
-		height: 40% !important;
-	}
+#siteContent{
+	flex-direction: column;
+	flex-wrap:nowrap;
+}
+
+#canvasContainer{
+	flex: none;
+	height: 65%;
+	margin: 0;
+	padding: 0 0 0.5em 0;
+	// flex-shrink: 0;
+}
+#propertiesContainer{
+	flex: 1 1;
+}
+@include media-breakpoint-up(md) {
 	#siteContent{
-		flex-direction: column
+		flex-direction: row;
+	}
+	#canvasContainer{
+		height: 100% !important;
+		flex: 1 0;
+		padding-bottom: 0;
+		padding-right: 0.5em;
+	}
+	#propertiesContainer{
+		height: 100% !important;
+		flex: none;
 	}
 }
+
+// #controlsContainer{
+// 	left: 50%;
+// 	transform: translate(-50%,0);
+// }
 
 // styles for other parts of the web app:
 @import "canvas.scss";

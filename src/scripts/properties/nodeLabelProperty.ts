@@ -1,37 +1,17 @@
-import { Element } from "@svgdotjs/svg.js";
-import { EditableProperty, NodeComponent } from "../internal"
+import { EditableProperty, LabelAnchor, NodeLabel, Undo } from "../internal"
+import * as SVG from "@svgdotjs/svg.js";
 
-export enum LabelAnchor {
-	default="default",
-	center="center",
-	north="north",
-	south="south",
-	east="east",
-	west="west",
-	northeast="north east",
-	northwest="north west",
-	southeast="south east",
-	southwest="south west"
-}
-
-export type Label = {
-	value:string
-	anchor?:LabelAnchor
-	labelDistance?:number
-	rendering?: Element
-}
-
-export class LabelProperty extends EditableProperty<Label>{
-	public getValue(): Label {
+export class NodeLabelProperty extends EditableProperty<NodeLabel>{
+	public getValue(): NodeLabel {
 		return this._value
 	}
-	public setValue(value: Label, updateHTML?: boolean): void {
+	public setValue(value: NodeLabel, updateHTML?: boolean): void {
 		if (value) {
 			let rendering = this._value?.rendering
 			this._value = {
 				value:value.value,
-				labelDistance:value.labelDistance,
-				anchor:value.anchor
+				distance:value.distance?value.distance.convertToUnit("cm"):new SVG.Number(0.1,"cm"),
+				anchor:value.anchor??LabelAnchor.default
 			}
 			if (value.rendering) {
 				this._value.rendering=value.rendering
@@ -39,8 +19,9 @@ export class LabelProperty extends EditableProperty<Label>{
 				this._value.rendering=rendering
 			}
 		}
-		if (updateHTML) {
+		if (updateHTML&&this.input) {
 			this.input.value = value.value
+			this.distanceInput.value = (this._value?this._value.distance.value??0:0).toString()
 		}
 	}
 
@@ -52,13 +33,13 @@ export class LabelProperty extends EditableProperty<Label>{
 	private anchorSelect:HTMLSelectElement
 
 	public buildHTML(container:HTMLElement): void {
-		let row1 = document.createElement("div") as HTMLDivElement
-		row1.classList.add("row","g-2","my-2")
+		let row = document.createElement("div") as HTMLDivElement
+		row.classList.add("row","g-2","my-2")
 		{
-			let labelSpan = document.createElement("span") as HTMLSpanElement
-			labelSpan.classList.add("col-3","col-md-12","form-label")
-			labelSpan.innerHTML = this._label??""
-			row1.appendChild(labelSpan)
+			this.labelElement = document.createElement("span") as HTMLSpanElement
+			this.labelElement.classList.add("col-3","col-md-12","form-label")
+			this.labelElement.innerHTML = this._label??""
+			row.appendChild(this.labelElement)
 	
 			let div2 = document.createElement("div") as HTMLDivElement
 			div2.classList.add("col","col-md-12","col-xxl","input-group", "has-validation")
@@ -86,84 +67,99 @@ export class LabelProperty extends EditableProperty<Label>{
 				this.renderButton.type = "button"
 				this.renderButton.innerHTML = "Render"
 				div2.appendChild(this.renderButton)
+
+				this.input.addEventListener("keydown",(ev:KeyboardEvent)=>{						
+					if (ev.key==="Enter") {
+						this.update()
+					}
+				})
+		
+				this.renderButton.addEventListener("click",(ev)=>{
+					this.update()
+				})
 			}
-			row1.appendChild(div2)
+			row.appendChild(div2)
 		}
 
-		this.input.addEventListener("keydown",(ev:KeyboardEvent)=>{						
-			if (ev.key==="Enter") {
-				if (this._value.value!==this.input.value) {
-					this.update()
-				}
-			}
-		})
 
-		this.renderButton.addEventListener("click",(ev)=>{
-			this.update()
-		})
-
-		if (this.componentReference instanceof NodeComponent) {
-			let positionDiv= document.createElement("div") as HTMLDivElement
-			positionDiv.classList.add("col-12","input-group")
-
+		let positionDiv= document.createElement("div") as HTMLDivElement
+		positionDiv.classList.add("col-12","input-group")
+		{
 			let anchorLabel = document.createElement("label") as HTMLLabelElement
 			anchorLabel.classList.add("input-group-text")
 			anchorLabel.setAttribute("for","labelAnchor")
 			anchorLabel.innerHTML = "Position"
 			positionDiv.appendChild(anchorLabel)
-
+	
 			this.anchorSelect = document.createElement("select") as HTMLSelectElement
 			this.anchorSelect.classList.add("form-select")
 			this.anchorSelect.id = "labelAnchor"
 			this.anchorSelect.name = "anchor"
 			let labelKeys = Object.keys(LabelAnchor)
 			let labelValues = Object.values(LabelAnchor)
-			let options = ["default","center","north","south","east","west","north east","north west","south east","south west"]
 			for (let index = 0; index < labelKeys.length; index++) {
 				const labelKey = labelKeys[index];
 				const labelValue = labelValues[index];
-
+	
 				let optionElement = document.createElement("option") as HTMLOptionElement
 				optionElement.value = labelKey
 				optionElement.innerHTML = labelValue
-				this.anchorSelect.appendChild(optionElement)
+				if (this._value.anchor&&labelValue==this._value.anchor) {
+					optionElement.selected = true
+				}
+				this.anchorSelect.appendChild(optionElement)	
 			}
-			positionDiv.appendChild(this.anchorSelect)
-			row1.appendChild(positionDiv)
-
-			let distanceDiv = document.createElement("div") as HTMLDivElement
-			distanceDiv.classList.add("col-12","input-group","d-flex","flex-row","w-100")
-
-			let distanceLabel = document.createElement("label") as HTMLLabelElement
-			distanceLabel.classList.add("input-group-text","fs-6")
-			distanceLabel.innerHTML="Gap"
-			// distanceLabel.setAttribute("for","labelDistanceSlider")
-			distanceDiv.appendChild(distanceLabel)
-			
-			this.distanceInput = document.createElement("input") as HTMLInputElement
-			this.distanceInput.classList.add("form-range","w-25","flex-grow-1","h-100","px-2","border","rounded-end")
-			this.distanceInput.id="labelDistanceSlider"
-			this.distanceInput.type="range"
-			distanceDiv.appendChild(this.distanceInput)
 
 			this.anchorSelect.addEventListener("change", (ev)=>{
 				this.update()
 			})
+		}
+		positionDiv.appendChild(this.anchorSelect)
+		row.appendChild(positionDiv)
+
+		let distanceDiv = document.createElement("div") as HTMLDivElement
+		distanceDiv.classList.add("col-12","input-group","d-flex","flex-row","w-100")
+		{
+			let distanceLabel = document.createElement("label") as HTMLLabelElement
+			distanceLabel.classList.add("input-group-text","fs-6")
+			distanceLabel.innerHTML="Gap"
+			distanceLabel.setAttribute("for","labelDistanceSlider")
+			distanceDiv.appendChild(distanceLabel)
+			
+			this.distanceInput = document.createElement("input") as HTMLInputElement
+			this.distanceInput.classList.add("form-range","w-25","flex-grow-1","h-100","px-2","border")
+			this.distanceInput.id="labelDistanceSlider"
+			this.distanceInput.type="range"
+			this.distanceInput.min="0"
+			this.distanceInput.max="1"
+			this.distanceInput.step="0.01"
+			this.distanceInput.value = (this._value?this._value.distance.value??0:0).toString()
+			distanceDiv.appendChild(this.distanceInput)
+	
+			let unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
+			unitLabel.innerHTML=this._value.distance.value.toFixed(2)+" "+this._value.distance.unit
+			distanceDiv.appendChild(unitLabel)
 
 			this.distanceInput.addEventListener("input",()=>{
 				this.update()
+				unitLabel.innerText = this._value.distance.value.toFixed(2)+" "+this._value.distance.unit
 			})
 
-			row1.appendChild(distanceDiv)
+			this.distanceInput.addEventListener("change",()=>{
+				this.update()
+				unitLabel.innerText = this._value.distance.value.toFixed(2)+" "+this._value.distance.unit
+				Undo.addState()
+			})
 		}
-
-		container.append(row1)
+		row.appendChild(distanceDiv)
+		
+		container.appendChild(row)
 	}
 
 	private update(){
 		this.updateValue({
 			value:this.input.value,
-			labelDistance:this.distanceInput?Number.parseFloat(this.distanceInput.value):undefined,
+			distance:this.distanceInput?new SVG.Number(Number.parseFloat(this.distanceInput.value),"cm"):undefined,
 			anchor:this.anchorSelect?LabelAnchor[this.anchorSelect.value]:undefined
 		})
 	}

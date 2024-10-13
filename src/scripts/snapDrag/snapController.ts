@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import {CanvasController, CircuitComponent, SnapPoint} from "../internal";
+import {CanvasController, SnapPoint} from "../internal";
 
 type DistStruct = {
 	dist: number;
@@ -28,13 +28,18 @@ export class SnapController {
 	// a list of all points (except grid points) which can be snapped to
 	private snapPoints: SnapPoint[] = [];
 
+	private whereSnap:SVG.Element
+
 	// save the created svg elements for later deletion
 	private snapUses: SVG.Use[] = [];
 
 	/**
 	 * Do not call this constructor directly. Use {@link instance} instead.
 	 */
-	private constructor() {}
+	private constructor() {
+		this.whereSnap = CanvasController.instance.canvas.circle(3).fill("green")
+		this.whereSnap.hide()
+	}
 
 	/**
 	 * Add points to snap to.
@@ -57,6 +62,7 @@ export class SnapController {
 	 * show the snap points on the canvas (doesn't show grid points)
 	 */
 	public showSnapPoints(){
+		this.whereSnap.show()
 		const snapSymbol = new SVG.Symbol(document.getElementById("snapPoint"));
 		const container = CanvasController.instance.canvas;
 		let viewBox = snapSymbol.viewbox();
@@ -76,6 +82,7 @@ export class SnapController {
 	 * hide the snap points again
 	 */
 	public hideSnapPoints(){
+		this.whereSnap.hide()
 		// remove all the snap point visualizations from the svg canvas
 		this.snapUses.forEach(snapUse=>{
 			snapUse.remove();
@@ -92,7 +99,7 @@ export class SnapController {
 		const canvasController = CanvasController.instance;
 		let gridSpacing: number = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px").value;
 		// take zoom level into account (canvas.ctm().a): zoomed in means smaller maximum distance
-		const maxSnapDistance = new SVG.Number(0.5, "cm").convertToUnit("px").value/CanvasController.instance.canvas.ctm().a
+		const maxSnapDistance = new SVG.Number(1, "cm").convertToUnit("px").value/CanvasController.instance.canvas.ctm().a
 		const movingSnapPoints = relSnapPoints.map((point) => pos.add(point));
 
 		if (!CanvasController.instance.gridVisible) {
@@ -155,6 +162,15 @@ export class SnapController {
 			// only snap if the snap distance is not too long
 			distStruct.vector = new SVG.Point(0,0)
 		}
+
+		if (distStruct.fixedSnapPoint) {
+			if (distStruct.dist>maxSnapDistance*maxSnapDistance) {
+				this.whereSnap.move(pos.x-1.5,pos.y-1.5)
+			}else{
+				this.whereSnap.move(distStruct.fixedSnapPoint.x-1.5,distStruct.fixedSnapPoint.y-1.5)
+			}
+		}
+
 		return distStruct.vector.add(pos);
 	}
 

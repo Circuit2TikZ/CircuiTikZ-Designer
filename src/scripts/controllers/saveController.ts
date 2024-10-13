@@ -3,7 +3,7 @@
  */
 
 import { Modal } from "bootstrap";
-import { NodeComponentInstance,PathComponentInstance,Line,SelectionController,Undo, CanvasController, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent, SelectionMode, LineComponent } from "../internal";
+import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent, SelectionMode, LineComponent, MainController, CanvasController } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
@@ -47,11 +47,13 @@ export class SaveController {
 	}
 
 	save(){
-		//TODO sync MainController.instance.components order with svg order
+		//TODO make this more efficient
 		let components = []
-		for (const component of CanvasController.instance.canvas.children()) {
-			if (component instanceof CircuitComponent) {
-				components.push(component.toJson())
+		for (const svgElement of CanvasController.instance.canvas.children()) {
+			for (const component of MainController.instance.circuitComponents) {
+				if (svgElement==component.visualization) {
+					components.push(component.toJson())
+				}
 			}
 		}
 

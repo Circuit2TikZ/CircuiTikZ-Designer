@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import { NodeComponentInstance, MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
+import { MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
 
 export enum SelectionMode {
 	RESET,
@@ -36,8 +36,6 @@ export class SelectionController {
 		this.currentlySelectedComponents = []
 		this.currentlyDragging = false
 		this.selectionMode = SelectionMode.RESET
-
-		//TODO selection only enables when state of program is drag pan
 		
 		CanvasController.instance.canvas.on("mousedown",(evt: MouseEvent)=>{
 

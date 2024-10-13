@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, SnapPoint, Undo, CanvasController } from "../internal";
+import { CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, Undo } from "../internal";
 
 export type DragCallbacks = {
 	dragStart?(pos: SVG.Point, ev?:MouseEvent):void
@@ -62,7 +62,9 @@ export class SnapDragHandler{
 		if (enable === false && snapDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
-			snapDragHandler.dragEnd(null,false)
+			if (snapDragHandler.startedDragging) {
+				snapDragHandler.dragEnd(null,false)
+			}
 			snapDragHandler.removeHandler();
 			return null;
 		}
@@ -74,6 +76,8 @@ export class SnapDragHandler{
 		this.element.off("dragmove.namespace", this.dragMove);
 		this.element.off("dragend", this.dragEnd);
 		this.element.draggable(false);
+		this.element.forget("_snapDragHandler");
+		this.element.forget("_draggable");
 	}
 
 	private dragStart(ev:DragEvent){
@@ -138,7 +142,6 @@ export class SnapDragHandler{
 		this.element.parent().node.classList.remove("dragging");
 		SnapController.instance.hideSnapPoints();
 
-		// TODO support touch screens again
 		if (ev.detail?.event instanceof TouchEvent) {
 			const clientXY = ev.detail.event.touches?.[0] ?? ev.detail.event.changedTouches?.[0];
 			const contextMenuEvent = new PointerEvent("contextmenu", {
@@ -188,7 +191,9 @@ export class AdjustDragHandler{
 		if (enable === false && adjustDragHandler) {
 			// enable === false --> not undefined
 			// if the snapDragHandler gets removed while currently moving, this means that the component placement is cancelled, i.e. no state should be added
-			adjustDragHandler.dragEnd(null,false)
+			if (adjustDragHandler.startedDragging) {
+				adjustDragHandler.dragEnd(null,false)
+			}
 			adjustDragHandler.removeHandler();
 			return null;
 		}
@@ -198,7 +203,7 @@ export class AdjustDragHandler{
 	/**
 	 * Remove the handler and deactivate `draggable` feature.
 	 */
-	removeHandler() {
+	private removeHandler() {
 		this.element.off("dragstart", this.dragStart);
 		this.element.off("dragmove.namespace", this.dragMove);
 		this.element.off("dragend", this.dragEnd);

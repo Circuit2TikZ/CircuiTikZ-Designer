@@ -18,7 +18,7 @@ export class InfoProperty extends EditableProperty<string>{
 		row.classList.add("row","mx-0", "my-2", "border", "border-info-subtle", "bg-info-subtle", "text-info-emphasis", "rounded")
 
 		this.labelElement = document.createElement("span") as HTMLSpanElement
-		this.labelElement.classList.add("text-start","col")
+		this.labelElement.classList.add("text-start","col-auto","me-3")
 		this.labelElement.innerHTML = this._label??"Label"
 		row.appendChild(this.labelElement)
 

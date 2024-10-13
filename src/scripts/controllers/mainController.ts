@@ -22,6 +22,10 @@ export enum Modes {
 	ERASE
 }
 
+// TODO Test
+// TODO support mobile again
+// TODO redo comments
+
 export class MainController {
 	private static _instance: MainController;
 	public static get instance(): MainController {
@@ -44,15 +48,6 @@ export class MainController {
 
 	private tabID=-1
 
-	/**
-	 * COMMENT/TODO: properly utilize the "component placing" mode:
-	 * clicking component shortcuts or an icon in the "+" menu should activate this component placing mode
-	 * component placing mode returns to DRAG_PAN as soon as the component has been successfully placed
-	 * Therefore: all kinds of behaviour can be checked and activated/deactivated more easily with this mode
-	 * 
-	 * This mode will not be shown to the user (show drag_pan instead)
-	 */
-
 	mode = Modes.DRAG_PAN;
 
 	private modeSwitchButtons = {
@@ -71,7 +66,6 @@ export class MainController {
 	static appVersion = "0.0.0";
 
 	isMac = false
-	snapController: SnapController;
 	selectionController: SelectionController;
 
 	/**
@@ -93,7 +87,6 @@ export class MainController {
 		this.darkMode = this.currentTheme === 'dark';
 		switchElement.checked = this.darkMode;
 
-		this.snapController = SnapController.instance;
 		let mathJaxPromise = this.#loadMathJax();
 		let canvasPromise = this.#initCanvas();
 		let symbolsDBPromise = this.#initSymbolDB();
@@ -160,6 +153,7 @@ export class MainController {
 			ComponentPlacer.instance;
 		});
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
+			document.getElementById("loadingSpinner")?.classList.add("d-none")
 			SnapCursorController.instance
 			this.#initAddComponentOffcanvas();
 			this.#initShortcuts();
@@ -807,7 +801,7 @@ export class MainController {
 	 */
 	public removeComponent(circuitComponent: CircuitComponent) {
 		if (circuitComponent.snappingPoints&&circuitComponent.snappingPoints.length>0){
-			this.snapController.removeSnapPoints(circuitComponent.snappingPoints);
+			SnapController.instance.removeSnapPoints(circuitComponent.snappingPoints);
 		} 
 		const idx = this.circuitComponents.indexOf(circuitComponent);
 		if (idx>-1) {

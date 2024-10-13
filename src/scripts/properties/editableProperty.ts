@@ -1,4 +1,4 @@
-import { CircuitComponent, Label } from "../internal";
+import { CircuitComponent, MainController, Modes } from "../internal";
 
 export type ChangeEvent<T> = {
 	previousValue:T,
@@ -28,10 +28,14 @@ export abstract class EditableProperty<T>{
 
 	protected lastValue:T
 
-	public constructor(componentReference:CircuitComponent){
-		this.changeListeners = []
+	public constructor(componentReference:CircuitComponent, value?:T){
+		// make sure to be in drag_pan mode when changing any value
+		this.changeListeners = [(ev)=>{MainController.instance.switchMode(Modes.DRAG_PAN)}]
 		this.componentReference = componentReference
 		this.lastValue = null
+		if (value!==undefined) {
+			this.setValue(value,false)
+		}
 	}
 
 	public abstract buildHTML(container:HTMLElement):void
@@ -55,7 +59,7 @@ export abstract class EditableProperty<T>{
 		this.setValue(newVal)
 		let changeEvent:ChangeEvent<T> = {
 			previousValue:this.lastValue,
-			value:newVal
+			value:this._value
 		}
 		for (const element of this.changeListeners) {
 			element(changeEvent)

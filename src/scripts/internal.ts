@@ -12,28 +12,23 @@ export * from "./controllers/copyController";
 export * from "./controllers/propertiesController";
 // properties
 export * from "./properties/editableProperty"
-export * from "./properties/labelProperty"
+export * from "./properties/nodeLabelProperty"
+export * from "./properties/pathLabelProperty"
 export * from "./properties/textProperty"
 export * from "./properties/infoProperty"
+export * from "./properties/zorderProperty"
+export * from "./properties/pathOrientationProperty"
+export * from "./properties/flipStateProperty"
 // components
 export * from "./components/circuitComponent";
 export * from "./components/circuitikzComponent";
 export * from "./components/componentPlacer";
 export * from "./components/componentSymbol";
-export * from "./components/componentInstance";
-export * from "./components/nodeComponentSymbol";
-export * from "./components/nodeComponentInstance";
 export * from "./components/nodeComponent";
-export * from "./components/pathComponentSymbol";
-export * from "./components/pathComponentInstance";
 export * from "./components/pathComponent";
 export * from "./components/lineComponent";
-// lines
-export * from "./lines/line";
-export * from "./lines/lineDrawer";
 // snapDrag
+export * from "./snapDrag/dragHandlers";
 export * from "./snapDrag/snapController";
 export * from "./snapDrag/snapCursor";
 export * from "./snapDrag/snapPoint";
-export * from "./snapDrag/nodeDragHandler";
-export * from "./snapDrag/pathDragHandler";

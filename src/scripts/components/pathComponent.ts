@@ -1,13 +1,23 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, FormEntry, MainController, SnapController, SnapCursorController, SnapPoint } from "../internal"
-import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, PathOrientationProperty, PathLabelProperty, Label, Undo } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor, pathPointRadius } from "../utils/selectionHelper";
+
+
+export type PathLabel = Label & {
+	otherSide?:boolean
+}
 
 export type PathSaveObject = CircuitikzSaveObject & {
 	start:{x:number, y:number}
 	end:{x:number, y:number}
+	label?:PathLabel
 	mirror?:boolean
 	invert?:boolean
+}
+
+export type PathOrientation = {
+	mirror:boolean,
+	invert:boolean
 }
 
 export class PathComponent extends CircuitikzComponent{
@@ -26,6 +36,9 @@ export class PathComponent extends CircuitikzComponent{
 	private startCircle:SVG.Circle;
 	private endCircle:SVG.Circle;
 
+	private pathOrientation:PathOrientationProperty
+	public label:PathLabelProperty
+
 	constructor(symbol:ComponentSymbol){
 		super(symbol)
 		SnapCursorController.instance.visible = true
@@ -35,14 +48,6 @@ export class PathComponent extends CircuitikzComponent{
 		
 		this.relSymbolStart = this.referenceSymbol._pins.at(startPinIndex).point
 		this.relSymbolEnd = this.referenceSymbol._pins.at(endPinIndex).point
-		
-		this.snappingPoints = [
-			new SnapPoint(this, null, new SVG.Point(0,0)),
-			new SnapPoint(this, null, new SVG.Point(0,0)),
-			...this.referenceSymbol._pins
-									.filter((_,index)=>!(index==startPinIndex||index==endPinIndex))
-									.map((pin) => new SnapPoint(this, pin.name, pin.point)),
-		];
 
 		this.visualization = CanvasController.instance.canvas.group()
 
@@ -56,7 +61,6 @@ export class PathComponent extends CircuitikzComponent{
 		this.endLine = CanvasController.instance.canvas.line()
 		this.endLine.attr(lineAttr);
 
-		
 		this.symbolUse = CanvasController.instance.canvas.use(this.referenceSymbol)
 		this.visualization.add(this.symbolUse)
 		this.visualization.add(this.startLine)
@@ -68,6 +72,41 @@ export class PathComponent extends CircuitikzComponent{
 		
 		this.endCircle = pathPointSVG()
 		this.visualization.add(this.endCircle)
+
+		this.label = new PathLabelProperty(this,{value:""})
+		this.label.label = "Label"
+		this.label.addChangeListener((ev)=>{
+			if (ev.value.value) {
+				if (!ev.previousValue||ev.previousValue.value!=ev.value.value) {
+					//rerender
+					this.generateLabelRender(this.label.getValue()).then(()=>Undo.addState())
+				}else{
+					this.updateLabelPosition()
+				}
+			}else{
+				ev.value.rendering?.remove()
+			}
+		})
+		this.editableProperties.push(this.label)
+
+		this.pathOrientation = new PathOrientationProperty(this,{mirror:false,invert:false})
+		this.pathOrientation.label = "Orientation"
+		this.pathOrientation.addChangeListener(ev=>{
+			if (!ev.previousValue||ev.previousValue.mirror!=ev.value.mirror||ev.previousValue.invert!=ev.value.invert) {
+				this.updateTransform()
+				this.recalculateSnappingPoints()
+				Undo.addState()
+			}
+		})
+		this.editableProperties.push(this.pathOrientation)
+
+		this.snappingPoints = [
+			new SnapPoint(this, null, new SVG.Point(0,0)),
+			new SnapPoint(this, null, new SVG.Point(0,0)),
+			...this.referenceSymbol._pins
+									.filter((_,index)=>!(index==startPinIndex||index==endPinIndex))
+									.map((pin) => new SnapPoint(this, pin.name, pin.point)),
+		];
 	}
 
 	public updateTheme(): void {
@@ -103,18 +142,41 @@ export class PathComponent extends CircuitikzComponent{
 		this.recalculateSnappingPoints()
 	}
 	public flip(horizontal: boolean): void {
+		let newPos1 = new SVG.Point(this.posStart.x,this.posEnd.y)
+		let newPos2 = new SVG.Point(this.posEnd.x,this.posStart.y)
+		if (horizontal) {
+			this.posStart = newPos1
+			this.posEnd = newPos2
+		} else {
+			this.posStart = newPos2
+			this.posEnd = newPos1
+		}
+		let currentOrientation:PathOrientation = {
+			mirror:!this.pathOrientation.getValue().mirror,
+			invert:this.pathOrientation.getValue().invert
+		}
+		this.pathOrientation.setValue(currentOrientation,true)
+		
+		this.updateTransform()
 		this.recalculateSnappingPoints()
-		throw new Error("Method not implemented.");
+	}
+
+	public getSnapPointTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix({
+			rotate:-this.rotationDeg,
+			scaleX:this.pathOrientation.getValue().mirror?-1:1,
+			scaleY:this.pathOrientation.getValue().invert?-1:1
+		})
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
 		this.snappingPoints[0].updateRelPosition(this.posStart.sub(this.position).rotate(-this.rotationDeg))
 		this.snappingPoints[1].updateRelPosition(this.posEnd.sub(this.position).rotate(-this.rotationDeg))
-		super.recalculateSnappingPoints(matrix)
+		super.recalculateSnappingPoints(matrix??this.getSnapPointTransformMatrix())
 	}
 
 	public getPlacingSnappingPoints(): SnapPoint[] {
-		return this.finishedPlacing?this.snappingPoints:[new SVG.Point() as SnapPoint]
+		return this.finishedPlacing?this.snappingPoints:[new SnapPoint(this,"",new SVG.Point())]
 	}
 
 	protected updateTransform(): void {
@@ -129,24 +191,24 @@ export class PathComponent extends CircuitikzComponent{
 			rotate: -this.rotationDeg, 
 			ox: this.position.x, 
 			oy: this.position.y,
-			// scaleY: this.#mirror?-1:1,
-			// scaleX: this.#invert?-1:1
+			scaleY: this.pathOrientation.getValue().mirror?-1:1,
+			scaleX: this.pathOrientation.getValue().invert?-1:1
 		});
 
 		let startEnd = this.relSymbolStart.rotate(this.rotationDeg).add(this.position)
 		let endStart = this.relSymbolEnd.rotate(this.rotationDeg).add(this.position)
 
-		this.startCircle.move(this.posStart.x-pathPointRadius/2,this.posStart.y-pathPointRadius/2)
-		this.endCircle.move(this.posEnd.x-pathPointRadius/2,this.posEnd.y-pathPointRadius/2)
+		this.startCircle.move(this.posStart.x-pathPointRadius,this.posStart.y-pathPointRadius)
+		this.endCircle.move(this.posEnd.x-pathPointRadius,this.posEnd.y-pathPointRadius)
 
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
-
-		this._bbox = this.visualization.bbox() // TODO this should ignore the label, otherwise the component flickers while moving it around when putting it inside the group
+		
+		this.updateLabelPosition()
+		this._bbox = this.visualization.bbox()
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
 		this.recalculateSelectionVisuals()
-		// this.updateLabelPosition()
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionRectangle) {
@@ -158,7 +220,8 @@ export class PathComponent extends CircuitikzComponent{
 										rotate: -this.rotationDeg, 
 										ox: this.position.x, 
 										oy: this.position.y, 
-										// scaleY: this.#mirror?-1:1
+										scaleY: this.pathOrientation.getValue().mirror?-1:1,
+										scaleX: this.pathOrientation.getValue().invert?-1:1
 									});
 		}
 	}
@@ -237,7 +300,6 @@ export class PathComponent extends CircuitikzComponent{
 	}
 
 	public toJson(): PathSaveObject {
-		//TODO add additional options!?
 		let data:PathSaveObject = {
 			type:"path",
 			id:this.referenceSymbol.node.id,
@@ -249,35 +311,38 @@ export class PathComponent extends CircuitikzComponent{
 			data.name = this.name.getValue()
 		}
 		if (this.label.getValue()) {
-			data.label = this.label.getValue()
+			data.label = {
+				value:this.label.getValue().value,
+				otherSide:this.label.getValue().otherSide
+			}
 		}
-		// TODO
-		// if (this.mirror) {
-		// 	data.mirror = this.mirror
-		// }
-		// if (this.invert) {
-		// 	data.invert = this.invert
-		// }
+
+		if (this.pathOrientation.getValue().mirror) {
+			data.mirror = this.pathOrientation.getValue().mirror
+		}
+		if (this.pathOrientation.getValue().invert) {
+			data.invert = this.pathOrientation.getValue().invert
+		}
 
 		return data
 	}
 	public toTikzString(): string {
+		let distStr = this.label.getValue().distance.convertToUnit("cm").minus(0.1).value.toPrecision(2)+"cm"
+		let shouldDist = this.label.getValue().distance&&distStr!="0.0cm"
 		return (
 			"\\draw " +
 			this.posStart.toTikzString() +
 			" to[" +
 			this.referenceSymbol.tikzName +
 			(this.name.getValue()===""?"":", name="+this.name.getValue()) +
-			(this.label.getValue().value!==""?", l={$"+this.label.getValue().value+"$}":"") +
-			// (this.#mirror?", mirror":"") +
-			// (this.#invert?", invert":"") +
+			(this.label.getValue().value!==""?", l"+(this.label.getValue().otherSide?"_":"")+"={$"+this.label.getValue().value+"$}"
+			+(shouldDist?", label distance="+distStr:""):"") +
+			(this.pathOrientation.getValue().mirror?", mirror":"") +
+			(this.pathOrientation.getValue().invert?", invert":"") +
 			"] " +
 			this.posEnd.toTikzString() +
 			";"
 		);
-	}
-	public getFormEntries(): FormEntry[] {
-		throw new Error("Method not implemented.");
 	}
 	public remove(): void {
 		SnapDragHandler.snapDrag(this,false)
@@ -285,12 +350,12 @@ export class PathComponent extends CircuitikzComponent{
 		AdjustDragHandler.snapDrag(this,this.endCircle,false)
 		this.visualization.remove()
 		this.viewSelected(false)
-		// this.#labelSVG?.remove()
+		this.label.getValue()?.rendering?.remove()
 	}
 
 	public draggable(drag: boolean): void {
-		this.startCircle.draggable(drag)
-		this.endCircle.draggable(drag)
+		// this.startCircle.draggable(drag)
+		// this.endCircle.draggable(drag)
 		if (drag) {
 			this.symbolUse.node.classList.add("draggable");
 			this.startCircle.node.classList.add("draggable")
@@ -308,12 +373,14 @@ export class PathComponent extends CircuitikzComponent{
 		AdjustDragHandler.snapDrag(this, this.startCircle, drag, {
 			dragMove: (pos)=>{
 				this.moveStartTo(pos)
-			}
+			},
+			dragEnd:()=>{Undo.addState()}
 		})
 		AdjustDragHandler.snapDrag(this, this.endCircle, drag, {
 			dragMove: (pos)=>{
 				this.moveEndTo(pos)
-			}
+			},
+			dragEnd:()=>{Undo.addState()}
 		})
 	}
 
@@ -356,12 +423,10 @@ export class PathComponent extends CircuitikzComponent{
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced=2
 
-		// TODO
-		// if (saveObject.mirror) {
-		// 	pathComponent.mirror = saveObject.mirror
-		// }else if(saveObject.invert){
-		// 	pathComponent.invert = saveObject.invert
-		// }
+		pathComponent.pathOrientation.setValue({
+			mirror:saveObject.mirror??false,
+			invert:saveObject.invert??false
+		},false)
 
 		if (saveObject.name) {
 			pathComponent.name.setValue(saveObject.name)
@@ -369,7 +434,7 @@ export class PathComponent extends CircuitikzComponent{
 
 		if (saveObject.label) {
 			pathComponent.label.setValue(saveObject.label)
-			// pathComponent.generateLabelRender(saveObject.label.value)
+			pathComponent.generateLabelRender(pathComponent.label.getValue())
 		}else{
 			pathComponent.label.setValue({value: ""})
 		}
@@ -380,7 +445,94 @@ export class PathComponent extends CircuitikzComponent{
 	}
 
 	public updateLabelPosition(): void {
-		console.log("update label posititon");
+		if (!this.label) {
+			return
+		}
+		let label = this.label.getValue()
+		if (!label||label.value===""||!label.rendering) {
+			return
+		}
+		let labelSVG = label.rendering
+		// breaking points where the label is parallel to the path or to the x axis. in degrees
+		const breakVertical = 70
+		const breakHorizontal = 21
+
+		let pathDiff = this.posEnd.sub(this.posStart)
+
+		// the bounding boxes for the label and the symbol
+		let labelBBox = labelSVG.bbox()
+		let symbolBBox = this.symbolUse.bbox()
+
+		// the nominal reference point of the label (bottom center)
+		let labelRef = new SVG.Point(labelBBox.w/2,labelBBox.h)
+		// the rotation angle of the label (not always identical to the path rotation angle)
+		let rotAngle = this.rotationDeg
+		if (rotAngle>90) {
+			// upper left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
+			rotAngle-=180
+			// the label reference point should now be the top center
+			labelRef.y = 0
+		}else if(rotAngle<-90){
+			// lower left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
+			rotAngle+=180
+			// the label reference point should now be the top center
+			labelRef.y = 0
+		}
+		
+		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
+		let referenceoffsetY = this.pathOrientation.getValue().mirror?this.referenceSymbol.relMid.y-symbolBBox.h:-this.referenceSymbol.relMid.y
+		
+		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
+		let referenceOffsetX = 0
+
+		let otherSide = this.label.getValue().otherSide
+		let other = otherSide?-1:1
+		if (otherSide) {
+			labelRef.y = labelBBox.h-labelRef.y
+			referenceoffsetY+=symbolBBox.h
+		}
+
+		// if the path is close to horizontal or vertical according to the break points
+		let nearHorizontal = Math.abs(this.rotationDeg)<breakHorizontal||Math.abs(this.rotationDeg)>(180-breakHorizontal);
+		let nearVertical = Math.abs(this.rotationDeg)>(breakVertical)&&Math.abs(this.rotationDeg)<(180-breakVertical);
+
+		if (nearHorizontal) {
+			// the label should not be rotated w.r.t. the x axis
+			rotAngle=0
+			//the offset where the rotation pivot point should lie (for both label and symbol)
+			let horizontalOffset = Math.min(labelBBox.w,symbolBBox.w)*Math.sign(this.rotationDeg)/2
+			referenceOffsetX = horizontalOffset*Math.sign(pathDiff.x)*other
+			labelRef.x+=horizontalOffset*other
+		}else if(nearVertical){
+			// the label should not be rotated w.r.t. the x axis
+			rotAngle=0
+			let side = Math.sign(-rotAngle)*other
+			let up = Math.sign(this.rotationDeg)*other
+			//the offset where the rotation pivot point should lie (for both label and symbol)
+			let verticalOffset = Math.min(labelBBox.h,symbolBBox.w)/2
+			referenceOffsetX = verticalOffset*-side
+
+			labelRef = new SVG.Point(labelBBox.w*(1+up)/2,verticalOffset*side*up)
+			labelRef.y+=verticalOffset
+		}
+
+		referenceoffsetY -=other*(label.distance?label.distance.convertToUnit("px").value:0)
+
+		// where the anchor point of the symbol is located relative to the midAbs point
+		let referenceOffset = new SVG.Point(referenceOffsetX,referenceoffsetY).transform(new SVG.Matrix({
+			rotate:-this.rotationDeg
+		}))
+
+		
+		// acutally move and rotate the label to the correct position
+		let compRef = this.position.add(referenceOffset)
+		let movePos = compRef.sub(labelRef)
+		labelSVG.move(movePos.x,movePos.y)
+		.transform({
+			rotate:-rotAngle,
+			ox:compRef.x,
+			oy:compRef.y
+		})
 		
 	}
 }

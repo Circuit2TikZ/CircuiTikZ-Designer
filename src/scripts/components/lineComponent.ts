@@ -64,10 +64,14 @@ export class LineComponent extends CircuitComponent{
 		}
 	}
 
+	public getSnapPointTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix()
+	}
+
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
 		this.snappingPoints[0].updateRelPosition(this.cornerPoints[0].sub(this.position))
 		this.snappingPoints[1].updateRelPosition(this.cornerPoints.at(-1).sub(this.position))
-		super.recalculateSnappingPoints(new SVG.Matrix())
+		super.recalculateSnappingPoints()
 	}
 
 	public getPlacingSnappingPoints(): SnapPoint[] {
@@ -178,7 +182,7 @@ export class LineComponent extends CircuitComponent{
 		this.draggableLine.clear()
 		this.draggableLine.plot(pointArray)
 		
-		this._bbox = this.visualization.bbox()
+		this._bbox = this.line.bbox()
 
 		this.position.x = this._bbox.cx
 		this.position.y = this._bbox.cy
@@ -248,9 +252,6 @@ export class LineComponent extends CircuitComponent{
 			outString+=" "+dir+" "+point.toTikzString()
 		}
 		return outString+";"
-	}
-	public getFormEntries(): FormEntry[] {
-		throw new Error("Method not implemented.");
 	}
 	public copyForPlacement(): LineComponent {
 		return new LineComponent();

@@ -2,7 +2,7 @@
  * @module propertyController
  */
 
-import { CanvasController, CircuitComponent, MainController, NodeComponentInstance, SelectionController, Undo } from "../internal";
+import { CanvasController, CircuitComponent, SelectionController } from "../internal";
 
 export type FormEntry = {
 	originalObject: object;
@@ -20,14 +20,12 @@ export class PropertyController{
 		return PropertyController._instance;
 	}
 
-	private objectName: HTMLSpanElement;
 	private gridProperties: HTMLDivElement
 	private propertiesEntries: HTMLDivElement
 	private propertiesTitle: HTMLElement
 
 	private constructor(){
 		this.propertiesTitle = document.getElementById("propertiesTitle") as HTMLElement
-		this.objectName = document.getElementById("objectName") as HTMLSpanElement
 		this.gridProperties = document.getElementById("grid-properties") as HTMLDivElement
 		this.propertiesEntries = document.getElementById("propertiesEntries") as HTMLDivElement
 	}
@@ -39,21 +37,19 @@ export class PropertyController{
 		if (components.length>1) {
 			//TODO multicomponent edit
 			//TODO alignment and distribution tools
-			this.objectName.classList.remove("d-none")
-			this.objectName.innerText = "Please select only one component to view its properties"
-		}else if (components.length===0) {
-			this.setFormGrid()
+			//TODO flip,rotate selection
+			this.propertiesEntries.classList.remove("d-none")
+			this.propertiesEntries.innerText = "Please select only one component to view its properties"
+		}else if (components.length===1) {
+			this.setForm(components[0]);
 		}else{
-			if (components.length===1) {
-				this.setForm(components[0]);
-			}
+			this.setFormGrid()
 		}
 	}
 
 	private setForm(component:CircuitComponent){		
 		this.propertiesEntries.classList.remove("d-none")
-		this.objectName.classList.remove("d-none")
-		this.objectName.innerText = component.displayName
+		this.propertiesTitle.innerText = component.displayName
 		
 		for (const property of component.editableProperties) {
 			property.buildHTML(this.propertiesEntries)
@@ -123,7 +119,8 @@ export class PropertyController{
 		this.propertiesTitle.innerText = "Properties"
 		this.gridProperties.classList.add("d-none")
 		this.propertiesEntries.classList.add("d-none")
-		this.objectName.classList.add("d-none")
+		this.propertiesEntries.innerText=""
+
 
 		while (this.propertiesEntries.lastElementChild) {
 			this.propertiesEntries.removeChild(this.propertiesEntries.lastElementChild)

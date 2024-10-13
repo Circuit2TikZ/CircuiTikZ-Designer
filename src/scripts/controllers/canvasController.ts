@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, Undo, SnapPoint } from "../internal";
+import { SnapController, Undo, SnapPoint, CircuitComponent } from "../internal";
 
 type PanningEventDetail = {
 	box:SVG.Box
@@ -178,29 +178,23 @@ export class CanvasController {
 		}))
 	}
 
-	/**
-	 * 
-	 * @param {SVG.Element} component 
-	 */
-	public bringComponentToFront(component: SVG.Element){
-		let index = this.canvas.children().findIndex(c=>c===component);
-		this.canvas.put(component)
-		if (index!==this.canvas.children().findIndex(c=>c===component)) {
+	public bringComponentToFront(component: CircuitComponent){
+		let element = component.visualization
+		let index = this.canvas.children().findIndex(c=>c===element);
+		this.canvas.put(element)
+		if (index!==this.canvas.children().findIndex(c=>c===element)) {
 			Undo.addState()
 		}
 	}
 
-	/**
-	 * 
-	 * @param {SVG.Element} component 
-	 */
-	public moveComponentToBack(component: SVG.Element){
-		let index = this.canvas.children().findIndex(c=>c===component);
+	public moveComponentToBack(component: CircuitComponent){
+		let element = component.visualization
+		let index = this.canvas.children().findIndex(c=>c===element);
 		// does put actually work on childNodes instead of children? this would explain why we need 11 instead of 6...
 		// this is super weird??
 		// see this.canvas.node.childNodes		
-		this.canvas.put(component,11)
-		if (index!==this.canvas.children().findIndex(c=>c===component)) {
+		this.canvas.put(element,11)
+		if (index!==this.canvas.children().findIndex(c=>c===element)) {
 			Undo.addState()
 		}
 	}

@@ -13,6 +13,8 @@
  * @property {function} onclick
  */
 
+//TODO update FAB
+
 /**
  * Internal class for managing individual FABs (floating action button).
  *

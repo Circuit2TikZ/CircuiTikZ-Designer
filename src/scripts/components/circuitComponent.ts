@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { EditableProperty, FormEntry, LabelAnchor, MainController, SnapPoint } from "../internal";
+import { EditableProperty, MainController, SnapPoint, ZOrderProperty } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 export type ComponentSaveObject = {
@@ -21,7 +21,6 @@ export abstract class CircuitComponent{
 	 */
 	public relPosition: SVG.Point;
 	public rotationDeg: number;
-	public flipState:SVG.Point = new SVG.Point(1,1);
 
 	public editableProperties:EditableProperty<any>[]=[]
 
@@ -34,7 +33,7 @@ export abstract class CircuitComponent{
 
 		this.displayName="Circuit Component"
 
-		//TODO add z-order controls as editableProperty
+		this.editableProperties.push(new ZOrderProperty(this))
 	}
 
 	protected _bbox: SVG.Box;
@@ -82,13 +81,16 @@ export abstract class CircuitComponent{
 		return new SVG.Matrix(this.visualization.transform())
 	}
 
+	public getSnapPointTransformMatrix(){
+		return new SVG.Matrix(this.visualization.transform())
+	}
+
 	public recalculateSnappingPoints(matrix?:SVG.Matrix){
 		for (const snappingPoint of this.snappingPoints) {
 			snappingPoint.recalculate(matrix)
 		}
 	}
 	
-	public abstract getFormEntries(): FormEntry[]
 	/**
 	 * create a copy from the provided CircuitComponent but ready for component placement
 	 * @param from 

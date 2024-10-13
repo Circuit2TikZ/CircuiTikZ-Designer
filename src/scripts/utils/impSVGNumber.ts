@@ -122,12 +122,12 @@ declare module "@svgdotjs/svg.js" {
 		 * Subtracts another svg point.
 		 * Returns a new instance.
 		 */
-		sub(other: Point): Point;
+		sub(other: Point|number): Point;
 		/**
 		 * Calculates the sum of this and another svg point.
 		 * Returns a new instance.
 		 */
-		add(other: Point): Point;
+		add(other: Point|number): Point;
 		/**
 		 * Calculates the multiplication of this point and another svg point or number (elementwise).
 		 * Returns a new instance.
@@ -495,11 +495,15 @@ SVG.extend(SVG.Point, {
 	 * Returns a new instance.
 	 *
 	 * @this {SVG.Point}
-	 * @param {SVG.Point} other - the subtrahend
+	 * @param {SVG.Point|number} other - the subtrahend
 	 * @returns {SVG.Point} the result
 	 */
-	sub(other: SVG.Point): SVG.Point {
-		return new SVG.Point(this.x - other.x, this.y - other.y);
+	sub(other: SVG.Point|number): SVG.Point {
+		if (other instanceof SVG.Point) {
+			return new SVG.Point(this.x - other.x, this.y - other.y);
+		}else{
+			return new SVG.Point(this.x - other, this.y - other);
+		}
 	},
 
 	/**
@@ -507,11 +511,15 @@ SVG.extend(SVG.Point, {
 	 * Returns a new instance.
 	 *
 	 * @this {SVG.Point}
-	 * @param {SVG.Point} other - the other summand
+	 * @param {SVG.Point|number} other - the other summand
 	 * @returns {SVG.Point} the result
 	 */
-	add(other: SVG.Point): SVG.Point {
-		return new SVG.Point(this.x + other.x, this.y + other.y);
+	add(other: SVG.Point|number): SVG.Point {
+		if (other instanceof SVG.Point) {
+			return new SVG.Point(this.x + other.x, this.y + other.y);
+		}else{
+			return new SVG.Point(this.x + other, this.y + other);
+		}
 	},
 	/**
 	 * Calculates the multiplication of this point and another svg point or number (elementwise).

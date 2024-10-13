@@ -1,4 +1,4 @@
-import { EditableProperty, Label, Undo } from "../internal"
+import { EditableProperty, Undo } from "../internal"
 
 export class TextProperty extends EditableProperty<string>{
 	private input:HTMLInputElement

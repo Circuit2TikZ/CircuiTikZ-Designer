@@ -3,7 +3,7 @@
  */
 
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController, CanvasController, NodeComponentInstance, PathComponentInstance, Line, CircuitikzComponent, CircuitComponent } from "../internal";
+import { SelectionController, MainController, CircuitikzComponent } from "../internal";
 import FileSaver from "file-saver";
 import pretty = require('pretty');
 
@@ -33,6 +33,13 @@ export class ExportController {
 	private copyTooltip: Tooltip;
 
 	private defaultDisplay: string
+
+	// TODO make this resilient to existing IDs
+	private _exportID: number = 0;
+	public get exportID(): number {
+		this._exportID++
+		return this._exportID;
+	}
 
 	/**
 	 * Init the ExportController
@@ -100,7 +107,7 @@ export class ExportController {
 			this.exportedContent.rows = arr.length;
 			this.exportedContent.value = arr.join("\n");
 		}
-
+		this._exportID=0
 		this.export(extensions)
 	}
 
