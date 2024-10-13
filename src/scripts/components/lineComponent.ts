@@ -279,10 +279,10 @@ export class LineComponent extends CircuitComponent{
 
 	private directionVecFromPos(relPos:SVG.Point,lastDirection:SVG.Point):SVG.Point{
 		var dir = lastDirection.clone()
-		if (relPos.x*lastDirection.x<0) {
+		if (relPos.y!=0&&relPos.x*lastDirection.x<0) {
 			dir.x=0
 			dir.y=Math.sign(relPos.y)
-		}else if(relPos.y*lastDirection.y<0){
+		}else if(relPos.x!=0&&relPos.y*lastDirection.y<0){
 			dir.x=Math.sign(relPos.x)
 			dir.y=0
 		}
@@ -307,7 +307,7 @@ export class LineComponent extends CircuitComponent{
 				return true
 			}
 		}else{
-			this.cornerPoints.push(pos)
+			this.cornerPoints.push(pos.clone())
 		}
 
 		this.cornerPoints.push(pos)

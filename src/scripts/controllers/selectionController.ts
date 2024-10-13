@@ -172,8 +172,7 @@ export class SelectionController {
 		this.selectionRectangle.attr("height",0);
 		this.selectionMode = SelectionMode.RESET;
 		this.currentlySelectedComponents = []
-		this.previewSelection();
-		this.updateSelection();
+		this.hideSelection()
 	}
 
 	public showSelection(){

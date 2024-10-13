@@ -391,7 +391,7 @@ export class MainController {
 			return false;
 		})
 		hotkeys("w",()=>{
-			this.switchMode(Modes.COMPONENT);
+			ComponentPlacer.instance.placeCancel()
 			ComponentPlacer.instance.placeComponent(new LineComponent())
 			return false;
 		})
