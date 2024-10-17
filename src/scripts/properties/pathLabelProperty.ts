@@ -6,6 +6,7 @@ export class PathLabelProperty extends EditableProperty<PathLabel>{
 		return this._value
 	}
 	public setValue(value: PathLabel, updateHTML?: boolean): void {
+		this.lastValue = this._value
 		if (value) {
 			let rendering = this._value?.rendering
 			this._value = {

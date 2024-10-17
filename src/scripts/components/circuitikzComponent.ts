@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, TextProperty } from "../internal";
+import { CanvasController, CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, TextProperty } from "../internal";
 
 const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
@@ -69,35 +69,79 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 		// @ts-ignore
 		window.MathJax.texReset();
 		// @ts-ignore
-		return window.MathJax.tex2svgPromise(label.value,{}).then((node: Element) =>{
-			let svgElement: SVGSVGElement = node.querySelector("svg")
+		return window.MathJax.tex2svgPromise(label.value,{}).then((node: Element) =>{			
+			let svgElement = new SVG.Svg(node.querySelector("svg"))
+
+			if (label.rendering) {
+				let removeIDs = new Set<string>()
+				for (const element of label.rendering.find("use")) {
+					removeIDs.add(element.node.getAttribute("xlink:href"))
+				}
+
+				for (const id of removeIDs) {
+					let element = CanvasController.instance.canvas.node.getElementById(id)
+					if (element) {
+						CanvasController.instance.canvas.node.removeChild(element)
+					}
+				}
+			}
+
+			let backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
+			let defs = svgElement.findOne("defs") as SVG.Defs
+			for (const def of defs.children()) {
+				backgroundDefs.put(def)
+			}
+			defs.remove()
+			
 			// slight padding of the label text
-			let padding_ex = 0.2
-			svgElement.setAttribute("style","vertical-align: top;padding: "+padding_ex+"ex;")
+			svgElement.node.setAttribute("style","vertical-align: top;")
 
 			// increase the width and height of the svg element by the padding
-			let widthStr = svgElement.getAttribute("width")
-			let width = Number.parseFloat(widthStr.slice(0,widthStr.length-2))+padding_ex*2
-			let heightStr = svgElement.getAttribute("height")
-			let height = Number.parseFloat(heightStr.slice(0,heightStr.length-2))+padding_ex*2
-
-			width = 10*width/2 // change to pt to explicitly change the font size
-			height = 10*height/2
-			widthStr = width.toString()+"pt"
-			heightStr = height.toString()+"pt"
-			svgElement.setAttribute("width",widthStr)
-			svgElement.setAttribute("height",heightStr)
-			svgElement.setAttribute("overflow","visible")
+			let expt = (1/1.545)*6.2 //1.545 magic number for the font used in MathJax; 6.2 = normal font size for tikz??? this should be 10pt but 10pt is far too big?? calculation wrong?
+			let widthStr = svgElement.node.getAttribute("width") // in ex units --> convert to pt and then to px
+			let width = new SVG.Number(new SVG.Number(widthStr).value*expt,"pt").convertToUnit("px");
+			let heightStr = svgElement.node.getAttribute("height")
+			let height = new SVG.Number(new SVG.Number(heightStr).value*expt,"pt").convertToUnit("px");
+			let size = new SVG.Point(width.value,height.value)
 			
-			//also set the width and height for the svg container
+			let svgViewBox = svgElement.viewbox()
+
+			let scale = size.div(new SVG.Point(svgViewBox.w,svgViewBox.h))
+			let translate = new SVG.Point(-svgViewBox.x,-svgViewBox.y).mul(scale)
+			let m = new SVG.Matrix({
+				scaleX:scale.x,
+				scaleY:scale.y,
+				translateX:translate.x,
+				translateY:translate.y
+			})
+
+			for (const elementGroup of svgElement.find("use")) {
+				elementGroup.node.removeAttribute("data-c")
+			}
+
+			let groupElements = svgElement.find("g") as SVG.List<SVG.G>
+			for (const elementGroup of groupElements) {
+				elementGroup.node.removeAttribute("data-mml-node")
+			}
+			for (const elementGroup of groupElements) {
+				let children = elementGroup.children()
+				if (children.length==1&&!elementGroup.node.hasAttributes()) {
+					elementGroup.parent().put(children[0])
+					elementGroup.remove()
+				}
+			}
+
+			let transformGroup = new SVG.G()
+			for (const child of svgElement.children()) {
+				transformGroup.add(child)
+			}
+			transformGroup.transform(m)
 
 			let currentLabel = label
 			currentLabel.rendering?.remove()
-			let rendering = new SVG.ForeignObject()
+			let rendering = new SVG.G()
 			rendering.addClass("pointerNone")
-			rendering.width(widthStr)
-			rendering.height(heightStr)
-			rendering.add(new SVG.Element(svgElement))
+			rendering.add(transformGroup)
 			this.visualization.add(rendering)
 			currentLabel.rendering = rendering
 			this.updateTransform()

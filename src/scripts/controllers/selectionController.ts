@@ -224,10 +224,6 @@ export class SelectionController {
 		return this.currentlySelectedComponents.includes(component)
 	}
 
-	/**
-	 * 
-	 * @returns {SVG.Box}
-	 */
 	public getOverallBoundingBox(): SVG.Box{
 		let bbox:SVG.Box = null
 		for (const component of this.currentlySelectedComponents) {

@@ -259,6 +259,7 @@ export class MainController {
 		// save the current state of tabs
 		localStorage.setItem(objname,JSON.stringify(current))
 
+		//TODO get rid of unload events: will be removed from chrome in the future and is currently ignored by many browsers
 		// prepare saveState for unloading
 		window.addEventListener("beforeunload",(ev)=>{
 			Undo.addState()

@@ -6,6 +6,7 @@ export class NodeLabelProperty extends EditableProperty<NodeLabel>{
 		return this._value
 	}
 	public setValue(value: NodeLabel, updateHTML?: boolean): void {
+		this.lastValue = this._value
 		if (value) {
 			let rendering = this._value?.rendering
 			this._value = {

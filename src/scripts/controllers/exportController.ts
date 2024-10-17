@@ -1,9 +1,9 @@
 /**
  * @module exportController
  */
-
+import * as SVG from "@svgdotjs/svg.js";
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController, CircuitikzComponent } from "../internal";
+import { SelectionController, MainController, CircuitikzComponent, CanvasController } from "../internal";
 import FileSaver from "file-saver";
 import pretty = require('pretty');
 
@@ -119,48 +119,63 @@ export class ExportController {
 		this.exportedContent.parentElement.style.display = this.defaultDisplay;
 		// prepare selection and bounding box
 		SelectionController.instance.selectAll()
-		let bbox = SelectionController.instance.getOverallBoundingBox()
 		SelectionController.instance.deactivateSelection()
-
+		
 		let colorTheme = MainController.instance.darkMode;
 		MainController.instance.darkMode = false;
 		MainController.instance.updateTheme()
-
-		//Get the canvas
-		let svgObj = document.getElementById("canvas").cloneNode(true) as SVGSVGElement
-		svgObj.removeAttribute("xmlns:svgjs")
-		svgObj.removeAttribute("class")
-		svgObj.removeAttribute("id")
-
-		// change bounding box to include all elements
-		if (bbox){
-			svgObj.setAttribute("viewBox", bbox.toString())
-		}
 		
+		//Get the canvas
+		let svgObj = CanvasController.instance.canvas.clone(true,false)//document.getElementById("canvas").cloneNode(true) as SVGSVGElement		
+		
+		svgObj.node.removeAttribute("xmlns:svgjs")
+		svgObj.node.removeAttribute("class")
+		svgObj.node.removeAttribute("id")
 		//remove not needed parts
-		/**@type {HTMLElement} */
-		let defs: HTMLElement = svgObj.children[0] as HTMLElement
-		defs.innerHTML = '';
-		// svgObj.removeChild(svgObj.children[0]) // defs for grid and axis
-		svgObj.removeChild(svgObj.getElementById("grid"))
-		svgObj.removeChild(svgObj.getElementById("xAxis"))
-		svgObj.removeChild(svgObj.getElementById("yAxis"))
-		svgObj.removeChild(svgObj.getElementById("selectionRectangle"))
+		let defs: HTMLElement = svgObj.node.children[0] as HTMLElement
+		defs.removeChild(svgObj.node.getElementById("smallGridPattern"))
+		defs.removeChild(svgObj.node.getElementById("gridPattern"))
+		defs.removeChild(svgObj.node.getElementById("snapCursor"))
+		defs.removeChild(svgObj.node.getElementById("snapPoint"))
+		// svgObj.node.removeChild(svgObj.node.children[0]) // defs for grid and axis
+		svgObj.node.removeChild(svgObj.node.getElementById("grid"))
+		svgObj.node.removeChild(svgObj.node.getElementById("xAxis"))
+		svgObj.node.removeChild(svgObj.node.getElementById("yAxis"))
+		svgObj.node.removeChild(svgObj.node.getElementById("selectionRectangle"))
 
-		svgObj.removeChild(svgObj.getElementById("snapCursorUse"))
-
+		svgObj.node.removeChild(svgObj.node.getElementById("snapCursorUse"))
+		
 		// delete path points for moving paths around
-		for (const element of svgObj.querySelectorAll(".draggable.pathPoint")) {
+		for (const element of svgObj.node.querySelectorAll(".draggable.pathPoint")) {
 			element.remove()
 		}
 
 		// delete path points for moving paths around
-		for (const element of svgObj.querySelectorAll("use")) {
+		for (const element of svgObj.node.querySelectorAll("use")) {
 			element.removeAttribute("class")
+		}
+
+		for (const elementGroup of svgObj.find("g") as SVG.List<SVG.G>) {
+			if (elementGroup.node.getAttribute("stroke")=="currentColor") {
+				elementGroup.node.removeAttribute("stroke")
+			}
+			if (elementGroup.node.getAttribute("fill")=="currentColor") {
+				elementGroup.node.removeAttribute("fill")
+			}
+		}
+		
+		// change bounding box to include all elements
+		let bbox = svgObj.bbox()
+		if (bbox){
+			//make bbox 1px larger in every direction to not cut of tiny bits of some objects
+			bbox.x-=1
+			bbox.y-=1
+			bbox.width+=2
+			bbox.height+=2
+			svgObj.viewbox(bbox)
 		}
 		
 		// get all used node/symbol names
-		let symbolDB = document.getElementById("symbolDB")
 		let usedSymbols = []
 		for (const instance of MainController.instance.circuitComponents) {
 			if (instance instanceof CircuitikzComponent) {
@@ -195,7 +210,7 @@ export class ExportController {
 
 		// convert to text and make pretty
 		let tempDiv = document.createElement("div");
-		tempDiv.appendChild(svgObj);
+		tempDiv.appendChild(svgObj.node);
 		let textContent = pretty(tempDiv.innerHTML, {ocd: true});
 		
 		this.exportedContent.rows = textContent.split("\n").length
