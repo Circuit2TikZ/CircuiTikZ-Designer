@@ -1,5 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitComponent, MainController, Modes, PropertyController, SnapController, Undo} from "../internal";
+import hotkeys from 'hotkeys-js';
 
 export class ComponentPlacer{
 	private static _instance: ComponentPlacer
@@ -30,7 +31,7 @@ export class ComponentPlacer{
 		if (ev.button==0) {
 			let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
 			if (ComponentPlacer.instance.component.placeStep(pt,ev)) {
-				ComponentPlacer.instance.placeFinish(ev)
+				ComponentPlacer.instance.placeFinish()
 			}
 		}
 	}
@@ -52,14 +53,15 @@ export class ComponentPlacer{
 		}
 	}
 
-	public placeFinish(ev:MouseEvent){
-		ComponentPlacer.instance.component.placeFinish()
-		ComponentPlacer.instance.cleanUp()
-		Undo.addState()
-		
-		// restart component placement for just finished component
-		ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
-
+	public placeFinish(){
+		if (ComponentPlacer.instance.component) {
+			ComponentPlacer.instance.component.placeFinish()
+			ComponentPlacer.instance.cleanUp()
+			Undo.addState()
+			
+			// restart component placement for just finished component
+			ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+		}
 	}
 
 	public placeCancel(ev?: KeyboardEvent){
@@ -79,7 +81,8 @@ export class ComponentPlacer{
 		let canvas = CanvasController.instance.canvas
 		canvas.off("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.off("mouseup",ComponentPlacer.instance.placeStep)
-		// canvas.off("dblclick",ComponentPlacer.instance.placeFinish)
+		canvas.off("dblclick",ComponentPlacer.instance.placeFinish)
+		hotkeys.unbind("enter",ComponentPlacer.instance.placeFinish)
 		// hotkeys.unbind("esc",ComponentPlacer.instance.placeCancel)
 	}
 
@@ -92,8 +95,8 @@ export class ComponentPlacer{
 
 		canvas.on("mousemove",ComponentPlacer.instance.placeMove)
 		canvas.on("mouseup",ComponentPlacer.instance.placeStep)
-		// canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
-		// hotkeys("esc",{keyup: true, keydown:false},ComponentPlacer.instance.placeCancel)
+		canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
+		hotkeys("enter",{keyup: false, keydown:true},ComponentPlacer.instance.placeFinish)
 		ComponentPlacer.instance.component.placeMove(CanvasController.instance.lastCanvasPoint)
 	}
 }

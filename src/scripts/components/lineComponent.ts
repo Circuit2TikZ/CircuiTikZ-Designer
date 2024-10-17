@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, FormEntry, MainController, SelectionController, SnapController, SnapCursorController, SnapPoint } from "../internal"
+import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SnapController, SnapCursorController, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
 import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, selectionColor } from "../utils/selectionHelper";
 
@@ -247,7 +247,7 @@ export class LineComponent extends CircuitComponent{
 	public toTikzString(): string {
 		let outString = "\\draw "+this.cornerPoints[0].toTikzString()
 		for (let index = 0; index < this.lineDirections.length; index++) {
-			const dir = this.lineDirections[index];
+			const dir = this.lineDirections[index]??"-|";
 			const point = this.cornerPoints[index+1];
 			outString+=" "+dir+" "+point.toTikzString()
 		}
@@ -302,7 +302,7 @@ export class LineComponent extends CircuitComponent{
 	public placeStep(pos: SVG.Point): boolean {
 		SnapCursorController.instance.visible=false
 		if (this.cornerPoints.length>0) {
-			let lastPoint = this.cornerPoints.at(-2)
+			let lastPoint = this.cornerPoints.at(-2) // there is never only one corner point in the array
 			if (pos.x==lastPoint.x&&pos.y==lastPoint.y) {
 				return true
 			}
@@ -326,16 +326,9 @@ export class LineComponent extends CircuitComponent{
 		}
 		
 		SnapCursorController.instance.visible=false
-		if (this.cornerPoints.length>0) {
-			this.placeStep(this.cornerPoints.at(-1))
-		}else{
+		if (this.cornerPoints.length<=2) {
 			MainController.instance.removeComponent(this)
-			return;
-		}
-
-		if (this.cornerPoints.length==2&&this.cornerPoints[0].eq(this.cornerPoints[1])) {
-			MainController.instance.removeComponent(this)
-			return;
+			return
 		}
 		
 		this.cornerPoints.pop()
@@ -353,7 +346,6 @@ export class LineComponent extends CircuitComponent{
 		this.draggable(true)
 		this.updateTransform()
 		this.recalculateSnappingPoints()
-
 
 		this.finishedPlacing = true
 	}

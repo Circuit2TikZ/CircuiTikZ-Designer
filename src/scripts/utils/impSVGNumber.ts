@@ -134,10 +134,10 @@ declare module "@svgdotjs/svg.js" {
 		 */
 		mul(other: Point|number): Point;
 		/**
-		 * Calculates the division of this point by a number.
+		 * Calculates the division of this point and another svg point or number (elementwise).
 		 * Returns a new instance.
 		 */
-		div(other: number): Point;
+		div(other: number|Point): Point;
 		/**
 		 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
 		 * rotation.
@@ -533,11 +533,15 @@ SVG.extend(SVG.Point, {
 		}
 	},
 	/**
-	 * Calculates the division of this point by a number.
+	 * Calculates the division of this point and another svg point or number (elementwise).
 	 * Returns a new instance.
 	 */
-	div(other: number): SVG.Point {
-		return new SVG.Point(this.x / other, this.y / other);
+	div(other: SVG.Point|number): SVG.Point {
+		if (other instanceof SVG.Point) {
+			return new SVG.Point(this.x / other.x, this.y / other.y);
+		}else{
+			return new SVG.Point(this.x / other, this.y / other);
+		}
 	},
 
 	/**
