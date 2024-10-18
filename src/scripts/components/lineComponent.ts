@@ -28,8 +28,6 @@ export class LineComponent extends CircuitComponent{
 	private line:SVG.Polyline
 	private draggableLine:SVG.Polyline
 
-	private isSelected=false
-
 	private draggingLineWidth=10
 	private adjustmentPoints:SVG.Element[]=[]
 	
@@ -210,7 +208,6 @@ export class LineComponent extends CircuitComponent{
 		return allPointsInside;
 	}
 	public viewSelected(show: boolean): void {
-		this.isSelected = show;
 		if (show) {
 			this.line.attr({
 				"stroke":selectionColor,

@@ -22,7 +22,7 @@ export class SelectionController {
 	private selectionStartPosition: SVG.Point
 	private selectionRectangle: SVG.Rect
 	private currentlyDragging: boolean
-	public currentlySelectedComponents: CircuitComponent[]
+	public currentlySelectedComponents: CircuitComponent[] = []
 	private selectionEnabled: boolean
 
 	private constructor() {
@@ -33,7 +33,6 @@ export class SelectionController {
 		this.selectionRectangle.attr("fill","none")
 		this.selectionRectangle.attr("id","selectionRectangle")
 		this.selectionEnabled = true
-		this.currentlySelectedComponents = []
 		this.currentlyDragging = false
 		this.selectionMode = SelectionMode.RESET
 		
@@ -88,7 +87,7 @@ export class SelectionController {
 		CanvasController.instance.canvas.on("mouseup",(/**@type {MouseEvent}*/evt: MouseEvent)=>{
 			if (evt.button===0) {
 				if (this.currentlyDragging) {
-					this.updateSelection();
+					this.updateSelectionWithRectangle();
 					this.currentlyDragging=false;
 					this.selectionRectangle.attr("width",0);
 					this.selectionRectangle.attr("height",0);
@@ -116,48 +115,25 @@ export class SelectionController {
 		this.selectionRectangle.stroke(MainController.instance.darkMode?"#fff":"#000")
 	}
 
-	private previewSelection(){
+	private updateSelectionWithRectangle(){
 		let selectionBox = this.selectionRectangle.bbox();
-		for (const component of MainController.instance.circuitComponents) {
-			let cond=false;
-			if (this.selectionMode==SelectionMode.RESET) {
-				cond = component.isInsideSelectionRectangle(selectionBox)
-			}else if (this.selectionMode==SelectionMode.ADD) {
-				cond = component.isInsideSelectionRectangle(selectionBox)||this.currentlySelectedComponents.includes(component)
-			}else{
-				cond = !component.isInsideSelectionRectangle(selectionBox)&&this.currentlySelectedComponents.includes(component)
-			}
-			component.viewSelected(cond)
-		}
+		let components = MainController.instance.circuitComponents.filter((comp)=>comp.isInsideSelectionRectangle(selectionBox))
+		this.selectComponents(components,this.selectionMode)
 	}
 
-	private updateSelection(){
+	private previewSelection(){
 		let selectionBox = this.selectionRectangle.bbox();
-		for (const component of MainController.instance.circuitComponents) {
-			if (this.selectionMode==SelectionMode.RESET) {
-				if (component.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedComponents.includes(component)) {
-						this.currentlySelectedComponents.push(component)
-					}
-				}else{
-					let idx = this.currentlySelectedComponents.indexOf(component)
-					if (idx>-1) {
-						this.currentlySelectedComponents.splice(idx,1)
-					}
-				}
-			}else if(this.selectionMode==SelectionMode.ADD){
-				if (component.isInsideSelectionRectangle(selectionBox)) {
-					if (!this.currentlySelectedComponents.includes(component)) {
-						this.currentlySelectedComponents.push(component)
-					}
-				}
-			}else{
-				if (component.isInsideSelectionRectangle(selectionBox)) {
-					let idx = this.currentlySelectedComponents.indexOf(component)
-					if (idx>-1) {
-						this.currentlySelectedComponents.splice(idx,1)
-					}
-				}
+		if (this.selectionMode==SelectionMode.RESET) {
+			for (const component of MainController.instance.circuitComponents) {
+				component.viewSelected(component.isInsideSelectionRectangle(selectionBox))
+			}
+		}else if(this.selectionMode==SelectionMode.ADD) {
+			for (const component of MainController.instance.circuitComponents) {
+				component.viewSelected(component.isSelected||component.isInsideSelectionRectangle(selectionBox))
+			}
+		}else if(this.selectionMode==SelectionMode.SUB) {
+			for (const component of MainController.instance.circuitComponents) {
+				component.viewSelected(component.isSelected&&!component.isInsideSelectionRectangle(selectionBox))
 			}
 		}
 	}
@@ -171,66 +147,61 @@ export class SelectionController {
 		this.selectionRectangle.attr("width",0);
 		this.selectionRectangle.attr("height",0);
 		this.selectionMode = SelectionMode.RESET;
-		this.currentlySelectedComponents = []
 		for (const component of MainController.instance.circuitComponents) {
 			component.viewSelected(false)
 		}
 	}
 
-	public showSelection(){
-		for (const component of this.currentlySelectedComponents) {
-			component.viewSelected(true)
-		}
-	}
-
-	public hideSelection(){
-		for (const component of this.currentlySelectedComponents) {
-			component.viewSelected(false)
+	public viewSelection(show=true){
+		for (const component of MainController.instance.circuitComponents) {
+			component.viewSelected(show&&component.isSelected)
 		}
 	}
 
 	public selectComponents(components: CircuitComponent[], mode:SelectionMode){
-		this.hideSelection();
-
-		if (mode === SelectionMode.RESET) {
-			this.currentlySelectedComponents=components
-		}else if(mode === SelectionMode.ADD){
-			this.currentlySelectedComponents = this.currentlySelectedComponents.concat(components)
-			this.currentlySelectedComponents = [...new Set(this.currentlySelectedComponents)]
-		}else{
+		if (mode==SelectionMode.RESET) {
+			for (const component of MainController.instance.circuitComponents) {
+				component.isSelected = false
+			}
 			for (const component of components) {
-				let idx = this.currentlySelectedComponents.findIndex((value)=>value===component)
-				if(idx>=0){
-					this.currentlySelectedComponents.splice(idx,1)
-				}
+				component.isSelected = true
+			}
+		}else if(mode==SelectionMode.ADD) {
+			for (const component of components) {
+				component.isSelected = true
+			}
+		}else if(mode==SelectionMode.SUB) {
+			for (const component of components) {
+				component.isSelected = false
 			}
 		}
 		
-		this.showSelection();
+		this.currentlySelectedComponents.splice(0)
+		this.currentlySelectedComponents.push(...MainController.instance.circuitComponents.filter((comp)=>comp.isSelected))
+		this.viewSelection();
 		
 		PropertyController.instance.update()
 	}
 
 	public selectAll(){
-		this.currentlySelectedComponents = []
-		for (const instance of MainController.instance.circuitComponents) {
-			this.currentlySelectedComponents.push(instance)
+		for (const component of MainController.instance.circuitComponents) {
+			component.isSelected = true
 		}
+		this.currentlySelectedComponents.splice(0)
+		this.currentlySelectedComponents.push(...MainController.instance.circuitComponents)
 
-		this.showSelection();
-	}
-
-	public isComponentSelected(component: CircuitComponent){
-		return this.currentlySelectedComponents.includes(component)
+		this.viewSelection();
 	}
 
 	public getOverallBoundingBox(): SVG.Box{
 		let bbox:SVG.Box = null
 		for (const component of this.currentlySelectedComponents) {
-			if (bbox==null) {
-				bbox = component.bbox
-			}else{
-				bbox = bbox.merge(component.bbox)
+			if (component.isSelected) {
+				if (bbox==null) {
+					bbox = component.bbox
+				}else{
+					bbox = bbox.merge(component.bbox)
+				}
 			}
 		}
 		return bbox

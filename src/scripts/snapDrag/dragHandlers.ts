@@ -84,7 +84,7 @@ export class SnapDragHandler{
 		this.startedDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
-		this.componentInSelection = SelectionController.instance.isComponentSelected(this.componentReference)
+		this.componentInSelection = this.componentReference.isSelected
 	}
 	private dragMove(ev:DragEvent){
 		if (!this.didDrag) {

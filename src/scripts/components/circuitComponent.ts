@@ -26,6 +26,8 @@ export abstract class CircuitComponent{
 
 	public displayName:string
 
+	public isSelected:boolean = false
+
 	public constructor(){
 		this.position = new SVG.Point()
 		this.relPosition = new SVG.Point()

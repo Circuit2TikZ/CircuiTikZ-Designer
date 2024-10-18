@@ -110,7 +110,7 @@ export class PathComponent extends CircuitikzComponent{
 	}
 
 	public updateTheme(): void {
-		if (!this.selectionRectangle) {
+		if (!this.isSelected) {
 			this.startLine.stroke(MainController.instance.darkMode?"#fff":"#000")
 			this.endLine.stroke(MainController.instance.darkMode?"#fff":"#000")
 		}

@@ -37,8 +37,6 @@ export class SnapController {
 	 * Do not call this constructor directly. Use {@link instance} instead.
 	 */
 	private constructor() {
-		this.whereSnap = CanvasController.instance.canvas.circle(3).fill("green")
-		this.whereSnap.hide()
 	}
 
 	/**
@@ -62,7 +60,9 @@ export class SnapController {
 	 * show the snap points on the canvas (doesn't show grid points)
 	 */
 	public showSnapPoints(){
-		this.whereSnap.show()
+		if (!this.whereSnap) {
+			this.whereSnap = CanvasController.instance.canvas.circle(2).fill("green")
+		}
 		const snapSymbol = new SVG.Symbol(document.getElementById("snapPoint"));
 		const container = CanvasController.instance.canvas;
 		let viewBox = snapSymbol.viewbox();
@@ -82,7 +82,8 @@ export class SnapController {
 	 * hide the snap points again
 	 */
 	public hideSnapPoints(){
-		this.whereSnap.hide()
+		this.whereSnap?.remove()
+		this.whereSnap = null
 		// remove all the snap point visualizations from the svg canvas
 		this.snapUses.forEach(snapUse=>{
 			snapUse.remove();
@@ -163,11 +164,13 @@ export class SnapController {
 			distStruct.vector = new SVG.Point(0,0)
 		}
 
-		if (distStruct.fixedSnapPoint) {
+		if (distStruct.fixedSnapPoint&&this.whereSnap) {
 			if (distStruct.dist>maxSnapDistance*maxSnapDistance) {
-				this.whereSnap.move(pos.x-1.5,pos.y-1.5)
+				this.whereSnap.hide()
+				this.whereSnap.move(pos.x-1,pos.y-1)
 			}else{
-				this.whereSnap.move(distStruct.fixedSnapPoint.x-1.5,distStruct.fixedSnapPoint.y-1.5)
+				this.whereSnap.show()
+				this.whereSnap.move(distStruct.fixedSnapPoint.x-1,distStruct.fixedSnapPoint.y-1)
 			}
 		}
 

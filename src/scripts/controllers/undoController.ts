@@ -19,7 +19,7 @@ export class Undo {
 		let currentState = []
 		for (const component of MainController.instance.circuitComponents) {
 			let componentObject = component.toJson()
-			componentObject.selected = SelectionController.instance.isComponentSelected(component)
+			componentObject.selected = component.isSelected
 			currentState.push(componentObject)
 		}
 
