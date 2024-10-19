@@ -437,6 +437,6 @@ export class NodeComponent extends CircuitikzComponent{
 		
 		// acutally move the label
 		let movePos = textPos.sub(ref)
-		labelSVG.move(movePos.x,movePos.y)
+		labelSVG.transform(new SVG.Matrix({translate:[movePos.x,movePos.y]}))
 	}
 }

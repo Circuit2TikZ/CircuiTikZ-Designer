@@ -508,14 +508,14 @@ export class PathComponent extends CircuitikzComponent{
 		}else if(nearVertical){
 			// the label should not be rotated w.r.t. the x axis
 			rotAngle=0
-			let side = Math.sign(-rotAngle)*other
-			let up = Math.sign(this.rotationDeg)*other
+			let right = this.rotationDeg>0?Math.sign(90-this.rotationDeg):Math.sign(this.rotationDeg+90)
+			let up = Math.sign(this.rotationDeg)
 			//the offset where the rotation pivot point should lie (for both label and symbol)
 			let verticalOffset = Math.min(labelBBox.h,symbolBBox.w)/2
-			referenceOffsetX = verticalOffset*-side
+			
+			referenceOffsetX = -verticalOffset*right*up*other
 
-			labelRef = new SVG.Point(labelBBox.w*(1+up)/2,verticalOffset*side*up)
-			labelRef.y+=verticalOffset
+			labelRef = new SVG.Point(labelBBox.w/2*(1+up*other),labelBBox.h/2+verticalOffset*other*right)
 		}
 
 		referenceoffsetY -=other*(label.distance?label.distance.convertToUnit("px").value:0)
@@ -524,16 +524,15 @@ export class PathComponent extends CircuitikzComponent{
 		let referenceOffset = new SVG.Point(referenceOffsetX,referenceoffsetY).transform(new SVG.Matrix({
 			rotate:-this.rotationDeg
 		}))
-
 		
 		// acutally move and rotate the label to the correct position
 		let compRef = this.position.add(referenceOffset)
 		let movePos = compRef.sub(labelRef)
-		labelSVG.move(movePos.x,movePos.y)
-		.transform({
+		labelSVG.transform({
 			rotate:-rotAngle,
-			ox:compRef.x,
-			oy:compRef.y
+			ox:labelRef.x,
+			oy:labelRef.y,
+			translate:[movePos.x,movePos.y]
 		})
 		
 	}
