@@ -22,9 +22,11 @@ export class ComponentPlacer{
 
 	public static pointFromEvent(ev:MouseEvent, component: CircuitComponent): SVG.Point{
 		let pt = CanvasController.eventToPoint(ev,false)
-		// let pt:SVG.Point = new SVG.Point(ev.clientX, ev.clientY).transform(component.visualization.screenCTM().inverseO())	
-		let shiftKey = ev.shiftKey
-		return shiftKey?pt:SnapController.instance.snapPoint(pt,component.getPlacingSnappingPoints().map(point=>point.relToComponentAnchor()))
+		// let pt:SVG.Point = new SVG.Point(ev.clientX, ev.clientY).transform(component.visualization.screenCTM().inverseO())
+		if (!ev.shiftKey) {
+			pt =  SnapController.instance.snapPoint(pt,component)
+		}
+		return pt
 	}
 
 	public placeStep(ev:MouseEvent){
@@ -33,12 +35,14 @@ export class ComponentPlacer{
 			if (ComponentPlacer.instance.component.placeStep(pt,ev)) {
 				ComponentPlacer.instance.placeFinish()
 			}
+			SnapController.instance.recalculateAdditionalSnapPoints()
 		}
 	}
 
 	public placeMove(ev:MouseEvent){
 		let pt = ComponentPlacer.pointFromEvent(ev, ComponentPlacer.instance.component)
 		ComponentPlacer.instance.component.placeMove(pt,ev)
+		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 
 	public placeRotate(angleDeg:number){
@@ -90,6 +94,7 @@ export class ComponentPlacer{
 		MainController.instance.switchMode(Modes.COMPONENT)
 		ComponentPlacer.instance._component = component		
 		let canvas = CanvasController.instance.canvas
+		SnapController.instance.updateSnapPoints(component,false)
 		SnapController.instance.showSnapPoints()
 		PropertyController.instance.update()
 
@@ -98,5 +103,6 @@ export class ComponentPlacer{
 		canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
 		hotkeys("enter",{keyup: false, keydown:true},ComponentPlacer.instance.placeFinish)
 		ComponentPlacer.instance.component.placeMove(CanvasController.instance.lastCanvasPoint)
+		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 }

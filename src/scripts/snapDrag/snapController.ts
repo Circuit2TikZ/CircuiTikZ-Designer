@@ -3,7 +3,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
-import {CanvasController, SnapPoint} from "../internal";
+import {CanvasController, CircuitComponent, MainController, SnapPoint} from "../internal";
 
 type DistStruct = {
 	dist: number;
@@ -25,34 +25,65 @@ export class SnapController {
 		return SnapController._instance;
 	}
 
-	// a list of all points (except grid points) which can be snapped to
-	private snapPoints: SnapPoint[] = [];
+	private fixedSnapPoints: SnapPoint[] = []
+	private movingSnapPoints: SnapPoint[] = []
+	private additionalSnapPoints: SnapPoint[] = []
 
 	private whereSnap:SVG.Element
 
-	// save the created svg elements for later deletion
-	private snapUses: SVG.Use[] = [];
+	private constructor() {}
 
-	/**
-	 * Do not call this constructor directly. Use {@link instance} instead.
-	 */
-	private constructor() {
+	public recalculateAdditionalSnapPoints(){
+		this.additionalSnapPoints.forEach((snapPoint)=>snapPoint.recalculate(new SVG.Matrix()))
 	}
 
-	/**
-	 * Add points to snap to.
-	 */
-	public addSnapPoints(points: SnapPoint[]) {
-		this.snapPoints.push(...points);
-	}
+	public updateSnapPoints(currentComponent:CircuitComponent,adjustOnly=false){
+		let show = this.whereSnap?true:false
 
-	/**
-	 * Remove points to snap to.
-	 */
-	public removeSnapPoints(points: SnapPoint[]) {
-		for (const point of points) {
-			const idx = this.snapPoints.indexOf(point);
-			if (idx >= 0) this.snapPoints.splice(idx, 1);
+		//reset
+		this.fixedSnapPoints.forEach((snapPoint)=>snapPoint.show(false))
+		this.movingSnapPoints.forEach((snapPoint)=>snapPoint.show(false))
+		this.additionalSnapPoints.forEach((snapPoint)=>snapPoint.show(false))
+		this.fixedSnapPoints=[]
+		this.movingSnapPoints=[]
+		this.additionalSnapPoints=[]
+
+		if (currentComponent) {
+			if (currentComponent.isSelected&&!adjustOnly) {
+				for (const component of MainController.instance.circuitComponents) {
+					if (component.isSelected) {
+						if (currentComponent===component) {
+							let snappingInfo = component.getPlacingSnappingPoints()
+							this.movingSnapPoints.push(...snappingInfo.trackedSnappingPoints)
+							this.additionalSnapPoints.push(...snappingInfo.additionalSnappingPoints)
+						} else {
+							this.movingSnapPoints.push(...component.snappingPoints)
+						}
+					}else{
+						this.fixedSnapPoints.push(...component.snappingPoints)
+					}
+				}
+			}else{
+				for (const component of MainController.instance.circuitComponents) {
+					if (component!==currentComponent) {
+						this.fixedSnapPoints.push(...component.snappingPoints)
+					}else if(!adjustOnly){
+						let snappingInfo = component.getPlacingSnappingPoints()
+						this.movingSnapPoints.push(...snappingInfo.trackedSnappingPoints)
+						this.additionalSnapPoints.push(...snappingInfo.additionalSnappingPoints)
+					}
+				}
+			}
+		}else{
+			for (const component of MainController.instance.circuitComponents) {
+				this.fixedSnapPoints.push(...component.snappingPoints)
+			}
+		}
+
+		if (show) {
+			this.showSnapPoints()
+		}else{
+			this.hideSnapPoints()
 		}
 	}
 
@@ -61,20 +92,17 @@ export class SnapController {
 	 */
 	public showSnapPoints(){
 		if (!this.whereSnap) {
-			this.whereSnap = CanvasController.instance.canvas.circle(2).fill("green")
+			this.whereSnap = CanvasController.instance.canvas.circle(2).fill("cyan")
 		}
-		const snapSymbol = new SVG.Symbol(document.getElementById("snapPoint"));
-		const container = CanvasController.instance.canvas;
-		let viewBox = snapSymbol.viewbox();
 
-		this.snapPoints.forEach(snapPoint => {
-			let use = container.use(snapSymbol)
-			use.width(viewBox.width);
-			use.height(viewBox.height);
-			use.move(snapPoint.x-viewBox.cx,snapPoint.y-viewBox.cy);
-			container.add(use);
-			// save the reference to the svg element for later removal
-			this.snapUses.push(use);
+		this.fixedSnapPoints.forEach(snapPoint => {
+			snapPoint.show(true,false)
+		});
+		this.movingSnapPoints.forEach(snapPoint => {
+			snapPoint.show(true,true)
+		});
+		this.additionalSnapPoints.forEach(snapPoint => {
+			snapPoint.show(true,true)
 		});
 	}
 
@@ -85,22 +113,35 @@ export class SnapController {
 		this.whereSnap?.remove()
 		this.whereSnap = null
 		// remove all the snap point visualizations from the svg canvas
-		this.snapUses.forEach(snapUse=>{
-			snapUse.remove();
+		this.fixedSnapPoints.forEach(snapPoint => {
+			snapPoint.show(false)
 		});
-		this.snapUses = [];
+		this.movingSnapPoints.forEach(snapPoint => {
+			snapPoint.show(false)
+		});
+		this.additionalSnapPoints.forEach(snapPoint => {
+			snapPoint.show(false)
+		});
 	}
 
 	/**
 	 * Snap a point to the grid or one of the added snap points.
 	 * Calculations done in px since the node snap points are defined in px
 	 */
-	public snapPoint(pos: SVG.Point, relSnapPoints: SVG.Point[] = [new SVG.Point()]): SVG.Point {
+	public snapPoint(pos: SVG.Point, component:CircuitComponent): SVG.Point {
 		// 1. Calculate grid snap points
 		const canvasController = CanvasController.instance;
 		let gridSpacing: number = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px").value;
 		// take zoom level into account (canvas.ctm().a): zoomed in means smaller maximum distance
 		const maxSnapDistance = new SVG.Number(1, "cm").convertToUnit("px").value/CanvasController.instance.canvas.ctm().a
+
+		let relSnapPoints = this.movingSnapPoints.map((snapPoint)=>snapPoint.relToComponentAnchor().add(snapPoint.componentReference.position).sub(component.position));
+		if (this.additionalSnapPoints) {
+			relSnapPoints.push(...this.additionalSnapPoints.map((snapPoint)=>snapPoint.relToComponentAnchor()))
+		}
+		if (relSnapPoints.length<1) {
+			relSnapPoints.push(new SVG.Point())
+		}
 		const movingSnapPoints = relSnapPoints.map((point) => pos.add(point));
 
 		if (!CanvasController.instance.gridVisible) {
@@ -150,7 +191,7 @@ export class SnapController {
 		const yMax = (relSnapPointsMaxY + pos.y) + maxSnapDistance;
 
 		// 3. filter remaining snap points
-		const filteredFixSnapPoints = this.snapPoints.filter(
+		const filteredFixSnapPoints = this.fixedSnapPoints.filter(
 			(point) => point.x >= xMin && point.x <= xMax && point.y >= yMin && point.y <= yMax
 		);
 

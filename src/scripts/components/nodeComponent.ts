@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, ExportController, FlipStateProperty, Label, MainController, NodeLabelProperty, SnapController, SnapDragHandler, SnapPoint, Undo } from "../internal"
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, ExportController, FlipStateProperty, Label, MainController, NodeLabelProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
 import { selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export enum LabelAnchor {
@@ -62,7 +62,6 @@ export class NodeComponent extends CircuitikzComponent{
 		this.flipState.addChangeListener(ev=>{
 			if (!ev.previousValue||ev.previousValue.x!=ev.value.x||ev.previousValue.y!=ev.value.y) {
 				this.updateTransform()
-				this.recalculateSnappingPoints()
 				Undo.addState()
 			}
 		})
@@ -94,8 +93,11 @@ export class NodeComponent extends CircuitikzComponent{
 		super.recalculateSnappingPoints(matrix??this.getSnapPointTransformMatrix())
 	}
 
-	public getPlacingSnappingPoints(): SnapPoint[] {
-		return this.snappingPoints.concat(new SnapPoint(this,"center",new SVG.Point()))
+	public getPlacingSnappingPoints():SnappingInfo {
+		return {
+			trackedSnappingPoints:this.snappingPoints,
+			additionalSnappingPoints:[new SnapPoint(this,"center",new SVG.Point())]
+		}
 	}
 
 	protected updateTransform(){
@@ -125,6 +127,7 @@ export class NodeComponent extends CircuitikzComponent{
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
 		this.recalculateSelectionVisuals()
+		this.recalculateSnappingPoints()
 	}
 
 	protected recalculateSelectionVisuals(): void {
@@ -147,7 +150,6 @@ export class NodeComponent extends CircuitikzComponent{
 		this.simplifyRotationAngle()
 		
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 	public flip(horizontal: boolean): void {
 		let currentFlipState = this.flipState.getValue().clone()
@@ -175,8 +177,6 @@ export class NodeComponent extends CircuitikzComponent{
 		this.flipState.setValue(currentFlipState,true)
 		
 		this.updateTransform()
-
-		this.recalculateSnappingPoints()
 	}
 
 	public viewSelected(show: boolean): void {
@@ -321,10 +321,7 @@ export class NodeComponent extends CircuitikzComponent{
 	public placeFinish(): void {
 		// make draggable
 		this.draggable(true)
-		// add snap points to snap controller
-		SnapController.instance.addSnapPoints(this.snappingPoints)
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 
 	public static fromJson(saveObject:NodeSaveObject): NodeComponent{

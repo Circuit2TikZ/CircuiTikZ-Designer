@@ -9,7 +9,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
+import { CanvasController, EraseController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -801,9 +801,6 @@ export class MainController {
 	 * Removes an instance from {@link instances} and also removes its snapping points.
 	 */
 	public removeComponent(circuitComponent: CircuitComponent) {
-		if (circuitComponent.snappingPoints&&circuitComponent.snappingPoints.length>0){
-			SnapController.instance.removeSnapPoints(circuitComponent.snappingPoints);
-		} 
 		const idx = this.circuitComponents.indexOf(circuitComponent);
 		if (idx>-1) {
 			this.circuitComponents.splice(idx, 1);

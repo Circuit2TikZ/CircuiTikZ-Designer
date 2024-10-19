@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, PathOrientationProperty, PathLabelProperty, Label, Undo } from "../internal"
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, PathOrientationProperty, PathLabelProperty, Label, Undo, SnappingInfo } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor, pathPointRadius } from "../utils/selectionHelper";
 
 
@@ -94,7 +94,6 @@ export class PathComponent extends CircuitikzComponent{
 		this.pathOrientation.addChangeListener(ev=>{
 			if (!ev.previousValue||ev.previousValue.mirror!=ev.value.mirror||ev.previousValue.invert!=ev.value.invert) {
 				this.updateTransform()
-				this.recalculateSnappingPoints()
 				Undo.addState()
 			}
 		})
@@ -126,20 +125,17 @@ export class PathComponent extends CircuitikzComponent{
 	public moveStartTo(position: SVG.Point){
 		this.posStart = position
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 
 	public moveEndTo(position: SVG.Point){
 		this.posEnd = position
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 
 	public rotate(angleDeg: number): void {
 		this.posStart = this.posStart.rotate(angleDeg,this.position)
 		this.posEnd = this.posEnd.rotate(angleDeg,this.position)
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 	public flip(horizontal: boolean): void {
 		let newPos1 = new SVG.Point(this.posStart.x,this.posEnd.y)
@@ -158,7 +154,6 @@ export class PathComponent extends CircuitikzComponent{
 		this.pathOrientation.setValue(currentOrientation,true)
 		
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
@@ -175,8 +170,16 @@ export class PathComponent extends CircuitikzComponent{
 		super.recalculateSnappingPoints(matrix??this.getSnapPointTransformMatrix())
 	}
 
-	public getPlacingSnappingPoints(): SnapPoint[] {
-		return this.finishedPlacing?this.snappingPoints:[new SnapPoint(this,"",new SVG.Point())]
+	public getPlacingSnappingPoints(): SnappingInfo {
+		if (this.finishedPlacing) {
+			return {
+				trackedSnappingPoints:this.snappingPoints,additionalSnappingPoints:[]
+			}
+		} else {
+			return {
+				trackedSnappingPoints:[],additionalSnappingPoints:this.pointsPlaced>0?[new SnapPoint(this,"",new SVG.Point())]:[]
+			}
+		}
 	}
 
 	protected updateTransform(): void {
@@ -209,6 +212,7 @@ export class PathComponent extends CircuitikzComponent{
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
 		this.recalculateSelectionVisuals()
+		this.recalculateSnappingPoints()
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionRectangle) {
@@ -406,9 +410,7 @@ export class PathComponent extends CircuitikzComponent{
 		this.finishedPlacing=true
 		SnapCursorController.instance.visible = false
 		SnapController.instance.hideSnapPoints();
-		SnapController.instance.addSnapPoints(this.snappingPoints)
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 		this.draggable(true)
 	}
 

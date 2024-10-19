@@ -8,6 +8,11 @@ export type ComponentSaveObject = {
 	selected?:boolean
 }
 
+export type SnappingInfo = {
+	trackedSnappingPoints:SnapPoint[]
+	additionalSnappingPoints:SnapPoint[]
+}
+
 /**
  * Every component which should be present in the export should be implementing this
  */
@@ -45,7 +50,8 @@ export abstract class CircuitComponent{
 
 	public visualization: SVG.Element;
 	public snappingPoints: SnapPoint[];
-	public abstract getPlacingSnappingPoints():SnapPoint[]
+
+	public abstract getPlacingSnappingPoints():SnappingInfo
 
 	public abstract draggable(drag: boolean):void
 

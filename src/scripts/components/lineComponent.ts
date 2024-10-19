@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SnapController, SnapCursorController, SnapPoint } from "../internal"
+import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SnapCursorController, SnappingInfo, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
 import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, selectionColor } from "../utils/selectionHelper";
 
@@ -72,8 +72,16 @@ export class LineComponent extends CircuitComponent{
 		super.recalculateSnappingPoints()
 	}
 
-	public getPlacingSnappingPoints(): SnapPoint[] {
-		return this.finishedPlacing?this.snappingPoints:[new SnapPoint(this,"center",new SVG.Point())]
+	public getPlacingSnappingPoints(): SnappingInfo {
+		if (this.finishedPlacing) {
+			return {
+				trackedSnappingPoints:this.snappingPoints,additionalSnappingPoints:[]
+			}
+		} else {
+			return {
+				trackedSnappingPoints:[],additionalSnappingPoints:this.cornerPoints.length>0?[new SnapPoint(this,"center",new SVG.Point())]:[]
+			}
+		}
 	}
 	public draggable(drag: boolean): void {
 		if (drag) {
@@ -144,7 +152,6 @@ export class LineComponent extends CircuitComponent{
 			}
 		})
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 	}
 	public flip(horizontal: boolean): void {
 		if (horizontal) {
@@ -186,6 +193,8 @@ export class LineComponent extends CircuitComponent{
 		this.position.y = this._bbox.cy
 
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
+		this.recalculateSelectionVisuals()
+		this.recalculateSnappingPoints()
 	}
 	protected recalculateSelectionVisuals(): void {}
 
@@ -332,7 +341,6 @@ export class LineComponent extends CircuitComponent{
 		this.lineDirections.pop()
 		this.snappingPoints = [new SnapPoint(this,"START",this.cornerPoints[0].sub(this.position)),
 								new SnapPoint(this,"END",this.cornerPoints.at(-1).sub(this.position))]
-		SnapController.instance.addSnapPoints(this.snappingPoints)
 		
 		for (const cornerPoint of this.cornerPoints) {
 			let element = pathPointSVG().move(cornerPoint.x-pathPointRadius,cornerPoint.y-pathPointRadius)
@@ -342,7 +350,6 @@ export class LineComponent extends CircuitComponent{
 		
 		this.draggable(true)
 		this.updateTransform()
-		this.recalculateSnappingPoints()
 
 		this.finishedPlacing = true
 	}
