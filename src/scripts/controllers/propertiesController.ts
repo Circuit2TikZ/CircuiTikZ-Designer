@@ -34,6 +34,8 @@ export class PropertyController{
 		let components = SelectionController.instance.currentlySelectedComponents
 		this.clearForm()
 
+		//TODO add rotate/flip/pushback/bringfront
+
 		if (components.length>1) {
 			//TODO multicomponent edit
 			//TODO alignment and distribution tools
@@ -54,31 +56,6 @@ export class PropertyController{
 		for (const property of component.editableProperties) {
 			property.buildHTML(this.propertiesEntries)
 		}
-					
-		// if (component instanceof NodeComponentInstance) {
-		// 	let anchorDiv = document.createElement("div")
-		// 	anchorDiv.classList.add("d-flex","flex-row","justify-content-between","w-100","gap-3","mt-2")
-		// 	anchorDiv.innerHTML = "<div class=\"fs-6 align-self-center\">Text position</div>\
-		// 		<select class=\"form-select w-50\" name=\"anchor\" id=\"labelAnchor\">\
-		// 			<option value=\"default\" selected>default</option>\
-		// 			<option value=\"center\">center</option>\
-		// 			<option value=\"north\">north</option>\
-		// 			<option value=\"south\">south</option>\
-		// 			<option value=\"east\">east</option>\
-		// 			<option value=\"west\">west</option>\
-		// 			<option value=\"north east\">north east</option>\
-		// 			<option value=\"north west\">north west</option>\
-		// 			<option value=\"south east\">south east</option>\
-		// 			<option value=\"south west\">south west</option>\
-		// 		</select>"
-		// 	entryNode.appendChild(anchorDiv)
-			
-		// 	let labelAnchorSelect = (entryNode as Element).querySelector("select") as HTMLSelectElement
-		// 	labelAnchorSelect.addEventListener("change", (ev)=>{
-		// 		component.labelAnchor = labelAnchorSelect.value
-		// 		component.updateLabelPosition()
-		// 	})
-		// }		
 	}
 	
 	private setFormGrid(){

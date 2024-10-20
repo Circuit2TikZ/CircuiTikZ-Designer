@@ -14,7 +14,7 @@ export class Undo {
 	private static currentIndex = -1;
 
 	//TODO discuss if selections should be remembered or not???
-	static addState(){
+	public static addState(){
 		// get json object
 		let currentState = []
 		for (const component of MainController.instance.circuitComponents) {
@@ -29,30 +29,30 @@ export class Undo {
 		Undo.currentIndex = Undo.states.length-1
 	}
 
-	static getCurrentState(){
+	public static getCurrentState(){
 		return Undo.states[Undo.currentIndex]
 	}
 
-	static undo(){
+	public static undo(){
 		Undo.currentIndex-=1
 		if (Undo.currentIndex<0) {
 			Undo.currentIndex=0
 			return
 		}
-		Undo.#loadState()
+		Undo.loadState()
 		
 	}
 
-	static redo(){
+	public static redo(){
 		Undo.currentIndex+=1
 		if (Undo.currentIndex>=Undo.states.length) {
 			Undo.currentIndex=Undo.states.length-1
 			return
 		}
-		Undo.#loadState()
+		Undo.loadState()
 	}
 
-	static #loadState(){		
+	private static loadState(){		
 		// remove all components
 		while (MainController.instance.circuitComponents.length>0) {
 			MainController.instance.removeComponent(MainController.instance.circuitComponents[0])
@@ -65,7 +65,9 @@ export class Undo {
 
 		for (const component of state) {
 			let initalializedComponenent = SaveController.fromJson(component)
-			components.push(initalializedComponenent)
+			if (component.selected) {
+				components.push(initalializedComponenent)
+			}
 		}
 
 		if (components.length>0) {

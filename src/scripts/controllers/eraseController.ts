@@ -4,7 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 
-import {Line, MainController, CanvasController, CircuitComponent} from "../internal";
+import { MainController, CanvasController, CircuitComponent} from "../internal";
 
 //TODO update erase controller
 

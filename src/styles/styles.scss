@@ -1,5 +1,5 @@
-$material-symbols-font-path: "../../node_modules/material-symbols/";
-@import "material-symbols/outlined";
+// $material-symbols-font-path: "../../node_modules/material-symbols/";
+// @import "material-symbols/outlined";
 // TODO clean up all css
 
 // Bootstrap
@@ -16,7 +16,7 @@ $danger: #c50f3c;
 @import "bootstrap/scss/bootstrap";
 // override some bootstrap classes
 @import "dropdown_classes.scss";
-@import "floatingActionButton.scss";
+// @import "floatingActionButton.scss";
 
 // additional bootstrap compatible classes:
 // material-alike button with symbol on left side
