@@ -1,7 +1,3 @@
-/**
- * @module undo
- */
-
 import {MainController, SelectionController, SaveController, ComponentSaveObject, SelectionMode} from "../internal";
 
 /**

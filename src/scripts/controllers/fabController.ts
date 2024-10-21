@@ -1,8 +1,4 @@
 /**
- * @module FABcontroller
- */
-
-/**
  * @typedef {object} ButtonDescription
  * @property {string} icon
  * @property {string} [iconClass="material-symbols-outlined"]

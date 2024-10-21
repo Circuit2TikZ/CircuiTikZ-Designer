@@ -1,7 +1,3 @@
-/**
- * @module saveController
- */
-
 import { Modal } from "bootstrap";
 import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent, SelectionMode, LineComponent, MainController, CanvasController } from "../internal";
 

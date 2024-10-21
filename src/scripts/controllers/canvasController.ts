@@ -1,10 +1,6 @@
-/**
- * @module canvasController
- */
-
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, Undo, SnapPoint, CircuitComponent, MainController } from "../internal";
+import { SnapController, Undo, CircuitComponent, MainController } from "../internal";
 
 type PanningEventDetail = {
 	box:SVG.Box
@@ -279,9 +275,10 @@ export class CanvasController {
 			CanvasController.instance.invScreenCTM = CanvasController.instance.canvas.screenCTM().inverseO()
 		}
 		let pt = new SVG.Point(clientXY.x, clientXY.y).transformO(CanvasController.instance.invScreenCTM)
+		SnapController.instance.updateSnapPoints(undefined)
 		return event instanceof MouseEvent&&event.shiftKey || !snap
 				? pt
-				: SnapController.instance.snapPoint(pt, [pt as SnapPoint]);
+				: SnapController.instance.snapPoint(pt, undefined);
 	}
 
 

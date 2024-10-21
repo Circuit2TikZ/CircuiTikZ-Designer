@@ -1,7 +1,3 @@
-/**
- * @module eraseController
- */
-
 import * as SVG from "@svgdotjs/svg.js";
 
 import { MainController, CanvasController, CircuitComponent} from "../internal";
@@ -98,7 +94,7 @@ export class EraseController {
 	 */
 	private findAndErase(point: SVG.Point, targets: EventTarget[]) {
 		let lowestDist = 10; // ~ 0.27 cm
-		let foundElement: (CircuitComponent | Line) | null = null;
+		let foundElement: (CircuitComponent) | null = null;
 
 		// uniq, not null & is SVGElement
 		targets = [...new Set(targets.filter((target) => target instanceof SVGElement))];

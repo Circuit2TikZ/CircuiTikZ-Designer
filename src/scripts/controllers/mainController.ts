@@ -1,7 +1,3 @@
-/**
- * @module mainController
- */
-
 import * as SVG from "@svgdotjs/svg.js";
 import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap";
 import "../utils/impSVGNumber";
@@ -9,7 +5,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, EraseController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
+import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -147,7 +143,7 @@ export class MainController {
 		);
 
 		canvasPromise.then(() => {
-			EraseController.instance;
+			// EraseController.instance;
 			SelectionController.instance;
 			PropertyController.instance;
 			ComponentPlacer.instance;
@@ -475,9 +471,9 @@ export class MainController {
 			const baseInfo = ComponentSymbol.getBaseInformation(symbol);
 			if (baseInfo.isNode === baseInfo.isPath) return []; // type not correctly set
 			try {
-				return new ComponentSymbol(symbol,baseInfo)
 				// if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
 				// else return new PathComponentSymbol(symbol, baseInfo);
+				return new ComponentSymbol(symbol,baseInfo)
 			} catch (e) {
 				console.log(e);
 				return [];
@@ -699,7 +695,7 @@ export class MainController {
 				break;
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected");
-				EraseController.instance.deactivate();
+				// EraseController.instance.deactivate();
 				break;
 			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
@@ -722,7 +718,7 @@ export class MainController {
 				break;
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected");
-				EraseController.instance.activate();
+				// EraseController.instance.activate();
 				break;
 			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.add("selected");

@@ -26,6 +26,7 @@
 	},
 	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"dependencies": {
+		"@prettier/plugin-xml": "^3.4.1",
 		"@svgdotjs/svg.draggable.js": "^3.0.4",
 		"@svgdotjs/svg.js": "^3.2.4",
 		"@svgdotjs/svg.panzoom.js": "^2.1.2",
@@ -33,7 +34,7 @@
 		"file-saver": "^2.0.5",
 		"hotkeys-js": "^3.13.7",
 		"mdb-ui-kit": "^6.4.2",
-		"pretty": "^2.0.0"
+		"prettier": "^3.3.3"
 	},
 	"devDependencies": {
 		"@parcel/config-default": "^2.9.3",
@@ -45,16 +46,16 @@
 		"@parcel/transformer-posthtml": "^2.9.3",
 		"@parcel/transformer-sass": "^2.9.3",
 		"@parcel/transformer-svg": "^2.9.3",
+		"@parcel/transformer-typescript-tsc": "^2.12.0",
 		"@parcel/transformer-webmanifest": "^2.10.3",
 		"@parcel/transformer-xml": "^2.9.3",
-		"@prettier/plugin-xml": "^3.1.1",
 		"@types/bootstrap": "^5.2.8",
 		"@types/file-saver": "^2.0.7",
 		"@types/html-validator": "^5.0.5",
 		"html-validator": "^6.0.1",
 		"parcel": "^2.9.3",
 		"posthtml-include": "^1.7.4",
-		"prettier": "^3.0.0",
-		"sass": "^1.68.0"
+		"sass": "^1.68.0",
+		"typescript": "^5.6.3"
 	}
 }

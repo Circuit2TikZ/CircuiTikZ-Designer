@@ -1,7 +1,3 @@
-/**
- * @module selectionController
- */
-
 import * as SVG from "@svgdotjs/svg.js";
 import { MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
 

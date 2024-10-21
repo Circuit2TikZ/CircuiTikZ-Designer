@@ -1,11 +1,6 @@
-/**
- * @module componentSymbol
- */
-
 import * as SVG from "@svgdotjs/svg.js";
 import { ensureInPx } from "../utils/impSVGNumber";
 import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
-import { CircuitikzComponent } from "../internal";
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 
@@ -93,7 +88,7 @@ export class ComponentSymbol extends SVG.Symbol {
 			baseInformation.componentInformation &&
 			getNamedTag(baseInformation.componentInformation, "pins", METADATA_NAMESPACE_URI);
 		let pinArray = pins ? getNamedTags(pins, "pin", METADATA_NAMESPACE_URI) : [];
-		this._pins = pinArray.map(this.#parseAnchor, this);
+		this._pins = pinArray.map(this.parseAnchor, this);
 
 		let additionalAnchors =
 			baseInformation.componentInformation &&
@@ -101,7 +96,7 @@ export class ComponentSymbol extends SVG.Symbol {
 		let additionalAnchorArray = additionalAnchors
 			? getNamedTags(additionalAnchors, "anchor", METADATA_NAMESPACE_URI)
 			: [];
-		this._additionalAnchors = additionalAnchorArray.map(this.#parseAnchor, this);
+		this._additionalAnchors = additionalAnchorArray.map(this.parseAnchor, this);
 
 		this._textPosition = this._additionalAnchors.find((tikzanchor)=>{
 			tikzanchor.name=="textPosition"
@@ -166,7 +161,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	 * @param {Element} anchorElement - the element to parse
 	 * @returns {TikZAnchor} the parsed anchor
 	 */
-	#parseAnchor(anchorElement: Element): TikZAnchor {
+	private parseAnchor(anchorElement: Element): TikZAnchor {
 		const numberRegEx = /^(\d*\.)?\d+$/; // "1", ".1", "1.1"; but not "1."
 		let anchor:TikZAnchor = {
 			name: anchorElement.getAttribute("anchorName") || anchorElement.getAttribute("anchorname") || undefined,
@@ -186,20 +181,6 @@ export class ComponentSymbol extends SVG.Symbol {
 		if (anchor.isDefault) this._defaultAnchor = anchor;
 
 		return anchor;
-	}
-
-	/**
-	 * Generate a instance of a symbol. Call this function on subclasses only.
-	 *
-	 * @param {SVG.Container} container - the container to add the instance to
-	 * @param {MouseEvent} event - the event which triggered the adding
-	 * @param {function():void} finishedPlacingCallback callback getting called when the element has been placed
-	 * @returns {ComponentInstance} the new instance
-	 */
-	addInstanceToContainer(container: SVG.Container, event: MouseEvent, finishedPlacingCallback: () => void): CircuitikzComponent {
-		if (this.svgMetadataElement.isnod) {
-			throw new Error("Not implemented; use subclasses");
-		}
 	}
 
 	/**

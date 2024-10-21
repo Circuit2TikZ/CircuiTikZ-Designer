@@ -1,11 +1,10 @@
-/**
- * @module exportController
- */
 import * as SVG from "@svgdotjs/svg.js";
 import { Modal, Tooltip } from "bootstrap";
 import { SelectionController, MainController, CircuitikzComponent, CanvasController } from "../internal";
 import FileSaver from "file-saver";
-import pretty = require('pretty');
+import * as prettier from "prettier";
+const parserXML = require("@prettier/plugin-xml").default;
+// import pretty = require('../../../node_modules/pretty');
 
 /**
  * Contains export functions and controls the "exportModal" (~dialog).
@@ -207,19 +206,26 @@ export class ExportController {
 		for (const element of optimizedSymbols) {
 			defs.appendChild(element)
 		}
-
+		
 		// convert to text and make pretty
 		let tempDiv = document.createElement("div");
 		tempDiv.appendChild(svgObj.node);
-		let textContent = pretty(tempDiv.innerHTML, {ocd: true});
-		
-		this.exportedContent.rows = textContent.split("\n").length
-		this.exportedContent.value = textContent;
-		const extensions = [".svg", ".txt"];
+		prettier.format(tempDiv.innerHTML,{
+			parser:"xml",
+			plugins:[parserXML],
+			tabWidth:4,
+			singleAttributePerLine:true,
+			xmlWhitespaceSensitivity:"ignore"
+		}).then(textContent=>{
+			this.exportedContent.rows = textContent.split("\n").length
+			this.exportedContent.value = textContent;
+			const extensions = [".svg", ".txt"];
+			this.export(extensions)
+			SelectionController.instance.activateSelection()
+			tempDiv.remove()
+		})
 		MainController.instance.darkMode = colorTheme;
 		MainController.instance.updateTheme()
-		this.export(extensions)
-		SelectionController.instance.activateSelection()
 	}
 
 	private export(extensions:string[]){

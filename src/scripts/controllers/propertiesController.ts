@@ -1,7 +1,3 @@
-/**
- * @module propertyController
- */
-
 import { CanvasController, CircuitComponent, SelectionController } from "../internal";
 
 export type FormEntry = {

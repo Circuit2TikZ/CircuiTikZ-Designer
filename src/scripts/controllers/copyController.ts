@@ -1,7 +1,3 @@
-/**
- * @module copyPaste
- */
-
 import { Point } from "@svgdotjs/svg.js"
 import { ComponentSaveObject, MainController, SaveController, SelectionController, SelectionMode, Undo } from "../internal"
 
