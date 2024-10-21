@@ -275,7 +275,6 @@ export class CanvasController {
 			CanvasController.instance.invScreenCTM = CanvasController.instance.canvas.screenCTM().inverseO()
 		}
 		let pt = new SVG.Point(clientXY.x, clientXY.y).transformO(CanvasController.instance.invScreenCTM)
-		SnapController.instance.updateSnapPoints(undefined)
 		return event instanceof MouseEvent&&event.shiftKey || !snap
 				? pt
 				: SnapController.instance.snapPoint(pt, undefined);
