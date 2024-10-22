@@ -104,12 +104,12 @@ export class PathLabelProperty extends EditableProperty<PathLabel>{
 			distanceDiv.appendChild(this.distanceInput)
 	
 			let unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
-			unitLabel.innerHTML=this._value.distance.value.toFixed(2)+" "+this._value.distance.unit
+			unitLabel.innerHTML=this._value.distance.value.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})+" "+this._value.distance.unit
 			distanceDiv.appendChild(unitLabel)
 
 			this.distanceInput.addEventListener("input",()=>{
 				this.update()
-				unitLabel.innerText = this._value.distance.value.toFixed(2)+" "+this._value.distance.unit
+				unitLabel.innerText = this._value.distance.value.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})+" "+this._value.distance.unit
 			})
 		}
 		row.appendChild(distanceDiv)
