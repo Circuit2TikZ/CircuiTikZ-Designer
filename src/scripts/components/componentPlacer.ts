@@ -17,14 +17,16 @@ export class ComponentPlacer{
 	}
 
 	private constructor(){
-
+		this.placeStep = this.placeStep.bind(this)
+		this.placeMove = this.placeMove.bind(this)
+		this.placeFinish = this.placeFinish.bind(this)
 	}
 
 	public static get instance(){
 		return ComponentPlacer._instance??(ComponentPlacer._instance = new ComponentPlacer())
 	}
 
-	public static pointFromEvent(ev:MouseEvent): SVG.Point{
+	public static pointFromEvent(ev:MouseEvent|TouchEvent): SVG.Point{
 		let pt = CanvasController.eventToPoint(ev,false)
 		// let pt:SVG.Point = new SVG.Point(ev.clientX, ev.clientY).transform(component.visualization.screenCTM().inverseO())
 		if (!ev.shiftKey) {
@@ -37,23 +39,27 @@ export class ComponentPlacer{
 	 * Initiate one placement step
 	 * @param ev which event is responsible for the placement step
 	 */
-	public placeStep(ev:MouseEvent){
-		if (ev.button==0) {
-			let pt = ComponentPlacer.pointFromEvent(ev)
-			if (ComponentPlacer.instance.component.placeStep(pt,ev)) {
-				ComponentPlacer.instance.placeFinish()
-			}
-			SnapController.instance.recalculateAdditionalSnapPoints()
+	public placeStep(ev:MouseEvent|TouchEvent){
+		if (ev instanceof MouseEvent && ev.button!==0) {
+			return
 		}
+		if (ev instanceof TouchEvent && ev.touches.length!==0) {
+			return
+		}
+		let pt = ComponentPlacer.pointFromEvent(ev)
+		if (this.component.placeStep(pt,ev)) {
+			this.placeFinish(ev)
+		}
+		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 
 	/**
 	 * Move the cursor/pointer/... while placing a component
 	 * @param ev which event is responsible for the movement
 	 */
-	public placeMove(ev:MouseEvent){
+	public placeMove(ev:MouseEvent|TouchEvent){
 		let pt = ComponentPlacer.pointFromEvent(ev)
-		ComponentPlacer.instance.component.placeMove(pt,ev)
+		this.component.placeMove(pt,ev)
 		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 
@@ -62,8 +68,8 @@ export class ComponentPlacer{
 	 * @param angleDeg angle in degrees
 	 */
 	public placeRotate(angleDeg:number){
-		if (ComponentPlacer.instance.component) {
-			ComponentPlacer.instance.component.placeRotate(angleDeg)
+		if (this.component) {
+			this.component.placeRotate(angleDeg)
 		}
 	}
 
@@ -72,37 +78,43 @@ export class ComponentPlacer{
 	 * @param horizontal which axis to flip at
 	 */
 	public placeFlip(horizontal:boolean){
-		if (ComponentPlacer.instance.component) {
-			ComponentPlacer.instance.component.placeFlip(horizontal)
+		if (this.component) {
+			this.component.placeFlip(horizontal)
 		}
 	}
 
 	/**
 	 * (Force) finish the component placement
 	 */
-	public placeFinish(){
-		if (ComponentPlacer.instance.component) {
-			ComponentPlacer.instance.component.placeFinish()
-			ComponentPlacer.instance.cleanUp()
+	public placeFinish(ev:Event){
+		if (this.component) {
+			this.component.placeFinish()
+			this.cleanUp()
 			Undo.addState()
 			
 			// restart component placement for just finished component
-			ComponentPlacer.instance.placeComponent(ComponentPlacer.instance.component.copyForPlacement())
+			if (!(ev instanceof TouchEvent)) {
+				this.placeComponent(this.component.copyForPlacement())
+			}else{
+				console.log(MainController.instance.mode);
+				this._component = null
+				MainController.instance.switchMode(Modes.DRAG_PAN)
+			}
 		}
 	}
 
 	/**
 	 * cancel the component placement
-	 * @param ev which event is responsible for the cancellation
+	 * @param ev which event is responsible for the cancellastion
 	 */
 	public placeCancel(ev?: KeyboardEvent){
-		let component = ComponentPlacer.instance.component
+		let component = this.component
 		if (component) {
 			component.placeFinish()
 			MainController.instance.removeComponent(component)
-			ComponentPlacer.instance._component = null
+			this._component = null
 		}	
-		ComponentPlacer.instance.cleanUp()
+		this.cleanUp()
 		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}
 
@@ -113,10 +125,12 @@ export class ComponentPlacer{
 		SnapController.instance.hideSnapPoints()
 		//remove event listeners
 		let canvas = CanvasController.instance.canvas
-		canvas.off("mousemove",ComponentPlacer.instance.placeMove)
-		canvas.off("mouseup",ComponentPlacer.instance.placeStep)
-		canvas.off("dblclick",ComponentPlacer.instance.placeFinish)
-		hotkeys.unbind("enter",ComponentPlacer.instance.placeFinish)
+		canvas.off("mousemove",this.placeMove)
+		canvas.off("touchmove",this.placeMove)
+		canvas.off("mouseup",this.placeStep)
+		canvas.off("touchend",this.placeStep)
+		// canvas.off("dblclick",this.placeFinish)
+		hotkeys.unbind("enter",this.placeFinish)
 	}
 
 	/**
@@ -125,20 +139,22 @@ export class ComponentPlacer{
 	 */
 	public placeComponent(component: CircuitComponent){
 		MainController.instance.switchMode(Modes.COMPONENT)
-		ComponentPlacer.instance._component = component		
+		this._component = component		
 		SnapController.instance.updateSnapPoints(component,false)
 		SnapController.instance.showSnapPoints()
 		PropertyController.instance.update()
 		
 		// add event listeners to canvas
 		let canvas = CanvasController.instance.canvas
-		canvas.on("mousemove",ComponentPlacer.instance.placeMove)
-		canvas.on("mouseup",ComponentPlacer.instance.placeStep)
-		canvas.on("dblclick",ComponentPlacer.instance.placeFinish)
-		hotkeys("enter",{keyup: false, keydown:true},ComponentPlacer.instance.placeFinish)
+		canvas.on("mousemove",this.placeMove)
+		canvas.on("touchmove",this.placeMove)
+		canvas.on("mouseup",this.placeStep)
+		canvas.on("touchend",this.placeStep)
+		// canvas.on("dblclick",this.placeFinish)
+		hotkeys("enter",{keyup: false, keydown:true},this.placeFinish)
 
 		// move once to actually place the component at the mouse position
-		ComponentPlacer.instance.component.placeMove(CanvasController.instance.lastCanvasPoint)
+		this.component.placeMove(CanvasController.instance.lastCanvasPoint)
 		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 }

@@ -5,7 +5,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject} from "../internal";
+import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject, EraseController} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -143,7 +143,7 @@ export class MainController {
 		);
 
 		canvasPromise.then(() => {
-			// EraseController.instance;
+			EraseController.instance;
 			SelectionController.instance;
 			PropertyController.instance;
 			ComponentPlacer.instance;
@@ -521,10 +521,10 @@ export class MainController {
 		const addComponentButton: HTMLAnchorElement = document.getElementById("addComponentButton") as HTMLAnchorElement;
 		addComponentButton.addEventListener(
 			"click",
-			(() => {
+			((ev:PointerEvent) => {
 				this.switchMode(Modes.DRAG_PAN);
 				leftOffcanvasOC.toggle();				
-				if (leftOffcanvas.classList.contains("showing")) {
+				if (leftOffcanvas.classList.contains("showing")&&ev.pointerType!=="touch") {
 					let searchBar = document.getElementById("componentFilterInput")
 					const refocus = ()=>{
 						searchBar.focus()
@@ -695,7 +695,7 @@ export class MainController {
 				break;
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected");
-				// EraseController.instance.deactivate();
+				EraseController.instance.deactivate();
 				break;
 			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected");
@@ -718,7 +718,7 @@ export class MainController {
 				break;
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected");
-				// EraseController.instance.activate();
+				EraseController.instance.activate();
 				break;
 			case Modes.COMPONENT:
 				this.modeSwitchButtons.modeDragPan.classList.add("selected");

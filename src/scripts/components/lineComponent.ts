@@ -434,6 +434,8 @@ export class LineComponent extends CircuitComponent{
 				lineComponent.lineDirections.push(dir)
 			}
 		}
+		lineComponent.cornerPoints.push(new SVG.Point())
+		lineComponent.lineDirections.push(LineDirection.Straight)
 		lineComponent.placeFinish()
 
 		return lineComponent;

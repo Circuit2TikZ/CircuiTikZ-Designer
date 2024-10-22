@@ -70,8 +70,7 @@ export class ExportController {
 
 	exportJSON(text:string){
 		this.heading.textContent = "Save JSON"
-		// don't show json content. Should this stay like this or can we just show the json?
-		// this.#exportedContent.parentElement.style.display = "none";
+		
 		// create extension select list
 		const extensions = [".json", ".txt"];
 

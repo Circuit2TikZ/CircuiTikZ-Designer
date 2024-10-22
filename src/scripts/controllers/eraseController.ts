@@ -1,22 +1,17 @@
 import * as SVG from "@svgdotjs/svg.js";
 
-import { MainController, CanvasController, CircuitComponent} from "../internal";
-
-//TODO update erase controller
+import { MainController, CanvasController, Undo} from "../internal";
 
 /**
  * Controller for the erase function/mode.
  */
 export class EraseController {
 	private static _instance: EraseController;
-	
-	private canvas: SVG.Svg;
 
-	/**
-	 * Init the EraseController
-	 */
 	private constructor() {
-		this.canvas = CanvasController.instance.canvas;
+		this.moveStart = this.moveStart.bind(this)
+		this.moveListener = this.moveListener.bind(this)
+		this.addUndo = this.addUndo.bind(this)
 	}
 
 	public static get instance(): EraseController {
@@ -26,115 +21,84 @@ export class EraseController {
 		return EraseController._instance;
 	}
 
-	/**
-	 * Deactivate the erasing feature temporary.
-	 *
-	 * Removes listeners from the canvas.
-	 */
-	deactivate() {
+	private dragging = false;
+	private didErase = false;
+
+
+	public deactivate() {
 		// unregister move listener
-		this.canvas.off("mousemove", this.moveListener);
-		this.canvas.off("touchmove", this.moveListener);
-		this.canvas.off("click", this.clickListener);
-		this.canvas.node.classList.remove("eraseCursor");
+		CanvasController.instance.canvas.node.classList.remove("eraseCursor");
+		
+		CanvasController.instance.canvas.off("mousedown", this.moveStart);
+		CanvasController.instance.canvas.off("touchdown", this.moveStart);
+		
+		CanvasController.instance.canvas.off("mousemove", this.moveListener);
+		CanvasController.instance.canvas.off("touchmove", this.moveListener);
+
+		CanvasController.instance.canvas.off("mouseup", this.addUndo);
+		CanvasController.instance.canvas.off("touchend", this.addUndo);
 	}
 
-	/**
-	 * Activate the erasing feature.
-	 *
-	 * Adds listeners to the canvas.
-	 */
-	activate() {
-		this.canvas.on("click", this.clickListener, this);
-		this.canvas.on("touchmove", this.moveListener, this);
-		this.canvas.on("mousemove", this.moveListener, this);
-		this.canvas.node.classList.add("eraseCursor");
+	public activate() {
+		console.log("activate");
+		
+		CanvasController.instance.canvas.node.classList.add("eraseCursor");
+		
+		CanvasController.instance.canvas.on("mousedown", this.moveStart);
+		CanvasController.instance.canvas.on("touchstart", this.moveStart);
+		
+		CanvasController.instance.canvas.on("mousemove", this.moveListener);
+		CanvasController.instance.canvas.on("touchmove", this.moveListener);
+
+		CanvasController.instance.canvas.on("mouseup", this.addUndo);
+		CanvasController.instance.canvas.on("touchend", this.addUndo);
 	}
 
-	/**
-	 * Listener for clicks to erase components/lines. Triggers erasing.
-	 *
-	 * @param {MouseEvent} event
-	 */
-	private clickListener(event: MouseEvent) {
-		let pt = CanvasController.eventToPoint(event);
-		this.findAndErase(pt, [event.target]);
+	private moveStart(event:MouseEvent|TouchEvent){
+		if (event instanceof MouseEvent && event.button!==0) {
+			return
+		}
+		
+		if (event instanceof TouchEvent && event.touches.length!==1) {
+			return
+		}
+		this.dragging = true
 	}
 
-	/**
-	 * Listener for mouse movements. Triggers erasing, if the main button is pressed.
-	 *
-	 * @param {MouseEvent|TouchEvent} event
-	 */
-	private moveListener(event: MouseEvent | TouchEvent) {
-		// Drag --> Drag-erase
-		// (Left click || Touch-click) || (mousemove)
-		let clientPt =
-			event instanceof MouseEvent && (event.buttons & 1 || (event.type !== "mousemove" && event.button === 0 ))
-				? event
-				: window.TouchEvent && event instanceof TouchEvent && event.touches.length === 1
-					? event.touches[0]
-					: null;
-
-		if (clientPt) {
-			const hitElements = [
-				clientPt.target || event.target,
-				document.elementFromPoint(clientPt.clientX, clientPt.clientY),
-			];
-			const pt = CanvasController.eventToPoint(clientPt);
-			this.findAndErase(pt, hitElements);
+	private moveListener(event: MouseEvent | TouchEvent) {		
+		if (!this.dragging) {
+			return
+		}
+		
+		if (event instanceof MouseEvent && (event.buttons & 1 || (event.type !== "mousemove" && event.button === 0 )) ||
+			event instanceof TouchEvent && window.TouchEvent && event.touches.length === 1) {
+			
+			this.findAndErase(CanvasController.eventToPoint(event,false));
 		}
 	}
 
-	/**
-	 * Find instances and lines around the point and removes them. One call only removes one instance/line.
-	 *
-	 * @param {SVG.Point} point - the point used to find a nearby line/instance
-	 * @param {EventTarget[]} targets - the (possible) targets of the event, which triggered the removal. Maybe the user clicked exactly on a line
-	 */
-	private findAndErase(point: SVG.Point, targets: EventTarget[]) {
-		let lowestDist = 10; // ~ 0.27 cm
-		let foundElement: (CircuitComponent) | null = null;
+	private addUndo(event:MouseEvent|TouchEvent){
+		if (event instanceof MouseEvent && event.button!==0) {
+			return
+		}
+		if (event instanceof TouchEvent && event.touches.length!==0) {
+			return
+		}
+		if (this.didErase) {			
+			Undo.addState()
+			this.didErase=false
+		}
+		this.dragging=false
+	}
 
-		// uniq, not null & is SVGElement
-		targets = [...new Set(targets.filter((target) => target instanceof SVGElement))];
-
-		// Try to get element by click/touch target
-		for (const target of targets) {
-			// Traverse DOM upwards to find .instance
-			// @ts-ignore there is no better/more type-safe alternative to parentElement
-			for (let elm = target; elm instanceof SVGElement; elm = elm.parentElement) {
-				if (
-					// @ts-ignore wr check if .instance exists
-					elm.instance && // @ts-ignore instance exists --> no error
-					(MainController.controller.instances.includes(elm.instance) || // @ts-ignore instance exists --> no error
-						MainController.controller.lines.includes(elm.instance))
-				) {
-					// @ts-ignore instance exists --> no error
-					foundElement = elm.instance;
-					break;
-				}
+	private findAndErase(pos:SVG.Point) {
+		let intersectionRect = new SVG.Box(pos.x-5,pos.y-5,10,10)
+		for (const component of MainController.instance.circuitComponents) {
+			if (component.isInsideSelectionRectangle(intersectionRect)) {
+				MainController.instance.removeComponent(component)
+				this.didErase = true
+				break;
 			}
-
-			if (foundElement) break;
-		}
-
-		if (!foundElement) {
-			// try to get line by location
-			for (const line of MainController.instance.lines) {
-				const dist = line.pointDistance(point, lowestDist);
-				if (dist !== null && dist < lowestDist) {
-					lowestDist = dist;
-					foundElement = line;
-				}
-			}
-		}
-
-		if (foundElement && foundElement instanceof Line) {
-			MainController.instance.removeLine(foundElement);
-		} else if (foundElement) {
-			// @ts-ignore if its not a line, it must be a instance
-			MainController.controller.removeInstance(foundElement);
 		}
 	}
 }

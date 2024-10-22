@@ -31,73 +31,98 @@ export class SelectionController {
 		this.selectionEnabled = true
 		this.currentlyDragging = false
 		this.selectionMode = SelectionMode.RESET
+
+		this.selectionStart = this.selectionStart.bind(this)
+		this.selectionMove = this.selectionMove.bind(this)
+		this.selectionEnd = this.selectionEnd.bind(this)
 		
-		CanvasController.instance.canvas.on("mousedown",(evt: MouseEvent)=>{
+		CanvasController.instance.canvas.on("mousedown",this.selectionStart)
+		CanvasController.instance.canvas.on("touchstart",this.selectionStart)
 
-			if (evt.button===0&&this.selectionEnabled) {
-				let shift = evt.shiftKey//||evt.detail.shiftKey
-				let ctrl = evt.ctrlKey||(MainController.instance.isMac&&evt.metaKey)||(MainController.instance.isMac&&evt.metaKey)
-				if (shift) {
-					if (ctrl) {
-						this.selectionMode = SelectionMode.RESET
-					}else{
-						this.selectionMode = SelectionMode.ADD;
-					}
-				}else{
-					if (ctrl) {
-						this.selectionMode = SelectionMode.SUB;
-					}else{
-						this.selectionMode = SelectionMode.RESET
-					}
-				}
-				
-				this.currentlyDragging=true;
-				this.selectionStartPosition = CanvasController.eventToPoint(evt, false);
+		CanvasController.instance.canvas.on("mousemove",this.selectionMove)
+		CanvasController.instance.canvas.on("touchmove",this.selectionMove)
 
-				this.selectionRectangle.move(this.selectionStartPosition.x,this.selectionStartPosition.y);
+		CanvasController.instance.canvas.on("mouseup",this.selectionEnd)
+		CanvasController.instance.canvas.on("touchend",this.selectionEnd)
+	}
+
+	private selectionStart(evt:MouseEvent|TouchEvent){
+		if (!this.selectionEnabled) {
+			return
+		}
+		if (evt instanceof MouseEvent&&evt.button!==0) {
+			return
+		}
+		let shift = evt.shiftKey//||evt.detail.shiftKey
+		let ctrl = evt.ctrlKey||(MainController.instance.isMac&&evt.metaKey)||(MainController.instance.isMac&&evt.metaKey)
+		if (shift) {
+			if (ctrl) {
+				this.selectionMode = SelectionMode.RESET
+			}else{
+				this.selectionMode = SelectionMode.ADD;
 			}
-		})
-		CanvasController.instance.canvas.on("mousemove",(/**@type {MouseEvent}*/evt: MouseEvent)=>{
-			if (this.currentlyDragging) {
-				let pt = CanvasController.eventToPoint(evt, false);
-				let dx = pt.x-this.selectionStartPosition.x;
-				let dy = pt.y-this.selectionStartPosition.y;
-				let moveX = this.selectionStartPosition.x;
-				let moveY = this.selectionStartPosition.y;
-				if (dx<0) {
-					moveX += dx
-					dx = -dx
-				}
-				if (dy<0) {
-					moveY += dy
-					dy = -dy
-				}
-				this.selectionRectangle.move(moveX,moveY)
-				this.selectionRectangle.attr("width",dx);
-				this.selectionRectangle.attr("height",dy);
-
-				this.previewSelection();
+		}else{
+			if (ctrl) {
+				this.selectionMode = SelectionMode.SUB;
+			}else{
+				this.selectionMode = SelectionMode.RESET
 			}
+		}
 
-		})
-		CanvasController.instance.canvas.on("mouseup",(/**@type {MouseEvent}*/evt: MouseEvent)=>{
-			if (evt.button===0) {
-				if (this.currentlyDragging) {
-					this.updateSelectionWithRectangle();
-					this.currentlyDragging=false;
-					this.selectionRectangle.attr("width",0);
-					this.selectionRectangle.attr("height",0);
-				}
+		this.currentlyDragging=true;
+		this.selectionStartPosition = CanvasController.eventToPoint(evt, false);
 
-				let pt = CanvasController.eventToPoint(evt, false);
-				if (pt.x==this.selectionStartPosition.x&&pt.y==this.selectionStartPosition.y) {
-					// clicked on canvas
-					this.deactivateSelection();
-					this.activateSelection();
-				}
-				PropertyController.instance.update()
-			}
-		})
+		this.selectionRectangle.move(this.selectionStartPosition.x,this.selectionStartPosition.y);
+	}
+
+	private selectionMove(evt:MouseEvent|TouchEvent){
+		if (!this.selectionEnabled||!this.currentlyDragging) {
+			return
+		}
+		let pt = CanvasController.eventToPoint(evt, false);
+		let dx = pt.x-this.selectionStartPosition.x;
+		let dy = pt.y-this.selectionStartPosition.y;
+		let moveX = this.selectionStartPosition.x;
+		let moveY = this.selectionStartPosition.y;
+		if (dx<0) {
+			moveX += dx
+			dx = -dx
+		}
+		if (dy<0) {
+			moveY += dy
+			dy = -dy
+		}
+		this.selectionRectangle.move(moveX,moveY)
+		this.selectionRectangle.attr("width",dx);
+		this.selectionRectangle.attr("height",dy);		
+
+		this.previewSelection();
+	}
+
+	private selectionEnd(evt:MouseEvent|TouchEvent){
+		if (!this.selectionEnabled) {
+			return
+		}
+		if (evt instanceof MouseEvent && evt.button!==0) {
+			return
+		}
+		if (evt instanceof TouchEvent && evt.touches.length>0) {
+			return
+		}
+		if (this.currentlyDragging) {
+			this.updateSelectionWithRectangle();
+			this.currentlyDragging=false;
+			this.selectionRectangle.attr("width",0);
+			this.selectionRectangle.attr("height",0);
+		}
+
+		let pt = CanvasController.eventToPoint(evt, false);
+		if (pt.x==this.selectionStartPosition.x&&pt.y==this.selectionStartPosition.y) {
+			// clicked on canvas
+			this.deactivateSelection();
+			this.activateSelection();
+		}
+		PropertyController.instance.update()
 	}
 
 	public static get instance(): SelectionController {
@@ -144,6 +169,7 @@ export class SelectionController {
 		this.selectionRectangle.attr("height",0);
 		this.selectionMode = SelectionMode.RESET;
 		for (const component of MainController.instance.circuitComponents) {
+			component.isSelected=false
 			component.viewSelected(false)
 		}
 	}
