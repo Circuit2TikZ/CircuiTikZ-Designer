@@ -4,6 +4,9 @@ import { getNamedTag, getNamedTags } from "../utils/xmlHelper";
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3";
 
+/**
+ * a point where one can snap to relative to the component position
+ */
 export type TikZAnchor = {
 	name?: string;
 	x: SVG.Number;
@@ -26,22 +29,40 @@ type SymbolBaseInformation = {
 }
 
 /**
- * Representation of a symbol. This class has sub classes describing path- and node-style symbols.
+ * Representation of a symbol and its metadata
  */
 export class ComponentSymbol extends SVG.Symbol {
 	svgMetadataElement: SVGMetadataElement | null;
 
+	/**
+	 * what the component is called
+	 */
 	displayName: string;
+	/**
+	 * the tikz id
+	 */
 	tikzName: string;
+	/**
+	 * in which group the symbol is located
+	 */
 	groupName: string | null;
 
+	/**
+	 * the delta of the component position relative to the upper left corner of the symbol
+	 */
 	relMid: SVG.Point;
 	viewBox: SVG.Box | null;
 	isNodeSymbol:boolean;
 
+	/**
+	 * which tikz options where used for this symbol
+	 */
 	_tikzOptions: Map<string, string | null>;
 	_pins: TikZAnchor[] = [];
 	_additionalAnchors: TikZAnchor[] = [];
+	/**
+	 * where the text should be placed
+	 */
 	_textPosition: TikZAnchor |null = null;
 	_defaultAnchor: TikZAnchor | null = null;
 
@@ -54,7 +75,6 @@ export class ComponentSymbol extends SVG.Symbol {
 	 */
 	constructor(symbolElement: SVGSymbolElement, baseInformation: SymbolBaseInformation) {
 		super(symbolElement);
-		// this.node.instance = this; // Overwrite node circular reference of SVG.Symbol
 
 		// parse information in componentInformation attributes, if not done already
 		if (!baseInformation) baseInformation = ComponentSymbol.getBaseInformation(symbolElement);
@@ -126,13 +146,11 @@ export class ComponentSymbol extends SVG.Symbol {
 		const shapeName = componentInformation?.getAttribute("shapeName") ?? null;
 		const groupName = componentInformation?.getAttribute("groupName") ?? null;
 
-		/** @type {SVG.Point} */
 		const mid: SVG.Point = new SVG.Point(
 			ensureInPx(componentInformation?.getAttribute("refX") || 0),
 			ensureInPx(componentInformation?.getAttribute("refY") || 0)
 		);
 
-		/** @type {?SVG.Box} */
 		let viewBox: SVG.Box | null;
 		if (componentInformation?.hasAttribute("viewBox"))
 			viewBox = new SVG.Box(componentInformation.getAttribute("viewBox"));
@@ -155,8 +173,6 @@ export class ComponentSymbol extends SVG.Symbol {
 
 	/**
 	 * Parses an anchor (pin, anchor and textPosition). If `isDefault` is set, `this.defaultAnchor` will be set.
-	 *
-	 * @private
 	 *
 	 * @param {Element} anchorElement - the element to parse
 	 * @returns {TikZAnchor} the parsed anchor
@@ -188,7 +204,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	 *
 	 * @returns {string} - the serialized options
 	 */
-	serializeTikzOptions(): string {
+	public serializeTikzOptions(): string {
 		return Array.from(this._tikzOptions.entries(), ([key, value]) => (value ? key + "=" + value : key)).join(", ");
 	}
 }

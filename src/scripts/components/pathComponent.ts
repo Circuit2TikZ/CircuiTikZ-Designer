@@ -93,7 +93,7 @@ export class PathComponent extends CircuitikzComponent{
 		this.pathOrientation.label = "Orientation"
 		this.pathOrientation.addChangeListener(ev=>{
 			if (!ev.previousValue||ev.previousValue.mirror!=ev.value.mirror||ev.previousValue.invert!=ev.value.invert) {
-				this.updateTransform()
+				this.update()
 				Undo.addState()
 			}
 		})
@@ -119,23 +119,23 @@ export class PathComponent extends CircuitikzComponent{
 		let diff = position.sub(this.position)
 		this.posStart = diff.add(this.posStart)
 		this.posEnd = diff.add(this.posEnd)
-		this.updateTransform()
+		this.update()
 	}
 
 	public moveStartTo(position: SVG.Point){
 		this.posStart = position
-		this.updateTransform()
+		this.update()
 	}
 
 	public moveEndTo(position: SVG.Point){
 		this.posEnd = position
-		this.updateTransform()
+		this.update()
 	}
 
 	public rotate(angleDeg: number): void {
 		this.posStart = this.posStart.rotate(angleDeg,this.position)
 		this.posEnd = this.posEnd.rotate(angleDeg,this.position)
-		this.updateTransform()
+		this.update()
 	}
 	public flip(horizontal: boolean): void {
 		let newPos1 = new SVG.Point(this.posStart.x,this.posEnd.y)
@@ -153,7 +153,7 @@ export class PathComponent extends CircuitikzComponent{
 		}
 		this.pathOrientation.setValue(currentOrientation,true)
 		
-		this.updateTransform()
+		this.update()
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
@@ -170,7 +170,7 @@ export class PathComponent extends CircuitikzComponent{
 		super.recalculateSnappingPoints(matrix??this.getSnapPointTransformMatrix())
 	}
 
-	public getPlacingSnappingPoints(): SnappingInfo {
+	public getSnappingInfo(): SnappingInfo {
 		if (this.finishedPlacing) {
 			return {
 				trackedSnappingPoints:this.snappingPoints,additionalSnappingPoints:[]
@@ -182,7 +182,7 @@ export class PathComponent extends CircuitikzComponent{
 		}
 	}
 
-	protected updateTransform(): void {
+	protected update(): void {
 		this.position = this.posStart.add(this.posEnd).div(2)
 		const tl = this.position.sub(this.referenceSymbol.relMid);
 
@@ -410,7 +410,7 @@ export class PathComponent extends CircuitikzComponent{
 		this.finishedPlacing=true
 		SnapCursorController.instance.visible = false
 		SnapController.instance.hideSnapPoints();
-		this.updateTransform()
+		this.update()
 		this.draggable(true)
 	}
 

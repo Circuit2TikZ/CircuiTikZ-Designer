@@ -12,6 +12,11 @@ type DistStruct = {
 	fixedSnapPoint?: SVG.Point;
 }
 
+export type SnappingInfo = {
+	trackedSnappingPoints:SnapPoint[]
+	additionalSnappingPoints:SnapPoint[]
+}
+
 /**
  * Controller for snapping points, objects, etc. to the grid or other already added components.
  * @class
@@ -53,7 +58,7 @@ export class SnapController {
 				for (const component of MainController.instance.circuitComponents) {
 					if (component.isSelected) {
 						if (currentComponent===component) {
-							let snappingInfo = component.getPlacingSnappingPoints()
+							let snappingInfo = component.getSnappingInfo()
 							this.movingSnapPoints.push(...snappingInfo.trackedSnappingPoints)
 							this.additionalSnapPoints.push(...snappingInfo.additionalSnappingPoints)
 						} else {
@@ -68,7 +73,7 @@ export class SnapController {
 					if (component!==currentComponent) {
 						this.fixedSnapPoints.push(...component.snappingPoints)
 					}else if(!adjustOnly){
-						let snappingInfo = component.getPlacingSnappingPoints()
+						let snappingInfo = component.getSnappingInfo()
 						this.movingSnapPoints.push(...snappingInfo.trackedSnappingPoints)
 						this.additionalSnapPoints.push(...snappingInfo.additionalSnappingPoints)
 					}

@@ -61,7 +61,7 @@ export class NodeComponent extends CircuitikzComponent{
 		this.flipState.label = "Flip state"
 		this.flipState.addChangeListener(ev=>{
 			if (!ev.previousValue||ev.previousValue.x!=ev.value.x||ev.previousValue.y!=ev.value.y) {
-				this.updateTransform()
+				this.update()
 				Undo.addState()
 			}
 		})
@@ -93,14 +93,14 @@ export class NodeComponent extends CircuitikzComponent{
 		super.recalculateSnappingPoints(matrix??this.getSnapPointTransformMatrix())
 	}
 
-	public getPlacingSnappingPoints():SnappingInfo {
+	public getSnappingInfo():SnappingInfo {
 		return {
 			trackedSnappingPoints:this.snappingPoints,
 			additionalSnappingPoints:[new SnapPoint(this,"center",new SVG.Point())]
 		}
 	}
 
-	protected updateTransform(){
+	protected update(){
 		// if flip has different x and y signs and 180 degrees turn, simplify to flip only
 		if (this.rotationDeg==180) {
 			if (this.flipState.getValue().x*this.flipState.getValue().y<0) {
@@ -141,7 +141,7 @@ export class NodeComponent extends CircuitikzComponent{
 
 	public moveTo(position: SVG.Point) {
 		this.position = position.clone()
-		this.updateTransform()
+		this.update()
 		this.symbolUse.move(this.position.x - this.referenceSymbol.relMid.x, this.position.y - this.referenceSymbol.relMid.y);
 	}
 	
@@ -149,7 +149,7 @@ export class NodeComponent extends CircuitikzComponent{
 		this.rotationDeg += angleDeg;
 		this.simplifyRotationAngle()
 		
-		this.updateTransform()
+		this.update()
 	}
 	public flip(horizontal: boolean): void {
 		let currentFlipState = this.flipState.getValue().clone()
@@ -176,7 +176,7 @@ export class NodeComponent extends CircuitikzComponent{
 		}		
 		this.flipState.setValue(currentFlipState,true)
 		
-		this.updateTransform()
+		this.update()
 	}
 
 	public viewSelected(show: boolean): void {
@@ -321,7 +321,7 @@ export class NodeComponent extends CircuitikzComponent{
 	public placeFinish(): void {
 		// make draggable
 		this.draggable(true)
-		this.updateTransform()
+		this.update()
 	}
 
 	public static fromJson(saveObject:NodeSaveObject): NodeComponent{
