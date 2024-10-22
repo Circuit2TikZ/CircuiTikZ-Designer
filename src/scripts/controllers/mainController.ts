@@ -5,7 +5,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject, EraseController} from "../internal";
+import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject, EraseController, RectangleComponent} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -401,6 +401,12 @@ export class MainController {
 			}
 			return false;
 		})
+
+		
+		hotkeys('k', ()=>{
+			ComponentPlacer.instance.placeComponent(new RectangleComponent())
+			return false
+		});
 
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
