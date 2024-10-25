@@ -1,5 +1,5 @@
 import { Modal } from "bootstrap";
-import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, LineSaveObject, CircuitComponent, SelectionMode, LineComponent, MainController, CanvasController } from "../internal";
+import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, WireSaveObject, CircuitComponent, SelectionMode, WireComponent, MainController, CanvasController, RectangleComponent, RectangleSaveObject } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format
@@ -119,7 +119,7 @@ export class SaveController {
 			}
 	
 			for (const line of obj.lines) {
-				components.push(LineComponent.fromJson(line as LineSaveObject))
+				components.push(WireComponent.fromJson(line as WireSaveObject))
 			}
 		}else{
 			for (const component of obj) {
@@ -144,9 +144,11 @@ export class SaveController {
 			case "path":
 				return PathComponent.fromJson(saveJson as PathSaveObject)
 			case "wire":
-				return LineComponent.fromJson(saveJson as LineSaveObject)
+				return WireComponent.fromJson(saveJson as WireSaveObject)
+			case "rect":
+				return RectangleComponent.fromJson(saveJson as RectangleSaveObject)
 			default:
-				break;
+				throw new Error("type "+saveJson.type +" not known")
 		}
 	}
 }

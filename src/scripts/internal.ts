@@ -12,13 +12,14 @@ export * from "./controllers/copyController";
 export * from "./controllers/propertiesController";
 // properties
 export * from "./properties/editableProperty"
-export * from "./properties/nodeLabelProperty"
-export * from "./properties/pathLabelProperty"
+export * from "./properties/booleanProperty"
+export * from "./properties/choiceProperty"
 export * from "./properties/textProperty"
 export * from "./properties/infoProperty"
 export * from "./properties/zorderProperty"
-export * from "./properties/pathOrientationProperty"
-export * from "./properties/flipStateProperty"
+export * from "./properties/mathjaxProperty"
+export * from "./properties/sliderProperty"
+export * from "./properties/sectionHeaderProperty"
 // components
 export * from "./components/circuitComponent";
 export * from "./components/circuitikzComponent";
@@ -26,7 +27,7 @@ export * from "./components/componentPlacer";
 export * from "./components/componentSymbol";
 export * from "./components/nodeComponent";
 export * from "./components/pathComponent";
-export * from "./components/lineComponent";
+export * from "./components/wireComponent";
 export * from "./components/rectangleComponent";
 // snapDrag
 export * from "./snapDrag/dragHandlers";

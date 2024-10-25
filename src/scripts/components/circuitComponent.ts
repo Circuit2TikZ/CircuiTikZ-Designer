@@ -29,9 +29,9 @@ export abstract class CircuitComponent{
 	public rotationDeg: number;
 
 	/**
-	 * all properties, which should be able to be edited in the properties window have to be included in this array
+	 * all properties, which should be able to be edited in the properties window have to be included here
 	 */
-	public editableProperties:EditableProperty<any>[]=[]
+	public propertiesHTMLRows: HTMLElement[]=[]
 
 	/**
 	 * the name of the component (e.g. "Resistor", "Wire" or "Transformer")
@@ -76,7 +76,7 @@ export abstract class CircuitComponent{
 		this.displayName="Circuit Component"
 
 		// all components should receive the possiblity to change their draw order/z order/depth
-		this.editableProperties.push(new ZOrderProperty(this))
+		this.propertiesHTMLRows.push(new ZOrderProperty(this).buildHTML())
 	}
 
 	/**

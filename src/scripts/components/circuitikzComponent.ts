@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, TextProperty } from "../internal";
+import { CanvasController, CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, MathJaxProperty, SectionHeaderProperty, SliderProperty, TextProperty } from "../internal";
 
 /**
  * names cannot contain punctuation, parantheses and some other symbols
@@ -36,7 +36,10 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 	/**
 	 * What will be used as the reference name in the tikz code (e.g. "\node[] (name) at (0,0){};"")
 	 */
-	protected name: TextProperty;
+	public name: TextProperty;
+	public mathJaxLabel: MathJaxProperty
+	public labelDistance: SliderProperty
+	public labelRendering: SVG.Element
 
 	/**
 	 * The reference to the symbol library component. Has metadata of the symbol
@@ -46,25 +49,20 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 		super()
 		this.displayName=symbol.displayName
 		this.referenceSymbol = symbol
-		
+	}
+
+	protected addInfo(){
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Info").buildHTML())
 		// the tikz id of the component. e.g. "nmos" in "\node[nmos] at (0,0){};"
-		let infoIDProperty = new InfoProperty(this)
-		infoIDProperty.label = "ID"
-		infoIDProperty.setValue(symbol.tikzName)
-		this.editableProperties.push(infoIDProperty)
+		this.propertiesHTMLRows.push(new InfoProperty("ID",this.referenceSymbol.tikzName).buildHTML())
 
 		// if options are used for the component, they will also be shown
 		let tikzOptions = Array.from(this.referenceSymbol._tikzOptions.keys()).join(", ")
-		if (tikzOptions) {
-			let infoOptionsProperty = new InfoProperty(this)
-			infoOptionsProperty.label = "Options"
-			infoOptionsProperty.setValue(tikzOptions)
-			this.editableProperties.push(infoOptionsProperty)
+		if (tikzOptions&&tikzOptions.length>0) {
+			this.propertiesHTMLRows.push(new InfoProperty("Options",tikzOptions).buildHTML())
 		}
 
-		this.name = new TextProperty(this)
-		this.name.label = "Name"
-		this.name.setValue("")
+		this.name = new TextProperty("Name","")
 		this.name.addChangeListener((ev)=>{
 			if (ev.value==="") {
 				// no name is always valid
@@ -79,8 +77,8 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			for (const component of MainController.instance.circuitComponents) {
 				// check if another component with the same name already exists
 				if (component instanceof CircuitikzComponent && component!=this) {
-					if (ev.value!==""&&component.name.getValue()==ev.value) {
-						this.name.setValue(ev.previousValue,false)
+					if (ev.value!==""&&component.name.value==ev.value) {
+						this.name.updateValue(ev.previousValue,false)
 						this.name.changeInvalidStatus("Name is already taken!")
 						return
 					}
@@ -88,7 +86,7 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			}
 			this.name.changeInvalidStatus("")
 		})
-		this.editableProperties.push(this.name)
+		this.propertiesHTMLRows.push(this.name.buildHTML())
 	}
 
 	/**
@@ -96,18 +94,18 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 	 * @param label the data for which to generate the label visualization
 	 * @returns a Promise<void>
 	 */
-	public async generateLabelRender(label:Label):Promise<void>{
+	public async generateLabelRender():Promise<void>{
 		// @ts-ignore
 		window.MathJax.texReset();
 		// @ts-ignore
-		return window.MathJax.tex2svgPromise(label.value,{}).then((node: Element) =>{	
+		return window.MathJax.tex2svgPromise(this.mathJaxLabel.value,{}).then((node: Element) =>{	
 			// mathjax renders the text via an svg container. That container also contains definitions and SVG.Use elements. get that container
 			let svgElement = new SVG.Svg(node.querySelector("svg"))
 
 			// if a previous label was rendered, remove everything concerning that rendering
-			if (label.rendering) {
+			if (this.labelRendering) {
 				let removeIDs = new Set<string>()
-				for (const element of label.rendering.find("use")) {
+				for (const element of this.labelRendering.find("use")) {
 					removeIDs.add(element.node.getAttribute("xlink:href"))
 				}
 
@@ -177,13 +175,13 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			transformGroup.transform(m)
 
 			// remove the current label and substitute with a new group element
-			label.rendering?.remove()
+			this.labelRendering?.remove()
 			let rendering = new SVG.G()
 			rendering.addClass("pointerNone")
 			rendering.add(transformGroup)
 			// add the label rendering to the visualization element
 			this.visualization.add(rendering)
-			label.rendering = rendering
+			this.labelRendering = rendering
 			this.update()
 		})
 	}

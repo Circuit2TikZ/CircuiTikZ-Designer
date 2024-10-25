@@ -1,32 +1,37 @@
 import { EditableProperty } from "../internal";
 
 export class InfoProperty extends EditableProperty<string>{
-	public getValue(): string {
-		return this._value
-	}
-	public setValue(value: string, updateHTML?: boolean): void {
-		this._value = value
-		if (this.valueElement && updateHTML) {
-			this.valueElement.innerHTML = value
-		}
-	}
-
 	private valueElement:HTMLSpanElement
+	private labelElement:HTMLElement
+	private labelString:string
+	
+	public constructor(label:string,initalValue?:string){
+		super(initalValue)
+		this.labelString = label
+	}
 
-	public buildHTML(container:HTMLElement): void {
+	public buildHTML(): HTMLElement {
 		let row = document.createElement("div") as HTMLDivElement
 		row.classList.add("row","mx-0", "my-2", "border", "border-info-subtle", "bg-info-subtle", "text-info-emphasis", "rounded")
 
 		this.labelElement = document.createElement("span") as HTMLSpanElement
 		this.labelElement.classList.add("text-start","col-auto","me-3")
-		this.labelElement.innerHTML = this._label??"Label"
+		this.labelElement.innerHTML = this.labelString??"Label"
 		row.appendChild(this.labelElement)
 
 		this.valueElement = document.createElement("span") as HTMLSpanElement
 		this.valueElement.classList.add("text-end","col")
-		this.valueElement.innerHTML = this._value??"Label"
+		this.valueElement.innerHTML = this.value??""
 		row.appendChild(this.valueElement)
 		
-		container.appendChild(row)
+		return row
+	}
+	public eq(first: string, second: string): boolean {
+		return first==second
+	}
+	public updateHTML(): void {
+		if (this.valueElement) {
+			this.valueElement.innerHTML = this.value??""
+		}
 	}
 }

@@ -2,8 +2,8 @@ import * as SVG from "@svgdotjs/svg.js";
 import { CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, Undo } from "../internal";
 
 export type DragCallbacks = {
-	dragStart?(pos: SVG.Point, ev?:MouseEvent):void
-	dragMove?(pos: SVG.Point, ev?:MouseEvent):void
+	dragStart?(pos: SVG.Point, ev?:MouseEvent|TouchEvent):void
+	dragMove?(pos: SVG.Point, ev?:MouseEvent|TouchEvent):void
 	dragEnd?():void
 }
 
@@ -20,7 +20,7 @@ type DragHandler = {
 
 type DragMoveEventDetail = {
 	box:SVG.Box
-	event: MouseEvent
+	event: MouseEvent|TouchEvent
 	handler: DragHandler
 }
 
@@ -223,6 +223,12 @@ export class AdjustDragHandler{
 	 */
 	dragMove(event: DragEvent) {
 		event.preventDefault();
+
+		if (event.detail.event instanceof TouchEvent && event.detail.event.touches.length>1) {
+			this.didDrag=true
+			this.dragEnd(event,true)
+			return
+		}
 		
 		if (!this.didDrag) {
 			// only show snapping points if actually moving

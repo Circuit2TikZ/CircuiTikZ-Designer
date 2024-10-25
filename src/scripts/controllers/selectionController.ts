@@ -72,11 +72,18 @@ export class SelectionController {
 		this.currentlyDragging=true;
 		this.selectionStartPosition = CanvasController.eventToPoint(evt, false);
 
+		CanvasController.instance.canvas.put(this.selectionRectangle) // bring to front
 		this.selectionRectangle.move(this.selectionStartPosition.x,this.selectionStartPosition.y);
 	}
 
 	private selectionMove(evt:MouseEvent|TouchEvent){
 		if (!this.selectionEnabled||!this.currentlyDragging) {
+			return
+		}
+		if (evt instanceof TouchEvent && evt.touches.length>1) {
+			this.currentlyDragging=false
+			this.selectionRectangle.size(0,0).move(0,0)
+			this.viewSelection(true)
 			return
 		}
 		let pt = CanvasController.eventToPoint(evt, false);
@@ -112,15 +119,14 @@ export class SelectionController {
 		if (this.currentlyDragging) {
 			this.updateSelectionWithRectangle();
 			this.currentlyDragging=false;
-			this.selectionRectangle.attr("width",0);
-			this.selectionRectangle.attr("height",0);
+			this.selectionRectangle.size(0,0)
 		}
 
 		let pt = CanvasController.eventToPoint(evt, false);
 		if (pt.x==this.selectionStartPosition.x&&pt.y==this.selectionStartPosition.y) {
-			// clicked on canvas
-			this.deactivateSelection();
-			this.activateSelection();
+			// clicked on canvas		
+			this.selectionRectangle.move(pt.x,pt.y).size(0,0)
+			this.updateSelectionWithRectangle()
 		}
 		PropertyController.instance.update()
 	}

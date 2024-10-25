@@ -5,7 +5,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, LineComponent, ComponentSymbol, ComponentSaveObject, EraseController, RectangleComponent} from "../internal";
+import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, WireComponent, ComponentSymbol, ComponentSaveObject, EraseController, RectangleComponent} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -19,7 +19,6 @@ export enum Modes {
 }
 
 // TODO Test
-// TODO support mobile again
 // TODO redo comments
 
 export class MainController {
@@ -71,7 +70,7 @@ export class MainController {
 		MainController._instance = this
 		this.isMac = window.navigator.userAgent.toUpperCase().indexOf('MAC')>=0
 
-		this.#addSaveStateManagement()
+		this.addSaveStateManagement()
 
 		// dark mode init
 		const htmlElement = document.documentElement;		
@@ -83,9 +82,9 @@ export class MainController {
 		this.darkMode = this.currentTheme === 'dark';
 		switchElement.checked = this.darkMode;
 
-		let mathJaxPromise = this.#loadMathJax();
-		let canvasPromise = this.#initCanvas();
-		let symbolsDBPromise = this.#initSymbolDB();
+		let mathJaxPromise = this.loadMathJax();
+		let canvasPromise = this.initCanvas();
+		let symbolsDBPromise = this.initSymbolDB();
 
 		MainController.appVersion = version;
 		document.addEventListener('DOMContentLoaded', () => {
@@ -94,13 +93,22 @@ export class MainController {
 			}
 		});
 
-		this.#initModeButtons();
+		this.initModeButtons();
+
+		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
 
 		//enable tooltips globally
 		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]')
-		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
-			fallbackPlacements:[] //always show them exactly where defined
-		}))
+		if (isMobile) {
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
+				fallbackPlacements:[], //always show them exactly where defined
+				trigger:'manual'
+			}))
+		}else{
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl,{
+				fallbackPlacements:[], //always show them exactly where defined
+			}))
+		}
 
 		// init exporting
 		ExportController.instance;
@@ -151,8 +159,8 @@ export class MainController {
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
 			document.getElementById("loadingSpinner")?.classList.add("d-none")
 			SnapCursorController.instance
-			this.#initAddComponentOffcanvas();
-			this.#initShortcuts();
+			this.initAddComponentOffcanvas();
+			this.initShortcuts();
 
 			// Prevent "normal" browser menu
 			document.getElementById("canvas").addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false });
@@ -188,7 +196,7 @@ export class MainController {
 		});
 	}
 
-	async #loadMathJax(){
+	private async loadMathJax(){
 		var promise = new Promise((resolve)=>{
 			if (!("MathJax" in window)) {
 				(window as any).MathJax = {
@@ -211,7 +219,7 @@ export class MainController {
 	/**
 	 * make it possible to open multiple tabs and all with different save States.
 	 */
-	#addSaveStateManagement(){
+	private addSaveStateManagement(){
 		const objname = "circuitikz-designer-saveState"
 		const tabname = "circuitikz-designer-tabID"
 
@@ -276,7 +284,7 @@ export class MainController {
 	/**
 	 * initialises keyboard shortcuts
 	 */
-	#initShortcuts(){		
+	private initShortcuts(){		
 		// stop reload behaviour
 		hotkeys('ctrl+r,command+r', ()=>false);
 
@@ -389,7 +397,7 @@ export class MainController {
 		})
 		hotkeys("w",()=>{
 			ComponentPlacer.instance.placeCancel()
-			ComponentPlacer.instance.placeComponent(new LineComponent())
+			ComponentPlacer.instance.placeComponent(new WireComponent())
 			return false;
 		})
 		hotkeys("del, backspace",()=>{
@@ -442,7 +450,7 @@ export class MainController {
 	/**
 	 * Init the canvas controller
 	 */
-	async #initCanvas() {
+	private async initCanvas() {
 		let canvasElement: SVGSVGElement = await waitForElementLoaded("canvas");
 		if (canvasElement) this.canvasController = new CanvasController(new SVG.Svg(canvasElement));
 	}
@@ -450,7 +458,7 @@ export class MainController {
 	/**
 	 * Fetch & parse the symbol(s) svg.
 	 */
-	async #initSymbolDB() {
+	private async initSymbolDB() {
 		// Fetch symbol DB
 		const symbolDBlink: HTMLLinkElement = await waitForElementLoaded("symbolDBlink");
 		const response = await fetch(symbolDBlink.href, {
@@ -490,7 +498,7 @@ export class MainController {
 	/**
 	 * Init the mode change buttons.
 	 */
-	#initModeButtons() {
+	private initModeButtons() {
 		this.modeSwitchButtons.modeDragPan = document.getElementById("modeDragPan");
 		this.modeSwitchButtons.modeDrawLine = document.getElementById("modeDrawLine");
 		this.modeSwitchButtons.modeEraser = document.getElementById("modeEraser");
@@ -505,7 +513,7 @@ export class MainController {
 			() => {
 				this.switchMode(Modes.COMPONENT)
 				this.modeSwitchButtons.modeDrawLine.classList.add("selected");
-				ComponentPlacer.instance.placeComponent(new LineComponent())
+				ComponentPlacer.instance.placeComponent(new WireComponent())
 			},
 			{ passive: false }
 		);
@@ -516,10 +524,72 @@ export class MainController {
 		);
 	}
 
+	private addShapeComponentsToOffcanvas(leftOffcanvasAccordion:HTMLDivElement, leftOffcanvasOC:Offcanvas){
+		// Add shapes accordion area
+		let groupName = "Shapes"
+		const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-");
+
+		const accordionGroup = leftOffcanvasAccordion.appendChild(document.createElement("div"));
+		accordionGroup.classList.add("accordion-item");
+
+		const accordionItemHeader = accordionGroup.appendChild(document.createElement("h2"));
+		accordionItemHeader.classList.add("accordion-header");
+
+		const accordionItemButton = accordionItemHeader.appendChild(document.createElement("button"));
+		accordionItemButton.classList.add("accordion-button");
+		accordionItemButton.innerText = groupName;
+		accordionItemButton.setAttribute("aria-controls", collapseGroupID);
+		accordionItemButton.setAttribute("aria-expanded", "true");
+		accordionItemButton.setAttribute("data-bs-target", "#" + collapseGroupID);
+		accordionItemButton.setAttribute("data-bs-toggle", "collapse");
+		accordionItemButton.type = "button";
+
+		const accordionItemCollapse = accordionGroup.appendChild(document.createElement("div"));
+		accordionItemCollapse.classList.add("accordion-collapse", "collapse", "show");
+		accordionItemCollapse.id = collapseGroupID;
+		accordionItemCollapse.setAttribute("data-bs-parent", "#leftOffcanvasAccordion");
+
+		const accordionItemBody = accordionItemCollapse.appendChild(document.createElement("div"));
+		accordionItemBody.classList.add("accordion-body", "iconLibAccordionBody");
+
+		//Add rectangle
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"));
+			addButton.classList.add("libComponent");
+			addButton.setAttribute("searchData","rect rectangle")
+			addButton.ariaRoleDescription = "button";
+			addButton.title = "Rectangle";
+	
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault();
+				this.switchMode(Modes.COMPONENT)					
+	
+				if (ComponentPlacer.instance.component) {
+					ComponentPlacer.instance.placeCancel()
+				}
+	
+				let newComponent = new RectangleComponent()
+				ComponentPlacer.instance.placeComponent(newComponent)
+				
+				leftOffcanvasOC.hide();
+			};
+	
+			addButton.addEventListener("mouseup", listener);
+			addButton.addEventListener("touchstart", listener, { passive: false });
+	
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(0,0,17,12)
+			svgIcon.rect(15,10).move(1,1).fill("none").stroke({
+				color:"var(--bs-emphasis-color)",
+				width:1
+			})
+		}
+	}
+
 	/**
 	 * Init the left add offcanvas.
 	 */
-	async #initAddComponentOffcanvas() {
+	private async initAddComponentOffcanvas() {
 		const leftOffcanvas: HTMLDivElement = document.getElementById("leftOffcanvas") as HTMLDivElement;
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas);
 		document.getElementById("componentFilterInput").addEventListener("input",this.filterComponents);
@@ -554,6 +624,8 @@ export class MainController {
 			},
 			new Map()
 		);
+
+		this.addShapeComponentsToOffcanvas(leftOffcanvasAccordion, leftOffcanvasOC)
 
 		let firstGroup = true;
 		for (const [groupName, symbols] of groupedSymbols.entries()) {
@@ -626,7 +698,7 @@ export class MainController {
 	/**
 	 * filter the components in the left OffCanvas to only show what matches the search string (in a new accordeon item)
 	 */
-	filterComponents(evt: Event){
+	private filterComponents(evt: Event){
 		evt.preventDefault();
 		evt.stopPropagation();
 		
@@ -685,7 +757,7 @@ export class MainController {
 	/**
 	 * Switches the mode. This deactivates the old controller and activates the new one.
 	 */
-	switchMode(newMode: Modes) {
+	public switchMode(newMode: Modes) {
 		if (newMode == this.mode) return;
 		let oldMode = this.mode
 		this.mode=newMode
@@ -735,7 +807,7 @@ export class MainController {
 		}
 	}
 
-	updateTheme(){
+	public updateTheme(){
 		if (this.darkModeLast==this.darkMode) {
 			return;
 		}

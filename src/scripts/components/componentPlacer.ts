@@ -96,7 +96,6 @@ export class ComponentPlacer{
 			if (!(ev instanceof TouchEvent)) {
 				this.placeComponent(this.component.copyForPlacement())
 			}else{
-				console.log(MainController.instance.mode);
 				this._component = null
 				MainController.instance.switchMode(Modes.DRAG_PAN)
 			}

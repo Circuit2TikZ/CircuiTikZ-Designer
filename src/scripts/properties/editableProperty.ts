@@ -1,44 +1,40 @@
-import { CircuitComponent, MainController, Modes } from "../internal";
+import { MainController, Modes } from "../internal";
 
-export type ChangeEvent<T> = {
+type ChangeEvent<T>={
 	previousValue:T,
 	value:T
 }
 
 export abstract class EditableProperty<T>{
-	protected _value: T;
-
-	public abstract getValue():T
-	public abstract setValue(value:T, updateHTML?:boolean):void
-
-	protected labelElement:HTMLElement
-	protected _label:string
-	public get label(): string{
-		return this._label
+	private _value: T;
+	public get value(): T {
+		return this._value;
 	}
-	public set label(value: string){
-		this._label = value
-		if (this.labelElement) {
-			this.labelElement.innerHTML = value
-		}
+	public set value(newVal:T){
+		this._value=newVal
 	}
 
 	private changeListeners:{(event:ChangeEvent<T>):void}[]
-	protected componentReference:CircuitComponent
 
-	protected lastValue:T
-
-	public constructor(componentReference:CircuitComponent, value?:T){
+	public constructor(initialValue?:T){
 		// make sure to be in drag_pan mode when changing any value
 		this.changeListeners = [(ev)=>{MainController.instance.switchMode(Modes.DRAG_PAN)}]
-		this.componentReference = componentReference
-		this.lastValue = null
-		if (value!==undefined) {
-			this.setValue(value,false)
+		if (initialValue!==undefined) {
+			this._value = initialValue
 		}
 	}
+	public abstract eq(first:T,second:T):boolean
 
-	public abstract buildHTML(container:HTMLElement):void
+	/**
+	 * Override/use this
+	*/
+	public abstract buildHTML():HTMLElement
+	protected getRow():HTMLDivElement{
+		let row = document.createElement("div") as HTMLDivElement
+		row.classList.add("row","g-2", "my-2")
+		return row
+	}
+	public abstract updateHTML():void
 
 	public addChangeListener(changeListener:(ev:ChangeEvent<T>)=>void){
 		this.changeListeners.push(changeListener)
@@ -52,19 +48,22 @@ export abstract class EditableProperty<T>{
 		return false
 	}
 
-	protected updateValue(newVal:T){
-		if (newVal === this.lastValue) {
+	public updateValue(newVal:T,updateHTML=false){
+		if (this.eq(newVal, this.value)) {
 			return
 		}
-		this.setValue(newVal)
+		let lastValue = this.value
+		this._value = newVal
 		let changeEvent:ChangeEvent<T> = {
-			previousValue:this.lastValue,
+			previousValue:lastValue,
 			value:this._value
+		}
+		if (updateHTML) {
+			this.updateHTML()
 		}
 		for (const element of this.changeListeners) {
 			element(changeEvent)
 		}
-		this.lastValue = newVal
 	}
 
 }

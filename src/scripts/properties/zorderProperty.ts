@@ -1,15 +1,15 @@
-import { CanvasController, EditableProperty } from "../internal";
+import { CanvasController, CircuitComponent, EditableProperty } from "../internal";
 
 export class ZOrderProperty extends EditableProperty<number>{
-	public getValue(): number {
-		throw new Error("There is no value associated with ZOrderProperty");
+	private componentReference:CircuitComponent;
+
+	public constructor(componentReference:CircuitComponent){
+		super()
+		this.componentReference = componentReference
 	}
-	public setValue(value: number, updateHTML?: boolean): void {
-		throw new Error("There is no value associated with ZOrderProperty");
-	}
-	public buildHTML(container: HTMLElement): void {
-		let row = document.createElement("div") as HTMLDivElement
-		row.classList.add("row","g-3","my-3")
+
+	public buildHTML(): HTMLElement {
+		let row = this.getRow()
 
 		let frontDiv = document.createElement("div") as HTMLDivElement
 		frontDiv.classList.add("col-6","mt-0")
@@ -35,7 +35,11 @@ export class ZOrderProperty extends EditableProperty<number>{
 			CanvasController.instance.moveComponentToBack(this.componentReference)
 		})
 
-		container.appendChild(row)
+		return row
 	}
 	
+	public eq(first: number, second: number): boolean {
+		return true
+	}
+	public updateHTML(): void {}
 }

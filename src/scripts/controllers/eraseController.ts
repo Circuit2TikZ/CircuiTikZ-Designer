@@ -39,9 +39,7 @@ export class EraseController {
 		CanvasController.instance.canvas.off("touchend", this.addUndo);
 	}
 
-	public activate() {
-		console.log("activate");
-		
+	public activate() {		
 		CanvasController.instance.canvas.node.classList.add("eraseCursor");
 		
 		CanvasController.instance.canvas.on("mousedown", this.moveStart);

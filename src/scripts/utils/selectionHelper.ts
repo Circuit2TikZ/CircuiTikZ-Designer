@@ -54,15 +54,11 @@ export function lineRectIntersection(line: SVG.Line | number[][],rect: SVG.Box){
  * @param {SVG.Box} rect2 
  * @returns {boolean}
  */
-export function rectRectIntersection(rect1: { x: number; y: number; x2: number; y2: number; },rect2: SVG.Box): boolean{
+export function rectRectIntersection(rect1:SVG.Box, rect2:SVG.Box): boolean{
 	let l1 = new SVG.Point(rect1.x,rect1.y)
 	let r1 = new SVG.Point(rect1.x2,rect1.y2)
 	let l2 = new SVG.Point(rect2.x,rect2.y)
 	let r2 = new SVG.Point(rect2.x2,rect2.y2)
-	
-	// if rectangle has area 0, no overlap
-	if (l1.x == r1.x || l1.y == r1.y || r2.x == l2.x || l2.y == r2.y)
-		return false;
 	
 	// If one rectangle is on left side of other
 	if (l1.x > r2.x || l2.x > r1.x) {

@@ -4,94 +4,94 @@ import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
 import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, selectionColor } from "../utils/selectionHelper";
 
 /**
- * how the line should be drawn. horizontal then vertical, vertical then horizontal or straight
+ * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
  */
-export enum LineDirection {
+export enum WireDirection {
 	Straight = "--",
 	HV = "-|",
 	VH = "|-"
 }
 
 /**
- * one line segement has a destination and a line direction
+ * one wire segement has a destination and a wire direction
  */
-export type LineSegment = {
+export type WireSegment = {
 	position: {x:number, y:number}
-	direction: LineDirection
+	direction: WireDirection
 }
 
 /**
- * a line consists of a starting position and at least one line segment
+ * a wire consists of a starting position and at least one wire segment
  */
-export type LineSaveObject = ComponentSaveObject &  {
+export type WireSaveObject = ComponentSaveObject &  {
 	start: {x:number, y:number}
-	segments: LineSegment[]
+	segments: WireSegment[]
 }
 
 /**
- * The component responsible for multi segmented lines (polylines)/wires
+ * The component responsible for multi segmented wires (polylines)/wires
  */
-export class LineComponent extends CircuitComponent{
+export class WireComponent extends CircuitComponent{
 	
 	/**
 	 * the corner points when drawing
 	 */
 	private cornerPoints:SVG.Point[]
 	/**
-	 * the line directions when drawing
+	 * the wire directions when drawing
 	 */
-	private lineDirections:LineDirection[]
+	private wireDirections:WireDirection[]
 	// useful for placing
 	private lastPlacingDirection=new SVG.Point(1,0)
 
 	// essentially the main visualisation
-	private line:SVG.Polyline
-	// a wider copy of line, but invisible, Meant for dragging the line
-	private draggableLine:SVG.Polyline
-	private draggingLineWidth=10
+	private wire:SVG.Polyline
+	// a wider copy of wire, but invisible, Meant for dragging the wire
+	private draggableWire:SVG.Polyline
+	private draggingWireWidth=10
 
-	// the svg elements where adjusting the line is possible
+	// the svg elements where adjusting the wire is possible
 	private adjustmentPoints:SVG.Element[]=[]
 	
 	constructor(){
 		super()
 		this.cornerPoints = []
-		this.lineDirections = []
+		this.wireDirections = []
 		SnapCursorController.instance.visible = true
-		this.displayName = "Line"
+		this.displayName = "Wire"
 
 		this.visualization = CanvasController.instance.canvas.group()
-		this.line = CanvasController.instance.canvas.polyline()
-		this.line.attr({
+		this.wire = CanvasController.instance.canvas.polyline()
+		this.wire.attr({
 			fill: "none",
 			stroke: MainController.instance.darkMode?"#fff":"#000",
 			"stroke-width": "0.4pt",
 		});
-		this.draggableLine = CanvasController.instance.canvas.polyline()
-		this.draggableLine.attr({
+		this.draggableWire = CanvasController.instance.canvas.polyline()
+		this.draggableWire.attr({
 			fill: "none",
 			stroke: "transparent",
-			"stroke-width": this.draggingLineWidth,
+			"stroke-width": this.draggingWireWidth,
 		});
 
-		this.visualization.add(this.line)
-		this.visualization.add(this.draggableLine)
+		this.visualization.add(this.wire)
+		this.visualization.add(this.draggableWire)
 		this.snappingPoints=[]
 	}
 
 	public updateTheme(): void {
 		if (!this.isSelected) {
-			this.line.stroke(MainController.instance.darkMode?"#fff":"#000");
+			this.wire.stroke(MainController.instance.darkMode?"#fff":"#000");
 		}
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
-		// snap points don't have to be transformed for lines
+		// snap points don't have to be transformed for wires
 		return new SVG.Matrix()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		// first update the relative positions of the snapping points w.r.t. the line, i.e. the start and end positions
+		// first update the relative positions of the snapping points w.r.t. the wire, i.e. the start and end positions
 		this.snappingPoints[0]?.updateRelPosition(this.cornerPoints[0].sub(this.position))
 		this.snappingPoints[1]?.updateRelPosition(this.cornerPoints.at(-1).sub(this.position))
 		super.recalculateSnappingPoints()
@@ -114,18 +114,18 @@ export class LineComponent extends CircuitComponent{
 	}
 	public draggable(drag: boolean): void {
 		if (drag) {
-			this.draggableLine.node.classList.add("draggable")
+			this.draggableWire.node.classList.add("draggable")
 		} else {
-			this.draggableLine.node.classList.remove("draggable")
+			this.draggableWire.node.classList.remove("draggable")
 		}
-		// actually enable/disable dragging for the line itself. This should be done with the draggable line
-		SnapDragHandler.snapDrag(this,drag,this.draggableLine)
+		// actually enable/disable dragging for the wire itself. This should be done with the draggable wire
+		SnapDragHandler.snapDrag(this,drag,this.draggableWire)
 
-		// pre calculate the direction of the line as a vector from the linedirection objects
+		// pre calculate the direction of the wire as a vector from the wiredirection objects
 		let dirs:SVG.Point[] = []
-		for (let index = 0; index < this.lineDirections.length; index++) {
+		for (let index = 0; index < this.wireDirections.length; index++) {
 			let rel = this.cornerPoints[index+1].sub(this.cornerPoints[index])
-			dirs[index] = this.lineDirections[index] == LineDirection.VH?
+			dirs[index] = this.wireDirections[index] == WireDirection.VH?
 														new SVG.Point(0,Math.sign(rel.y)):
 														new SVG.Point(Math.sign(rel.x),0)
 		}
@@ -143,24 +143,26 @@ export class LineComponent extends CircuitComponent{
 			AdjustDragHandler.snapDrag(this,element,drag,{
 				dragMove:(pos,ev)=>{
 					if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
-						// lines from and to this point should be straight
+						// wires from and to this point should be straight
 						if (index>0) {
-							this.lineDirections[index-1]=LineDirection.Straight
+							this.wireDirections[index-1]=WireDirection.Straight
 						}
-						this.lineDirections[index]=LineDirection.Straight
+						if (index<this.wireDirections.length) {
+							this.wireDirections[index]=WireDirection.Straight
+						}
 					}else{
-						// change the line direction if necessary
+						// change the wire direction if necessary
 						if (index>0) {
 							// from the last point to this point
 							dirs[index-1] = this.directionVecFromPos(pos.sub(this.cornerPoints[index-1]),dirs[index-1])
-							this.lineDirections[index-1]=this.lineDirectionFromDirectionVec(dirs[index-1],ev)
+							this.wireDirections[index-1]=this.wireDirectionFromDirectionVec(dirs[index-1],ev)
 						}
 						if (index<this.adjustmentPoints.length-1) {
 							// from this point to the next point
 							let rel = pos.sub(this.cornerPoints[index+1])
 							dirs[index] = this.directionVecFromPos(rel,dirs[index])
 							let dir = dirs[index].x!=0?new SVG.Point(0,rel.y):new SVG.Point(rel.x,0)
-							this.lineDirections[index]=this.lineDirectionFromDirectionVec(dir,ev)
+							this.wireDirections[index]=this.wireDirectionFromDirectionVec(dir,ev)
 						}
 					}
 					this.cornerPoints[index].x=pos.x
@@ -179,14 +181,14 @@ export class LineComponent extends CircuitComponent{
 	public rotate(angleDeg: number): void {
 		// rotate all points around the component reference position
 		this.cornerPoints = this.cornerPoints.map((point)=>point.rotate(angleDeg,this.position))
-		// adjust all line directions (flip HV and VH)
-		this.lineDirections = this.lineDirections.map((dir)=>{
-			if (dir==LineDirection.HV) {
-				return LineDirection.VH
-			}else if (dir==LineDirection.VH) {
-				return LineDirection.HV
+		// adjust all wire directions (flip HV and VH)
+		this.wireDirections = this.wireDirections.map((dir)=>{
+			if (dir==WireDirection.HV) {
+				return WireDirection.VH
+			}else if (dir==WireDirection.VH) {
+				return WireDirection.HV
 			}else{
-				return LineDirection.Straight
+				return WireDirection.Straight
 			}
 		})
 		this.update()
@@ -203,33 +205,33 @@ export class LineComponent extends CircuitComponent{
 		}
 	}
 	protected update(): void {
-		//update the points where the line can be adjusted
+		//update the points where the wire can be adjusted
 		for (let index = 0; index < this.adjustmentPoints.length; index++) {
 			this.adjustmentPoints[index].move(this.cornerPoints[index].x-pathPointRadius,this.cornerPoints[index].y-pathPointRadius)
 		}
 
-		// generate all the points in the line from the corner points and the line directions
+		// generate all the points in the wire from the corner points and the wire directions
 		let pointArray = new SVG.PointArray(this.cornerPoints[0].toArray())
-		for (let index = 0; index < this.lineDirections.length; index++) {
-			const direction = this.lineDirections[index];
+		for (let index = 0; index < this.wireDirections.length; index++) {
+			const direction = this.wireDirections[index];
 			const lastPoint = this.cornerPoints[index];
 			const point = this.cornerPoints[index+1];
-			if (direction==LineDirection.HV) {
+			if (direction==WireDirection.HV) {
 				pointArray.push(new SVG.Point(point.x,lastPoint.y).toArray())
-			} else if(direction==LineDirection.VH){
+			} else if(direction==WireDirection.VH){
 				pointArray.push(new SVG.Point(lastPoint.x,point.y).toArray())
 			}
 			pointArray.push(point.toArray())
 		}
 
 		// actually plot the points
-		this.line.clear()
-		this.line.plot(pointArray)
-		this.draggableLine.clear()
-		this.draggableLine.plot(pointArray)
+		this.wire.clear()
+		this.wire.plot(pointArray)
+		this.draggableWire.clear()
+		this.draggableWire.plot(pointArray)
 		
 		//recalculate the bounding box and position
-		this._bbox = this.line.bbox()
+		this._bbox = this.wire.bbox()
 		this.position.x = this._bbox.cx
 		this.position.y = this._bbox.cy
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
@@ -241,18 +243,18 @@ export class LineComponent extends CircuitComponent{
 	protected recalculateSelectionVisuals(): void {}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
-		//essentially check each line segment if via a line rect intersection
-		let pointsArray = this.line.array()
+		//essentially check each wire segment if via a wire rect intersection
+		let pointsArray = this.wire.array()
 		let allPointsInside = pointInsideRect(new SVG.Point(pointsArray[0]),selectionRectangle);
 		for (let idx = 0; idx < pointsArray.length-1; idx++) {
 			let p2 = pointsArray[idx+1];
-			let lineSegment = [pointsArray[idx],p2];
+			let wireSegment = [pointsArray[idx],p2];
 
 			if (allPointsInside) {
 				allPointsInside = pointInsideRect(new SVG.Point(p2),selectionRectangle)
 			}
 
-			if (lineRectIntersection(lineSegment, selectionRectangle)) {
+			if (lineRectIntersection(wireSegment, selectionRectangle)) {
 				return true;
 			}
 		}
@@ -262,32 +264,32 @@ export class LineComponent extends CircuitComponent{
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.line.attr({
+			this.wire.attr({
 				"stroke":selectionColor,
 				// "stroke-width": selectedWireWidth,
 			});
 		} else {
-			this.line.attr({
+			this.wire.attr({
 				"stroke":MainController.instance.darkMode?"#fff":"#000",
 				// "stroke-width": "0.4pt",
 			});
 		}
 	}
 
-	public toJson(): LineSaveObject {
-		let others:LineSegment[] = []
-		for (let index = 0; index < this.lineDirections.length; index++) {
-			let segment:LineSegment = {
+	public toJson(): WireSaveObject {
+		let others:WireSegment[] = []
+		for (let index = 0; index < this.wireDirections.length; index++) {
+			let segment:WireSegment = {
 				position:{
 					x:this.cornerPoints[index+1].x,
 					y:this.cornerPoints[index+1].y
 				},
-				direction: this.lineDirections[index]
+				direction: this.wireDirections[index]
 			}
 			others.push(segment)
 		}
 
-		let data:LineSaveObject = {
+		let data:WireSaveObject = {
 			type:"wire",
 			start:{x:this.cornerPoints[0].x,y:this.cornerPoints[0].y},
 			segments:others
@@ -298,16 +300,16 @@ export class LineComponent extends CircuitComponent{
 
 	public toTikzString(): string {
 		let outString = "\\draw "+this.cornerPoints[0].toTikzString()
-		for (let index = 0; index < this.lineDirections.length; index++) {
-			const dir = this.lineDirections[index]??"-|";
+		for (let index = 0; index < this.wireDirections.length; index++) {
+			const dir = this.wireDirections[index]??"-|";
 			const point = this.cornerPoints[index+1];
 			outString+=" "+dir+" "+point.toTikzString()
 		}
 		return outString+";"
 	}
 
-	public copyForPlacement(): LineComponent {
-		return new LineComponent();
+	public copyForPlacement(): WireComponent {
+		return new WireComponent();
 	}
 
 	public remove(): void {
@@ -326,7 +328,7 @@ export class LineComponent extends CircuitComponent{
 			let relToLastPoint = pos.sub(lastPoint)
 
 			this.lastPlacingDirection=this.directionVecFromPos(relToLastPoint,this.lastPlacingDirection)
-			this.lineDirections[this.lineDirections.length-1]=this.lineDirectionFromDirectionVec(this.lastPlacingDirection,ev)
+			this.wireDirections[this.wireDirections.length-1]=this.wireDirectionFromDirectionVec(this.lastPlacingDirection,ev)
 
 			this.cornerPoints[this.cornerPoints.length-1] = pos
 			this.update()
@@ -334,9 +336,9 @@ export class LineComponent extends CircuitComponent{
 	}
 
 	/**
-	 * This essentially adjusts the line direction if necessary. If the cursor crosses the axis perpendicular to the previous initial direction of the line segment, this axis should now be the initial direction of the line segment
+	 * This essentially adjusts the wire direction if necessary. If the cursor crosses the axis perpendicular to the previous initial direction of the wire segment, this axis should now be the initial direction of the wire segment
 	 * @param relPos the current position relative to the position of the previous point
-	 * @param lastDirection in which direction the line was previously starting
+	 * @param lastDirection in which direction the wire was previously starting
 	 * @returns the adjusted direction
 	 */
 	private directionVecFromPos(relPos:SVG.Point,lastDirection:SVG.Point):SVG.Point{
@@ -351,20 +353,20 @@ export class LineComponent extends CircuitComponent{
 		return dir
 	}
 
-	private lineDirectionFromDirectionVec(directionVec:SVG.Point,ev?:MouseEvent):LineDirection{
+	private wireDirectionFromDirectionVec(directionVec:SVG.Point,ev?:MouseEvent|TouchEvent):WireDirection{
 		if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
-			return LineDirection.Straight
+			return WireDirection.Straight
 		}else if (directionVec.x!=0) {
-			return LineDirection.HV
+			return WireDirection.HV
 		}else if(directionVec.y!=0){
-			return LineDirection.VH
+			return WireDirection.VH
 		}
 	}
 
 	public placeStep(pos: SVG.Point): boolean {
 		SnapCursorController.instance.visible=false
 		if (this.cornerPoints.length>0) {
-			//if there already exists a line, check if the same point was placed twice --> if so, the line placement should end
+			//if there already exists a wire, check if the same point was placed twice --> if so, the wire placement should end
 			let lastPoint = this.cornerPoints.at(-2) // there is never only one corner point in the array
 			if (pos.x==lastPoint.x&&pos.y==lastPoint.y) {
 				return true
@@ -374,7 +376,8 @@ export class LineComponent extends CircuitComponent{
 		}
 
 		this.cornerPoints.push(pos)
-		this.lineDirections.push(LineDirection.HV)
+		
+		this.wireDirections.push(WireDirection.HV)
 		this.lastPlacingDirection.x=1
 		this.lastPlacingDirection.y=0
 
@@ -391,12 +394,12 @@ export class LineComponent extends CircuitComponent{
 		
 		SnapCursorController.instance.visible=false
 		
-		// remove the point which was currently being placed (not actually part of the line)
+		// remove the point which was currently being placed (not actually part of the wire)
 		this.cornerPoints.pop()
-		this.lineDirections.pop()
+		this.wireDirections.pop()
 
 		if (this.cornerPoints.length<2) {
-			// if not event 2 corner points --> not a line
+			// if not event 2 corner points --> not a wire
 			MainController.instance.removeComponent(this)
 			return
 		}
@@ -417,27 +420,27 @@ export class LineComponent extends CircuitComponent{
 		this.finishedPlacing = true
 	}
 
-	public static fromJson(saveObject: LineSaveObject): LineComponent {
-		let lineComponent: LineComponent = new LineComponent()
-		lineComponent.cornerPoints.push(new SVG.Point(saveObject.start))
+	public static fromJson(saveObject: WireSaveObject): WireComponent {
+		let wireComponent: WireComponent = new WireComponent()
+		wireComponent.cornerPoints.push(new SVG.Point(saveObject.start))
 		if (Object.hasOwn(saveObject,"segments")) {
 			for (const segment of saveObject.segments) {
-				lineComponent.cornerPoints.push(new SVG.Point(segment.position))
-				lineComponent.lineDirections.push(segment.direction)
+				wireComponent.cornerPoints.push(new SVG.Point(segment.position))
+				wireComponent.wireDirections.push(segment.direction)
 			}
 		}else{
 			// @ts-ignore: backwards compatibility
 			for (const point of saveObject.others) {
-				let dir = point.dir==0?LineDirection.Straight:point.dir==1?LineDirection.HV:LineDirection.VH
+				let dir = point.dir==0?WireDirection.Straight:point.dir==1?WireDirection.HV:WireDirection.VH
 				// @ts-ignore: backwards compatibility
-				lineComponent.cornerPoints.push(new SVG.Point(point.x,point.y))
-				lineComponent.lineDirections.push(dir)
+				wireComponent.cornerPoints.push(new SVG.Point(point.x,point.y))
+				wireComponent.wireDirections.push(dir)
 			}
 		}
-		lineComponent.cornerPoints.push(new SVG.Point())
-		lineComponent.lineDirections.push(LineDirection.Straight)
-		lineComponent.placeFinish()
+		wireComponent.cornerPoints.push(new SVG.Point())
+		wireComponent.wireDirections.push(WireDirection.Straight)
+		wireComponent.placeFinish()
 
-		return lineComponent;
+		return wireComponent;
 	}
 }

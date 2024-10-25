@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, ExportController, FlipStateProperty, Label, MainController, NodeLabelProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
+import { BooleanProperty, CanvasController, ChoiceProperty, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, ExportController, Label, MainController, MathJaxProperty, SectionHeaderProperty, SliderProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
 import { selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export enum LabelAnchor {
@@ -15,8 +15,31 @@ export enum LabelAnchor {
 	southwest="south west"
 }
 
+const anchorDirectionMap = new Map<LabelAnchor,SVG.Point>([
+	[LabelAnchor.default, new SVG.Point(NaN,NaN)],
+	[LabelAnchor.center, new SVG.Point(0,0)],
+	[LabelAnchor.north, new SVG.Point(0,-1)],
+	[LabelAnchor.south, new SVG.Point(0,1)],
+	[LabelAnchor.east, new SVG.Point(1,0)],
+	[LabelAnchor.west, new SVG.Point(-1,0)],
+	[LabelAnchor.northeast, new SVG.Point(1,-1)],
+	[LabelAnchor.northwest, new SVG.Point(-1,-1)],
+	[LabelAnchor.southeast, new SVG.Point(1,1)],
+	[LabelAnchor.southwest, new SVG.Point(-1,1)]
+])
+const getAnchorFromDirection = function(direction:SVG.Point):LabelAnchor{
+	let roundedDir = new SVG.Point(Math.round(direction.x),Math.round(direction.y))
+	for (const [anchor,dir] of anchorDirectionMap) {
+		if (dir.x==roundedDir.x&&dir.y==roundedDir.y) {
+			return anchor
+		}
+	}
+	return LabelAnchor.default
+}
+
 export type NodeLabel = Label & {
 	anchor?:LabelAnchor
+	position?:LabelAnchor
 }
 
 export type NodeSaveObject = CircuitikzSaveObject & {
@@ -29,8 +52,12 @@ export type NodeSaveObject = CircuitikzSaveObject & {
 
 export class NodeComponent extends CircuitikzComponent{
 	private selectionRectangle: SVG.Rect = null;
-	public flipState:FlipStateProperty
-	public label: NodeLabelProperty;
+	
+	public anchorChoice: ChoiceProperty
+	public positionChoice: ChoiceProperty
+
+	public flipStateX:BooleanProperty
+	public flipStateY:BooleanProperty
 
 	constructor(symbol:ComponentSymbol){
 		super(symbol)
@@ -40,32 +67,46 @@ export class NodeComponent extends CircuitikzComponent{
 		this.visualization = CanvasController.instance.canvas.group()
 		this.visualization.add(this.symbolUse)
 		this.rotationDeg = 0
-
-		this.label = new NodeLabelProperty(this,{value:""})
-		this.label.label = "Label"
-		this.label.addChangeListener((ev)=>{
-			if (ev.value.value) {
-				if (!ev.previousValue||ev.previousValue.value!=ev.value.value) {
-					//rerender
-					this.generateLabelRender(this.label.getValue()).then(()=>Undo.addState())
-				}else{
-					this.updateLabelPosition()
-				}
-			}else{
-				ev.value.rendering?.remove()
-			}
-		})
-		this.editableProperties.push(this.label)
 		
-		this.flipState = new FlipStateProperty(this,new SVG.Point(1,1))
-		this.flipState.label = "Flip state"
-		this.flipState.addChangeListener(ev=>{
-			if (!ev.previousValue||ev.previousValue.x!=ev.value.x||ev.previousValue.y!=ev.value.y) {
-				this.update()
+		let updateWithTrack = (track:boolean=true)=>{
+			this.update()
+			if (track) {
 				Undo.addState()
 			}
-		})
-		this.editableProperties.push(this.flipState)
+		}
+
+		{
+			//label section
+			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
+
+			this.mathJaxLabel = new MathJaxProperty()
+			this.mathJaxLabel.addChangeListener(ev=>this.generateLabelRender())
+			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+	
+			this.anchorChoice = new ChoiceProperty("Anchor",LabelAnchor,LabelAnchor.default)
+			this.anchorChoice.addChangeListener(ev=>this.updateLabelPosition())
+			this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
+	
+			this.positionChoice = new ChoiceProperty("Position",LabelAnchor,LabelAnchor.default)
+			this.positionChoice.addChangeListener(ev=>this.updateLabelPosition())
+			this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
+	
+			this.labelDistance = new SliderProperty("Gap",-0.5,1,0.01,new SVG.Number(0.12,"cm"))
+			this.labelDistance.addChangeListener(ev=>this.updateLabelPosition())
+			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+		}
+		
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Symbol Orientation").buildHTML())
+
+		this.flipStateX = new BooleanProperty("Flip X",false)
+		this.flipStateX.addChangeListener(ev=>updateWithTrack())
+		this.propertiesHTMLRows.push(this.flipStateX.buildHTML())
+
+		this.flipStateY = new BooleanProperty("Flip Y",false)
+		this.flipStateY.addChangeListener(ev=>updateWithTrack())
+		this.propertiesHTMLRows.push(this.flipStateY.buildHTML())
+
+		this.addInfo()
 		
 		this.snappingPoints = symbol._pins.map(
 			(pin) => new SnapPoint(this, pin.name, pin.point)
@@ -76,16 +117,16 @@ export class NodeComponent extends CircuitikzComponent{
 		return new SVG.Matrix({
 			rotate:-this.rotationDeg,
 			origin:[this.position.x,this.position.y],
-			scaleX:this.flipState.getValue().x,
-			scaleY:this.flipState.getValue().y
+			scaleX:this.flipStateX.value?-1:1,
+			scaleY:this.flipStateY.value?-1:1
 		})
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
 		return new SVG.Matrix({
 			rotate:-this.rotationDeg,
-			scaleX:this.flipState.getValue().x,
-			scaleY:this.flipState.getValue().y
+			scaleX:this.flipStateX.value?-1:1,
+			scaleY:this.flipStateY.value?-1:1
 		})
 	}
 
@@ -103,26 +144,27 @@ export class NodeComponent extends CircuitikzComponent{
 	protected update(){
 		// if flip has different x and y signs and 180 degrees turn, simplify to flip only
 		if (this.rotationDeg==180) {
-			if (this.flipState.getValue().x*this.flipState.getValue().y<0) {
-				let currentFlipState = this.flipState.getValue().clone()
-				this.flipState.setValue(currentFlipState.mul(-1),true)
+			if (this.flipStateX.value?!this.flipStateY.value:this.flipStateY.value) {
+				this.flipStateX.value = !this.flipStateX.value
+				this.flipStateY.value = !this.flipStateY.value
+				this.flipStateX.updateHTML()
+				this.flipStateY.updateHTML()
 				this.rotationDeg=0;
-			}else if(this.flipState.getValue().x<0&&this.flipState.getValue().y<0){
-				this.flipState.setValue(new SVG.Point(1,1),true)
+			}else if(this.flipStateX.value&&this.flipStateY.value){
+				this.flipStateX.value = false
+				this.flipStateY.value = false
+				this.flipStateX.updateHTML()
+				this.flipStateY.updateHTML()
 				this.rotationDeg=0;
 			}
 		}
 		const tl = this.position.sub(this.referenceSymbol.relMid);
 		this.symbolUse.move(tl.x, tl.y);
-		this.symbolUse.transform(new SVG.Matrix({
-			rotate:-this.rotationDeg,
-			origin:[this.position.x,this.position.y],
-			scaleX:this.flipState.getValue().x,
-			scaleY:this.flipState.getValue().y
-		}))
+		let m = this.getTransformMatrix()
+		this.symbolUse.transform(m)
 
+		this._bbox = this.symbolUse.bbox().transform(m)
 		this.updateLabelPosition()
-		this._bbox = this.symbolUse.bbox().transform(this.getTransformMatrix())
 
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
@@ -152,29 +194,36 @@ export class NodeComponent extends CircuitikzComponent{
 		this.update()
 	}
 	public flip(horizontal: boolean): void {
-		let currentFlipState = this.flipState.getValue().clone()
+		let flipX = this.flipStateX.value
+		let flipY = this.flipStateY.value
 		if (this.rotationDeg%180==0) {
 			if (horizontal) {
-				currentFlipState.y*=-1;
+				flipY=!flipY
 			}else{
-				currentFlipState.x*=-1;
+				flipX=!flipX
 			}
 		}else{
 			if (horizontal) {
-				currentFlipState.x*=-1;
+				flipX=!flipX
 			}else{
-				currentFlipState.y*=-1;
+				flipY=!flipY
 			}
 		}
 		
 		// double flipping equals rotation by 180 deg
-		if (currentFlipState.x<0&&currentFlipState.y<0) {
-			currentFlipState.x=1
-			currentFlipState.y=1
+		if (flipX&&flipY) {
+			flipX=false
+			flipY=false
 			this.rotationDeg+=180;
 			this.simplifyRotationAngle()
-		}		
-		this.flipState.setValue(currentFlipState,true)
+		}
+		if (this.finishedPlacing) {
+			this.flipStateX.updateValue(flipX,true)
+			this.flipStateY.updateValue(flipY,true)
+		}else{
+			this.flipStateX.value = flipX
+			this.flipStateY.value = flipY
+		}
 		
 		this.update()
 	}
@@ -207,20 +256,21 @@ export class NodeComponent extends CircuitikzComponent{
 		if (this.rotationDeg!==0) {
 			data.rotation=this.rotationDeg
 		}
-		if (this.flipState.getValue().x<0) {
+		if (this.flipStateX.value) {
 			data.flipX = true
 		}
-		if (this.flipState.getValue().y<0) {
+		if (this.flipStateY.value) {
 			data.flipY = true
 		}
-		if (this.name.getValue()) {
-			data.name = this.name.getValue()
+		if (this.name.value) {
+			data.name = this.name.value
 		}
-		if (this.label.getValue()&&this.label.getValue().value) {
+		if (this.mathJaxLabel.value) {
 			let labelWithoutRender:NodeLabel = {
-				value:this.label.getValue().value,
-				anchor:this.label.getValue().anchor??undefined,
-				distance:this.label.getValue().distance.convertToUnit("px")??undefined
+				value:this.mathJaxLabel.value,
+				anchor:LabelAnchor[this.anchorChoice.value]??undefined,
+				position:LabelAnchor[this.positionChoice.value]??undefined,
+				distance:this.labelDistance.value??undefined
 			}
 			data.label = labelWithoutRender
 		}
@@ -228,48 +278,44 @@ export class NodeComponent extends CircuitikzComponent{
 		return data
 	}
 
-	private getLabelTikzOptionsString():string{
-		let labelDist = this.label.getValue().distance.convertToUnit("cm").minus(0.1).value
-		let label = this.label.getValue().value&&labelDist!=0?true:false
-		if (this.labelPos.x==0) {
-			if (this.labelPos.y==0) {
-				return "anchor=center"
-			} else if(this.labelPos.y==-1) {
-				return "anchor=north"+(label?", yshift="+(-labelDist).toPrecision(2)+"cm":"")
-			} else {
-				return "anchor=south"+(label?", yshift="+(labelDist).toPrecision(2)+"cm":"")
-			}
-		} else if(this.labelPos.x==-1) {
-			if (this.labelPos.y==0) {
-				return "anchor=west"+(label?", xshift="+(labelDist).toPrecision(2)+"cm":"")
-			} else if(this.labelPos.y==-1) {
-				return "anchor=north west"+(label?", xshift="+(labelDist).toPrecision(2)+"cm"+", yshift="+(-labelDist).toPrecision(2)+"cm":"")
-			} else {
-				return "anchor=south west"+(label?", xshift="+(labelDist).toPrecision(2)+"cm"+", yshift="+(labelDist).toPrecision(2)+"cm":"")
-			}
-		} else {
-			if (this.labelPos.y==0) {
-				return "anchor=east"+(label?", xshift="+(-labelDist).toPrecision(2)+"cm":"")
-			} else if(this.labelPos.y==-1) {
-				return "anchor=north east"+(label?", xshift="+(-labelDist).toPrecision(2)+"cm"+", yshift="+(-labelDist).toPrecision(2)+"cm":"")
-			} else {
-				return "anchor=south east"+(label?", xshift="+(-labelDist).toPrecision(2)+"cm"+", yshift="+(labelDist).toPrecision(2)+"cm":"")
-			}
-		}
-	}
-
 	public toTikzString(): string {
 		const optionsString = this.referenceSymbol.serializeTikzOptions();
 
-		let label = this.label.getValue()
-		let id = this.name.getValue()
-		if (!id&&label.value) {
-			id = "N"+ExportController.instance.exportID
+		let label = this.mathJaxLabel.value
+		let id = this.name.value
+		if (!id&&this.mathJaxLabel.value) {
+			id = ExportController.instance.exportID
 		}
 
-		let labelNodeStr:string
-		if (label.value) {
-			labelNodeStr = " node["+this.getLabelTikzOptionsString()+"] at ("+id+".text){$"+label.value+"$}"
+		let labelNodeStr = ""
+		if (this.mathJaxLabel.value) {
+			let labelStr = "anchor="+this.labelPos
+			
+			let labelDist = this.labelDistance.value.convertToUnit("cm")
+			
+			if (this.anchorChoice.value==LabelAnchor.default) {
+				labelDist = labelDist.minus(0.12)
+			}
+
+			let labelShift = anchorDirectionMap.get(this.labelPos).mul(-labelDist.value)
+			let posShift = ""
+			if (labelShift.x!==0) {
+				posShift+="xshift="+labelShift.x.toPrecision(2)+"cm"
+			}
+			if (labelShift.y!==0) {
+				posShift += posShift==""?"":", "
+				posShift+="yshift="+(-labelShift.y).toPrecision(2)+"cm"
+			}
+			posShift = posShift==""?"":"["+posShift+"]"
+
+			let pos = getAnchorFromDirection(anchorDirectionMap.get(this.positionChoice.value as LabelAnchor).transform(new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				scaleX:this.flipStateX.value?-1:1,
+				scaleY:this.flipStateY.value?-1:1
+			})))
+			let posStr = this.positionChoice.value==LabelAnchor.default?id+".text":id+"."+pos
+
+			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){$"+this.mathJaxLabel.value+"$}"
 		}
 		
 		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same
@@ -278,14 +324,14 @@ export class NodeComponent extends CircuitikzComponent{
 			this.referenceSymbol.tikzName +
 			(optionsString ? ", " + optionsString : "") +
 			(this.rotationDeg !== 0 ? `, rotate=${this.rotationDeg}` : "") +
-			(this.flipState.getValue().x < 0 ? `, xscale=-1` : "") +
-			(this.flipState.getValue().y < 0 ? `, yscale=-1` : "") +
+			(this.flipStateX.value ? `, xscale=-1` : "") +
+			(this.flipStateY.value ? `, yscale=-1` : "") +
 			"] " +
 			(id ? "(" + id + ") " : "") +
 			"at " +
 			this.position.toTikzString() +
 			" {}"+
-			(label.value?labelNodeStr:"")
+			labelNodeStr
 			+";"
 		);
 	}
@@ -293,7 +339,7 @@ export class NodeComponent extends CircuitikzComponent{
 		SnapDragHandler.snapDrag(this,false)
 		this.visualization.remove()
 		this.viewSelected(false)
-		this.label.getValue()?.rendering?.remove()
+		this.labelRendering?.remove()
 	}
 
 	public draggable(drag: boolean): void {
@@ -322,6 +368,7 @@ export class NodeComponent extends CircuitikzComponent{
 		// make draggable
 		this.draggable(true)
 		this.update()
+		this.finishedPlacing=true
 	}
 
 	public static fromJson(saveObject:NodeSaveObject): NodeComponent{
@@ -333,29 +380,27 @@ export class NodeComponent extends CircuitikzComponent{
 			nodeComponent.rotationDeg = saveObject.rotation
 		}
 
-		let currentFlipState = nodeComponent.flipState.getValue().clone()
 		if (saveObject.flipX) {
-			currentFlipState.x = -1
-		}else if(saveObject.flipY){
-			currentFlipState.y = -1
+			nodeComponent.flipStateX.updateValue(saveObject.flipX,true)
 		}
-		nodeComponent.flipState.setValue(currentFlipState)
+		if(saveObject.flipY){
+			nodeComponent.flipStateY.updateValue(saveObject.flipY,true)
+		}
 
 		if (saveObject.name) {
-			nodeComponent.name.setValue(saveObject.name)
+			nodeComponent.name.updateValue(saveObject.name,true)
 		}
 
 		if (saveObject.label) {
 			if (Object.hasOwn(saveObject.label,"value")) {
-				saveObject.label.distance=new SVG.Number(saveObject.label.distance)
-				nodeComponent.label.setValue(saveObject.label)
+				nodeComponent.labelDistance.updateValue(saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0),true)
+				nodeComponent.anchorChoice.updateValue(saveObject.label.anchor??LabelAnchor.default,true)
+				nodeComponent.positionChoice.updateValue(saveObject.label.position??LabelAnchor.default,true)
+				nodeComponent.mathJaxLabel.updateValue(saveObject.label.value,true)
 			}else{
-				// @ts-ignore
-				nodeComponent.label.setValue({value:saveObject.label})
+				//@ts-ignore
+				nodeComponent.mathJaxLabel.value = (saveObject.label)
 			}
-			nodeComponent.generateLabelRender(nodeComponent.label.getValue())
-		}else{
-			nodeComponent.label.setValue({value: ""})
 		}
 		nodeComponent.placeFinish()
 
@@ -365,73 +410,55 @@ export class NodeComponent extends CircuitikzComponent{
 	public copyForPlacement(): NodeComponent {
 		let newComponent = new NodeComponent(this.referenceSymbol)
 		newComponent.rotationDeg = this.rotationDeg;
-		newComponent.flipState.setValue(this.flipState.getValue(),false)
+		newComponent.flipStateX.value = this.flipStateX.value
+		newComponent.flipStateY.value = this.flipStateY.value
 		return newComponent
 	}
 
-	private labelPos:SVG.Point
+	private labelPos:LabelAnchor
 	public updateLabelPosition(): void {
 		// currently working only with 90 deg rotation steps
-		if (!this.label||!this.label.getValue()||this.label.getValue().value===""||!this.label.getValue().rendering) {
+		if (!this.mathJaxLabel.value||!this.labelRendering) {
 			return
 		}
-		let label = this.label.getValue()
-		let labelSVG = this.label.getValue().rendering
+		let label = this.mathJaxLabel.value
+		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
 		// get relevant positions and bounding boxes
-		let textPos = this.referenceSymbol._textPosition.point.add(this.position).transform(transformMatrix)
+		let textPos:SVG.Point
+		if (this.positionChoice.value==LabelAnchor.default) {
+			textPos = this.referenceSymbol._textPosition.point.add(this.position).transform(transformMatrix)
+		}else{
+			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
+			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
+			textPos = pos.add(bboxHalfSize.mul(anchorDirectionMap.get(this.positionChoice.value as LabelAnchor)))
+		}
 		let labelBBox = labelSVG.bbox()
 
 		// calculate where on the label the anchor point should be
 		let labelRef:SVG.Point;
-		let labelDist = label.distance.convertToUnit("px").value??0;
-		switch (label.anchor) {
-			case LabelAnchor.default:
-				let clamp = function(value:number,min:number,max:number){
-					if (value<min) {
-						return min
-					}else if(value>max){
-						return max
-					}else{
-						return value
-					}
+		let labelDist = this.labelDistance.value.convertToUnit("px").value??0;
+		if (this.anchorChoice.value==LabelAnchor.default) {
+			let clamp = function(value:number,min:number,max:number){
+				if (value<min) {
+					return min
+				}else if(value>max){
+					return max
+				}else{
+					return value
 				}
-				let useBBox = this.symbolUse.bbox().transform(transformMatrix)
-				let horizontalTextPosition = clamp(Math.round(2*(useBBox.cx-textPos.x)/useBBox.w),-1,1)		
-				let verticalTextPosition = clamp(Math.round(2*(useBBox.cy-textPos.y)/useBBox.h),-1,1)	
-				labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
-				break;
-			case LabelAnchor.center:
-				labelRef = new SVG.Point(0,0)
-				break;
-			case LabelAnchor.north:
-				labelRef = new SVG.Point(0,1)
-				break;
-			case LabelAnchor.south:
-				labelRef = new SVG.Point(0,-1)
-				break;
-			case LabelAnchor.east:
-				labelRef = new SVG.Point(-1,0)
-				break;
-			case LabelAnchor.west:
-				labelRef = new SVG.Point(1,0)
-				break;
-			case LabelAnchor.northeast:
-				labelRef = new SVG.Point(-1,1)
-				break;
-			case LabelAnchor.northwest:
-				labelRef = new SVG.Point(1,1)
-				break;
-			case LabelAnchor.southeast:
-				labelRef = new SVG.Point(-1,-1)
-				break;
-			case LabelAnchor.southwest:
-				labelRef = new SVG.Point(1,-1)
-				break;
-			default:
-				break;
-		}		
-		this.labelPos = labelRef
+			}
+			let useBBox = this.symbolUse.bbox().transform(transformMatrix)
+			let horizontalTextPosition = clamp(Math.round(2*(useBBox.cx-textPos.x)/useBBox.w),-1,1)		
+			let verticalTextPosition = clamp(Math.round(2*(useBBox.cy-textPos.y)/useBBox.h),-1,1)	
+			labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
+
+			//reset to center before actually checking where it should go
+			this.labelPos = getAnchorFromDirection(labelRef)
+		}else{
+			labelRef = anchorDirectionMap.get(this.anchorChoice.value as LabelAnchor)
+			this.labelPos = this.anchorChoice.value as LabelAnchor
+		}
 		
 		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w,labelBBox.h)).add(labelRef.mul(labelDist))
 		

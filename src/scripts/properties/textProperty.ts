@@ -3,23 +3,29 @@ import { EditableProperty, Undo } from "../internal"
 export class TextProperty extends EditableProperty<string>{
 	private input:HTMLInputElement
 	private invalidDiv:HTMLDivElement
-	
-	public buildHTML(container:HTMLElement): void {
-		let row = document.createElement("div") as HTMLDivElement
-		row.classList.add("row","g-2", "my-2")
 
-		let span = document.createElement("span") as HTMLSpanElement
-		span.classList.add("col-3","form-label")
-		span.innerHTML = this._label??""
-		row.appendChild(span)
+	private label:string;
+
+	public constructor(label:string,initalValue?:string){
+		super(initalValue)
+		this.label = label
+	}
+	
+	public buildHTML(): HTMLElement {
+		let row = this.getRow()
 		
 		let inputDiv = document.createElement("div") as HTMLDivElement
-		inputDiv.classList.add("col","col-md-12")
+		inputDiv.classList.add("col","col-md-12","my-0","input-group", "has-validation")
 		{
+			let labelSpan = document.createElement("span") as HTMLSpanElement
+			labelSpan.classList.add("input-group-text")
+			labelSpan.innerHTML = this.label??""
+			inputDiv.appendChild(labelSpan)
+
 			this.input = document.createElement("input") as HTMLInputElement
-			this.input.classList.add("w-100","form-control")
+			this.input.classList.add("form-control")
 			this.input.setAttribute("type","text")
-			this.input.value = this._value??""
+			this.input.value = this.value??""
 			inputDiv.appendChild(this.input)
 			
 			this.invalidDiv = document.createElement("div") as HTMLDivElement
@@ -28,19 +34,20 @@ export class TextProperty extends EditableProperty<string>{
 		}
 		row.appendChild(inputDiv)
 
+		let previousState = ""
 		this.input.addEventListener("focusin",(ev)=>{
-			this.lastValue = this._value??""
+			previousState = this.value??""
 		})
 		this.input.addEventListener("input",(ev)=>{
 			this.updateValue(this.input.value)
 		})
 
 		this.input.addEventListener("focusout",(ev)=>{
-			if (this.lastValue!==undefined&&this.getValue()!==undefined&&this.lastValue!==this.getValue()) {
+			if (this.value&&previousState!==this.value) {
 				Undo.addState()
 			}
 		})
-		container.appendChild(row)
+		return row
 	}
 
 	public changeInvalidStatus(msg:string){
@@ -51,19 +58,20 @@ export class TextProperty extends EditableProperty<string>{
 				this.invalidDiv.innerHTML=""
 			}else{
 				this.input.classList.add("is-invalid")
+				this.input.classList.add("is-invalid")
 				this.invalidDiv.classList.remove("d-none")
 				this.invalidDiv.innerHTML="Invalid! "+msg
 			}
 		}
 	}
 
-	public getValue(): string {
-		return this._value
-	}
-	public setValue(value: string, updateHTML=true): void {
-		this._value = value
-		if (this.input&&updateHTML) {
-			this.input.value = value
+	public updateHTML(): void {
+		if (this.input) {
+			this.input.value = this.value
 		}
+	}
+
+	public eq(first: string, second: string): boolean {
+		return first==second
 	}
 }

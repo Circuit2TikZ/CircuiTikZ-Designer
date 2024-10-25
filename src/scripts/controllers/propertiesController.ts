@@ -48,10 +48,7 @@ export class PropertyController{
 	private setForm(component:CircuitComponent){		
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = component.displayName
-		
-		for (const property of component.editableProperties) {
-			property.buildHTML(this.propertiesEntries)
-		}
+		this.propertiesEntries.append(...component.propertiesHTMLRows)
 	}
 	
 	private setFormGrid(){

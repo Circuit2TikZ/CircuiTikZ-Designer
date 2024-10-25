@@ -33,11 +33,26 @@ export class ExportController {
 
 	private defaultDisplay: string
 
-	// TODO make this resilient to existing IDs
+	private idPrefix="N"
 	private _exportID: number = 0;
-	public get exportID(): number {
+	public get exportID(): string {
 		this._exportID++
-		return this._exportID;
+		let outID = this.idPrefix+this._exportID
+		while (this.isIDUsed(outID)) {
+			this._exportID++
+			outID = this.idPrefix+this._exportID
+		}
+		return outID;
+	}
+
+	private isIDUsed(id:string):boolean{
+		for (const component of MainController.instance.circuitComponents) {
+			// check if another component with the same name already exists
+			if (component instanceof CircuitikzComponent && component.name.getValue()==id) {
+				return true
+			}
+		}
+		return false
 	}
 
 	/**
