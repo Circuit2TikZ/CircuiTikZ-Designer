@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { EditableProperty, MainController, SnapPoint, ZOrderProperty, SnappingInfo } from "../internal";
+import { EditableProperty, MainController, SnapPoint, ZOrderProperty, SnappingInfo, ButtonGridProperty, CanvasController, SectionHeaderProperty } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 /**
@@ -41,7 +41,13 @@ export abstract class CircuitComponent{
 	/**
 	 * If the component is currently selected by the selection controller
 	 */
-	public isSelected:boolean = false
+	private _isSelected: boolean = false;
+	public get isSelected(): boolean {
+		return this._isSelected;
+	}
+	public set isSelected(value: boolean) {
+		this._isSelected = value;
+	}
 
 	/**
 	 * the cached bounding box of the component. Useful for example for the selection controller
@@ -74,9 +80,29 @@ export abstract class CircuitComponent{
 		MainController.instance.addComponent(this)
 
 		this.displayName="Circuit Component"
-
+		this.addZOrdering()
+		this.addPositioning()
+	}
+	
+	protected addZOrdering(){
 		// all components should receive the possiblity to change their draw order/z order/depth
-		this.propertiesHTMLRows.push(new ZOrderProperty(this).buildHTML())
+		let ordering = new ButtonGridProperty(2,[["To Foreground",""],["To Background",""],["Move Forward",""],["Move Backward",""]],[
+			(ev)=>CanvasController.instance.componentToForeground(this),
+			(ev)=>CanvasController.instance.componentToBackground(this),
+			(ev)=>CanvasController.instance.moveComponentForward(this),
+			(ev)=>CanvasController.instance.moveComponentBackward(this)
+		])
+		this.propertiesHTMLRows.push(ordering.buildHTML())
+	}
+
+	protected addPositioning(){
+		let positioning = new ButtonGridProperty(2,[["Rotate CW","rotate_right"],["Rotate CCW","rotate_left"],["Flip X",["flip","rotateText"]],["Flip Y","flip"]],[
+			(ev)=>this.rotate(-90),
+			(ev)=>this.rotate(90),
+			(ev)=>this.flip(true),
+			(ev)=>this.flip(false)
+		])
+		this.propertiesHTMLRows.push(positioning.buildHTML())
 	}
 
 	/**

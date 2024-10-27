@@ -22,7 +22,6 @@ export class ChoiceProperty extends EditableProperty<string|number>{
 		{			
 			let anchorLabel = document.createElement("label") as HTMLLabelElement
 			anchorLabel.classList.add("input-group-text")
-			anchorLabel.setAttribute("for","labelAnchor")
 			anchorLabel.innerHTML = this.label
 			col.appendChild(anchorLabel)
 
@@ -31,7 +30,6 @@ export class ChoiceProperty extends EditableProperty<string|number>{
 
 			this.selectElement = document.createElement("select") as HTMLSelectElement
 			this.selectElement.classList.add("form-select")
-			this.selectElement.id = "labelAnchor"
 			this.selectElement.name = "anchor"
 			for (let index = 0; index < labelKeys.length; index++) {
 				const labelKey = labelKeys[index];

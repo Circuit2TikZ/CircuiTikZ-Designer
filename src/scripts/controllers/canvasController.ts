@@ -174,7 +174,35 @@ export class CanvasController {
 		}))
 	}
 
-	public bringComponentToFront(component: CircuitComponent){
+	public moveComponentForward(component:CircuitComponent){
+		if (MainController.instance.circuitComponents.length<2) {
+			return
+		}
+		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
+		if (idx<0||idx==MainController.instance.circuitComponents.length-1) {
+			return
+		}
+		let switchComponent = MainController.instance.circuitComponents[idx+1]
+		component.visualization.insertAfter(switchComponent.visualization)
+		MainController.instance.circuitComponents[idx]=switchComponent
+		MainController.instance.circuitComponents[idx+1]=component
+	}
+
+	public moveComponentBackward(component:CircuitComponent){
+		if (MainController.instance.circuitComponents.length<2) {
+			return
+		}
+		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
+		if (idx<1) {
+			return
+		}
+		let switchComponent = MainController.instance.circuitComponents[idx-1]
+		component.visualization.insertBefore(switchComponent.visualization)
+		MainController.instance.circuitComponents[idx]=switchComponent
+		MainController.instance.circuitComponents[idx-1]=component
+	}
+
+	public componentToForeground(component: CircuitComponent){
 		if (MainController.instance.circuitComponents.length<2) {
 			return
 		}
@@ -187,7 +215,7 @@ export class CanvasController {
 		Undo.addState()
 	}
 
-	public moveComponentToBack(component: CircuitComponent){
+	public componentToBackground(component: CircuitComponent){
 		if (MainController.instance.circuitComponents.length<2) {
 			return
 		}

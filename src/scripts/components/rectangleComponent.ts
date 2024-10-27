@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SnapCursorController, SnapDragHandler, SnappingInfo } from "../internal";
+import { anchorDirectionMap, CanvasController, CircuitComponent, ColorProperty, ComponentSaveObject, LabelAnchor, MainController, SelectionController, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint } from "../internal";
 import { selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type RectangleSaveObject = ComponentSaveObject & {
@@ -65,6 +65,32 @@ export class RectangleComponent extends CircuitComponent{
 
 		SnapCursorController.instance.visible = true;
 		this.snappingPoints = []
+
+		//TODO add color property
+		this.propertiesHTMLRows.push(new ColorProperty("Fill",null).buildHTML())
+	}
+
+	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
+		let relPositions:{anchorname:string,relPos:SVG.Point}[] = []
+		let halfSize = new SVG.Point(Math.abs(this.firstPoint.x-this.secondPoint.x)/2,Math.abs(this.firstPoint.y-this.secondPoint.y)/2)
+		for (const anchor of Object.values(LabelAnchor)) {
+			if (anchor==LabelAnchor.default) {
+				continue
+			}			
+			relPositions.push({relPos:halfSize.mul(anchorDirectionMap.get(anchor)),anchorname:anchor})
+		}
+		if (!this.snappingPoints||this.snappingPoints.length==0) {
+			for (const element of relPositions) {
+				this.snappingPoints.push(new SnapPoint(this,element.anchorname,element.relPos))
+			}
+		}else{
+			for (let index = 0; index < relPositions.length; index++) {
+				const relPos = relPositions[index].relPos;
+				const snappingPoint = this.snappingPoints[index];
+				snappingPoint.updateRelPosition(relPos)
+				snappingPoint.recalculate(new SVG.Matrix())
+			}
+		}
 	}
 
 	public updateTheme(): void {
@@ -91,11 +117,11 @@ export class RectangleComponent extends CircuitComponent{
 
 	public getSnappingInfo(): SnappingInfo {
 		return {
-			trackedSnappingPoints:[],
+			trackedSnappingPoints:this.snappingPoints,
 			additionalSnappingPoints:[],
 		}
-		// throw new Error("Method not implemented.");
 	}
+
 	public draggable(drag: boolean): void {
 		if (drag) {
 			this.rectangleDrag.node.classList.add("draggable")
@@ -104,6 +130,33 @@ export class RectangleComponent extends CircuitComponent{
 		}
 		SnapDragHandler.snapDrag(this,drag,this.rectangleDrag)
 	}
+
+	public resizeable(resizeable:boolean){
+		let originalPos:SVG.Point
+		let originalSize:SVG.Point
+		const getInitialDim = ()=>{
+			originalPos = this.position.clone()
+			originalSize = this.firstPoint.sub(this.secondPoint)
+			originalSize.x = Math.abs(originalSize.x)
+			originalSize.y = Math.abs(originalSize.y)
+		}
+		// AdjustDragHandler.snapDrag(this, this.startCircle, drag, {
+		// 	dragStart: (pos)=>{
+		// 		getInitialDim()
+		// 	},
+		// 	dragMove: (pos)=>{
+		// 		this.moveStartTo(pos)
+		// 	},
+		// 	dragEnd:()=>{Undo.addState()}
+		// })
+		// AdjustDragHandler.snapDrag(this, this.endCircle, drag, {
+		// 	dragMove: (pos)=>{
+		// 		this.moveEndTo(pos)
+		// 	},
+		// 	dragEnd:()=>{Undo.addState()}
+		// })
+	}
+
 	public moveTo(position: SVG.Point): void {
 		let delta = position.sub(this.position)
 		this.firstPoint = this.firstPoint.add(delta)
@@ -111,10 +164,12 @@ export class RectangleComponent extends CircuitComponent{
 		this.update()
 	}
 	public rotate(angleDeg: number): void {
-		throw new Error("Method not implemented.");
+		this.firstPoint = this.firstPoint.rotate(angleDeg,this.position)
+		this.secondPoint = this.secondPoint.rotate(angleDeg,this.position)
+		this.update()
 	}
 	public flip(horizontal: boolean): void {
-		throw new Error("Method not implemented.");
+		//doesn't do anything for rectangles
 	}
 	protected update(): void {
 		let halfstroke = this.strokeInfo.width/2
@@ -123,25 +178,26 @@ export class RectangleComponent extends CircuitComponent{
 
 		this.rectangleDrag.move(upperLeft.x,upperLeft.y).size(lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
 
+		this.size = lowerRight.sub(upperLeft)
+
 		upperLeft = upperLeft.add(halfstroke)
 		lowerRight = lowerRight.sub(halfstroke)
 
 		this.position = lowerRight.add(upperLeft).div(2)
-		this.size = lowerRight.sub(upperLeft)
 		if (this.size.x<0) {
 			this.size.x=0
 		}
 		if (this.size.y<0) {
 			this.size.y=0
 		}
-
-		this._bbox = new SVG.Box(upperLeft.x,upperLeft.y,this.size.x,this.size.y)
-
-		this.rectangle.size(this.size.x,this.size.y)
+		
+		this.rectangle.size(this.size.x-this.strokeInfo.width,this.size.y-this.strokeInfo.width)
 		this.rectangle.move(upperLeft.x,upperLeft.y)
-
+		this._bbox = new SVG.Box(upperLeft.x-halfstroke,upperLeft.y-halfstroke,this.size.x,this.size.y)
+		
 		this.relPosition = this.position.sub(upperLeft)
 		this.recalculateSelectionVisuals()
+		this.recalculateSnappingPoints()
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionRectangle) {
@@ -167,6 +223,7 @@ export class RectangleComponent extends CircuitComponent{
 			this.visualization.stroke("#000")
 			this.selectionRectangle = null
 		}
+		this.resizeable(this.isSelected&&SelectionController.instance.currentlySelectedComponents.length<2)
 	}
 	public toJson(): RectangleSaveObject {
 		return {
@@ -191,6 +248,7 @@ export class RectangleComponent extends CircuitComponent{
 	}
 	public remove(): void {
 		this.visualization.remove()
+		this.selectionRectangle?.remove()
 	}
 	public placeMove(pos: SVG.Point, ev?: Event): void {
 		if (!this.firstPoint) {
@@ -210,6 +268,7 @@ export class RectangleComponent extends CircuitComponent{
 			this.rectangle.show()
 			this.placeMove(pos,ev)
 			this.updateTheme()
+			SnapCursorController.instance.visible=false
 			return false
 		}else{
 			this.secondPoint = pos
@@ -225,7 +284,7 @@ export class RectangleComponent extends CircuitComponent{
 			this.placeStep(new SVG.Point())
 		}
 		this.rectangle.show()
-		this.draggable(true)
+		this.draggable(true)		
 		this.update()
 		SnapCursorController.instance.visible=false
 	}

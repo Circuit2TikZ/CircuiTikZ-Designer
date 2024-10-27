@@ -50,8 +50,7 @@ export class SnapPoint extends SVG.Point {
 				const container = CanvasController.instance.canvas;
 				this.element = container.circle(4).fill("none").stroke({color:moving?"green":"red",width:1})
 				container.add(this.element);
-				let bbox = this.element.bbox()
-				this.element.move(this.x-bbox.w/2,this.y-bbox.h/2);
+				this.element.center(this.x,this.y);
 			}
 		}else{
 			this.element?.remove()

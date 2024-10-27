@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty } from "../internal"
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor, pathPointRadius } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor } from "../utils/selectionHelper";
 
 
 export type PathLabel = Label & {
@@ -208,8 +208,8 @@ export class PathComponent extends CircuitikzComponent{
 		let startEnd = this.relSymbolStart.rotate(this.rotationDeg).add(this.position)
 		let endStart = this.relSymbolEnd.rotate(this.rotationDeg).add(this.position)
 
-		this.startCircle.move(this.posStart.x-pathPointRadius,this.posStart.y-pathPointRadius)
-		this.endCircle.move(this.posEnd.x-pathPointRadius,this.posEnd.y-pathPointRadius)
+		this.startCircle.center(this.posStart.x,this.posStart.y)
+		this.endCircle.center(this.posEnd.x,this.posEnd.y)
 
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)

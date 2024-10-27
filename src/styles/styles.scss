@@ -59,6 +59,10 @@ $danger: #c50f3c;
 // 	align-self: stretch;
 // }
 
+.rotateText{
+	transform: rotate(90deg);
+}
+
 
 #loadingSpinner > div{
 	margin-top: -50%;

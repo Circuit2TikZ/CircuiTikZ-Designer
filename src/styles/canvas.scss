@@ -12,6 +12,9 @@ svg.mainCanvas {
 .draggable {
 	cursor: grab;
 }
+// .draggable:hover{
+// 	box-shadow: 5;
+// }
 
 .draggable.dragging,
 .dragging {
@@ -24,8 +27,9 @@ svg.mainCanvas {
 }
 
 .draggable.pathPoint:hover {
-	stroke: #d44;
-	stroke-dasharray: 5;
+	stroke: green;
+	stroke-dasharray: 3;
+	cursor: grab;
 }
 
 .eraseCursor,

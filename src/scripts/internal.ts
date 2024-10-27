@@ -17,9 +17,11 @@ export * from "./properties/choiceProperty"
 export * from "./properties/textProperty"
 export * from "./properties/infoProperty"
 export * from "./properties/zorderProperty"
+export * from "./properties/buttonGridProperty"
 export * from "./properties/mathjaxProperty"
 export * from "./properties/sliderProperty"
 export * from "./properties/sectionHeaderProperty"
+export * from "./properties/colorProperty"
 // components
 export * from "./components/circuitComponent";
 export * from "./components/circuitikzComponent";

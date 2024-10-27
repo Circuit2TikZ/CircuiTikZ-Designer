@@ -15,7 +15,7 @@ export enum LabelAnchor {
 	southwest="south west"
 }
 
-const anchorDirectionMap = new Map<LabelAnchor,SVG.Point>([
+export const anchorDirectionMap = new Map<LabelAnchor,SVG.Point>([
 	[LabelAnchor.default, new SVG.Point(NaN,NaN)],
 	[LabelAnchor.center, new SVG.Point(0,0)],
 	[LabelAnchor.north, new SVG.Point(0,-1)],
@@ -56,8 +56,8 @@ export class NodeComponent extends CircuitikzComponent{
 	public anchorChoice: ChoiceProperty
 	public positionChoice: ChoiceProperty
 
-	public flipStateX:BooleanProperty
-	public flipStateY:BooleanProperty
+	public flipStateX:boolean
+	public flipStateY:boolean
 
 	constructor(symbol:ComponentSymbol){
 		super(symbol)
@@ -95,16 +95,6 @@ export class NodeComponent extends CircuitikzComponent{
 			this.labelDistance.addChangeListener(ev=>this.updateLabelPosition())
 			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
 		}
-		
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Symbol Orientation").buildHTML())
-
-		this.flipStateX = new BooleanProperty("Flip X",false)
-		this.flipStateX.addChangeListener(ev=>updateWithTrack())
-		this.propertiesHTMLRows.push(this.flipStateX.buildHTML())
-
-		this.flipStateY = new BooleanProperty("Flip Y",false)
-		this.flipStateY.addChangeListener(ev=>updateWithTrack())
-		this.propertiesHTMLRows.push(this.flipStateY.buildHTML())
 
 		this.addInfo()
 		
@@ -117,16 +107,16 @@ export class NodeComponent extends CircuitikzComponent{
 		return new SVG.Matrix({
 			rotate:-this.rotationDeg,
 			origin:[this.position.x,this.position.y],
-			scaleX:this.flipStateX.value?-1:1,
-			scaleY:this.flipStateY.value?-1:1
+			scaleX:this.flipStateX?-1:1,
+			scaleY:this.flipStateY?-1:1
 		})
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
 		return new SVG.Matrix({
 			rotate:-this.rotationDeg,
-			scaleX:this.flipStateX.value?-1:1,
-			scaleY:this.flipStateY.value?-1:1
+			scaleX:this.flipStateX?-1:1,
+			scaleY:this.flipStateY?-1:1
 		})
 	}
 
@@ -144,17 +134,13 @@ export class NodeComponent extends CircuitikzComponent{
 	protected update(){
 		// if flip has different x and y signs and 180 degrees turn, simplify to flip only
 		if (this.rotationDeg==180) {
-			if (this.flipStateX.value?!this.flipStateY.value:this.flipStateY.value) {
-				this.flipStateX.value = !this.flipStateX.value
-				this.flipStateY.value = !this.flipStateY.value
-				this.flipStateX.updateHTML()
-				this.flipStateY.updateHTML()
+			if (this.flipStateX?!this.flipStateY:this.flipStateY) {
+				this.flipStateX = !this.flipStateX
+				this.flipStateY = !this.flipStateY
 				this.rotationDeg=0;
-			}else if(this.flipStateX.value&&this.flipStateY.value){
-				this.flipStateX.value = false
-				this.flipStateY.value = false
-				this.flipStateX.updateHTML()
-				this.flipStateY.updateHTML()
+			}else if(this.flipStateX&&this.flipStateY){
+				this.flipStateX = false
+				this.flipStateY = false
 				this.rotationDeg=0;
 			}
 		}
@@ -194,8 +180,8 @@ export class NodeComponent extends CircuitikzComponent{
 		this.update()
 	}
 	public flip(horizontal: boolean): void {
-		let flipX = this.flipStateX.value
-		let flipY = this.flipStateY.value
+		let flipX = this.flipStateX
+		let flipY = this.flipStateY
 		if (this.rotationDeg%180==0) {
 			if (horizontal) {
 				flipY=!flipY
@@ -217,13 +203,8 @@ export class NodeComponent extends CircuitikzComponent{
 			this.rotationDeg+=180;
 			this.simplifyRotationAngle()
 		}
-		if (this.finishedPlacing) {
-			this.flipStateX.updateValue(flipX,true)
-			this.flipStateY.updateValue(flipY,true)
-		}else{
-			this.flipStateX.value = flipX
-			this.flipStateY.value = flipY
-		}
+		this.flipStateX = flipX
+		this.flipStateY = flipY
 		
 		this.update()
 	}
@@ -256,10 +237,10 @@ export class NodeComponent extends CircuitikzComponent{
 		if (this.rotationDeg!==0) {
 			data.rotation=this.rotationDeg
 		}
-		if (this.flipStateX.value) {
+		if (this.flipStateX) {
 			data.flipX = true
 		}
-		if (this.flipStateY.value) {
+		if (this.flipStateY) {
 			data.flipY = true
 		}
 		if (this.name.value) {
@@ -310,8 +291,8 @@ export class NodeComponent extends CircuitikzComponent{
 
 			let pos = getAnchorFromDirection(anchorDirectionMap.get(this.positionChoice.value as LabelAnchor).transform(new SVG.Matrix({
 				rotate: -this.rotationDeg,
-				scaleX:this.flipStateX.value?-1:1,
-				scaleY:this.flipStateY.value?-1:1
+				scaleX:this.flipStateX?-1:1,
+				scaleY:this.flipStateY?-1:1
 			})))
 			let posStr = this.positionChoice.value==LabelAnchor.default?id+".text":id+"."+pos
 
@@ -324,8 +305,8 @@ export class NodeComponent extends CircuitikzComponent{
 			this.referenceSymbol.tikzName +
 			(optionsString ? ", " + optionsString : "") +
 			(this.rotationDeg !== 0 ? `, rotate=${this.rotationDeg}` : "") +
-			(this.flipStateX.value ? `, xscale=-1` : "") +
-			(this.flipStateY.value ? `, yscale=-1` : "") +
+			(this.flipStateX ? `, xscale=-1` : "") +
+			(this.flipStateY ? `, yscale=-1` : "") +
 			"] " +
 			(id ? "(" + id + ") " : "") +
 			"at " +
@@ -381,10 +362,10 @@ export class NodeComponent extends CircuitikzComponent{
 		}
 
 		if (saveObject.flipX) {
-			nodeComponent.flipStateX.updateValue(saveObject.flipX,true)
+			nodeComponent.flipStateX = saveObject.flipX
 		}
 		if(saveObject.flipY){
-			nodeComponent.flipStateY.updateValue(saveObject.flipY,true)
+			nodeComponent.flipStateY = saveObject.flipY
 		}
 
 		if (saveObject.name) {
@@ -410,8 +391,8 @@ export class NodeComponent extends CircuitikzComponent{
 	public copyForPlacement(): NodeComponent {
 		let newComponent = new NodeComponent(this.referenceSymbol)
 		newComponent.rotationDeg = this.rotationDeg;
-		newComponent.flipStateX.value = this.flipStateX.value
-		newComponent.flipStateY.value = this.flipStateY.value
+		newComponent.flipStateX = this.flipStateX
+		newComponent.flipStateY = this.flipStateY
 		return newComponent
 	}
 
