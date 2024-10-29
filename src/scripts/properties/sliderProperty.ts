@@ -14,12 +14,31 @@ export class SliderProperty extends EditableProperty<SVG.Number>{
 	private numberInput:HTMLInputElement
 	private unitLabel:HTMLLabelElement
 
+	private fractionDigits:number
+	private integerDigits:number
+
 	public constructor(label:string,min:number,max:number,step:number,initalValue?:SVG.Number){
 		super(initalValue)
 		this.label = label
 		this.min = min
 		this.max = max
 		this.step = step
+
+		if (step>0) {
+			this.fractionDigits=0
+			let stepTemp=step
+			while (stepTemp<1) {
+				stepTemp*=10
+				this.fractionDigits+=1
+			}
+		}
+
+		this.integerDigits=1
+		let maxDigits = Math.max(Math.abs(min),Math.abs(max))
+		while (maxDigits>1) {
+			this.integerDigits+=1
+			maxDigits/=10
+		}
 	}
 
 	public buildHTML(): HTMLElement {
@@ -27,7 +46,7 @@ export class SliderProperty extends EditableProperty<SVG.Number>{
 
 		let col = document.createElement("div") as HTMLDivElement
 		col.classList.add("col-12","my-0","input-group","d-flex","flex-row","w-100")
-		{
+		
 			let distanceLabel = document.createElement("label") as HTMLLabelElement
 			distanceLabel.classList.add("input-group-text","fs-6")
 			distanceLabel.innerHTML=this.label
@@ -45,9 +64,10 @@ export class SliderProperty extends EditableProperty<SVG.Number>{
 			col.appendChild(this.numberInput)
 	
 			this.unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
+			// this.unitLabel.style.width="30%"
 			let update = ()=>{
-				this.updateUnitLabel()
 				this.updateValue(new SVG.Number(Number.parseFloat(this.numberInput.value),this.value.unit))
+				this.updateUnitLabel()
 			}
 			update()
 			col.appendChild(this.unitLabel)
@@ -56,13 +76,17 @@ export class SliderProperty extends EditableProperty<SVG.Number>{
 			this.numberInput.addEventListener("change",()=>{
 				Undo.addState()
 			})
-		}
+		
 		row.appendChild(col)
 		return row
 	}
 
 	private updateUnitLabel(){
-		this.unitLabel.innerText=this.value.value.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})+" "+this.value.unit
+		this.unitLabel.innerText=this.value.value.toLocaleString(undefined, {
+			minimumFractionDigits:this.fractionDigits,
+			maximumFractionDigits:this.fractionDigits,
+			// minimumIntegerDigits:this.integerDigits,
+		})+" "+this.value.unit
 	}
 
 	public updateHTML(): void {

@@ -212,11 +212,12 @@ export class SelectionController {
 	}
 
 	public selectAll(){
+		this.currentlySelectedComponents.splice(0)
+		this.currentlySelectedComponents.push(...MainController.instance.circuitComponents)
+
 		for (const component of MainController.instance.circuitComponents) {
 			component.isSelected = true
 		}
-		this.currentlySelectedComponents.splice(0)
-		this.currentlySelectedComponents.push(...MainController.instance.circuitComponents)
 
 		this.viewSelection();
 	}

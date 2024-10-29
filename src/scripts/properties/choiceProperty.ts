@@ -1,18 +1,18 @@
 import { EditableProperty, Undo } from "../internal";
 
-export class ChoiceProperty extends EditableProperty<string|number>{
+export class ChoiceProperty extends EditableProperty<{key:string,name:string}>{
 
 	private label:string
 	private selectElement:HTMLSelectElement
-	private choiceOptions:{[key:string]:string|number}
+	private choiceOptions:{key:string,name:string}[]
 
-	public constructor(label:string, choiceOptions:{[key:string]:string|number}, initialValue?:string|number){
+	public constructor(label:string, choiceOptions:{key:string,name:string}[], initialValue?:{key:string,name:string}){
 		super(initialValue)
 		this.label = label
 		this.choiceOptions=choiceOptions
 	}
-	public eq<T=string|number>(first: T, second: T): boolean {
-		return first==second
+	public eq(first: {key:string,name:string}, second: {key:string,name:string}): boolean {
+		return first.key==second.key&&first.name==second.name
 	}
 	public buildHTML(): HTMLElement {
 		let row = this.getRow()
@@ -25,25 +25,22 @@ export class ChoiceProperty extends EditableProperty<string|number>{
 			anchorLabel.innerHTML = this.label
 			col.appendChild(anchorLabel)
 
-			let labelKeys = Object.keys(this.choiceOptions)
-			let labelValues = Object.values(this.choiceOptions)
-
 			this.selectElement = document.createElement("select") as HTMLSelectElement
 			this.selectElement.classList.add("form-select")
 			this.selectElement.name = "anchor"
-			for (let index = 0; index < labelKeys.length; index++) {
-				const labelKey = labelKeys[index];
-				const labelValue = labelValues[index];
+			for (let index = 0; index < this.choiceOptions.length; index++) {
+				const labelKey = this.choiceOptions[index].key;
+				const labelName = this.choiceOptions[index].name;
 	
 				let optionElement = document.createElement("option") as HTMLOptionElement
 				optionElement.value = labelKey
-				optionElement.innerHTML = typeof labelValue == "string"?labelValue:labelValue.toString()
-				optionElement.selected = this.value?labelValue==this.value:false
+				optionElement.innerHTML = labelName
+				optionElement.selected = this.value?labelKey==this.value.key:false
 				this.selectElement.appendChild(optionElement)	
 			}
 
 			this.selectElement.addEventListener("change", (ev)=>{
-				this.updateValue(this.choiceOptions[this.selectElement.value])
+				this.updateValue(this.choiceOptions.find((el)=>el.key==this.selectElement.value))
 				Undo.addState()
 			})
 			col.appendChild(this.selectElement)
@@ -53,11 +50,8 @@ export class ChoiceProperty extends EditableProperty<string|number>{
 	}
 	public updateHTML(): void {
 		if (this.selectElement) {
-			let key = Object.entries(this.choiceOptions).find((value)=>{
-				return value[1]==this.value
-			})[0]
 			for (const optionElement of this.selectElement.children) {
-				(optionElement as HTMLOptionElement).selected = (optionElement as HTMLOptionElement).value==key
+				(optionElement as HTMLOptionElement).selected = (optionElement as HTMLOptionElement).value==this.value.key
 			}
 		}
 	}

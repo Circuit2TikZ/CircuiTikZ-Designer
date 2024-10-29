@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { EditableProperty, MainController, SnapPoint, ZOrderProperty, SnappingInfo, ButtonGridProperty, CanvasController, SectionHeaderProperty } from "../internal";
+import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 /**
@@ -10,6 +10,41 @@ export type ComponentSaveObject = {
 	type: string
 	selected?:boolean
 }
+
+export type DirectionInfo = {
+	key:string,
+	name:string,
+	direction:SVG.Point,
+	pointer?:string
+}
+
+/**
+ * A type encompassing all information needed for the label
+ */
+export type Label = {
+	value: string
+	rendering?: SVG.Element
+	distance?: SVG.Number
+}
+
+export type PositionedLabel = Label & {
+	anchor?:string
+	position?:string
+}
+
+export const basicDirections:DirectionInfo[]=[
+	{key:"default",name:"default",direction:new SVG.Point(NaN,NaN)},
+	{key:"center",name:"center",direction:new SVG.Point()},
+	{key:"north",name:"north",direction:new SVG.Point(0,-1),pointer:"ns-resize"},
+	{key:"south",name:"south",direction:new SVG.Point(0,1),pointer:"ns-resize"},
+	{key:"east",name:"east",direction:new SVG.Point(1,0),pointer:"ew-resize"},
+	{key:"west",name:"west",direction:new SVG.Point(-1,0),pointer:"ew-resize"},
+	{key:"northeast",name:"north east",direction:new SVG.Point(1,-1),pointer:"nesw-resize"},
+	{key:"northwest",name:"north west",direction:new SVG.Point(-1,-1),pointer:"nwse-resize"},
+	{key:"southeast",name:"south east",direction:new SVG.Point(1,1),pointer:"nwse-resize"},
+	{key:"southwest",name:"south west",direction:new SVG.Point(-1,1),pointer:"nesw-resize"},
+]
+export const defaultBasicDirection=basicDirections[0]
 
 /**
  * Every component in the circuit should be deriving from this class.
@@ -41,13 +76,8 @@ export abstract class CircuitComponent{
 	/**
 	 * If the component is currently selected by the selection controller
 	 */
-	private _isSelected: boolean = false;
-	public get isSelected(): boolean {
-		return this._isSelected;
-	}
-	public set isSelected(value: boolean) {
-		this._isSelected = value;
-	}
+	public isSelected: boolean = false;
+	protected isResizing:boolean = false
 
 	/**
 	 * the cached bounding box of the component. Useful for example for the selection controller
@@ -69,6 +99,10 @@ export abstract class CircuitComponent{
 	 * A List of all the Snapping points of this component
 	 */
 	public snappingPoints: SnapPoint[];
+
+	
+	protected mathJaxLabel: MathJaxProperty
+	protected labelRendering: SVG.Element
 
 	/**
 	 * The default constructor giving basic functionality. Never call this directly (only via super() in the constructor of the derived class).
@@ -115,6 +149,13 @@ export abstract class CircuitComponent{
 	 * @param drag if dragging should be enabled
 	 */
 	public abstract draggable(drag: boolean):void
+
+	/**
+	 * Set this component resizable or not
+	 * @param resize if resizing should be enabled
+	 */
+	public abstract resizable(resize: boolean):void
+	protected abstract recalculateResizePoints():void
 
 	/**
 	 * Move the component to the specified position
@@ -263,4 +304,106 @@ export abstract class CircuitComponent{
 	 * Called by ComponentPlacer after {@link placeStep}==true to clean up the component placement. Also instantly finishes the placement when called
 	 */
 	public abstract placeFinish():void // call this to force the placement to finish
+
+	/**
+	 * Generate a label visualization via mathjax
+	 * @param label the data for which to generate the label visualization
+	 * @returns a Promise<void>
+	 */
+	protected async generateLabelRender():Promise<void>{
+		// @ts-ignore
+		window.MathJax.texReset();
+		// @ts-ignore
+		return window.MathJax.tex2svgPromise(this.mathJaxLabel.value,{}).then((node: Element) =>{	
+			// mathjax renders the text via an svg container. That container also contains definitions and SVG.Use elements. get that container
+			let svgElement = new SVG.Svg(node.querySelector("svg"))
+
+			// if a previous label was rendered, remove everything concerning that rendering
+			if (this.labelRendering) {
+				let removeIDs = new Set<string>()
+				for (const element of this.labelRendering.find("use")) {
+					removeIDs.add(element.node.getAttribute("xlink:href"))
+				}
+
+				for (const id of removeIDs) {
+					let element = CanvasController.instance.canvas.node.getElementById(id)
+					if (element) {
+						CanvasController.instance.canvas.node.removeChild(element)
+					}
+				}
+			}
+
+			// move the label definitions to the overall definitions of the canvas
+			let backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
+			let defs = svgElement.findOne("defs") as SVG.Defs
+			for (const def of defs.children()) {
+				backgroundDefs.put(def)
+			}
+			defs.remove()
+			
+			//1.545 magic number (how large 1em, i.e. font size, is in terms of ex) for the font used in MathJax. 
+			//6.5 = normal font size for tikz??? This should be 10pt for the normalsize in latex? If measuring via 2 lines 1 cm apart(28.34pt), you need 6.5pt to match up with the tikz rendering!?
+			let expt = (1/1.545)*6.5
+			//convert width and height from ex to pt via expt and then to px
+			let widthStr = svgElement.node.getAttribute("width")
+			let width = new SVG.Number(new SVG.Number(widthStr).value*expt,"pt").convertToUnit("px");
+			let heightStr = svgElement.node.getAttribute("height")
+			let height = new SVG.Number(new SVG.Number(heightStr).value*expt,"pt").convertToUnit("px");
+			let size = new SVG.Point(width.value,height.value)
+			
+
+			// remove unnecessary data
+			for (const elementGroup of svgElement.find("use")) {
+				elementGroup.node.removeAttribute("data-c")
+			}
+			let groupElements = svgElement.find("g") as SVG.List<SVG.G>
+			for (const elementGroup of groupElements) {
+				elementGroup.node.removeAttribute("data-mml-node")
+			}
+			// remove unnecessary svg groups
+			for (const elementGroup of groupElements) {
+				let children = elementGroup.children()
+				if (children.length==1&&!elementGroup.node.hasAttributes()) {
+					elementGroup.parent().put(children[0])
+					elementGroup.remove()
+				}
+			}
+
+			// the current rendering svg viewbox
+			let svgViewBox = svgElement.viewbox()
+
+			// scale such that px size is actually correct for rendering
+			let scale = size.div(new SVG.Point(svgViewBox.w,svgViewBox.h))
+			//move the rendering to local 0,0
+			let translate = new SVG.Point(-svgViewBox.x,-svgViewBox.y).mul(scale)
+			let m = new SVG.Matrix({
+				scaleX:scale.x,
+				scaleY:scale.y,
+				translateX:translate.x,
+				translateY:translate.y
+			})
+			// add all symbol components to a group
+			let transformGroup = new SVG.G()
+			for (const child of svgElement.children()) {
+				transformGroup.add(child)
+			}
+			// apply the transformation --> the symbol is now at the origin with the correct size and no rotation
+			transformGroup.transform(m)
+
+			// remove the current label and substitute with a new group element
+			this.labelRendering?.remove()
+			let rendering = new SVG.G()
+			rendering.addClass("pointerNone")
+			rendering.add(transformGroup)
+			// add the label rendering to the visualization element
+			this.visualization.add(rendering)
+			this.labelRendering = rendering
+			this.update()
+		})
+	}
+
+	/**
+	 * Updates the position of the label when moving/rotating... Override this!
+	 */
+	public abstract updateLabelPosition():void
 }

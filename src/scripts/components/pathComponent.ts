@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty } from "../internal"
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, pathPointSVG, selectionColor } from "../utils/selectionHelper";
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController } from "../internal"
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG } from "../utils/selectionHelper";
 
 
 export type PathLabel = Label & {
@@ -33,8 +33,8 @@ export class PathComponent extends CircuitikzComponent{
 
 	private selectionRectangle: SVG.Rect = null;
 
-	private startCircle:SVG.Circle;
-	private endCircle:SVG.Circle;
+	private startSVG:SVG.Element;
+	private endSVG:SVG.Element;
 
 	private mirror:BooleanProperty
 	private invert:BooleanProperty
@@ -68,12 +68,6 @@ export class PathComponent extends CircuitikzComponent{
 		this.visualization.add(this.startLine)
 		this.visualization.add(this.endLine)
 		this.visualization.hide()
-		
-		this.startCircle = pathPointSVG()
-		this.visualization.add(this.startCircle)
-		
-		this.endCircle = pathPointSVG()
-		this.visualization.add(this.endCircle)
 
 		let updateWithTrack = (track:boolean=true)=>{
 			this.update()
@@ -208,9 +202,7 @@ export class PathComponent extends CircuitikzComponent{
 		let startEnd = this.relSymbolStart.rotate(this.rotationDeg).add(this.position)
 		let endStart = this.relSymbolEnd.rotate(this.rotationDeg).add(this.position)
 
-		this.startCircle.center(this.posStart.x,this.posStart.y)
-		this.endCircle.center(this.posEnd.x,this.posEnd.y)
-
+		this.recalculateResizePoints()
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
 		
@@ -267,6 +259,7 @@ export class PathComponent extends CircuitikzComponent{
 				"stroke":MainController.instance.darkMode?"#fff":"#000",
 			});
 		}
+		this.resizable(this.isSelected&&show&&SelectionController.instance.currentlySelectedComponents.length==1)
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
@@ -356,42 +349,67 @@ export class PathComponent extends CircuitikzComponent{
 	}
 	public remove(): void {
 		SnapDragHandler.snapDrag(this,false)
-		AdjustDragHandler.snapDrag(this,this.startCircle,false)
-		AdjustDragHandler.snapDrag(this,this.endCircle,false)
+		if (this.startSVG) {
+			AdjustDragHandler.snapDrag(this,this.startSVG,false)
+			this.startSVG.remove()
+		}
+		if (this.endSVG) {
+			AdjustDragHandler.snapDrag(this,this.endSVG,false)
+			this.endSVG.remove()
+		}
 		this.visualization.remove()
 		this.viewSelected(false)
 		this.labelRendering?.remove()
 	}
 
 	public draggable(drag: boolean): void {
-		// this.startCircle.draggable(drag)
-		// this.endCircle.draggable(drag)
 		if (drag) {
 			this.symbolUse.node.classList.add("draggable");
-			this.startCircle.node.classList.add("draggable")
-			this.startCircle.node.classList.remove("d-none")
-			this.endCircle.node.classList.add("draggable")
-			this.endCircle.node.classList.remove("d-none")
 		}else{
 			this.symbolUse.node.classList.remove("draggable");
-			this.startCircle.node.classList.remove("draggable")
-			this.startCircle.node.classList.add("d-none")
-			this.endCircle.node.classList.remove("draggable")
-			this.endCircle.node.classList.add("d-none")
 		}
 		SnapDragHandler.snapDrag(this, drag)
-		AdjustDragHandler.snapDrag(this, this.startCircle, drag, {
-			dragMove: (pos)=>{
-				this.moveStartTo(pos)
-			},
-			dragEnd:()=>{Undo.addState()}
-		})
-		AdjustDragHandler.snapDrag(this, this.endCircle, drag, {
-			dragMove: (pos)=>{
-				this.moveEndTo(pos)
-			},
-			dragEnd:()=>{Undo.addState()}
-		})
+		
+	}
+
+	protected recalculateResizePoints(): void {
+		this.startSVG?.center(this.posStart.x,this.posStart.y)
+		this.endSVG?.center(this.posEnd.x,this.posEnd.y)
+	}
+
+	public resizable(resize: boolean): void {
+		if (this.isResizing==resize) {
+			return
+		}
+		this.isResizing=resize
+		if (resize) {
+			this.startSVG = resizeSVG()
+			this.startSVG.node.style.cursor = "grab"
+			this.visualization.add(this.startSVG)
+			
+			this.endSVG = resizeSVG()
+			this.endSVG.node.style.cursor = "grab"
+			this.visualization.add(this.endSVG)
+
+			AdjustDragHandler.snapDrag(this, this.startSVG, true, {
+				dragMove: (pos)=>{
+					this.moveStartTo(pos)
+				},
+				dragEnd:()=>{Undo.addState()}
+			})
+			AdjustDragHandler.snapDrag(this, this.endSVG, true, {
+				dragMove: (pos)=>{
+					this.moveEndTo(pos)
+				},
+				dragEnd:()=>{Undo.addState()}
+			})
+		}else{
+			AdjustDragHandler.snapDrag(this, this.startSVG, false)
+			AdjustDragHandler.snapDrag(this, this.endSVG, false)
+			this.startSVG?.remove()
+			this.endSVG?.remove()
+		}
+		this.update()
 	}
 
 	public placeMove(pos: SVG.Point): void {

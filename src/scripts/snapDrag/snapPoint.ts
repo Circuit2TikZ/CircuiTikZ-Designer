@@ -4,6 +4,7 @@
 
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitComponent } from "../internal";
+import { selectionColor } from "../utils/selectionHelper";
 
 /**
  * Realizes a point which is relative to another point. This can be used to recreate CircuiTikZ anchors, which are
@@ -48,7 +49,7 @@ export class SnapPoint extends SVG.Point {
 		if (show) {
 			if (!this.element) {
 				const container = CanvasController.instance.canvas;
-				this.element = container.circle(4).fill("none").stroke({color:moving?"green":"red",width:1})
+				this.element = container.circle(4).fill("none").stroke({color:moving?"var(--bs-cyan)":selectionColor,width:1})
 				container.add(this.element);
 				this.element.center(this.x,this.y);
 			}

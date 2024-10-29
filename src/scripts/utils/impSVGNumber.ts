@@ -155,6 +155,13 @@ declare module "@svgdotjs/svg.js" {
 		eq(other:Point, eps?:number):boolean
 		toTikzString(): string;
 	}
+
+	interface Color{
+		/**
+		 * convert the color to tikz format
+		 */
+		toTikzString():string
+	}
 }
 
 
@@ -581,13 +588,10 @@ SVG.extend(SVG.Point, {
 	 * @returns true if the points are equal
 	 */
 	eq(other:SVG.Point, eps:number=1e-7):boolean{
-		if (this.x < other.x-eps || this.x > other.x+eps) {
-			return false
+		if ((this.x > other.x-eps) && (this.x < other.x+eps) && (this.y > other.y-eps) && (this.y < other.y+eps)) {
+			return true
 		}
-		if (this.y < other.y-eps || this.y > other.y+eps) {
-			return false
-		}
-		return true
+		return false
 	},
 
 	/**
@@ -608,3 +612,11 @@ SVG.extend(SVG.Point, {
 		return `(${x}, ${y})`;
 	},
 });
+
+
+SVG.extend(SVG.Color,{
+	toTikzString():string{
+		let color:SVG.Color = this.rgb()
+		return "{rgb,}"
+	}
+})

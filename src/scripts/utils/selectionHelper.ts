@@ -2,13 +2,19 @@ import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController } from "../internal";
 
 export const selectedBoxWidth = "0.4pt"
-export const selectionColor = "#d44"
+export const selectionColor = "var(--bs-red)"
 
 export const pathPointRadius = 8
 export function pathPointSVG(){
 	let circle = CanvasController.instance.canvas.circle(pathPointRadius*2).fill("transparent")
 	circle.node.classList.add("pathPoint")
 	return circle
+}
+
+export function resizeSVG():SVG.Element{
+	//TODO update to include larger invisible circle to grab
+	//should change to symbol and use
+	return CanvasController.instance.canvas.rect(5,5).fill("var(--bs-cyan)")
 }
 
 /**

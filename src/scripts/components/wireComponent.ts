@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SnapCursorController, SnappingInfo, SnapPoint } from "../internal"
+import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SelectionController, SnapCursorController, SnappingInfo, SnapPoint, Undo } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, resizeSVG, selectionColor } from "../utils/selectionHelper";
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -32,6 +32,9 @@ export type WireSaveObject = ComponentSaveObject &  {
  * The component responsible for multi segmented wires (polylines)/wires
  */
 export class WireComponent extends CircuitComponent{
+	public updateLabelPosition(): void {
+		//not needed for wires 
+	}
 	
 	/**
 	 * the corner points when drawing
@@ -120,58 +123,83 @@ export class WireComponent extends CircuitComponent{
 		}
 		// actually enable/disable dragging for the wire itself. This should be done with the draggable wire
 		SnapDragHandler.snapDrag(this,drag,this.draggableWire)
-
-		// pre calculate the direction of the wire as a vector from the wiredirection objects
-		let dirs:SVG.Point[] = []
-		for (let index = 0; index < this.wireDirections.length; index++) {
-			let rel = this.cornerPoints[index+1].sub(this.cornerPoints[index])
-			dirs[index] = this.wireDirections[index] == WireDirection.VH?
-														new SVG.Point(0,Math.sign(rel.y)):
-														new SVG.Point(Math.sign(rel.x),0)
+	}
+	
+	public resizable(resize: boolean): void {
+		if (resize==this.isResizing) {
+			return
 		}
-
-		// add dragging to all corner points
-		for (let index = 0; index < this.adjustmentPoints.length; index++) {
-			const element = this.adjustmentPoints[index];
-			if (drag) {
-				element.node.classList.add("draggable")
-				element.node.classList.remove("d-none")
-			}else{
-				element.node.classList.remove("draggable")
-				element.node.classList.add("d-none")
+		this.isResizing=resize
+		if (resize) {
+			// pre calculate the direction of the wire as a vector from the wiredirection objects
+			let dirs:SVG.Point[] = []
+			for (let index = 0; index < this.wireDirections.length; index++) {
+				let rel = this.cornerPoints[index+1].sub(this.cornerPoints[index])
+				dirs[index] = this.wireDirections[index] == WireDirection.VH?
+															new SVG.Point(0,Math.sign(rel.y)):
+															new SVG.Point(Math.sign(rel.x),0)
 			}
-			AdjustDragHandler.snapDrag(this,element,drag,{
-				dragMove:(pos,ev)=>{
-					if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
-						// wires from and to this point should be straight
-						if (index>0) {
-							this.wireDirections[index-1]=WireDirection.Straight
+	
+			// add dragging to all corner points
+			for (let index = 0; index < this.cornerPoints.length; index++) {
+				const element = resizeSVG();
+				element.node.style.cursor="move"
+				this.adjustmentPoints.push(element)
+
+
+				AdjustDragHandler.snapDrag(this,element,resize,{
+					dragMove:(pos,ev)=>{
+						if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
+							// wires from and to this point should be straight
+							if (index>0) {
+								this.wireDirections[index-1]=WireDirection.Straight
+							}
+							if (index<this.wireDirections.length) {
+								this.wireDirections[index]=WireDirection.Straight
+							}
+						}else{
+							// change the wire direction if necessary
+							if (index>0) {
+								// from the last point to this point
+								dirs[index-1] = this.directionVecFromPos(pos.sub(this.cornerPoints[index-1]),dirs[index-1])
+								this.wireDirections[index-1]=this.wireDirectionFromDirectionVec(dirs[index-1],ev)
+							}
+							if (index<this.adjustmentPoints.length-1) {
+								// from this point to the next point
+								let rel = pos.sub(this.cornerPoints[index+1])
+								dirs[index] = this.directionVecFromPos(rel,dirs[index])
+								let dir = dirs[index].x!=0?new SVG.Point(0,rel.y):new SVG.Point(rel.x,0)
+								this.wireDirections[index]=this.wireDirectionFromDirectionVec(dir,ev)
+							}
 						}
-						if (index<this.wireDirections.length) {
-							this.wireDirections[index]=WireDirection.Straight
-						}
-					}else{
-						// change the wire direction if necessary
-						if (index>0) {
-							// from the last point to this point
-							dirs[index-1] = this.directionVecFromPos(pos.sub(this.cornerPoints[index-1]),dirs[index-1])
-							this.wireDirections[index-1]=this.wireDirectionFromDirectionVec(dirs[index-1],ev)
-						}
-						if (index<this.adjustmentPoints.length-1) {
-							// from this point to the next point
-							let rel = pos.sub(this.cornerPoints[index+1])
-							dirs[index] = this.directionVecFromPos(rel,dirs[index])
-							let dir = dirs[index].x!=0?new SVG.Point(0,rel.y):new SVG.Point(rel.x,0)
-							this.wireDirections[index]=this.wireDirectionFromDirectionVec(dir,ev)
-						}
-					}
-					this.cornerPoints[index].x=pos.x
-					this.cornerPoints[index].y=pos.y
-					this.update()
-				}
-			})
+						this.cornerPoints[index].x=pos.x
+						this.cornerPoints[index].y=pos.y
+						this.update()
+					},
+					dragEnd() {
+						Undo.addState()
+					},
+				})
+			}
+			this.update()
+		}else{
+			for (const point of this.adjustmentPoints) {
+				AdjustDragHandler.snapDrag(this, point, false)
+				point.remove()
+			}
+			this.adjustmentPoints = []
 		}
 	}
+	protected recalculateResizePoints(){
+		let halfsize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
+		for (let index = 0; index < this.adjustmentPoints.length; index++) {
+			const viz = this.adjustmentPoints[index];
+			const point = this.cornerPoints[index];
+			
+			viz.center(point.x,point.y)
+		}
+	}
+
 	public moveTo(position: SVG.Point): void {
 		for (let index = 0; index < this.cornerPoints.length; index++) {
 			this.cornerPoints[index] = this.cornerPoints[index].sub(this.position).add(position)
@@ -205,11 +233,6 @@ export class WireComponent extends CircuitComponent{
 		}
 	}
 	protected update(): void {
-		//update the points where the wire can be adjusted
-		for (let index = 0; index < this.adjustmentPoints.length; index++) {
-			this.adjustmentPoints[index].move(this.cornerPoints[index].x-pathPointRadius,this.cornerPoints[index].y-pathPointRadius)
-		}
-
 		// generate all the points in the wire from the corner points and the wire directions
 		let pointArray = new SVG.PointArray(this.cornerPoints[0].toArray())
 		for (let index = 0; index < this.wireDirections.length; index++) {
@@ -239,6 +262,7 @@ export class WireComponent extends CircuitComponent{
 		// update visuals
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
+		this.recalculateResizePoints()
 	}
 	protected recalculateSelectionVisuals(): void {}
 
@@ -274,6 +298,7 @@ export class WireComponent extends CircuitComponent{
 				// "stroke-width": "0.4pt",
 			});
 		}
+		this.resizable(this.isSelected&&show&&SelectionController.instance.currentlySelectedComponents.length==1)
 	}
 
 	public toJson(): WireSaveObject {
@@ -406,14 +431,7 @@ export class WireComponent extends CircuitComponent{
 
 		this.snappingPoints = [new SnapPoint(this,"START",this.cornerPoints[0].sub(this.position)),
 								new SnapPoint(this,"END",this.cornerPoints.at(-1).sub(this.position))]
-		
-		// add the corner adjustment points
-		for (const cornerPoint of this.cornerPoints) {
-			let element = pathPointSVG().move(cornerPoint.x-pathPointRadius,cornerPoint.y-pathPointRadius)
-			this.visualization.add(element)
-			this.adjustmentPoints.push(element)
-		}
-		
+				
 		this.draggable(true)
 		this.update()
 

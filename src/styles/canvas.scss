@@ -27,7 +27,7 @@ svg.mainCanvas {
 }
 
 .draggable.pathPoint:hover {
-	stroke: green;
+	stroke: var(--bs-cyan);
 	stroke-dasharray: 3;
 	cursor: grab;
 }
