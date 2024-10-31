@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitComponent, ComponentSaveObject, MainController, SelectionController, SnapCursorController, SnappingInfo, SnapPoint, Undo } from "../internal"
+import { CanvasController, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapController, SnapCursorController, SnappingInfo, SnapPoint, Undo } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
 import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, resizeSVG, selectionColor } from "../utils/selectionHelper";
 
@@ -24,10 +24,30 @@ export type WireSegment = {
  * a wire consists of a starting position and at least one wire segment
  */
 export type WireSaveObject = ComponentSaveObject &  {
-	start: {x:number, y:number}
-	segments: WireSegment[]
+	start: {x:number, y:number},
+	segments: WireSegment[],
+	startArrow?:string,
+	endArrow?:string,
 }
 
+export type ArrowTip={
+	key:string,
+	name:string,
+	tikz:string,
+	setBack:number
+}
+
+export const arrowTips:ArrowTip[]=[
+	{key:"none",name:'none',tikz:"",setBack:0},
+	{key:"stealth",name:"stealth",tikz:"stealth",setBack:7},
+	{key:"stealthR",name:"stealth reversed",tikz:"stealth reversed",setBack:3},
+	{key:"latex",name:"latex",tikz:"latex",setBack:10},
+	{key:"latexR",name:"latex reversed",tikz:"latex reversed",setBack:0},
+	{key:"to",name:"to",tikz:"to",setBack:1},
+	{key:"toR",name:"to reversed",tikz:"to reversed",setBack:4},
+	{key:"line",name:"line",tikz:"|",setBack:0}
+]
+export const defaultArrowTip = arrowTips[0]
 /**
  * The component responsible for multi segmented wires (polylines)/wires
  */
@@ -49,12 +69,16 @@ export class WireComponent extends CircuitComponent{
 
 	// essentially the main visualisation
 	private wire:SVG.Polyline
+	private wireWidth:SVG.Number
 	// a wider copy of wire, but invisible, Meant for dragging the wire
 	private draggableWire:SVG.Polyline
 	private draggingWireWidth=10
 
 	// the svg elements where adjusting the wire is possible
 	private adjustmentPoints:SVG.Element[]=[]
+
+	private arrowEnd:ChoiceProperty<ArrowTip>
+	private arrowStart:ChoiceProperty<ArrowTip>
 	
 	constructor(){
 		super()
@@ -65,10 +89,11 @@ export class WireComponent extends CircuitComponent{
 
 		this.visualization = CanvasController.instance.canvas.group()
 		this.wire = CanvasController.instance.canvas.polyline()
+		this.wireWidth = new SVG.Number("0.4pt").convertToUnit("px")
 		this.wire.attr({
 			fill: "none",
 			stroke: MainController.instance.darkMode?"#fff":"#000",
-			"stroke-width": "0.4pt",
+			"stroke-width": this.wireWidth.toString(),
 		});
 		this.draggableWire = CanvasController.instance.canvas.polyline()
 		this.draggableWire.attr({
@@ -80,6 +105,35 @@ export class WireComponent extends CircuitComponent{
 		this.visualization.add(this.wire)
 		this.visualization.add(this.draggableWire)
 		this.snappingPoints=[]
+		
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Arrows").buildHTML())
+		this.arrowStart = new ChoiceProperty("Start", arrowTips, defaultArrowTip)
+		this.arrowStart.addChangeListener(ev=>{
+			this.updateArrows()
+			this.update()
+		})
+		this.propertiesHTMLRows.push(this.arrowStart.buildHTML())
+
+		this.arrowEnd = new ChoiceProperty("End", arrowTips, defaultArrowTip)
+		this.arrowEnd.addChangeListener(ev=>{
+			this.updateArrows()
+			this.update()
+		})
+		this.propertiesHTMLRows.push(this.arrowEnd.buildHTML())
+	}
+
+	private updateArrows(){
+		if (this.arrowStart.value.key==defaultArrowTip.key) {
+			this.wire.node.style.markerStart = ""
+		}else{
+			this.wire.node.style.markerStart = `url(#${this.arrowStart.value.key})`
+		}
+
+		if (this.arrowEnd.value.key==defaultArrowTip.key) {
+			this.wire.node.style.markerEnd = ""
+		}else{
+			this.wire.node.style.markerEnd = `url(#${this.arrowEnd.value.key})`
+		}
 	}
 
 	public updateTheme(): void {
@@ -94,9 +148,6 @@ export class WireComponent extends CircuitComponent{
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		// first update the relative positions of the snapping points w.r.t. the wire, i.e. the start and end positions
-		this.snappingPoints[0]?.updateRelPosition(this.cornerPoints[0].sub(this.position))
-		this.snappingPoints[1]?.updateRelPosition(this.cornerPoints.at(-1).sub(this.position))
 		super.recalculateSnappingPoints()
 	}
 
@@ -200,6 +251,10 @@ export class WireComponent extends CircuitComponent{
 		}
 	}
 
+	public getPureBBox(): SVG.Box {
+		return this.wire.bbox()
+	}
+
 	public moveTo(position: SVG.Point): void {
 		for (let index = 0; index < this.cornerPoints.length; index++) {
 			this.cornerPoints[index] = this.cornerPoints[index].sub(this.position).add(position)
@@ -231,34 +286,68 @@ export class WireComponent extends CircuitComponent{
 				return new SVG.Point(2*this.position.x-point.x,point.y)
 			})
 		}
+		this.update()
 	}
 	protected update(): void {
 		// generate all the points in the wire from the corner points and the wire directions
-		let pointArray = new SVG.PointArray(this.cornerPoints[0].toArray())
+		let pointArray:SVG.Point[] = [this.cornerPoints[0]]
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			const direction = this.wireDirections[index];
+
 			const lastPoint = this.cornerPoints[index];
 			const point = this.cornerPoints[index+1];
-			if (direction==WireDirection.HV) {
-				pointArray.push(new SVG.Point(point.x,lastPoint.y).toArray())
-			} else if(direction==WireDirection.VH){
-				pointArray.push(new SVG.Point(lastPoint.x,point.y).toArray())
+			if (direction==WireDirection.HV&&lastPoint.x!=point.x&&lastPoint.y!=point.y) {
+				pointArray.push(new SVG.Point(point.x,lastPoint.y))
+			} else if(direction==WireDirection.VH&&lastPoint.x!=point.x&&lastPoint.y!=point.y){
+				pointArray.push(new SVG.Point(lastPoint.x,point.y))
 			}
-			pointArray.push(point.toArray())
+			pointArray.push(point)
+		}
+
+		// first update the relative positions of the snapping points w.r.t. the wire, i.e. the start and end positions
+		let pointsNoArrow = pointArray.map(point=>point.clone())
+		
+		// adjust end points for arrow heads
+		if (this.arrowStart.value.key!==defaultArrowTip.key) {
+			let firstRef = pointArray[1].sub(pointArray[0])
+			let firstRefLength = firstRef.abs()
+			if (firstRefLength>0) {
+				pointArray[0] = pointArray[0].add(firstRef.div(firstRefLength).mul(this.arrowStart.value.setBack*this.wireWidth.value))
+			}
+		}
+		
+		if (this.arrowEnd.value.key!==defaultArrowTip.key) {
+			let numPoints = pointArray.length-1
+			let secondRef = pointArray[numPoints-1].sub(pointArray[numPoints])
+			let secondRefLength = secondRef.abs()
+			if (secondRefLength>0) {
+				pointArray[numPoints] = pointArray[numPoints].add(secondRef.div(secondRefLength).mul(this.arrowEnd.value.setBack*this.wireWidth.value))
+			}
 		}
 
 		// actually plot the points
 		this.wire.clear()
-		this.wire.plot(pointArray)
+		let plotPoints = new SVG.PointArray(pointArray.map(val=>val.toArray()))
+		this.wire.plot(plotPoints)
 		this.draggableWire.clear()
-		this.draggableWire.plot(pointArray)
-		
+		this.draggableWire.plot(plotPoints)
+
 		//recalculate the bounding box and position
 		this._bbox = this.wire.bbox()
-		this.position.x = this._bbox.cx
-		this.position.y = this._bbox.cy
+		this.position = new SVG.Point(this._bbox.cx,this._bbox.cy)
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
+		//recalculate the snapping point offsets
+		if (this.snappingPoints.length==pointsNoArrow.length) {
+			for (let index = 0; index < this.snappingPoints.length; index++) {
+				const snapPoint = this.snappingPoints[index];
+				const point = pointsNoArrow[index];
+				snapPoint.updateRelPosition(point.sub(this.position))
+			}
+		}else{
+			this.snappingPoints = pointsNoArrow.map((point,idx)=>new SnapPoint(this,idx==0?"START":idx==pointsNoArrow.length-1?"END":"",point.sub(this.position)))
+		}
+		
 		// update visuals
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
@@ -320,14 +409,41 @@ export class WireComponent extends CircuitComponent{
 			segments:others
 		}
 
+		if (this.arrowStart.value.key!==defaultArrowTip.key) {
+			data.startArrow = this.arrowStart.value.key
+		}
+
+		if (this.arrowEnd.value.key!==defaultArrowTip.key) {
+			data.endArrow = this.arrowEnd.value.key
+		}
+
 		return data
 	}
 
 	public toTikzString(): string {
-		let outString = "\\draw "+this.cornerPoints[0].toTikzString()
+		let drawOptions:string[] = []
+		if (this.arrowStart.value.key!==defaultArrowTip.key) {
+			drawOptions.push(this.arrowStart.value.tikz)
+			drawOptions.push("-")
+		}
+		if (this.arrowEnd.value.key!==defaultArrowTip.key) {
+			if (drawOptions.length==0) {
+				drawOptions.push("-")
+			}
+			drawOptions.push(this.arrowEnd.value.tikz)
+		}
+		let drawOptionsStr = drawOptions.length>0?"["+drawOptions.join("")+"]":""
+		let outString = "\\draw"+drawOptionsStr+" "+this.cornerPoints[0].toTikzString()
 		for (let index = 0; index < this.wireDirections.length; index++) {
-			const dir = this.wireDirections[index]??"-|";
+			const lastPoint = this.cornerPoints[index]
 			const point = this.cornerPoints[index+1];
+			let dir = this.wireDirections[index];
+			if (dir==WireDirection.HV&&lastPoint.y==point.y) {
+				dir=WireDirection.Straight
+			}
+			if (dir==WireDirection.VH&&lastPoint.x==point.x) {
+				dir=WireDirection.Straight
+			}
 			outString+=" "+dir+" "+point.toTikzString()
 		}
 		return outString+";"
@@ -433,6 +549,7 @@ export class WireComponent extends CircuitComponent{
 								new SnapPoint(this,"END",this.cornerPoints.at(-1).sub(this.position))]
 				
 		this.draggable(true)
+		this.updateArrows()
 		this.update()
 
 		this.finishedPlacing = true
@@ -454,6 +571,15 @@ export class WireComponent extends CircuitComponent{
 				wireComponent.cornerPoints.push(new SVG.Point(point.x,point.y))
 				wireComponent.wireDirections.push(dir)
 			}
+		}
+		if (saveObject.startArrow) {
+			wireComponent.arrowStart.value = arrowTips.find(item=>item.key==saveObject.startArrow)
+			wireComponent.arrowStart.updateHTML()
+		}
+		
+		if (saveObject.endArrow) {
+			wireComponent.arrowEnd.value = arrowTips.find(item=>item.key==saveObject.endArrow)
+			wireComponent.arrowEnd.updateHTML()
 		}
 		wireComponent.cornerPoints.push(new SVG.Point())
 		wireComponent.wireDirections.push(WireDirection.Straight)

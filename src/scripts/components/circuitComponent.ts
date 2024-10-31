@@ -90,6 +90,8 @@ export abstract class CircuitComponent{
 		return this._bbox;
 	}
 
+	public abstract getPureBBox():SVG.Box
+
 	/**
 	 * the SVG.js Element which represents the visualization/graphics of the component on the canvas. Should probably always be a group containing more svg components
 	 */
@@ -121,10 +123,10 @@ export abstract class CircuitComponent{
 	protected addZOrdering(){
 		// all components should receive the possiblity to change their draw order/z order/depth
 		let ordering = new ButtonGridProperty(2,[["To Foreground",""],["To Background",""],["Move Forward",""],["Move Backward",""]],[
-			(ev)=>CanvasController.instance.componentToForeground(this),
-			(ev)=>CanvasController.instance.componentToBackground(this),
-			(ev)=>CanvasController.instance.moveComponentForward(this),
-			(ev)=>CanvasController.instance.moveComponentBackward(this)
+			(ev)=>CanvasController.instance.componentsToForeground([this]),
+			(ev)=>CanvasController.instance.componentsToBackground([this]),
+			(ev)=>CanvasController.instance.moveComponentsForward([this]),
+			(ev)=>CanvasController.instance.moveComponentsBackward([this])
 		])
 		this.propertiesHTMLRows.push(ordering.buildHTML())
 	}

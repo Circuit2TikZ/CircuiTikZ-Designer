@@ -303,6 +303,16 @@ export class PathComponent extends CircuitikzComponent{
 		return false;
 	}
 
+	public getPureBBox(): SVG.Box {
+		return this.symbolUse.bbox().transform(new SVG.Matrix({
+			rotate: -this.rotationDeg, 
+			ox: this.position.x, 
+			oy: this.position.y,
+			scaleY: this.mirror.value?-1:1,
+			scaleX: this.invert.value?-1:1
+		})).merge(this.startLine.bbox()).merge(this.endLine.bbox());
+	}
+
 	public toJson(): PathSaveObject {
 		let data:PathSaveObject = {
 			type:"path",
@@ -385,11 +395,9 @@ export class PathComponent extends CircuitikzComponent{
 		if (resize) {
 			this.startSVG = resizeSVG()
 			this.startSVG.node.style.cursor = "grab"
-			this.visualization.add(this.startSVG)
 			
 			this.endSVG = resizeSVG()
 			this.endSVG.node.style.cursor = "grab"
-			this.visualization.add(this.endSVG)
 
 			AdjustDragHandler.snapDrag(this, this.startSVG, true, {
 				dragMove: (pos)=>{

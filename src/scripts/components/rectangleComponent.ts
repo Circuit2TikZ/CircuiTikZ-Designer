@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, defaultBasicDirection, DirectionInfo, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SelectionController, SliderProperty, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint, TextProperty, Undo } from "../internal";
+import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, defaultBasicDirection, defaultFontSize, DirectionInfo, FontSize, fontSizes, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SelectionController, SliderProperty, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint, Text, TextAreaProperty, Undo } from "../internal";
 import { resizeSVG, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type RectangleSaveObject = ComponentSaveObject & {
@@ -7,7 +7,8 @@ export type RectangleSaveObject = ComponentSaveObject & {
 	secondPoint:SVG.Point,
 	fill?:FillInfo,
 	stroke?:StrokeInfo,
-	label?:PositionedLabel
+	label?:PositionedLabel,
+	text?:Text&{innerSep?:SVG.Number,fontSize?:string}
 }
 
 export type StrokeInfo = {
@@ -42,11 +43,13 @@ export class RectangleComponent extends CircuitComponent{
 	private strokeOpacityProperty:SliderProperty
 	private strokeWidthProperty:SliderProperty
 
-	private anchorChoice:ChoiceProperty
-	private positionChoice:ChoiceProperty
+	private anchorChoice:ChoiceProperty<DirectionInfo>
+	private positionChoice:ChoiceProperty<DirectionInfo>
 	private labelDistance:SliderProperty
 
-	private textProperty:TextProperty // TODO change to textarea, add toJson and Tikz
+	private textAreaProperty:TextAreaProperty
+	private textInnerSep:SliderProperty
+	private textFontSize:ChoiceProperty<FontSize>
 	private textForeign:SVG.ForeignObject
 	private textDiv:HTMLDivElement
 
@@ -58,7 +61,7 @@ export class RectangleComponent extends CircuitComponent{
 		this.resizeVisualizations = new Map<DirectionInfo,SVG.Element>()
 
 		this.fillInfo={
-			color:new SVG.Color(0,0,0,"rgb").toRgb(),
+			color:"default",
 			opacity:0,
 		}
 		this.strokeInfo={
@@ -92,7 +95,7 @@ export class RectangleComponent extends CircuitComponent{
 			this.updateTheme()
 		})
 
-		this.fillColorProperty  = new ColorProperty("Color",new SVG.Color(0,0,0,"rgb"))
+		this.fillColorProperty  = new ColorProperty("Color",null)
 		this.fillColorProperty.addChangeListener(ev=>{
 			if (ev.value==null) {
 				this.fillInfo.color = "default"
@@ -136,13 +139,19 @@ export class RectangleComponent extends CircuitComponent{
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
 
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
-		this.textProperty = new TextProperty("Content","")
-		this.textProperty.addChangeListener(ev=>{
-			// I know I should sanatize the input here, but we don't have any database or connection to the server apart from loading the page so this really shouldn't be a problem
-			this.textDiv.innerHTML = this.textProperty.value
+		this.textAreaProperty = new TextAreaProperty({text:"",align:-1,justify:-1})
+		this.textAreaProperty.addChangeListener(ev=>{		
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.textProperty.buildHTML())
+		this.propertiesHTMLRows.push(this.textAreaProperty.buildHTML())
+
+		this.textFontSize = new ChoiceProperty("Fontsize",fontSizes,defaultFontSize)
+		this.textFontSize.addChangeListener((ev)=>{this.update()})
+		this.propertiesHTMLRows.push(this.textFontSize.buildHTML())
+
+		this.textInnerSep = new SliderProperty("Inner sep",0,10,0.1,new SVG.Number(5,"pt"))
+		this.textInnerSep.addChangeListener((ev)=>{this.update()})
+		this.propertiesHTMLRows.push(this.textInnerSep.buildHTML())
 
 		{
 			//label section
@@ -169,7 +178,14 @@ export class RectangleComponent extends CircuitComponent{
 		this.textForeign.node.setAttribute("overflow","visible")
 		this.textForeign.node.style.pointerEvents = "none"
 		this.textDiv = document.createElement("div") as HTMLDivElement
-		this.textDiv.classList.add("w-100","h-100")
+		this.textDiv.classList.add("unselectable")
+		this.textDiv.style.width = "100%"
+		this.textDiv.style.height = "100%"
+		this.textDiv.style.display = "flex"
+		let textSpan = document.createElement("div") as HTMLDivElement
+		textSpan.style.width = "100%"
+		textSpan.style.display = "inline-block"
+		this.textDiv.appendChild(textSpan)
 		this.textForeign.node.appendChild(this.textDiv)
 		this.visualization.add(this.textForeign)
 	}
@@ -349,6 +365,11 @@ export class RectangleComponent extends CircuitComponent{
 			this.selectionRectangle.attr("height",this.bbox.h);
 		}
 	}
+
+	public getPureBBox(): SVG.Box {
+		return this.rectangle.bbox()
+	}
+
 	public viewSelected(show: boolean): void {
 		if (show) {
 			if (!this.selectionRectangle) {
@@ -418,6 +439,25 @@ export class RectangleComponent extends CircuitComponent{
 			data.label = labelWithoutRender
 		}
 
+		if (this.textAreaProperty.value&&this.textAreaProperty.value.text!=="") {
+			let textData:Text&{fontSize?:string,innerSep?:SVG.Number}={
+				text:this.textAreaProperty.value.text
+			}
+			if (this.textAreaProperty.value.align!==-1) {
+				textData.align=this.textAreaProperty.value.align
+			}
+			if (this.textAreaProperty.value.justify!==-1) {
+				textData.justify=this.textAreaProperty.value.justify
+			}
+			if (this.textFontSize.value.key!==defaultFontSize.key) {
+				textData.fontSize = this.textFontSize.value.key
+			}
+			if (this.textInnerSep.value.value!==5) {
+				textData.innerSep = this.textInnerSep.value
+			}
+			data.text=textData
+		}
+
 		return data
 	}
 
@@ -467,12 +507,28 @@ export class RectangleComponent extends CircuitComponent{
 				rectComponent.mathJaxLabel.updateValue(saveObject.label.value,true)
 			}
 		}
+
+		if (saveObject.text) {
+			let text:Text={
+				text:saveObject.text.text,
+				align:saveObject.text.align??-1,
+				justify:saveObject.text.justify??-1
+			}
+			rectComponent.textAreaProperty.value = text
+			rectComponent.textAreaProperty.updateHTML()
+			rectComponent.textFontSize.value = saveObject.text.fontSize?fontSizes.find(item=>item.key==saveObject.text.fontSize):defaultFontSize
+			rectComponent.textFontSize.updateHTML()
+			rectComponent.textInnerSep.value = saveObject.text.innerSep?new SVG.Number(saveObject.text.innerSep):new SVG.Number("5pt")
+			rectComponent.textInnerSep.updateHTML()
+		}
+
 		rectComponent.placeFinish()
 		rectComponent.updateTheme()
 		return rectComponent
 	}
 
 	public toTikzString(): string {
+		
 		let fillStr:string[] = []
 		if (this.fillInfo.opacity>0) {
 			if (this.fillInfo.color!=="default") {
@@ -504,8 +560,23 @@ export class RectangleComponent extends CircuitComponent{
 			}
 		}
 
+		let textStr = ""
+		if (this.textAreaProperty.value.text) {
+			let dir = new SVG.Point(this.textAreaProperty.value.align,this.textAreaProperty.value.justify)
+			let anchor = basicDirections.find(item=>item.direction.eq(dir)).name;
+			let pos = this.position.add(dir.mul(new SVG.Point(this.bbox.w/2,this.bbox.h/2)))
+			let textWidth = new SVG.Number(this.bbox.w,"px").minus(this.strokeInfo.width.times(2)).minus(this.textInnerSep.value).convertToUnit("cm")
+			let innerSep = this.textInnerSep.value.convertToUnit("pt").value + this.strokeInfo.width.convertToUnit("pt").value/2 + "pt"
+			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==-1?"left":this.textAreaProperty.value.align==0?"center":"right"}, text width=${textWidth.value.toFixed(3)}cm, inner sep=${innerSep}]`
+			textStr = ` node ${options} at `+pos.toTikzString()+`{\\${this.textFontSize.value.name} ${this.textAreaProperty.value.text.replaceAll("\n","\\\\")}}`
+		}
+		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value 
+		let halfstroke = strokeWidth/2
+		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x)+halfstroke,Math.min(this.firstPoint.y,this.secondPoint.y)+halfstroke)
+		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x)-halfstroke,Math.max(this.firstPoint.y,this.secondPoint.y)-halfstroke)
+
 		let optionsStr = strokeStr.length>0||fillStr.length>0?`[${fillStr.concat(strokeStr).join(", ")}]`:""
-		return `\\path${optionsStr} ${this.firstPoint.toTikzString()} rectangle ${this.secondPoint.toTikzString()};`
+		return `\\path${optionsStr} ${upperLeft.toTikzString()} rectangle ${lowerRight.toTikzString()}`+textStr+";"
 	}
 	public copyForPlacement(): CircuitComponent {
 		return new RectangleComponent()
@@ -570,7 +641,7 @@ export class RectangleComponent extends CircuitComponent{
 		}else{
 			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
 			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(basicDirections.find((item)=>item.key==this.positionChoice.value.key).direction))
+			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction))
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -592,7 +663,7 @@ export class RectangleComponent extends CircuitComponent{
 			let verticalTextPosition = clamp(Math.round(2*(useBBox.cy-textPos.y)/useBBox.h),-1,1)	
 			labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
 		}else{
-			labelRef = basicDirections.find((item)=>item.key==this.anchorChoice.value.key).direction
+			labelRef = this.anchorChoice.value.direction
 		}
 		
 		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w,labelBBox.h)).add(labelRef.mul(labelDist))
@@ -603,12 +674,18 @@ export class RectangleComponent extends CircuitComponent{
 	}
 
 	private updateText(){
-		console.log("update");
-		
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-		this.textForeign.move(this.bbox.x+strokeWidth/2,this.bbox.y+strokeWidth/2)
-		this.textForeign.size(this.bbox.w-strokeWidth, this.bbox.h-strokeWidth)
-		this.textForeign.node.setAttribute("width",(this.bbox.w-strokeWidth).toString())
-		this.textForeign.node.setAttribute("height",(this.bbox.h-strokeWidth).toString())
+		this.textForeign.move(this.bbox.x+strokeWidth,this.bbox.y+strokeWidth)
+		let w = this.bbox.w-strokeWidth*2
+		let h = this.bbox.h-strokeWidth*2
+		this.textForeign.size(w<0?0:w,h<0?0:h)
+
+		// I know I should sanatize the input here, but we don't have any database or connection to the server apart from loading the page so this really shouldn't be a problem
+		this.textDiv.children[0].innerHTML = this.textAreaProperty.value.text.replaceAll("\n","<br>")	
+		this.textDiv.style.textAlign = this.textAreaProperty.value.align==-1?"start":this.textAreaProperty.value.align==0?"center":"end"
+		this.textDiv.style.alignItems = this.textAreaProperty.value.justify==-1?"start":this.textAreaProperty.value.justify==0?"center":"end"
+		this.textDiv.style.fontSize = this.textFontSize.value.size + "pt"
+		this.textDiv.style.padding = this.textInnerSep.value.convertToUnit("pt").toString()
+		this.textDiv.style.lineHeight = this.textFontSize.value.size*1.1 + "pt"
 	}
 }

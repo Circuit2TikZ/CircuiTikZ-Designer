@@ -30,10 +30,12 @@ export class MathJaxProperty extends EditableProperty<string>{
 			this.input.value = this.value
 			col.appendChild(this.input)
 			
-			col.appendChild(formulaSpan1.cloneNode(true))
+			let formulaSpan2 = formulaSpan1.cloneNode(true) as HTMLSpanElement
+			formulaSpan2.style.borderRadius="0"
+			col.appendChild(formulaSpan2)
 
 			this.renderButton = document.createElement("button") as HTMLButtonElement
-			this.renderButton.classList.add("btn", "btn-secondary", "px-2")
+			this.renderButton.classList.add("btn", "btn-primary", "px-2")
 			this.renderButton.type = "button"
 			this.renderButton.innerHTML = "Render"
 			col.appendChild(this.renderButton)

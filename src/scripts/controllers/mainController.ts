@@ -666,7 +666,6 @@ export class MainController {
 					this.switchMode(Modes.COMPONENT)					
 
 					if (ComponentPlacer.instance.component) {
-						//TODO check here if path component and retrace steps
 						ComponentPlacer.instance.placeCancel()
 					}
 

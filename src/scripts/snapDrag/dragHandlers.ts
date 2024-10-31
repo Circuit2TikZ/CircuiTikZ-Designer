@@ -114,7 +114,11 @@ export class SnapDragHandler{
 			let ctrlCommand = ev.detail.event.ctrlKey||(MainController.instance.isMac&&ev.detail.event.metaKey)
 			let selectionMode = ev.detail.event.shiftKey?SelectionMode.ADD:ctrlCommand?SelectionMode.SUB:SelectionMode.RESET;
 
-			SelectionController.instance.selectComponents([this.componentReference], selectionMode)
+			if (selectionMode==SelectionMode.RESET&&SelectionController.instance.currentlySelectedComponents.includes(this.componentReference)&&SelectionController.instance.currentlySelectedComponents.length>1) {
+				SelectionController.instance.setReference(this.componentReference)
+			}else{
+				SelectionController.instance.selectComponents([this.componentReference], selectionMode)
+			}
 			trackState = false;			
 		}
 
@@ -261,7 +265,11 @@ export class AdjustDragHandler{
 			let ctrlCommand = event.detail.event.ctrlKey||(MainController.instance.isMac&&event.detail.event.metaKey)
 			let selectionMode = event.detail.event.shiftKey?SelectionMode.ADD:ctrlCommand?SelectionMode.SUB:SelectionMode.RESET;
 
-			SelectionController.instance.selectComponents([this.componentReference], selectionMode)
+			if (selectionMode==SelectionMode.RESET&&SelectionController.instance.currentlySelectedComponents.includes(this.componentReference)&&SelectionController.instance.currentlySelectedComponents.length>1) {
+				SelectionController.instance.setReference(this.componentReference)
+			}else{
+				SelectionController.instance.selectComponents([this.componentReference], selectionMode)
+			}
 			trackState = false;
 		}
 

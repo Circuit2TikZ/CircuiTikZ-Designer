@@ -174,58 +174,88 @@ export class CanvasController {
 		}))
 	}
 
-	public moveComponentForward(component:CircuitComponent){
-		if (MainController.instance.circuitComponents.length<2) {
+	public moveComponentsForward(components:CircuitComponent[]){
+		if (MainController.instance.circuitComponents.length<2||components.length==0) {
 			return
 		}
-		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
-		if (idx<0||idx==MainController.instance.circuitComponents.length-1) {
-			return
+		let idxComps = components.map(c=>{return {idx:MainController.instance.circuitComponents.findIndex((cc)=>cc===c),component:c}})
+		idxComps.sort((a,b)=>a.idx-b.idx).reverse()
+		let lastSelectedIndex = MainController.instance.circuitComponents.length
+		let switched = false
+		for (const idxComp of idxComps) {
+			if (idxComp.idx!==lastSelectedIndex-1) {
+				//switch the components
+				let switchComponent = MainController.instance.circuitComponents[idxComp.idx+1]
+				idxComp.component.visualization.insertAfter(switchComponent.visualization)
+				MainController.instance.circuitComponents[idxComp.idx]=switchComponent
+				MainController.instance.circuitComponents[idxComp.idx+1]=idxComp.component
+				lastSelectedIndex=idxComp.idx+1
+				switched=true
+			}else{
+				lastSelectedIndex=idxComp.idx
+			}
 		}
-		let switchComponent = MainController.instance.circuitComponents[idx+1]
-		component.visualization.insertAfter(switchComponent.visualization)
-		MainController.instance.circuitComponents[idx]=switchComponent
-		MainController.instance.circuitComponents[idx+1]=component
+		if (switched) {
+			Undo.addState()
+		}
 	}
 
-	public moveComponentBackward(component:CircuitComponent){
-		if (MainController.instance.circuitComponents.length<2) {
+	public moveComponentsBackward(components:CircuitComponent[]){
+		if (MainController.instance.circuitComponents.length<2||components.length==0) {
 			return
 		}
-		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
-		if (idx<1) {
-			return
+		let idxComps = components.map(c=>{return {idx:MainController.instance.circuitComponents.findIndex((cc)=>cc===c),component:c}})
+		idxComps.sort((a,b)=>a.idx-b.idx)
+		let lastSelectedIndex = -1
+		let switched = false
+		for (const idxComp of idxComps) {
+			if (idxComp.idx!==lastSelectedIndex+1) {
+				//switch the components
+				let switchComponent = MainController.instance.circuitComponents[idxComp.idx-1]
+				idxComp.component.visualization.insertBefore(switchComponent.visualization)
+				MainController.instance.circuitComponents[idxComp.idx]=switchComponent
+				MainController.instance.circuitComponents[idxComp.idx-1]=idxComp.component
+				lastSelectedIndex=idxComp.idx-1
+				switched=true
+			}else{
+				lastSelectedIndex=idxComp.idx
+			}
 		}
-		let switchComponent = MainController.instance.circuitComponents[idx-1]
-		component.visualization.insertBefore(switchComponent.visualization)
-		MainController.instance.circuitComponents[idx]=switchComponent
-		MainController.instance.circuitComponents[idx-1]=component
+		if (switched) {
+			Undo.addState()
+		}
 	}
 
-	public componentToForeground(component: CircuitComponent){
-		if (MainController.instance.circuitComponents.length<2) {
+	public componentsToForeground(components: CircuitComponent[]){
+		if (MainController.instance.circuitComponents.length<2||components.length==0) {
 			return
 		}
-		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
-		if (idx<0||idx==MainController.instance.circuitComponents.length-1) {
-			return
+		let idxComps = components.map(c=>{return {idx:MainController.instance.circuitComponents.findIndex((cc)=>cc===c),component:c}})
+		idxComps.sort((a,b)=>a.idx-b.idx)
+		if (components.length<MainController.instance.circuitComponents.length-idxComps[0].idx) {
+			for (const idxComp of idxComps) {
+				idxComp.component.visualization.insertAfter(MainController.instance.circuitComponents.at(-1).visualization)
+				MainController.instance.circuitComponents.push(...MainController.instance.circuitComponents.splice(idxComp.idx,1))				
+			}
+			Undo.addState()
 		}
-		component.visualization.insertAfter(MainController.instance.circuitComponents.at(-1).visualization)
-		MainController.instance.circuitComponents.push(...MainController.instance.circuitComponents.splice(idx,1))
-		Undo.addState()
 	}
 
-	public componentToBackground(component: CircuitComponent){
-		if (MainController.instance.circuitComponents.length<2) {
+	public componentsToBackground(components: CircuitComponent[]){
+		if (MainController.instance.circuitComponents.length<2||components.length==0) {
 			return
 		}
-		let idx = MainController.instance.circuitComponents.findIndex((c)=>c===component)
-		if (idx<1) {
-			return
+		let idxComps = components.map(c=>{return {idx:MainController.instance.circuitComponents.findIndex((cc)=>cc===c),component:c}})
+		idxComps.sort((a,b)=>a.idx-b.idx).reverse()
+		if (components.length<=idxComps[0].idx) {
+			let offset = 0
+			for (const idxComp of idxComps) {
+				idxComp.component.visualization.insertBefore(MainController.instance.circuitComponents[0].visualization)
+				MainController.instance.circuitComponents = MainController.instance.circuitComponents.splice(idxComp.idx+offset,1).concat(MainController.instance.circuitComponents)
+				offset++
+			}
+			Undo.addState()
 		}
-		component.visualization.insertBefore(MainController.instance.circuitComponents[0].visualization)
-		MainController.instance.circuitComponents = MainController.instance.circuitComponents.splice(idx,1).concat(MainController.instance.circuitComponents)
-		Undo.addState()
 	}
 
 	/**

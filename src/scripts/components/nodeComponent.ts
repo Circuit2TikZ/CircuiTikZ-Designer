@@ -13,8 +13,8 @@ export type NodeSaveObject = CircuitikzSaveObject & {
 export class NodeComponent extends CircuitikzComponent{
 	private selectionRectangle: SVG.Rect = null;
 	
-	public anchorChoice: ChoiceProperty
-	public positionChoice: ChoiceProperty
+	public anchorChoice: ChoiceProperty<DirectionInfo>
+	public positionChoice: ChoiceProperty<DirectionInfo>
 
 	public flipStateX:boolean
 	public flipStateY:boolean
@@ -109,6 +109,10 @@ export class NodeComponent extends CircuitikzComponent{
 
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
+	}
+
+	public getPureBBox(): SVG.Box {
+		return this.symbolUse.bbox().transform(this.getTransformMatrix())
 	}
 
 	protected recalculateSelectionVisuals(): void {
@@ -243,7 +247,7 @@ export class NodeComponent extends CircuitikzComponent{
 
 			let pos = defaultBasicDirection.name
 			if (this.positionChoice.value.key!="default") {
-				let newdir = basicDirections.find((item)=>item.key==this.positionChoice.value.key).direction.transform(new SVG.Matrix({
+				let newdir = this.positionChoice.value.direction.transform(new SVG.Matrix({
 					rotate: -this.rotationDeg,
 					scaleX:this.flipStateX?-1:1,
 					scaleY:this.flipStateY?-1:1
@@ -379,7 +383,7 @@ export class NodeComponent extends CircuitikzComponent{
 		}else{
 			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
 			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(basicDirections.find((item)=>item.key==this.positionChoice.value.key).direction))
+			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction))
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -404,7 +408,7 @@ export class NodeComponent extends CircuitikzComponent{
 			//reset to center before actually checking where it should go
 			this.labelPos = basicDirections.find((item)=>item.direction.eq(labelRef))
 		}else{
-			this.labelPos = basicDirections.find((item)=>item.key==this.anchorChoice.value.key)
+			this.labelPos = this.anchorChoice.value
 			labelRef = this.labelPos.direction
 		}
 		

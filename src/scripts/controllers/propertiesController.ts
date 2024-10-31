@@ -1,4 +1,4 @@
-import { CanvasController, CircuitComponent, SelectionController } from "../internal";
+import { AlignmentMode, ButtonGridProperty, CanvasController, CircuitComponent, SelectionController } from "../internal";
 
 export type FormEntry = {
 	originalObject: object;
@@ -30,19 +30,46 @@ export class PropertyController{
 		let components = SelectionController.instance.currentlySelectedComponents
 		this.clearForm()
 
-		//TODO add rotate/flip/pushback/bringfront
-
 		if (components.length>1) {
-			//TODO multicomponent edit
-			//TODO alignment and distribution tools
-			//TODO flip,rotate selection
-			this.propertiesEntries.classList.remove("d-none")
-			this.propertiesEntries.innerText = "Please select only one component to view its properties"
+			this.setMultiForm(components)
 		}else if (components.length===1) {
 			this.setForm(components[0]);
 		}else{
 			this.setFormGrid()
 		}
+	}
+
+	private setMultiForm(components:CircuitComponent[]){
+		//TODO multicomponent edit
+		//TODO alignment and distribution tools
+
+		this.propertiesEntries.classList.remove("d-none")
+		this.propertiesTitle.innerText = "Selection"
+
+		let rows:HTMLElement[]=[]
+		let positioning = new ButtonGridProperty(2,[["Rotate CW","rotate_right"],["Rotate CCW","rotate_left"],["Flip X",["flip","rotateText"]],["Flip Y","flip"]],[
+			(ev)=>SelectionController.instance.rotateSelection(-90),
+			(ev)=>SelectionController.instance.rotateSelection(90),
+			(ev)=>SelectionController.instance.flipSelection(true),
+			(ev)=>SelectionController.instance.flipSelection(false)
+		])
+		rows.push(positioning.buildHTML())
+
+		let ordering = new ButtonGridProperty(2,[["To Foreground",""],["To Background",""],["Move Forward",""],["Move Backward",""]],[
+			(ev)=>CanvasController.instance.componentsToForeground(SelectionController.instance.currentlySelectedComponents),
+			(ev)=>CanvasController.instance.componentsToBackground(SelectionController.instance.currentlySelectedComponents),
+			(ev)=>CanvasController.instance.moveComponentsForward(SelectionController.instance.currentlySelectedComponents),
+			(ev)=>CanvasController.instance.moveComponentsBackward(SelectionController.instance.currentlySelectedComponents)
+		])
+		rows.push(ordering.buildHTML())
+
+		let alignment = new ButtonGridProperty(2,[["Align left",""],["Align right",""]],[
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.START,true),
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.END,true),
+		])
+		rows.push(alignment.buildHTML())
+
+		this.propertiesEntries.append(...rows)
 	}
 
 	private setForm(component:CircuitComponent){		

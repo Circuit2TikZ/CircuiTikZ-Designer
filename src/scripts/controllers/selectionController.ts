@@ -7,6 +7,12 @@ export enum SelectionMode {
 	SUB
 }
 
+export enum AlignmentMode {
+	START=-1,
+	CENTER=0,
+	END=1
+}
+
 /**
  * Controller holding selection information and handling selecting/deselecting
  * @class
@@ -20,6 +26,7 @@ export class SelectionController {
 	private currentlyDragging: boolean
 	public currentlySelectedComponents: CircuitComponent[] = []
 	private selectionEnabled: boolean
+	public referenceComponent:CircuitComponent
 
 	private constructor() {
 		this.selectionStartPosition = new SVG.Point()
@@ -323,5 +330,31 @@ export class SelectionController {
 	 */
 	public hasSelection(){
 		return this.currentlySelectedComponents.length>0
+	}
+
+	public setReference(component:CircuitComponent){
+		this.referenceComponent = component
+	}
+
+	public alignSelection(mode:AlignmentMode,horizontal:boolean){
+		let selectionBBox = this.getOverallBoundingBox()
+		let selectionCenter = new SVG.Point(selectionBBox.cx,selectionBBox.cy)
+		let halfSelectionSize = new SVG.Point(selectionBBox.w/2,selectionBBox.h/2)
+		let direction = horizontal?new SVG.Point(1,0):new SVG.Point(0,1)
+		let referencePosition:SVG.Point
+		if (this.referenceComponent) {
+			let elementBBox = this.referenceComponent.getPureBBox()
+			let elementHalfSize = new SVG.Point(elementBBox.w/2,elementBBox.h/2)
+			referencePosition = new SVG.Point(elementBBox.cx,elementBBox.cy).add(elementHalfSize.mul(direction).mul(mode))
+		}else{
+			referencePosition = selectionCenter.add(halfSelectionSize.mul(direction).mul(mode))
+		}
+		for (const element of this.currentlySelectedComponents) {
+			let elementBBox = element.getPureBBox()
+			let elementHalfSize = new SVG.Point(elementBBox.w/2,elementBBox.h/2)
+			let elementReferencePoint = new SVG.Point(elementBBox.cx,elementBBox.cy).add(elementHalfSize.mul(direction).mul(mode))
+			let delta = referencePosition.sub(elementReferencePoint).mul(direction)
+			element.moveRel(delta)
+		}
 	}
 }

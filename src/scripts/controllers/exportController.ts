@@ -48,7 +48,7 @@ export class ExportController {
 	private isIDUsed(id:string):boolean{
 		for (const component of MainController.instance.circuitComponents) {
 			// check if another component with the same name already exists
-			if (component instanceof CircuitikzComponent && component.name.getValue()==id) {
+			if (component instanceof CircuitikzComponent && component.name.value==id) {
 				return true
 			}
 		}
@@ -149,8 +149,7 @@ export class ExportController {
 		defs.removeChild(svgObj.node.getElementById("smallGridPattern"))
 		defs.removeChild(svgObj.node.getElementById("gridPattern"))
 		defs.removeChild(svgObj.node.getElementById("snapCursor"))
-		defs.removeChild(svgObj.node.getElementById("snapPoint"))
-		// svgObj.node.removeChild(svgObj.node.children[0]) // defs for grid and axis
+
 		svgObj.node.removeChild(svgObj.node.getElementById("grid"))
 		svgObj.node.removeChild(svgObj.node.getElementById("xAxis"))
 		svgObj.node.removeChild(svgObj.node.getElementById("yAxis"))

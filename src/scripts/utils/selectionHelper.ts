@@ -12,9 +12,10 @@ export function pathPointSVG(){
 }
 
 export function resizeSVG():SVG.Element{
-	//TODO update to include larger invisible circle to grab
-	//should change to symbol and use
-	return CanvasController.instance.canvas.rect(5,5).fill("var(--bs-cyan)")
+	let g = CanvasController.instance.canvas.group()
+	g.add(CanvasController.instance.canvas.rect(10,10).fill("transparent").stroke("none"))
+	g.add(CanvasController.instance.canvas.rect(5,5).fill("var(--bs-cyan)").stroke("none").move(2.5,2.5))
+	return g
 }
 
 /**

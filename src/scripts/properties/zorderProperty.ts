@@ -28,11 +28,11 @@ export class ZOrderProperty extends EditableProperty<number>{
 		row.appendChild(backDiv)
 
 		bringFront.addEventListener("click",ev=>{
-			CanvasController.instance.componentToForeground(this.componentReference)
+			CanvasController.instance.componentsToForeground([this.componentReference])
 		})
 
 		pushBack.addEventListener("click",ev=>{
-			CanvasController.instance.componentToBackground(this.componentReference)
+			CanvasController.instance.componentsToBackground([this.componentReference])
 		})
 
 		return row

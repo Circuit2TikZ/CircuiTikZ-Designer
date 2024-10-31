@@ -1,18 +1,18 @@
 import { EditableProperty, Undo } from "../internal";
 
-export class ChoiceProperty extends EditableProperty<{key:string,name:string}>{
+export class ChoiceProperty<T extends {key:string,name:string}> extends EditableProperty<T>{
 
 	private label:string
 	private selectElement:HTMLSelectElement
-	private choiceOptions:{key:string,name:string}[]
+	private choiceOptions:T[]
 
-	public constructor(label:string, choiceOptions:{key:string,name:string}[], initialValue?:{key:string,name:string}){
+	public constructor(label:string, choiceOptions:T[], initialValue?:T){
 		super(initialValue)
 		this.label = label
 		this.choiceOptions=choiceOptions
 	}
-	public eq(first: {key:string,name:string}, second: {key:string,name:string}): boolean {
-		return first.key==second.key&&first.name==second.name
+	public eq(first: T, second: T): boolean {
+		return first.key==second.key
 	}
 	public buildHTML(): HTMLElement {
 		let row = this.getRow()
