@@ -1,4 +1,4 @@
-import { AlignmentMode, ButtonGridProperty, CanvasController, CircuitComponent, SelectionController } from "../internal";
+import { AlignmentMode, ButtonGridProperty, CanvasController, CircuitComponent, DistributionMode, SectionHeaderProperty, SelectionController } from "../internal";
 
 export type FormEntry = {
 	originalObject: object;
@@ -55,7 +55,8 @@ export class PropertyController{
 		])
 		rows.push(positioning.buildHTML())
 
-		let ordering = new ButtonGridProperty(2,[["To Foreground",""],["To Background",""],["Move Forward",""],["Move Backward",""]],[
+		rows.push(new SectionHeaderProperty("Ordering").buildHTML())
+		let ordering = new ButtonGridProperty(2,[["Foreground",""],["Background",""],["Forward",""],["Backward",""]],[
 			(ev)=>CanvasController.instance.componentsToForeground(SelectionController.instance.currentlySelectedComponents),
 			(ev)=>CanvasController.instance.componentsToBackground(SelectionController.instance.currentlySelectedComponents),
 			(ev)=>CanvasController.instance.moveComponentsForward(SelectionController.instance.currentlySelectedComponents),
@@ -63,11 +64,29 @@ export class PropertyController{
 		])
 		rows.push(ordering.buildHTML())
 
-		let alignment = new ButtonGridProperty(2,[["Align left",""],["Align right",""]],[
+		rows.push(new SectionHeaderProperty("Align").buildHTML())
+		let alignment = new ButtonGridProperty(3,[
+			["","align_horizontal_left"],["","align_horizontal_center"],["","align_horizontal_right"],
+			["","align_vertical_top"],["","align_vertical_center"],["","align_vertical_bottom"]],[
 			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.START,true),
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.CENTER,true),
 			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.END,true),
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.START,false),
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.CENTER,false),
+			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.END,false),
 		])
 		rows.push(alignment.buildHTML())
+
+		rows.push(new SectionHeaderProperty("Distribute").buildHTML())
+		let distribute = new ButtonGridProperty(2,[
+			["Center","horizontal_distribute"],["Spacing","align_justify_space_even"],
+			["Center","vertical_distribute"],["Spacing","align_space_even"]],[
+			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.CENTER,true),
+			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.SPACE,true),
+			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.CENTER,false),
+			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.SPACE,false),
+		])
+		rows.push(distribute.buildHTML())
 
 		this.propertiesEntries.append(...rows)
 	}

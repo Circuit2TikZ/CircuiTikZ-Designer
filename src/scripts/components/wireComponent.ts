@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapController, SnapCursorController, SnappingInfo, SnapPoint, Undo } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, resizeSVG, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, referenceColor, resizeSVG, selectionColor } from "../utils/selectionHelper";
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -378,7 +378,7 @@ export class WireComponent extends CircuitComponent{
 	public viewSelected(show: boolean): void {
 		if (show) {
 			this.wire.attr({
-				"stroke":selectionColor,
+				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 				// "stroke-width": selectedWireWidth,
 			});
 		} else {

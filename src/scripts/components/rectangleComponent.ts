@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, defaultBasicDirection, defaultFontSize, DirectionInfo, FontSize, fontSizes, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SelectionController, SliderProperty, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint, Text, TextAreaProperty, Undo } from "../internal";
-import { resizeSVG, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
+import { referenceColor, resizeSVG, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type RectangleSaveObject = ComponentSaveObject & {
 	firstPoint:SVG.Point
@@ -367,21 +367,22 @@ export class RectangleComponent extends CircuitComponent{
 	}
 
 	public getPureBBox(): SVG.Box {
-		return this.rectangle.bbox()
+		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x),Math.min(this.firstPoint.y,this.secondPoint.y))
+		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x),Math.max(this.firstPoint.y,this.secondPoint.y))
+		return new SVG.Box(upperLeft.x,upperLeft.y,lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
 	}
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			if (!this.selectionRectangle) {
-				this.selectionRectangle = CanvasController.instance.canvas.rect(this.bbox.w,this.bbox.h).move(this.bbox.x,this.bbox.y)
-				this.selectionRectangle.attr({
-					"stroke-width":selectedBoxWidth,
-					"stroke":selectionColor,
-					"stroke-dasharray":"3,3",
-					"fill":"none"
-				});
-				this.visualization.stroke("#f00")
-			}
+			this.selectionRectangle?.remove()
+			this.selectionRectangle = CanvasController.instance.canvas.rect(this.bbox.w,this.bbox.h).move(this.bbox.x,this.bbox.y)
+			this.selectionRectangle.attr({
+				"stroke-width":selectedBoxWidth,
+				"stroke":this.isSelectionReference?referenceColor:selectionColor,
+				"stroke-dasharray":"3,3",
+				"fill":"none"
+			});
+			this.visualization.stroke("#f00")
 		} else {
 			this.selectionRectangle?.remove();
 			this.visualization.stroke("#000")

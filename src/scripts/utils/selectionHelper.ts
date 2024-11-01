@@ -3,6 +3,7 @@ import { CanvasController } from "../internal";
 
 export const selectedBoxWidth = "0.4pt"
 export const selectionColor = "var(--bs-red)"
+export const referenceColor = "var(--bs-teal)"
 
 export const pathPointRadius = 8
 export function pathPointSVG(){

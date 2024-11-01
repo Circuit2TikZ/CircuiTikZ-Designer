@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController } from "../internal"
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor } from "../utils/selectionHelper";
 
 
 export type PathLabel = Label & {
@@ -230,24 +230,23 @@ export class PathComponent extends CircuitikzComponent{
 	}
 	public viewSelected(show: boolean): void {
 		if (show) {
-			if (!this.selectionRectangle) {
-				let box = this.symbolUse.bbox();
-				this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h)
-				this.recalculateSelectionVisuals()
+			this.selectionRectangle?.remove()
+			let box = this.symbolUse.bbox();
+			this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h)
+			this.recalculateSelectionVisuals()
 
-				this.selectionRectangle.attr({
-					"stroke-width": selectedBoxWidth,
-					"stroke": selectionColor,
-					"stroke-dasharray":"3,3",
-					"fill": "none"
-				});
-			}
+			this.selectionRectangle.attr({
+				"stroke-width": selectedBoxWidth,
+				"stroke": this.isSelectionReference?referenceColor:selectionColor,
+				"stroke-dasharray":"3,3",
+				"fill": "none"
+			});
 			// also paint the lines leading to the symbol
 			this.startLine.attr({
-				"stroke":selectionColor,
+				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 			});
 			this.endLine.attr({
-				"stroke":selectionColor,
+				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 			});
 		} else {
 			this.selectionRectangle?.remove();

@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { MainController, PropertyController, CanvasController, CircuitComponent } from "../internal";
+import { MainController, PropertyController, CanvasController, CircuitComponent, Undo } from "../internal";
 
 export enum SelectionMode {
 	RESET,
@@ -11,6 +11,12 @@ export enum AlignmentMode {
 	START=-1,
 	CENTER=0,
 	END=1
+}
+
+export enum DistributionMode {
+	CENTER, // equal distance between component centers
+	SPACE, // equal spacing between components
+
 }
 
 /**
@@ -333,7 +339,14 @@ export class SelectionController {
 	}
 
 	public setReference(component:CircuitComponent){
-		this.referenceComponent = component
+		if (component==this.referenceComponent) {
+			component.isSelected=false
+			component.isSelected=true
+			component.viewSelected(true)
+		}else{
+			component.setAsSelectionReference()
+			this.referenceComponent = component
+		}
 	}
 
 	public alignSelection(mode:AlignmentMode,horizontal:boolean){
@@ -346,6 +359,7 @@ export class SelectionController {
 			let elementBBox = this.referenceComponent.getPureBBox()
 			let elementHalfSize = new SVG.Point(elementBBox.w/2,elementBBox.h/2)
 			referencePosition = new SVG.Point(elementBBox.cx,elementBBox.cy).add(elementHalfSize.mul(direction).mul(mode))
+			
 		}else{
 			referencePosition = selectionCenter.add(halfSelectionSize.mul(direction).mul(mode))
 		}
@@ -355,6 +369,77 @@ export class SelectionController {
 			let elementReferencePoint = new SVG.Point(elementBBox.cx,elementBBox.cy).add(elementHalfSize.mul(direction).mul(mode))
 			let delta = referencePosition.sub(elementReferencePoint).mul(direction)
 			element.moveRel(delta)
+		}
+		Undo.addState()
+	}
+
+	public distributeSelection(mode:DistributionMode,horizontal:boolean){
+		if (this.currentlySelectedComponents.length<=2) {
+			return
+		}
+		let direction = horizontal?new SVG.Point(1,0):new SVG.Point(0,1)
+
+		let refPos:SVG.Point
+		let bboxes = this.currentlySelectedComponents.map(c=>{
+			let bbox = c.getPureBBox()
+			if (c==this.referenceComponent) {
+				refPos = c.position
+			}
+			return {box:bbox,component:c}
+		})
+
+		bboxes.sort((a,b)=>{
+			let diff = new SVG.Point(a.box.cx-b.box.cx,a.box.cy-b.box.cy)
+			return horizontal?diff.x:diff.y
+		})
+
+		let shouldUndo=false
+		let zeroVector = new SVG.Point()
+
+		if (mode==DistributionMode.CENTER) {
+			let totalSpace = new SVG.Point(bboxes.at(-1).box.cx-bboxes[0].box.cx,bboxes.at(-1).box.cy-bboxes[0].box.cy)
+			const start = new SVG.Point(bboxes[0].box.cx,bboxes[0].box.cy)
+			const increment = totalSpace.div(this.currentlySelectedComponents.length-1)
+			for (let index = 1; index < bboxes.length-1; index++) {
+				const bbox = bboxes[index];
+				const newPosDiff = start.add(increment.mul(index)).sub(new SVG.Point(bbox.box.cx,bbox.box.cy)).mul(direction)
+				if (!shouldUndo&&!newPosDiff.eq(zeroVector)) {
+					shouldUndo=true
+				}
+				bbox.component.moveRel(newPosDiff)
+			}
+		}else{
+			let selectionBBox = this.getOverallBoundingBox()
+			let availableSpacing = new SVG.Point(selectionBBox.w,selectionBBox.h)
+			bboxes.forEach((value)=>{
+				availableSpacing.x-=value.box.w;
+				availableSpacing.y-=value.box.h;
+			})
+			availableSpacing.x = availableSpacing.x<0?0:availableSpacing.x
+			availableSpacing.y = availableSpacing.y<0?0:availableSpacing.y
+			availableSpacing = availableSpacing.div(this.currentlySelectedComponents.length-1)
+			let lastPos = new SVG.Point(bboxes[0].box.x2,bboxes[0].box.y2)
+			for (let index = 1; index < bboxes.length; index++) {
+				const bbox = bboxes[index];
+				lastPos = lastPos.add(availableSpacing).add(new SVG.Point(bbox.box.w,bbox.box.h))
+				const newPosDiff = lastPos.sub(new SVG.Point(bbox.box.x2,bbox.box.y2)).mul(direction)
+				if (!shouldUndo&&!newPosDiff.eq(zeroVector)) {
+					shouldUndo=true
+				}
+				bbox.component.moveRel(newPosDiff)
+			}
+		}
+		if (refPos) {
+			let refResetDiff = refPos.sub(this.referenceComponent.position)
+			for (const element of this.currentlySelectedComponents) {
+				element.moveRel(refResetDiff)
+			}
+			if (!shouldUndo&&!refResetDiff.eq(zeroVector)) {
+				shouldUndo=true
+			}
+		}
+		if (shouldUndo) {
+			Undo.addState()
 		}
 	}
 }

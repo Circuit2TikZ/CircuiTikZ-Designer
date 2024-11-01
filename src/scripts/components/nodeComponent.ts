@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { basicDirections, CanvasController, ChoiceProperty, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, defaultBasicDirection, DirectionInfo, ExportController, MainController, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SliderProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
-import { selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
+import { referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type NodeSaveObject = CircuitikzSaveObject & {
 	position:{x:number, y:number}
@@ -168,17 +168,16 @@ export class NodeComponent extends CircuitikzComponent{
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			if (!this.selectionRectangle) {
-				let box = this.symbolUse.bbox().transform(this.getTransformMatrix());
-				this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h).move(box.x,box.y)
-				this.selectionRectangle.attr({
-					"stroke-width":selectedBoxWidth,
-					"stroke":selectionColor,
-					"stroke-dasharray":"3,3",
-					"fill":"none"
-				});
-				this.visualization.stroke("#f00")
-			}
+			this.selectionRectangle?.remove()
+			let box = this.symbolUse.bbox().transform(this.getTransformMatrix());
+			this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h).move(box.x,box.y)
+			this.selectionRectangle.attr({
+				"stroke-width":selectedBoxWidth,
+				"stroke":this.isSelectionReference?referenceColor:selectionColor,
+				"stroke-dasharray":"3,3",
+				"fill":"none"
+			});
+			this.visualization.stroke("#f00")
 		} else {
 			this.selectionRectangle?.remove();
 			this.visualization.stroke("#000")

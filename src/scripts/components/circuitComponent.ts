@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty } from "../internal";
+import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty, SelectionController } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 /**
@@ -76,7 +76,19 @@ export abstract class CircuitComponent{
 	/**
 	 * If the component is currently selected by the selection controller
 	 */
-	public isSelected: boolean = false;
+	private _isSelected: boolean = false;
+	public get isSelected(): boolean {
+		return this._isSelected;
+	}
+	public set isSelected(value: boolean) {
+		if (!value) {
+			this.isSelectionReference = false
+			SelectionController.instance.referenceComponent=null
+		}
+		this._isSelected = value;
+	}
+
+
 	protected isResizing:boolean = false
 
 	/**
@@ -197,6 +209,16 @@ export abstract class CircuitComponent{
 	 * @param show if the component should appear selected or not
 	 */
 	public abstract viewSelected(show:boolean):void
+
+	protected isSelectionReference = false
+	public setAsSelectionReference():void{
+		if (SelectionController.instance.referenceComponent) {
+			SelectionController.instance.referenceComponent.isSelectionReference = false
+			SelectionController.instance.referenceComponent.viewSelected(SelectionController.instance.referenceComponent.isSelected)
+		}
+		this.isSelectionReference = true
+		this.viewSelected(true)
+	}
 
 	/**
 	 * Checks if the component is inside the selection visualization. The default implementation is a rect-rect intersection check between the selection rectangle and the component bounding box. Override this for a more sophisticated check
