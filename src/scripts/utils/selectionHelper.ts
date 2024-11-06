@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController } from "../internal";
 
-export const selectedBoxWidth = "0.4pt"
+export const selectedBoxWidth = new SVG.Number("0.6pt")
 export const selectionColor = "var(--bs-red)"
 export const referenceColor = "var(--bs-teal)"
 
@@ -17,6 +17,13 @@ export function resizeSVG():SVG.Element{
 	g.add(CanvasController.instance.canvas.rect(10,10).fill("transparent").stroke("none"))
 	g.add(CanvasController.instance.canvas.rect(5,5).fill("var(--bs-cyan)").stroke("none").move(2.5,2.5))
 	return g
+}
+
+export function roundTikz(n:number):string{
+	return n.toLocaleString("en",{
+		maximumFractionDigits:3,
+		notation:"standard"
+	})
 }
 
 /**

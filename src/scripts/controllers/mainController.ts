@@ -5,7 +5,7 @@ import { waitForElementLoaded } from "../utils/domWatcher";
 import hotkeys from 'hotkeys-js';
 import {version} from '../../../package.json';
 
-import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, WireComponent, ComponentSymbol, ComponentSaveObject, EraseController, RectangleComponent} from "../internal";
+import { CanvasController, SnapCursorController, ExportController, SelectionController, SaveController, Undo, CopyPaste, PropertyController, CircuitComponent, ComponentPlacer, NodeComponent, CircuitikzComponent, PathComponent, WireComponent, ComponentSymbol, ComponentSaveObject, EraseController, RectangleComponent, EllipseComponent} from "../internal";
 
 type SaveState = {
 	currentIndices: number[];
@@ -396,7 +396,7 @@ export class MainController {
 			return false;
 		})
 		hotkeys("w",()=>{
-			ComponentPlacer.instance.placeCancel()
+			this.switchMode(Modes.DRAG_PAN)
 			ComponentPlacer.instance.placeComponent(new WireComponent())
 			return false;
 		})
@@ -409,12 +409,6 @@ export class MainController {
 			}
 			return false;
 		})
-
-		
-		hotkeys('k', ()=>{
-			ComponentPlacer.instance.placeComponent(new RectangleComponent())
-			return false
-		});
 
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found
@@ -580,6 +574,38 @@ export class MainController {
 			let svgIcon = SVG.SVG().addTo(addButton)
 			svgIcon.viewbox(0,0,17,12)
 			svgIcon.rect(15,10).move(1,1).fill("none").stroke({
+				color:"var(--bs-emphasis-color)",
+				width:1
+			})
+		}
+		//Add Ellipse
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"));
+			addButton.classList.add("libComponent");
+			addButton.setAttribute("searchData","ellipse circle")
+			addButton.ariaRoleDescription = "button";
+			addButton.title = "Ellipse";
+	
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault();
+				this.switchMode(Modes.COMPONENT)					
+	
+				if (ComponentPlacer.instance.component) {
+					ComponentPlacer.instance.placeCancel()
+				}
+	
+				let newComponent = new EllipseComponent()
+				ComponentPlacer.instance.placeComponent(newComponent)
+				
+				leftOffcanvasOC.hide();
+			};
+	
+			addButton.addEventListener("mouseup", listener);
+			addButton.addEventListener("touchstart", listener, { passive: false });
+	
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(0,0,17,12)
+			svgIcon.ellipse(15,10).move(1,1).fill("none").stroke({
 				color:"var(--bs-emphasis-color)",
 				width:1
 			})

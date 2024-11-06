@@ -1,8 +1,7 @@
-import { EditableProperty } from "../internal";
+import { EditableProperty, Undo } from "../internal";
 
 export class MathJaxProperty extends EditableProperty<string>{
 
-	private renderButton:HTMLButtonElement
 	private input:HTMLInputElement
 
 	public constructor(initialValue?:string){
@@ -16,7 +15,7 @@ export class MathJaxProperty extends EditableProperty<string>{
 		let row = this.getRow()
 
 		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col","col-md-12","col-xxl","my-0","input-group", "has-validation")
+		col.classList.add("col","col-md-12","col-xxl","my-0","input-group")
 		{
 			let formulaSpan1 = document.createElement("span") as HTMLSpanElement
 			formulaSpan1.classList.add("input-group-text")
@@ -26,32 +25,26 @@ export class MathJaxProperty extends EditableProperty<string>{
 			this.input = document.createElement("input") as HTMLInputElement
 			this.input.classList.add("form-control")
 			this.input.type = "text"
-			this.input.style.minWidth = "50px"
-			this.input.value = this.value
+			this.input.value = this.value??""
 			col.appendChild(this.input)
 			
-			let formulaSpan2 = formulaSpan1.cloneNode(true) as HTMLSpanElement
-			formulaSpan2.style.borderRadius="0"
+			let formulaSpan2 = document.createElement("div") as HTMLDivElement
+			formulaSpan2.classList.add("input-group-text")
+			formulaSpan2.innerHTML = "$"
 			col.appendChild(formulaSpan2)
 
-			this.renderButton = document.createElement("button") as HTMLButtonElement
-			this.renderButton.classList.add("btn", "btn-primary", "px-2")
-			this.renderButton.type = "button"
-			this.renderButton.innerHTML = "Render"
-			col.appendChild(this.renderButton)
-
-			const update = ()=>{
-				this.updateValue(this.input.value)
-			}
-
-			this.input.addEventListener("keydown",(ev:KeyboardEvent)=>{						
-				if (ev.key==="Enter") {
-					update()
-				}
+			let previousState = ""
+			this.input.addEventListener("focusin",(ev)=>{
+				previousState = this.value??""
 			})
-	
-			this.renderButton.addEventListener("click",(ev)=>{
-				update()
+			this.input.addEventListener("input",(ev)=>{
+				this.updateValue(this.input.value)
+			})
+
+			this.input.addEventListener("focusout",(ev)=>{
+				if (this.value&&previousState!==this.value) {
+					Undo.addState()
+				}
 			})
 		}
 		row.appendChild(col)

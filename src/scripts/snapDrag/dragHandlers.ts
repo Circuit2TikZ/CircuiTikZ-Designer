@@ -4,7 +4,7 @@ import { CircuitComponent, MainController, SelectionController, SelectionMode, S
 export type DragCallbacks = {
 	dragStart?(pos: SVG.Point, ev?:MouseEvent|TouchEvent):void
 	dragMove?(pos: SVG.Point, ev?:MouseEvent|TouchEvent):void
-	dragEnd?():void
+	dragEnd?():boolean //return true if an Undo state can be added
 }
 
 type DragHandler = {
@@ -110,7 +110,7 @@ export class SnapDragHandler{
 		}
 
 		if (!this.didDrag) {
-			// didn't move at all -> essentially clicked the component --> select the component instead
+			// didn't move at all -> essentially clicked the component --> select the component instead; no Undo state
 			let ctrlCommand = ev.detail.event.ctrlKey||(MainController.instance.isMac&&ev.detail.event.metaKey)
 			let selectionMode = ev.detail.event.shiftKey?SelectionMode.ADD:ctrlCommand?SelectionMode.SUB:SelectionMode.RESET;
 
@@ -280,13 +280,14 @@ export class AdjustDragHandler{
 
 		SnapController.instance.hideSnapPoints();
 
+		let shouldUndo = false;
 		if (this.dragCallbacks && this.dragCallbacks.dragEnd) {
-			this.dragCallbacks.dragEnd()
+			shouldUndo = this.dragCallbacks.dragEnd()
 		}
 		
 		this.componentReference.recalculateSnappingPoints();
 
-		if (trackState) {
+		if (trackState&&shouldUndo) {
 			Undo.addState()
 		}
 	}

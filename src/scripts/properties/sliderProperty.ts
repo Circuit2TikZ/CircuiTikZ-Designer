@@ -45,7 +45,7 @@ export class SliderProperty extends EditableProperty<SVG.Number>{
 		let row = this.getRow()
 
 		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col-12","my-0","input-group","d-flex","flex-row","w-100")
+		col.classList.add("col-12","my-0","input-group")
 		
 			let distanceLabel = document.createElement("label") as HTMLLabelElement
 			distanceLabel.classList.add("input-group-text","fs-6")

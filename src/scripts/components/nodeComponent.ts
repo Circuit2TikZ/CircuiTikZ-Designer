@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { basicDirections, CanvasController, ChoiceProperty, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, defaultBasicDirection, DirectionInfo, ExportController, MainController, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SliderProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
-import { referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
+import { referenceColor, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type NodeSaveObject = CircuitikzSaveObject & {
 	position:{x:number, y:number}
@@ -188,7 +188,7 @@ export class NodeComponent extends CircuitikzComponent{
 		let data:NodeSaveObject = {
 			type:"node",
 			id:this.referenceSymbol.node.id,
-			position:{x:this.position.x,y:this.position.y},
+			position:this.position.simplifyForJson(),
 		}
 		if (this.rotationDeg!==0) {
 			data.rotation=this.rotationDeg
@@ -220,7 +220,7 @@ export class NodeComponent extends CircuitikzComponent{
 
 		let id = this.name.value
 		if (!id&&this.mathJaxLabel.value) {
-			id = ExportController.instance.exportID
+			id = ExportController.instance.createExportID("N")
 		}
 
 		let labelNodeStr = ""
@@ -236,11 +236,11 @@ export class NodeComponent extends CircuitikzComponent{
 			let labelShift = this.labelPos.direction.mul(-labelDist.value)
 			let posShift = ""
 			if (labelShift.x!==0) {
-				posShift+="xshift="+labelShift.x.toPrecision(2)+"cm"
+				posShift+="xshift="+roundTikz(labelShift.x)+"cm"
 			}
 			if (labelShift.y!==0) {
 				posShift += posShift==""?"":", "
-				posShift+="yshift="+(-labelShift.y).toPrecision(2)+"cm"
+				posShift+="yshift="+roundTikz(-labelShift.y)+"cm"
 			}
 			posShift = posShift==""?"":"["+posShift+"]"
 
@@ -342,12 +342,19 @@ export class NodeComponent extends CircuitikzComponent{
 
 		if (saveObject.label) {
 			if (Object.hasOwn(saveObject.label,"value")) {
-				nodeComponent.labelDistance.updateValue(saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0),true)
-				nodeComponent.anchorChoice.updateValue(
-					saveObject.label.anchor?basicDirections.find((item)=>item.key==saveObject.label.anchor):defaultBasicDirection,true)
-				nodeComponent.positionChoice.updateValue(
-					saveObject.label.position?basicDirections.find((item)=>item.key==saveObject.label.position):defaultBasicDirection,true)
-				nodeComponent.mathJaxLabel.updateValue(saveObject.label.value,true)
+				nodeComponent.labelDistance.value=saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0)
+				nodeComponent.labelDistance.updateHTML()
+				nodeComponent.anchorChoice.value=
+					saveObject.label.anchor?basicDirections.find((item)=>item.key==saveObject.label.anchor):defaultBasicDirection
+				nodeComponent.anchorChoice.updateHTML()
+				nodeComponent.positionChoice.value=
+					saveObject.label.position?basicDirections.find((item)=>item.key==saveObject.label.position):defaultBasicDirection
+				nodeComponent.positionChoice.updateHTML()
+				nodeComponent.mathJaxLabel.value = saveObject.label.value
+				nodeComponent.mathJaxLabel.updateHTML()
+				nodeComponent.labelColor.value = saveObject.label.color?new SVG.Color(saveObject.label.color):null
+				nodeComponent.labelColor.updateHTML()
+				nodeComponent.generateLabelRender()
 			}else{
 				//@ts-ignore
 				nodeComponent.mathJaxLabel.value = (saveObject.label)

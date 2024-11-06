@@ -198,7 +198,9 @@ export class WireComponent extends CircuitComponent{
 				this.adjustmentPoints.push(element)
 
 
+				let startPos:SVG.Point
 				AdjustDragHandler.snapDrag(this,element,resize,{
+					dragStart:(pos)=>{startPos=this.cornerPoints[index]},
 					dragMove:(pos,ev)=>{
 						if (ev&&(ev.ctrlKey||(MainController.instance.isMac&&ev.metaKey))) {
 							// wires from and to this point should be straight
@@ -228,7 +230,7 @@ export class WireComponent extends CircuitComponent{
 						this.update()
 					},
 					dragEnd() {
-						Undo.addState()
+						return this.cornerPoints[index].eq(startPos)
 					},
 				})
 			}
@@ -394,10 +396,7 @@ export class WireComponent extends CircuitComponent{
 		let others:WireSegment[] = []
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			let segment:WireSegment = {
-				position:{
-					x:this.cornerPoints[index+1].x,
-					y:this.cornerPoints[index+1].y
-				},
+				position:this.cornerPoints[index+1].simplifyForJson(),
 				direction: this.wireDirections[index]
 			}
 			others.push(segment)
@@ -405,7 +404,7 @@ export class WireComponent extends CircuitComponent{
 
 		let data:WireSaveObject = {
 			type:"wire",
-			start:{x:this.cornerPoints[0].x,y:this.cornerPoints[0].y},
+			start:this.cornerPoints[0].simplifyForJson(),
 			segments:others
 		}
 

@@ -1,10 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, MainController, SectionHeaderProperty, SliderProperty, TextProperty } from "../internal";
-
-/**
- * names cannot contain punctuation, parantheses and some other symbols
- */
-const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
+import { CircuitComponent, ColorProperty, ComponentSaveObject, ComponentSymbol, InfoProperty, invalidNameRegEx, MainController, SectionHeaderProperty, SliderProperty, TextProperty } from "../internal";
 
 /**
  * extension of {@link ComponentSaveObject} to also include the circuitikz id and a given name for the component
@@ -28,7 +23,6 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 	 * What will be used as the reference name in the tikz code (e.g. "\node[] (name) at (0,0){};"")
 	 */
 	public name: TextProperty;
-	public labelDistance: SliderProperty
 
 	/**
 	 * The reference to the symbol library component. Has metadata of the symbol

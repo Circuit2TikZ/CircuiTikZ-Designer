@@ -5,6 +5,7 @@
  */
 
 import * as SVG from "@svgdotjs/svg.js";
+import { roundTikz } from "./selectionHelper";
 
 declare module "@svgdotjs/svg.js" {
 	interface Number {
@@ -154,6 +155,7 @@ declare module "@svgdotjs/svg.js" {
 		 */
 		eq(other:Point, eps?:number):boolean
 		toTikzString(): string;
+		simplifyForJson():Point;
 	}
 
 	interface Color{
@@ -248,22 +250,27 @@ const unitPriority: string[] = ["px", "in", "pt", "pc", "cm", "mm"];
  */
 function toSameUnit(thisNumber: SVG.Number, otherNumber: SVG.Number | number): SVG.Number[] {
 	const thisNumberUnit = thisNumber.unit || "px"; // Empty == "px"
-	const otherNumberUnit = otherNumber instanceof SVG.Number? otherNumber.unit : "px";
+	const otherNumberUnit = otherNumber instanceof SVG.Number? otherNumber.unit || "px" : "px";
 
+	let numberA:SVG.Number = new SVG.Number(thisNumber)
+	let numberB:SVG.Number
 	if (!(otherNumber instanceof SVG.Number)) {
-		thisNumber = new SVG.Number(thisNumber); // clone
-		otherNumber = new SVG.Number(otherNumber, thisNumberUnit); // assume same unit
+		numberB = new SVG.Number(otherNumber, thisNumberUnit); // assume same unit
 	} else if (thisNumberUnit !== otherNumberUnit) {
 		const thisNumberPrio = unitPriority.indexOf(thisNumberUnit);
 		const otherNumberPrio = unitPriority.indexOf(otherNumberUnit);
 
+		numberB = new SVG.Number(otherNumber);
 		if (thisNumberPrio < otherNumberPrio) {
-			thisNumber = new SVG.Number(thisNumber); // clone
-			otherNumber = otherNumber.convertToUnit(thisNumberUnit);
-		} else thisNumber = thisNumber.convertToUnit(otherNumberUnit);
+			numberB = numberB.convertToUnit(thisNumberUnit);
+		} else{
+			numberA = numberA.convertToUnit(otherNumberUnit);
+		} 
+	}else{
+		numberB = new SVG.Number(otherNumber);
 	}
 
-	return [thisNumber, otherNumber];
+	return [numberA, numberB];
 }
 
 SVG.extend(SVG.Number, {
@@ -603,20 +610,18 @@ SVG.extend(SVG.Point, {
 	 * @returns {string} the TikZ representation, e.g. "(0.1, 1.23)"
 	 */
 	toTikzString(): string {
-		let x = Number(this.x * unitConvertMap.px.cm)
-			.toFixed(2)
-			.replace(/\.?0+$/, "");
-		let y = Number(-this.y * unitConvertMap.px.cm)
-			.toFixed(2)
-			.replace(/\.?0+$/, "");
-		return `(${x}, ${y})`;
+		return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`;
 	},
+	simplifyForJson(digits:2|3|4|5=3): SVG.Point{
+		let factor = 10**digits
+		return new SVG.Point(Math.round(this.x*factor)/factor,Math.round(this.y*factor)/factor)
+	}
 });
 
 
 SVG.extend(SVG.Color,{
 	toTikzString():string{
 		let color:SVG.Color = this.rgb()
-		return "{rgb,}"
+		return `{rgb,255:red,${color.r.toFixed(0)};green,${color.g.toFixed(0)};blue,${color.b.toFixed(0)}}`
 	}
 })

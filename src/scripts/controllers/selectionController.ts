@@ -60,12 +60,16 @@ export class SelectionController {
 	}
 
 	private selectionStart(evt:MouseEvent|TouchEvent){
-		if (!this.selectionEnabled) {
+		if (!this.selectionEnabled||this.currentlyDragging) {
 			return
 		}
+
 		if (evt instanceof MouseEvent&&evt.button!==0) {
 			return
 		}
+
+		evt.preventDefault()
+
 		let shift = evt.shiftKey//||evt.detail.shiftKey
 		let ctrl = evt.ctrlKey||(MainController.instance.isMac&&evt.metaKey)||(MainController.instance.isMac&&evt.metaKey)
 		if (shift) {
@@ -93,6 +97,11 @@ export class SelectionController {
 		if (!this.selectionEnabled||!this.currentlyDragging) {
 			return
 		}
+
+		if (evt instanceof MouseEvent && evt.button!==0) {
+			return
+		}
+
 		if (evt instanceof TouchEvent && evt.touches.length>1) {
 			this.currentlyDragging=false
 			this.selectionRectangle.size(0,0).move(0,0)
@@ -123,9 +132,11 @@ export class SelectionController {
 		if (!this.selectionEnabled) {
 			return
 		}
+		
 		if (evt instanceof MouseEvent && evt.button!==0) {
 			return
 		}
+
 		if (evt instanceof TouchEvent && evt.touches.length>0) {
 			return
 		}
@@ -374,7 +385,7 @@ export class SelectionController {
 	}
 
 	public distributeSelection(mode:DistributionMode,horizontal:boolean){
-		if (this.currentlySelectedComponents.length<=2) {
+		if (this.currentlySelectedComponents.length<2) {
 			return
 		}
 		let direction = horizontal?new SVG.Point(1,0):new SVG.Point(0,1)

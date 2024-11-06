@@ -11,6 +11,7 @@ export class Undo {
 
 	//TODO discuss if selections should be remembered or not???
 	public static addState(){
+		
 		// get json object
 		let currentState = []
 		for (const component of MainController.instance.circuitComponents) {
@@ -19,10 +20,22 @@ export class Undo {
 			currentState.push(componentObject)
 		}
 
+		let shouldAddState=true
+		if (Undo.states.length>0) {
+			let compareState = Undo.states.at(Undo.currentIndex)
+			if (JSON.stringify(compareState)==JSON.stringify(currentState)) {
+				// This and the last state are identical -> no new state
+				// sometimes needed for more complicated scenarios
+				shouldAddState = false
+			}
+		}
+
 		// push state on stack
-		Undo.states = Undo.states.slice(0,Undo.currentIndex+1)
-		Undo.states.push(currentState)
-		Undo.currentIndex = Undo.states.length-1
+		if (shouldAddState) {
+			Undo.states = Undo.states.slice(0,Undo.currentIndex+1)
+			Undo.states.push(currentState)
+			Undo.currentIndex = Undo.states.length-1
+		}
 	}
 
 	public static getCurrentState(){

@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController } from "../internal"
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor, roundTikz } from "../utils/selectionHelper";
 
 
 export type PathLabel = Label & {
@@ -316,8 +316,8 @@ export class PathComponent extends CircuitikzComponent{
 		let data:PathSaveObject = {
 			type:"path",
 			id:this.referenceSymbol.node.id,
-			start:{x:this.posStart.x,y:this.posStart.y},
-			end:{x:this.posEnd.x,y:this.posEnd.y},
+			start:this.posStart.simplifyForJson(),
+			end:this.posEnd.simplifyForJson(),
 		}
 
 		if (this.name.value) {
@@ -339,7 +339,7 @@ export class PathComponent extends CircuitikzComponent{
 		return data
 	}
 	public toTikzString(): string {
-		let distStr = this.labelDistance.value.convertToUnit("cm").minus(0.1).value.toPrecision(2)+"cm"
+		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value)+"cm"
 		let shouldDist = this.labelDistance.value&&distStr!="0.0cm"
 		return (
 			"\\draw " +
@@ -398,17 +398,25 @@ export class PathComponent extends CircuitikzComponent{
 			this.endSVG = resizeSVG()
 			this.endSVG.node.style.cursor = "grab"
 
+			let startPos:SVG.Point
+			let endPos:SVG.Point
 			AdjustDragHandler.snapDrag(this, this.startSVG, true, {
+				dragStart: (pos)=>{
+					startPos = this.posStart
+				},
 				dragMove: (pos)=>{
 					this.moveStartTo(pos)
 				},
-				dragEnd:()=>{Undo.addState()}
+				dragEnd:()=>{return startPos.eq(this.posStart)}
 			})
 			AdjustDragHandler.snapDrag(this, this.endSVG, true, {
+				dragStart: (pos)=>{
+					endPos = this.posEnd
+				},
 				dragMove: (pos)=>{
 					this.moveEndTo(pos)
 				},
-				dragEnd:()=>{Undo.addState()}
+				dragEnd:()=>{return endPos.eq(this.posEnd)}
 			})
 		}else{
 			AdjustDragHandler.snapDrag(this, this.startSVG, false)
@@ -456,17 +464,26 @@ export class PathComponent extends CircuitikzComponent{
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced=2
 
-		pathComponent.mirror.updateValue(saveObject.mirror??false,true)
-		pathComponent.invert.updateValue(saveObject.invert??false,true)
+		pathComponent.mirror.value=saveObject.mirror??false
+		pathComponent.mirror.updateHTML()
+		pathComponent.invert.value=saveObject.invert??false
+		pathComponent.invert.updateHTML()
 
 		if (saveObject.name) {
-			pathComponent.name.updateValue(saveObject.name,true)
+			pathComponent.name.value = saveObject.name
+			pathComponent.name.updateHTML()
 		}
 
 		if (saveObject.label) {
-			pathComponent.labelSide.updateValue(saveObject.label.otherSide??false,true)
-			pathComponent.labelDistance.updateValue(saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0,"cm"),true)
-			pathComponent.mathJaxLabel.updateValue(saveObject.label.value,true)
+			pathComponent.labelSide.value = saveObject.label.otherSide??false
+			pathComponent.labelSide.updateHTML()
+			pathComponent.labelDistance.value = saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0,"cm")
+			pathComponent.labelDistance.updateHTML()
+			pathComponent.mathJaxLabel.value=saveObject.label.value
+			pathComponent.mathJaxLabel.updateHTML()
+			pathComponent.labelColor.value = saveObject.label.color?new SVG.Color(saveObject.label.color):null
+			pathComponent.labelColor.updateHTML()
+			pathComponent.generateLabelRender()
 		}
 		pathComponent.placeFinish()
 		pathComponent.visualization.show()

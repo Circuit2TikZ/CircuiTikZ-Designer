@@ -1,36 +1,33 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, defaultBasicDirection, defaultFontSize, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, Text, TextAreaProperty } from "../internal";
-import { referenceColor, resizeSVG, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
-import sanitizeHtml from 'sanitize-html';
+import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, defaultBasicDirection, defaultFontSize, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint, StrokeInfo, Text, TextAreaProperty, Undo } from "../internal";
+import { referenceColor, resizeSVG, selectedBoxWidth, selectionColor, roundTikz } from "../utils/selectionHelper";
 
-export type RectangleSaveObject = ShapeSaveObject & {
+export type EllipseSaveObject = ShapeSaveObject & {
 	firstPoint:SVG.Point
 	secondPoint:SVG.Point,
-	text?:Text&{innerSep?:SVG.Number,fontSize?:string}
 }
 
-export class RectangleComponent extends ShapeComponent{
+export class EllipseComponent extends ShapeComponent{
 	private firstPoint:SVG.Point;
 	private secondPoint:SVG.Point;
 
-	protected declare shapeVisualization:SVG.Rect;
-	protected declare selectionElement:SVG.Rect;
-	protected declare dragElement:SVG.Rect
+	protected declare shapeVisualization:SVG.Ellipse;
+	protected declare selectionElement:SVG.Ellipse;
+	protected declare dragElement:SVG.Ellipse
 
-	private textAreaProperty:TextAreaProperty
-	private textInnerSep:SliderProperty
-	private textFontSize:ChoiceProperty<FontSize>
-	private textForeign:SVG.ForeignObject
-	private textDiv:HTMLDivElement
+	private _isCircle = false;
+	public get isCircle() {
+		return this._isCircle;
+	}
 
 	public constructor(){
 		super()
-		this.displayName = "Rectangle"
+		this.displayName = "Ellipse"
 
-		this.shapeVisualization = CanvasController.instance.canvas.rect(0,0)
+		this.shapeVisualization = CanvasController.instance.canvas.ellipse(0,0)
 		this.shapeVisualization.hide()
 
-		this.dragElement = CanvasController.instance.canvas.rect(0,0)
+		this.dragElement = CanvasController.instance.canvas.ellipse(0,0)
 		this.dragElement.attr({
 			fill: "transparent",
 			stroke: "none",
@@ -43,36 +40,10 @@ export class RectangleComponent extends ShapeComponent{
 
 		SnapCursorController.instance.visible = true;
 		this.snappingPoints = []
+	}
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
-		this.textAreaProperty = new TextAreaProperty({text:"",align:-1,justify:-1})
-		this.textAreaProperty.addChangeListener(ev=>{		
-			this.update()
-		})
-		this.propertiesHTMLRows.push(this.textAreaProperty.buildHTML())
-
-		this.textFontSize = new ChoiceProperty("Fontsize",fontSizes,defaultFontSize)
-		this.textFontSize.addChangeListener((ev)=>{this.update()})
-		this.propertiesHTMLRows.push(this.textFontSize.buildHTML())
-
-		this.textInnerSep = new SliderProperty("Inner sep",0,10,0.1,new SVG.Number(5,"pt"))
-		this.textInnerSep.addChangeListener((ev)=>{this.update()})
-		this.propertiesHTMLRows.push(this.textInnerSep.buildHTML())
-
-		this.textForeign = CanvasController.instance.canvas.foreignObject(0,0)
-		this.textForeign.node.setAttribute("overflow","visible")
-		this.textForeign.node.style.pointerEvents = "none"
-		this.textDiv = document.createElement("div") as HTMLDivElement
-		this.textDiv.classList.add("unselectable")
-		this.textDiv.style.width = "100%"
-		this.textDiv.style.height = "100%"
-		this.textDiv.style.display = "flex"
-		let textSpan = document.createElement("div") as HTMLDivElement
-		textSpan.style.width = "100%"
-		textSpan.style.display = "inline-block"
-		this.textDiv.appendChild(textSpan)
-		this.textForeign.node.appendChild(this.textDiv)
-		this.visualization.add(this.textForeign)
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
@@ -81,9 +52,15 @@ export class RectangleComponent extends ShapeComponent{
 		for (const anchor of basicDirections) {
 			if (anchor.key==defaultBasicDirection.key) {
 				continue
-			}			
-			relPositions.push({relPos:halfSize.mul(anchor.direction),anchorname:anchor.name})
+			}
+			let dirLength = anchor.direction.abs()
+			dirLength=dirLength==0?1:dirLength
+			relPositions.push({relPos:halfSize.mul(anchor.direction.div(dirLength)),anchorname:anchor.name})
+			if (dirLength>1) {
+				relPositions.push({relPos:halfSize.mul(anchor.direction),anchorname:""})
+			}
 		}
+
 		if (!this.snappingPoints||this.snappingPoints.length==0) {
 			for (const element of relPositions) {
 				this.snappingPoints.push(new SnapPoint(this,element.anchorname,element.relPos))
@@ -94,7 +71,7 @@ export class RectangleComponent extends ShapeComponent{
 				const snappingPoint = this.snappingPoints[index];
 				snappingPoint.updateRelPosition(relPos)
 				snappingPoint.recalculate(new SVG.Matrix())
-			}
+			}			
 		}
 	}
 
@@ -157,6 +134,7 @@ export class RectangleComponent extends ShapeComponent{
 						this.secondPoint = newPos.add(newHalfSize)
 						this.update()
 					},
+					// dragEnd:()=>{Undo.addState()}
 				})
 			}
 			this.update()
@@ -181,7 +159,7 @@ export class RectangleComponent extends ShapeComponent{
 		this.update()
 	}
 	public flip(horizontal: boolean): void {
-		//doesn't do anything for rectangles
+		//doesn't do anything for ellipses
 	}
 	protected update(): void {
 		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value 
@@ -203,6 +181,8 @@ export class RectangleComponent extends ShapeComponent{
 		if (this.size.y<0) {
 			this.size.y=0
 		}
+
+		this._isCircle=Math.abs(this.size.x-this.size.y)<1e-5
 		
 		this.shapeVisualization.size(this.size.x<strokeWidth?0:this.size.x-strokeWidth,this.size.y<strokeWidth?0:this.size.y-strokeWidth)
 		this.shapeVisualization.move(upperLeft.x,upperLeft.y)
@@ -213,14 +193,12 @@ export class RectangleComponent extends ShapeComponent{
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
 		this.updateLabelPosition()
-		this.updateText()
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			let lineWidth = selectedBoxWidth.convertToUnit("px").value
-			this.selectionElement.move(this.bbox.x-lineWidth/2,this.bbox.y-lineWidth/2);
-			this.selectionElement.attr("width",this.bbox.w+lineWidth);
-			this.selectionElement.attr("height",this.bbox.h+lineWidth);
+			this.selectionElement.center(this.position.x,this.position.y);
+			this.selectionElement.size(this.bbox.w+2*lineWidth,this.bbox.h+2*lineWidth);
 		}
 	}
 
@@ -232,15 +210,19 @@ export class RectangleComponent extends ShapeComponent{
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.selectionElement?.remove()
-			this.selectionElement = CanvasController.instance.canvas.rect(this.bbox.w,this.bbox.h).move(this.bbox.x,this.bbox.y)
+			if (!this.selectionElement) {
+				this.selectionElement = CanvasController.instance.canvas.ellipse()
+				this.selectionElement.stroke({
+					width:selectedBoxWidth.convertToUnit("px").value,
+					dasharray:"3,3"
+				})
+				this.selectionElement.fill("none")
+			}
 			this.selectionElement.attr({
-				"stroke-width":selectedBoxWidth,
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
-				"stroke-dasharray":"3,3",
-				"fill":"none"
-			});
+			})
 			this.visualization.stroke("#f00")
+			this.recalculateSelectionVisuals()
 		} else {
 			this.selectionElement?.remove();
 			this.visualization.stroke("#000")
@@ -248,9 +230,9 @@ export class RectangleComponent extends ShapeComponent{
 		}
 		this.resizable(this.isSelected&&show&&SelectionController.instance.currentlySelectedComponents.length==1)
 	}
-	public toJson(): RectangleSaveObject {
-		let data:RectangleSaveObject = {
-			type:"rect",
+	public toJson(): EllipseSaveObject {
+		let data:EllipseSaveObject = {
+			type:"ellipse",
 			firstPoint:this.firstPoint.simplifyForJson(),
 			secondPoint:this.secondPoint.simplifyForJson()
 		}
@@ -274,7 +256,7 @@ export class RectangleComponent extends ShapeComponent{
 		if (this.strokeInfo.color!="default") {
 			stroke.color = this.strokeInfo.color
 			shouldStroke = true
-		}		
+		}
 		if (this.strokeInfo.opacity!=1) {
 			stroke.opacity = this.strokeInfo.opacity
 			shouldStroke = true
@@ -299,102 +281,74 @@ export class RectangleComponent extends ShapeComponent{
 			data.label = labelWithoutRender
 		}
 
-		if (this.textAreaProperty.value&&this.textAreaProperty.value.text!=="") {
-			let textData:Text&{fontSize?:string,innerSep?:SVG.Number}={
-				text:this.textAreaProperty.value.text
-			}
-			if (this.textAreaProperty.value.align!==-1) {
-				textData.align=this.textAreaProperty.value.align
-			}
-			if (this.textAreaProperty.value.justify!==-1) {
-				textData.justify=this.textAreaProperty.value.justify
-			}
-			if (this.textFontSize.value.key!==defaultFontSize.key) {
-				textData.fontSize = this.textFontSize.value.key
-			}
-			if (this.textInnerSep.value.value!==5) {
-				textData.innerSep = this.textInnerSep.value
-			}
-			data.text=textData
-		}
-
 		return data
 	}
 
-	static fromJson(saveObject: RectangleSaveObject): RectangleComponent {
-		let rectComponent = new RectangleComponent()
-		rectComponent.firstPoint = new SVG.Point(saveObject.firstPoint)
-		rectComponent.secondPoint = new SVG.Point(saveObject.secondPoint)
+	static fromJson(saveObject: EllipseSaveObject): EllipseComponent {
+		let ellipseComponent = new EllipseComponent()
+		ellipseComponent.firstPoint = new SVG.Point(saveObject.firstPoint)
+		ellipseComponent.secondPoint = new SVG.Point(saveObject.secondPoint)
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
-				rectComponent.fillInfo.color=saveObject.fill.color
-				rectComponent.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
-				rectComponent.fillColorProperty.updateHTML()
+				ellipseComponent.fillInfo.color=saveObject.fill.color
+				ellipseComponent.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
+				ellipseComponent.fillColorProperty.updateHTML()
 			}
 			if (saveObject.fill.opacity!=undefined) {
-				rectComponent.fillInfo.opacity=saveObject.fill.opacity
-				rectComponent.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity*100,"%")
-				rectComponent.fillOpacityProperty.updateHTML()
+				ellipseComponent.fillInfo.opacity=saveObject.fill.opacity
+				ellipseComponent.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity*100,"%")
+				ellipseComponent.fillOpacityProperty.updateHTML()
 			}
 		}
 
 		if (saveObject.stroke) {
-			
 			if (saveObject.stroke.color) {
-				rectComponent.strokeInfo.color=saveObject.stroke.color
-				rectComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-				rectComponent.strokeColorProperty.updateHTML()
+				ellipseComponent.strokeInfo.color=saveObject.stroke.color
+				ellipseComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
+				ellipseComponent.strokeColorProperty.updateHTML()
 			}
 			if (saveObject.stroke.opacity!=undefined) {
-				rectComponent.strokeInfo.opacity=saveObject.stroke.opacity
-				rectComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity*100,"%")
-				rectComponent.strokeOpacityProperty.updateHTML()
+				ellipseComponent.strokeInfo.opacity=saveObject.stroke.opacity
+				ellipseComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity*100,"%")
+				ellipseComponent.strokeOpacityProperty.updateHTML()
 			}			
 			if (saveObject.stroke.width) {
-				rectComponent.strokeInfo.width=new SVG.Number(saveObject.stroke.width)
-				rectComponent.strokeWidthProperty.value = rectComponent.strokeInfo.width
-				rectComponent.strokeWidthProperty.updateHTML()
+				ellipseComponent.strokeInfo.width=new SVG.Number(saveObject.stroke.width)
+				ellipseComponent.strokeWidthProperty.value = ellipseComponent.strokeInfo.width
+				ellipseComponent.strokeWidthProperty.updateHTML()
 			}
 		}
 
 		if (saveObject.label) {
-			rectComponent.labelDistance.value=saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0)
-			rectComponent.labelDistance.updateHTML()
-			rectComponent.anchorChoice.value=
+			ellipseComponent.labelDistance.value=saveObject.label.distance?new SVG.Number(saveObject.label.distance):new SVG.Number(0)
+			ellipseComponent.labelDistance.updateHTML()
+			ellipseComponent.anchorChoice.value=
 				saveObject.label.anchor?basicDirections.find((item)=>item.key==saveObject.label.anchor):defaultBasicDirection;
-			rectComponent.anchorChoice.updateHTML()
-			rectComponent.positionChoice.value=
+			ellipseComponent.anchorChoice.updateHTML()
+			ellipseComponent.positionChoice.value=
 				saveObject.label.position?basicDirections.find((item)=>item.key==saveObject.label.position):defaultBasicDirection;
-			rectComponent.positionChoice.updateHTML()
-			rectComponent.mathJaxLabel.value = saveObject.label.value
-			rectComponent.mathJaxLabel.updateHTML()
-			rectComponent.labelColor.value = saveObject.label.color?new SVG.Color(saveObject.label.color):null
-			rectComponent.labelColor.updateHTML()
-			rectComponent.generateLabelRender()
+			ellipseComponent.positionChoice.updateHTML()
+			ellipseComponent.mathJaxLabel.value = saveObject.label.value
+			ellipseComponent.mathJaxLabel.updateHTML()
+			ellipseComponent.labelColor.value = saveObject.label.color?new SVG.Color(saveObject.label.color):null
+			ellipseComponent.labelColor.updateHTML()
+			ellipseComponent.generateLabelRender()
 		}
 
-		if (saveObject.text) {
-			let text:Text={
-				text:saveObject.text.text,
-				align:saveObject.text.align??-1,
-				justify:saveObject.text.justify??-1
-			}
-			rectComponent.textAreaProperty.value = text
-			rectComponent.textAreaProperty.updateHTML()
-			rectComponent.textFontSize.value = saveObject.text.fontSize?fontSizes.find(item=>item.key==saveObject.text.fontSize):defaultFontSize
-			rectComponent.textFontSize.updateHTML()
-			rectComponent.textInnerSep.value = saveObject.text.innerSep?new SVG.Number(saveObject.text.innerSep):new SVG.Number("5pt")
-			rectComponent.textInnerSep.updateHTML()
-		}
-
-		rectComponent.placeFinish()
-		rectComponent.updateTheme()
-		return rectComponent
+		ellipseComponent.placeFinish()
+		ellipseComponent.updateTheme()
+		return ellipseComponent
 	}
 
 	public toTikzString(): string {
-		let optionsArray:string[]=["shape=rectangle"]
+		let optionsArray:string[]=[]
+		
+		if (this.isCircle) {
+			optionsArray.push("shape=circle")
+		}else{
+			optionsArray.push("shape=ellipse")
+		}
 		if (this.fillInfo.opacity>0) {
 			if (this.fillInfo.color!=="default") {
 				let c = new SVG.Color(this.fillInfo.color)
@@ -427,26 +381,14 @@ export class RectangleComponent extends ShapeComponent{
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
 		optionsArray.push("inner sep=0")
-		optionsArray.push("minimum width="+roundTikz(new SVG.Number(this.size.x-strokeWidth,"px").convertToUnit("cm").value)+"cm")
-		optionsArray.push("minimum height="+roundTikz(new SVG.Number(this.size.y-strokeWidth,"px").convertToUnit("cm").value)+"cm")
+		optionsArray.push("minimum width="+roundTikz(new SVG.Number(this.bbox.w-strokeWidth,"px").convertToUnit("cm").value)+"cm")
+		if (!this.isCircle) {
+			optionsArray.push("minimum height="+roundTikz(new SVG.Number(this.bbox.h-strokeWidth,"px").convertToUnit("cm").value)+"cm")
+		}
 
 		let id = this.name.value
-		if (!id&&(this.mathJaxLabel.value)) {
-			id = ExportController.instance.createExportID("Rect")
-		}		
-
-		let textStr = ""
-		if (this.textAreaProperty.value.text) {
-			let dir = new SVG.Point(this.textAreaProperty.value.align,this.textAreaProperty.value.justify)
-			let anchor = basicDirections.find(item=>item.direction.eq(dir)).name;
-			let pos = this.position.add(dir.mul(this.size.div(2)))
-			
-			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width.times(0.5))
-			let textWidth = new SVG.Number(this.size.x,"px").minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2)).convertToUnit("cm")
-			
-			let fontStr = this.textFontSize.value.key==defaultFontSize.key?"":`\\${this.textFontSize.value.name}`
-			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==-1?"left":this.textAreaProperty.value.align==0?"center":"right"}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}]`
-			textStr = ` node ${options} at ${pos.toTikzString()}{${fontStr} ${this.textAreaProperty.value.text.replaceAll("\n","\\\\")}}`
+		if (!id&&this.mathJaxLabel.value) {
+			id = ExportController.instance.createExportID("Ellipse")
 		}
 
 		let labelNodeStr = ""
@@ -455,8 +397,9 @@ export class RectangleComponent extends ShapeComponent{
 			
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 
-			let anchorDir = this.anchorChoice.value.key==defaultBasicDirection.key?new SVG.Point():this.anchorChoice.value.direction
-			let labelShift = anchorDir.mul(-labelDist.value)
+			let norm = this.labelPos.direction.abs()			
+			norm = norm==0?1:norm
+			let labelShift = this.labelPos.direction.mul(-labelDist.value/norm)
 			let posShift = ""
 			if (labelShift.x!==0) {
 				posShift+="xshift="+roundTikz(labelShift.x)+"cm"
@@ -473,10 +416,37 @@ export class RectangleComponent extends ShapeComponent{
 		}
 
 		let optionsStr = optionsArray.length>0?`[${optionsArray.join(", ")}]`:""
-		return `\\node${optionsStr}${id?"("+id+")":""} at ${this.position.toTikzString()}{}${textStr}${labelNodeStr};`
+		return `\\node${optionsStr}${id?"("+id+")":""} at ${this.position.toTikzString()}{}${labelNodeStr};`
 	}
+
+	public requiredTikzLibraries(): string[] {
+		return this.isCircle?[]:["shapes.geometric"]
+	}
+
+	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
+		//rescale ellipse and rectangle to a unit circle and rectangle (and move rectangle to equivalent position)
+		let ellipseExtendsInv = new SVG.Point(2/this.bbox.w,2/this.bbox.h)
+		let rectPos = new SVG.Point(selectionRectangle.cx,selectionRectangle.cy)
+		let rectExtendsHalf = new SVG.Point(selectionRectangle.w/2,selectionRectangle.h/2)
+		rectPos = this.position.add(rectPos.sub(this.position).mul(ellipseExtendsInv))
+		rectExtendsHalf = rectExtendsHalf.mul(ellipseExtendsInv)
+
+		// check absolute difference of rectangle and circle centers
+		let diff = new SVG.Point(Math.abs(this.position.x-rectPos.x),Math.abs(this.position.y-rectPos.y))
+
+		//outside
+		let r = 1 // radius/squared radius of ellipse(now circle)
+		if (diff.x>rectExtendsHalf.x+r||diff.y>rectExtendsHalf.y+r) return false
+
+		//inside
+		if (diff.x<=rectExtendsHalf.x||diff.y<=rectExtendsHalf.y) return true
+
+		//rounded corner check
+		return (diff.x-rectExtendsHalf.x)**2+(diff.y-rectExtendsHalf.y)**2 <=r
+	}
+
 	public copyForPlacement(): CircuitComponent {
-		return new RectangleComponent()
+		return new EllipseComponent()
 	}
 	public remove(): void {
 		for (const [dir,viz] of this.resizeVisualizations) {
@@ -553,7 +523,7 @@ export class RectangleComponent extends ShapeComponent{
 		}else{
 			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
 			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction.div(this.positionChoice.value.direction.abs())))
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -585,28 +555,5 @@ export class RectangleComponent extends ShapeComponent{
 		// acutally move the label
 		let movePos = textPos.sub(ref)
 		labelSVG.transform(new SVG.Matrix({translate:[movePos.x,movePos.y]}))
-	}
-
-	private updateText(){
-		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-		this.textForeign.move(this.bbox.x+strokeWidth,this.bbox.y+strokeWidth)
-		let w = this.bbox.w-strokeWidth*2
-		let h = this.bbox.h-strokeWidth*2
-		this.textForeign.size(w<0?0:w,h<0?0:h)
-
-		let text = sanitizeHtml(this.textAreaProperty.value.text,{
-			allowedTags:[],
-			allowedAttributes:{},
-		})
-
-		this.textDiv.children[0].innerHTML = text.replaceAll("\n","<br>")
-		this.textDiv.style.textAlign = this.textAreaProperty.value.align==-1?"start":this.textAreaProperty.value.align==0?"center":"end"
-		this.textDiv.style.alignItems = this.textAreaProperty.value.justify==-1?"start":this.textAreaProperty.value.justify==0?"center":"end"
-		this.textDiv.style.fontSize = this.textFontSize.value.size + "pt"
-		this.textDiv.style.fontFamily = "Times New Roman"
-		this.textDiv.style.overflowWrap = "break-word"
-		this.textDiv.style.hyphens = "auto"
-		this.textDiv.style.padding = this.textInnerSep.value.convertToUnit("pt").toString()
-		this.textDiv.style.lineHeight = this.textFontSize.value.size*1.1 + "pt"
 	}
 }

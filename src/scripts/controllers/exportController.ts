@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController, CircuitikzComponent, CanvasController } from "../internal";
+import { SelectionController, MainController, CircuitikzComponent, CanvasController, EllipseComponent } from "../internal";
 import FileSaver from "file-saver";
 import * as prettier from "prettier";
 const parserXML = require("@prettier/plugin-xml").default;
@@ -33,16 +33,18 @@ export class ExportController {
 
 	private defaultDisplay: string
 
-	private idPrefix="N"
-	private _exportID: number = 0;
-	public get exportID(): string {
-		this._exportID++
-		let outID = this.idPrefix+this._exportID
-		while (this.isIDUsed(outID)) {
-			this._exportID++
-			outID = this.idPrefix+this._exportID
+	private usedIDs:Map<string,number>
+	public createExportID(prefix="N"):string{
+		let currentID:number
+		if (this.usedIDs.has(prefix)) {
+			currentID = this.usedIDs.get(prefix)
+			currentID++
+		}else{
+			currentID=1
 		}
-		return outID;
+		while(this.isIDUsed(prefix+currentID))currentID++
+		this.usedIDs.set(prefix,currentID)
+		return prefix+currentID
 	}
 
 	private isIDUsed(id:string):boolean{
@@ -69,7 +71,6 @@ export class ExportController {
 		this.copyButton = document.getElementById("copyExportedContent") as HTMLDivElement;
 		this.saveButton = document.getElementById("exportModalSave") as HTMLButtonElement;
 
-		
 		this.defaultDisplay = this.exportedContent.parentElement.style.display;
 
 		let copyButtonDefaultTooltipText = "Copy to clipboard!"
@@ -81,6 +82,8 @@ export class ExportController {
 		this.copyButton.setAttribute("data-bs-toggle","tooltip");
 		this.copyButton.setAttribute("data-bs-title",copyButtonDefaultTooltipText);
 		this.copyTooltip = new Tooltip(this.copyButton);
+
+		this.usedIDs = new Map<string,number>()
 	}
 
 	exportJSON(text:string){
@@ -107,20 +110,26 @@ export class ExportController {
 		// actually export/create the string
 		{
 			let circuitElements = []
+			let requiredTikzLibraries:Set<string>=new Set<string>()
 			for (const circuitElement of MainController.instance.circuitComponents) {
+				circuitElement.requiredTikzLibraries().forEach(item=>requiredTikzLibraries.add(item))
 				circuitElements.push("\t"+circuitElement.toTikzString())
 			}
+			let libraryStr = requiredTikzLibraries.size>0?"\\usetikzlibrary{"+requiredTikzLibraries.values().toArray().join(", ")+"}":""
 			
-			const arr = [
+			let arr = [
 				"\\begin{tikzpicture}",
 				"\t% Paths, nodes and wires:",
 				...circuitElements,
 				"\\end{tikzpicture}",
 			];
+			if (libraryStr) {
+				arr = [libraryStr].concat(arr)
+			}
 			this.exportedContent.rows = arr.length;
 			this.exportedContent.value = arr.join("\n");
 		}
-		this._exportID=0
+		this.usedIDs.clear()
 		this.export(extensions)
 	}
 
@@ -223,12 +232,12 @@ export class ExportController {
 		// convert to text and make pretty
 		let tempDiv = document.createElement("div");
 		tempDiv.appendChild(svgObj.node);
-		prettier.format(tempDiv.innerHTML,{
+		prettier.format(tempDiv.innerHTML.replaceAll("<br>","<br/>"),{
 			parser:"xml",
 			plugins:[parserXML],
 			tabWidth:4,
 			singleAttributePerLine:true,
-			xmlWhitespaceSensitivity:"ignore"
+			xmlWhitespaceSensitivity:"preserve",
 		}).then(textContent=>{
 			this.exportedContent.rows = textContent.split("\n").length
 			this.exportedContent.value = textContent;

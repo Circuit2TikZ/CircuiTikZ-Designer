@@ -41,7 +41,6 @@ export class PropertyController{
 
 	private setMultiForm(components:CircuitComponent[]){
 		//TODO multicomponent edit
-		//TODO alignment and distribution tools
 
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = "Selection"

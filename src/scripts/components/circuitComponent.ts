@@ -1,7 +1,12 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty, SelectionController } from "../internal";
+import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty, SelectionController, Undo, ColorProperty, SliderProperty } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
+
+/**
+ * names cannot contain punctuation, parentheses and some other symbols
+ */
+export const invalidNameRegEx = /[\t\r\n\v.,:;()-]/;
 
 /**
  * the root object for saving components as json. Extend this for custom components
@@ -25,6 +30,7 @@ export type Label = {
 	value: string
 	rendering?: SVG.Element
 	distance?: SVG.Number
+	color?:string|"default"
 }
 
 export type PositionedLabel = Label & {
@@ -117,6 +123,8 @@ export abstract class CircuitComponent{
 	
 	protected mathJaxLabel: MathJaxProperty
 	protected labelRendering: SVG.Element
+	protected labelDistance:SliderProperty
+	protected labelColor: ColorProperty
 
 	/**
 	 * The default constructor giving basic functionality. Never call this directly (only via super() in the constructor of the derived class).
@@ -390,6 +398,10 @@ export abstract class CircuitComponent{
 				if (children.length==1&&!elementGroup.node.hasAttributes()) {
 					elementGroup.parent().put(children[0])
 					elementGroup.remove()
+				}else{
+					if (elementGroup.fill()=="currentColor") {
+						elementGroup.fill("inherit")
+					}
 				}
 			}
 
@@ -423,6 +435,7 @@ export abstract class CircuitComponent{
 			this.visualization.add(rendering)
 			this.labelRendering = rendering
 			this.update()
+			this.updateTheme()
 		})
 	}
 
@@ -430,4 +443,8 @@ export abstract class CircuitComponent{
 	 * Updates the position of the label when moving/rotating... Override this!
 	 */
 	public abstract updateLabelPosition():void
+
+	public requiredTikzLibraries():string[]{
+		return []
+	}
 }

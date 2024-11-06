@@ -31,7 +31,9 @@ export * from "./components/componentSymbol";
 export * from "./components/nodeComponent";
 export * from "./components/pathComponent";
 export * from "./components/wireComponent";
+export * from "./components/shapeComponent";
 export * from "./components/rectangleComponent";
+export * from "./components/ellipseComponent";
 // snapDrag
 export * from "./snapDrag/dragHandlers";
 export * from "./snapDrag/snapController";
