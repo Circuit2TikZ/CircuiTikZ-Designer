@@ -105,3 +105,4 @@
 # Packaged builds
 *.7z
 *.zip
+/out

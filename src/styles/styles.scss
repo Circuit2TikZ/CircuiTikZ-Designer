@@ -1,5 +1,5 @@
 $material-symbols-font-path: "../../node_modules/material-symbols/";
-@import "material-symbols/outlined";
+@import "../../node_modules/material-symbols/outlined";
 
 // Bootstrap
 // preset bootstrap (scss) variables:
@@ -12,7 +12,7 @@ $danger: #c50f3c;
 
 @import "dropdown_variables.scss";
 // import bootstrap:
-@import "bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap/scss/bootstrap";
 // override some bootstrap classes
 @import "dropdown_classes.scss";
 @import "floatingActionButton.scss";
