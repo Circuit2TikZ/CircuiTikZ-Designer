@@ -17,7 +17,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      // platforms: ['darwin'],
     },
     {
       name: '@electron-forge/maker-deb',
@@ -26,6 +26,12 @@ module.exports = {
     {
       name: '@electron-forge/maker-rpm',
       config: {},
+    },
+    {
+      name: '@electron-forge/maker-wix',
+      config: {
+        "icon": "./src/icons/android-icon-192x192.ico",
+      },
     },
   ],
   plugins: [
