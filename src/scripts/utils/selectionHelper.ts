@@ -5,9 +5,9 @@ export const selectedBoxWidth = new SVG.Number("0.6pt")
 export const selectionColor = "var(--bs-red)"
 export const referenceColor = "var(--bs-teal)"
 
-export const pathPointRadius = 8
+export const selectionSize = 16
 export function pathPointSVG(){
-	let circle = CanvasController.instance.canvas.circle(pathPointRadius*2).fill("transparent")
+	let circle = CanvasController.instance.canvas.circle(selectionSize).fill("transparent")
 	circle.node.classList.add("pathPoint")
 	return circle
 }

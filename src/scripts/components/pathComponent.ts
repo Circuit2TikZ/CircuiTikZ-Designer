@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController, ColorProperty } from "../internal"
-import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor, roundTikz } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor, roundTikz, selectionSize } from "../utils/selectionHelper";
 
 
 export type PathLabel = Label & {
@@ -26,6 +26,8 @@ export class PathComponent extends CircuitikzComponent{
 	
 	private startLine: SVG.Line
 	private endLine: SVG.Line
+	private dragStartLine: SVG.Line
+	private dragEndLine: SVG.Line
 	private relSymbolStart: SVG.Point
 	private relSymbolEnd: SVG.Point
 
@@ -63,10 +65,15 @@ export class PathComponent extends CircuitikzComponent{
 		this.endLine = CanvasController.instance.canvas.line()
 		this.endLine.attr(lineAttr);
 
+		this.dragStartLine = CanvasController.instance.canvas.line().fill("none").stroke({width:selectionSize,color:"transparent"})
+		this.dragEndLine = CanvasController.instance.canvas.line().fill("none").stroke({width:selectionSize,color:"transparent"})
+
 		this.symbolUse = CanvasController.instance.canvas.use(this.referenceSymbol)
 		this.visualization.add(this.symbolUse)
 		this.visualization.add(this.startLine)
 		this.visualization.add(this.endLine)
+		this.visualization.add(this.dragStartLine)
+		this.visualization.add(this.dragEndLine)
 		this.visualization.hide()
 
 		let updateWithTrack = (track:boolean=true)=>{
@@ -212,6 +219,8 @@ export class PathComponent extends CircuitikzComponent{
 		this.recalculateResizePoints()
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
+		this.dragStartLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
+		this.dragEndLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
 		
 		this.updateLabelPosition()
 		this._bbox = this.visualization.bbox()
@@ -385,8 +394,12 @@ export class PathComponent extends CircuitikzComponent{
 	public draggable(drag: boolean): void {
 		if (drag) {
 			this.symbolUse.node.classList.add("draggable");
+			this.dragStartLine.node.classList.add("draggable");
+			this.dragEndLine.node.classList.add("draggable");
 		}else{
 			this.symbolUse.node.classList.remove("draggable");
+			this.dragStartLine.node.classList.add("draggable");
+			this.dragEndLine.node.classList.add("draggable");
 		}
 		SnapDragHandler.snapDrag(this, drag)
 		

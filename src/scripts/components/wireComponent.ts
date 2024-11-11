@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { CanvasController, ChoiceEntry, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapCursorController, SnappingInfo, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pointInsideRect, referenceColor, resizeSVG, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, referenceColor, resizeSVG, selectionColor, selectionSize } from "../utils/selectionHelper";
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -70,7 +70,6 @@ export class WireComponent extends CircuitComponent{
 	private wireWidth:SVG.Number
 	// a wider copy of wire, but invisible, Meant for dragging the wire
 	private draggableWire:SVG.Polyline
-	private draggingWireWidth=10
 
 	// the svg elements where adjusting the wire is possible
 	private adjustmentPoints:SVG.Element[]=[]
@@ -97,7 +96,7 @@ export class WireComponent extends CircuitComponent{
 		this.draggableWire.attr({
 			fill: "none",
 			stroke: "transparent",
-			"stroke-width": this.draggingWireWidth,
+			"stroke-width": selectionSize,
 		});
 
 		this.visualization.add(this.wire)
@@ -227,7 +226,7 @@ export class WireComponent extends CircuitComponent{
 						this.cornerPoints[index].y=pos.y
 						this.update()
 					},
-					dragEnd() {
+					dragEnd:()=> {
 						return this.cornerPoints[index].eq(startPos)
 					},
 				})
