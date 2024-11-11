@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
-import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty, SelectionController, Undo, ColorProperty, SliderProperty } from "../internal";
+import { MainController, SnapPoint, SnappingInfo, ButtonGridProperty, CanvasController, MathJaxProperty, SelectionController, ColorProperty, SliderProperty, ChoiceEntry } from "../internal";
 import { rectRectIntersection } from "../utils/selectionHelper";
 
 /**
@@ -16,9 +16,7 @@ export type ComponentSaveObject = {
 	selected?:boolean
 }
 
-export type DirectionInfo = {
-	key:string,
-	name:string,
+export type DirectionInfo = ChoiceEntry & {
 	direction:SVG.Point,
 	pointer?:string
 }
@@ -67,7 +65,7 @@ export abstract class CircuitComponent{
 	/**
 	 * the current rotation angle in degrees
 	 */
-	public rotationDeg: number;
+	public rotationDeg: number = 0;
 
 	/**
 	 * all properties, which should be able to be edited in the properties window have to be included here
@@ -152,7 +150,7 @@ export abstract class CircuitComponent{
 	}
 
 	protected addPositioning(){
-		let positioning = new ButtonGridProperty(2,[["Rotate CW","rotate_right"],["Rotate CCW","rotate_left"],["Flip X",["flip","rotateText"]],["Flip Y","flip"]],[
+		let positioning = new ButtonGridProperty(2,[["Rotate CW","rotate_right"],["Rotate CCW","rotate_left"],["Flip vertically",["flip","rotateText"]],["Flip horizontally","flip"]],[
 			(ev)=>this.rotate(-90),
 			(ev)=>this.rotate(90),
 			(ev)=>this.flip(true),
@@ -239,7 +237,13 @@ export abstract class CircuitComponent{
 	/**
 	 * update the visuals to comply with dark/light mode
 	 */
-	public updateTheme(){}
+	public updateTheme(){
+		let labelColor = "var(--bs-emphasis-color)"
+		if (this.labelColor.value) {
+			labelColor = this.labelColor.value.toString()
+		}
+		this.labelRendering?.fill(labelColor)
+	}
 
 	/**
 	 * helper method to always be between -180 and 180 degrees. TODO could be optimized to not use while loops but a closed form solution
@@ -402,6 +406,13 @@ export abstract class CircuitComponent{
 					if (elementGroup.fill()=="currentColor") {
 						elementGroup.fill("inherit")
 					}
+				}
+			}
+
+			//remove background of mathjax error message
+			for (const elementGroup of svgElement.find("rect")) {
+				if (elementGroup.node.hasAttribute("data-background")) {
+					elementGroup.remove()
 				}
 			}
 

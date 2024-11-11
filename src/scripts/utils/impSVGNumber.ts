@@ -140,6 +140,10 @@ declare module "@svgdotjs/svg.js" {
 		 */
 		div(other: number|Point): Point;
 		/**
+		 * calculates the dot product between this point and the other point
+		 */
+		dot(other:SVG.Point):number
+		/**
 		 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
 		 * rotation.
 		 * @param angle - rotation angle in degrees or radians
@@ -557,6 +561,12 @@ SVG.extend(SVG.Point, {
 			return new SVG.Point(this.x / other, this.y / other);
 		}
 	},
+	/**
+	 * calculates the dot product between this point and the other point
+	 */
+	dot(other:SVG.Point):number{
+		return this.x*other.x+this.y*other.y
+	},
 
 	/**
 	 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
@@ -618,10 +628,24 @@ SVG.extend(SVG.Point, {
 	}
 });
 
-
 SVG.extend(SVG.Color,{
 	toTikzString():string{
 		let color:SVG.Color = this.rgb()
 		return `{rgb,255:red,${color.r.toFixed(0)};green,${color.g.toFixed(0)};blue,${color.b.toFixed(0)}}`
 	}
 })
+
+//helper functions
+
+/**
+ * get the point on the line (through A and B) which is closest to the point P including its relation to the anchor points of the line (i.e. line segment)
+ * @param P which point to check
+ * @param A first point on the line
+ * @param B second point on the line
+ * @returns array of the closest point on the line S to the point P and t: how far along the line the point is according to S=A+t*(B-A). A value between 0 and 1 indicates the point is on the line segment AB
+ */
+export const closestPointOnLine = (P:SVG.Point, A:SVG.Point, B:SVG.Point): [SVG.Point, number] => {
+	let dir = B.sub(A)
+	let t = P.sub(A).dot(dir)/(dir.dot(dir))
+	return [A.add(dir.mul(t)), t]
+}

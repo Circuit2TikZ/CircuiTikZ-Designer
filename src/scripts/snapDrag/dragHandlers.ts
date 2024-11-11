@@ -129,7 +129,7 @@ export class SnapDragHandler{
 		this.element.parent().node.classList.remove("dragging");
 		SnapController.instance.hideSnapPoints();
 
-		if (ev.detail?.event instanceof TouchEvent) {
+		if (window.TouchEvent&&ev.detail?.event instanceof TouchEvent) {
 			const clientXY = ev.detail.event.touches?.[0] ?? ev.detail.event.changedTouches?.[0];
 			const contextMenuEvent = new PointerEvent("contextmenu", {
 				clientX: clientXY.clientX,
@@ -228,7 +228,7 @@ export class AdjustDragHandler{
 	dragMove(event: DragEvent) {
 		event.preventDefault();
 
-		if (event.detail.event instanceof TouchEvent && event.detail.event.touches.length>1) {
+		if (window.TouchEvent&&event.detail.event instanceof TouchEvent && event.detail.event.touches.length>1) {
 			this.didDrag=true
 			this.dragEnd(event,true)
 			return

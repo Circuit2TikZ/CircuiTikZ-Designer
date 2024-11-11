@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, ColorProperty, ComponentSaveObject, ComponentSymbol, InfoProperty, invalidNameRegEx, MainController, SectionHeaderProperty, SliderProperty, TextProperty } from "../internal";
+import { CircuitComponent, ComponentSaveObject, ComponentSymbol, InfoProperty, invalidNameRegEx, MainController, SectionHeaderProperty, TextProperty } from "../internal";
 
 /**
  * extension of {@link ComponentSaveObject} to also include the circuitikz id and a given name for the component
@@ -32,19 +32,7 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 		super()
 		this.displayName=symbol.displayName
 		this.referenceSymbol = symbol
-	}
-
-	protected addInfo(){
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Info").buildHTML())
-		// the tikz id of the component. e.g. "nmos" in "\node[nmos] at (0,0){};"
-		this.propertiesHTMLRows.push(new InfoProperty("ID",this.referenceSymbol.tikzName).buildHTML())
-
-		// if options are used for the component, they will also be shown
-		let tikzOptions = Array.from(this.referenceSymbol._tikzOptions.keys()).join(", ")
-		if (tikzOptions&&tikzOptions.length>0) {
-			this.propertiesHTMLRows.push(new InfoProperty("Options",tikzOptions).buildHTML())
-		}
-
+		
 		this.name = new TextProperty("Name","")
 		this.name.addChangeListener((ev)=>{
 			if (ev.value==="") {
@@ -70,5 +58,17 @@ export abstract class CircuitikzComponent extends CircuitComponent{
 			this.name.changeInvalidStatus("")
 		})
 		this.propertiesHTMLRows.push(this.name.buildHTML())
+	}
+
+	protected addInfo(){
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Info").buildHTML())
+		// the tikz id of the component. e.g. "nmos" in "\node[nmos] at (0,0){};"
+		this.propertiesHTMLRows.push(new InfoProperty("ID",this.referenceSymbol.tikzName).buildHTML())
+
+		// if options are used for the component, they will also be shown
+		let tikzOptions = Array.from(this.referenceSymbol._tikzOptions.keys()).join(", ")
+		if (tikzOptions&&tikzOptions.length>0) {
+			this.propertiesHTMLRows.push(new InfoProperty("Options",tikzOptions).buildHTML())
+		}
 	}
 }

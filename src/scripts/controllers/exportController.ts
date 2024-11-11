@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import { Modal, Tooltip } from "bootstrap";
-import { SelectionController, MainController, CircuitikzComponent, CanvasController, EllipseComponent } from "../internal";
+import { SelectionController, MainController, CircuitikzComponent, CanvasController } from "../internal";
 import FileSaver from "file-saver";
 import * as prettier from "prettier";
 const parserXML = require("@prettier/plugin-xml").default;

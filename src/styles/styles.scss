@@ -111,6 +111,18 @@ body {
 	}
 }
 
+.input-group {
+	> * {
+		padding-top: 0.25em;
+		padding-bottom: 0.25em;
+	}
+	> .form-control-color{
+		height: 100%;
+		padding-top: 0.375em;
+		padding-bottom: 0.375em;
+	}
+}
+
 // styles for other parts of the web app:
 @import "canvas.scss";
 @import "toolbarButtons.scss";

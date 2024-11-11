@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController } from "../internal"
+import { CanvasController, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, MainController, SnapController, SnapCursorController, SnapPoint, AdjustDragHandler, SnapDragHandler, Label, Undo, SnappingInfo, BooleanProperty, MathJaxProperty, SliderProperty, SectionHeaderProperty, SelectionController, ColorProperty } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionColor, resizeSVG, referenceColor, roundTikz } from "../utils/selectionHelper";
 
 
@@ -86,7 +86,13 @@ export class PathComponent extends CircuitikzComponent{
 			this.labelDistance = new SliderProperty("Gap",-0.5,1,0.01,new SVG.Number(0.12,"cm"))
 			this.labelDistance.addChangeListener(ev=>this.updateLabelPosition())
 			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
-	
+				
+			this.labelColor  = new ColorProperty("Color",null)
+			this.labelColor.addChangeListener(ev=>{		
+				this.updateTheme()
+			})
+			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
+
 			this.labelSide = new BooleanProperty("Switch side")
 			this.labelSide.addChangeListener(ev=>this.updateLabelPosition())
 			this.propertiesHTMLRows.push(this.labelSide.buildHTML())
@@ -114,6 +120,7 @@ export class PathComponent extends CircuitikzComponent{
 	}
 
 	public updateTheme(): void {
+		super.updateTheme()
 		if (!this.isSelected) {
 			this.startLine.stroke(MainController.instance.darkMode?"#fff":"#000")
 			this.endLine.stroke(MainController.instance.darkMode?"#fff":"#000")
@@ -326,7 +333,8 @@ export class PathComponent extends CircuitikzComponent{
 		data.label = {
 			value:this.mathJaxLabel.value??undefined,
 			otherSide:this.labelSide.value?true:undefined,
-			distance:this.labelDistance.value.value!=0?this.labelDistance.value:undefined
+			distance:this.labelDistance.value.value!=0?this.labelDistance.value:undefined,
+			color:this.labelColor.value?this.labelColor.value.toString():undefined
 		}
 
 		if (this.mirror.value) {
@@ -341,13 +349,16 @@ export class PathComponent extends CircuitikzComponent{
 	public toTikzString(): string {
 		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value)+"cm"
 		let shouldDist = this.labelDistance.value&&distStr!="0.0cm"
+		
+		let latexStr = this.mathJaxLabel.value?"$"+this.mathJaxLabel.value+"$":""
+		latexStr = latexStr&&this.labelColor.value?"\\textcolor"+this.labelColor.value.toTikzString()+"{"+latexStr+"}":latexStr
 		return (
 			"\\draw " +
 			this.posStart.toTikzString() +
 			" to[" +
 			this.referenceSymbol.tikzName +
 			(this.name.value===""?"":", name="+this.name.value) +
-			(this.mathJaxLabel.value!==""?", l"+(this.labelSide.value?"_":"")+"={$"+this.mathJaxLabel.value+"$}"
+			(this.mathJaxLabel.value!==""?", l"+(this.labelSide.value?"_":"")+"={"+latexStr+"}"
 			+(shouldDist?", label distance="+distStr:""):"") +
 			(this.mirror.value?", mirror":"") +
 			(this.invert.value?", invert":"") +

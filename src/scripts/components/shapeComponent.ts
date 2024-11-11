@@ -1,7 +1,8 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, DirectionInfo, PositionedLabel, SliderProperty, TextProperty, CanvasController, SectionHeaderProperty, MathJaxProperty, basicDirections, defaultBasicDirection, invalidNameRegEx, MainController, CircuitikzComponent, SnappingInfo, SnapDragHandler, Undo } from "../internal";
+import { ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, DirectionInfo, PositionedLabel, SliderProperty, TextProperty, CanvasController, SectionHeaderProperty, MathJaxProperty, basicDirections, defaultBasicDirection, invalidNameRegEx, MainController, CircuitikzComponent, SnappingInfo, SnapDragHandler, Undo, ChoiceEntry } from "../internal";
 
 export type ShapeSaveObject = ComponentSaveObject & {
+	rotationDeg?:number,
 	fill?:FillInfo,
 	stroke?:StrokeInfo,
 	label?:PositionedLabel,
@@ -11,13 +12,35 @@ export type ShapeSaveObject = ComponentSaveObject & {
 export type StrokeInfo = {
 	width?:SVG.Number,
 	color?:string|"default",
-	opacity?:number
+	opacity?:number,
+	style?:string
 }
 
 export type FillInfo = {
 	color?:string|"default",
 	opacity?:number
 }
+
+export type StrokeStyle= ChoiceEntry&{
+	dasharray:number[]
+}
+
+export const strokeStyleChoices:StrokeStyle[] = [
+	{key:"solid",name:"solid",dasharray:[1, 0]},
+	{key:"dotted",name:"dotted",dasharray:[1, 4]},
+	{key:"denselydotted",name:"densely dotted",dasharray:[1, 2]},
+	{key:"looselydotted",name:"loosely dotted",dasharray:[1, 8]},
+	{key:"dashed",name:"dashed",dasharray:[4, 4]},
+	{key:"denselydashed",name:"densely dashed",dasharray:[4, 2]},
+	{key:"looselydashed",name:"loosely dashed",dasharray:[4, 8]},
+	{key:"dashdot",name:"dash dot",dasharray:[4, 2, 1, 2]},
+	{key:"denselydashdot",name:"densely dash dot",dasharray:[4, 1, 1, 1]},
+	{key:"looselydashdot",name:"loosely dash dot",dasharray:[4, 4, 1, 4]},
+	{key:"dashdotdot",name:"dash dot dot",dasharray:[4, 2, 1, 2, 1, 2]},
+	{key:"denselydashdotdot",name:"densely dash dot dot",dasharray:[4, 1, 1, 1, 1, 1]},
+	{key:"looselydashdotdot",name:"loosely dash dot dot",dasharray:[4, 4, 1, 4, 1, 4]},
+]
+export const defaultStrokeStyleChoice = strokeStyleChoices[0]
 
 export abstract class ShapeComponent extends CircuitComponent{
 	protected strokeInfo:StrokeInfo;
@@ -37,6 +60,7 @@ export abstract class ShapeComponent extends CircuitComponent{
 	protected strokeColorProperty:ColorProperty
 	protected strokeOpacityProperty:SliderProperty
 	protected strokeWidthProperty:SliderProperty
+	protected strokeStyleProperty:ChoiceProperty<StrokeStyle>
 
 	protected anchorChoice:ChoiceProperty<DirectionInfo>
 	protected positionChoice:ChoiceProperty<DirectionInfo>
@@ -55,6 +79,7 @@ export abstract class ShapeComponent extends CircuitComponent{
 			color:"default",
 			opacity:1,
 			width:new SVG.Number("1pt"),
+			style:defaultStrokeStyleChoice.key
 		}
 
 		this.name = new TextProperty("Name","")
@@ -131,9 +156,15 @@ export abstract class ShapeComponent extends CircuitComponent{
 			this.update()
 			this.updateTheme()
 		})
+		this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>("Style",strokeStyleChoices,defaultStrokeStyleChoice)
+		this.strokeStyleProperty.addChangeListener(ev=>{
+			this.strokeInfo.style = ev.value.key
+			this.updateTheme()
+		})
 		this.propertiesHTMLRows.push(this.strokeColorProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeOpacityProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
+		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
 
 		{
 			//label section
@@ -178,6 +209,7 @@ export abstract class ShapeComponent extends CircuitComponent{
 			color:strokeColor,
 			opacity:this.strokeInfo.opacity,
 			width:this.strokeInfo.opacity==0?0:this.strokeInfo.width.convertToUnit("px").value,
+			dasharray:this.strokeStyleProperty.value.dasharray.map(factor=>this.strokeInfo.width.times(factor).toString()).join(" ")
 		})
 		this.shapeVisualization.fill({
 			color:fillColor,
@@ -188,7 +220,7 @@ export abstract class ShapeComponent extends CircuitComponent{
 		if (this.labelColor.value) {
 			labelColor = this.labelColor.value.toString()
 		}
-		
+
 		this.labelRendering?.fill(labelColor)
 	}
 

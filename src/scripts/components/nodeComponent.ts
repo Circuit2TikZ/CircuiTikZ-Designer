@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { basicDirections, CanvasController, ChoiceProperty, CircuitikzComponent, CircuitikzSaveObject, ComponentSymbol, defaultBasicDirection, DirectionInfo, ExportController, MainController, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SliderProperty, SnapDragHandler, SnappingInfo, SnapPoint, Undo } from "../internal"
+import { basicDirections, CanvasController, ChoiceProperty, CircuitikzComponent, CircuitikzSaveObject, ColorProperty, ComponentSymbol, defaultBasicDirection, DirectionInfo, ExportController, MainController, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SliderProperty, SnapDragHandler, SnappingInfo, SnapPoint } from "../internal"
 import { referenceColor, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type NodeSaveObject = CircuitikzSaveObject & {
@@ -47,6 +47,12 @@ export class NodeComponent extends CircuitikzComponent{
 			this.labelDistance = new SliderProperty("Gap",-0.5,1,0.01,new SVG.Number(0.12,"cm"))
 			this.labelDistance.addChangeListener(ev=>this.updateLabelPosition())
 			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+			
+			this.labelColor  = new ColorProperty("Color",null)
+			this.labelColor.addChangeListener(ev=>{		
+				this.updateTheme()
+			})
+			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
 		}
 
 		this.addInfo()
@@ -139,6 +145,7 @@ export class NodeComponent extends CircuitikzComponent{
 	public flip(horizontal: boolean): void {
 		let flipX = this.flipStateX
 		let flipY = this.flipStateY
+		
 		if (this.rotationDeg%180==0) {
 			if (horizontal) {
 				flipY=!flipY
@@ -207,7 +214,8 @@ export class NodeComponent extends CircuitikzComponent{
 				value:this.mathJaxLabel.value,
 				anchor:this.anchorChoice.value.key,
 				position:this.positionChoice.value.key,
-				distance:this.labelDistance.value??undefined
+				distance:this.labelDistance.value??undefined,
+				color:this.labelColor.value?this.labelColor.value.toString():undefined
 			}
 			data.label = labelWithoutRender
 		}
@@ -229,7 +237,7 @@ export class NodeComponent extends CircuitikzComponent{
 			
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 			
-			if (this.anchorChoice.value.key==defaultBasicDirection.key) {
+			if (!isNaN(this.labelPos.direction.absSquared())) {
 				labelDist = labelDist.minus(0.12)
 			}
 
@@ -252,12 +260,14 @@ export class NodeComponent extends CircuitikzComponent{
 					scaleY:this.flipStateY?-1:1
 				}))
 				
-				pos = basicDirections.find((item)=>item.direction==newdir).name
+				pos = basicDirections.find((item)=>item.direction.eq(newdir)).name
 			}
 
 			let posStr = this.positionChoice.value.key==defaultBasicDirection.key?id+".text":id+"."+pos
+			let latexStr = this.mathJaxLabel.value?"$"+this.mathJaxLabel.value+"$":""
+			latexStr = latexStr&&this.labelColor.value?"\\textcolor"+this.labelColor.value.toTikzString()+"{"+latexStr+"}":latexStr
 
-			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){$"+this.mathJaxLabel.value+"$}"
+			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){"+latexStr+"}"
 		}
 		
 		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same

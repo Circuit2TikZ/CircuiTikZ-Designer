@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapController, SnapCursorController, SnappingInfo, SnapPoint, Undo } from "../internal"
+import { CanvasController, ChoiceEntry, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapCursorController, SnappingInfo, SnapPoint } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pathPointRadius, pathPointSVG, pointInsideRect, referenceColor, resizeSVG, selectionColor } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, referenceColor, resizeSVG, selectionColor } from "../utils/selectionHelper";
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -30,9 +30,7 @@ export type WireSaveObject = ComponentSaveObject &  {
 	endArrow?:string,
 }
 
-export type ArrowTip={
-	key:string,
-	name:string,
+export type ArrowTip= ChoiceEntry&{
 	tikz:string,
 	setBack:number
 }

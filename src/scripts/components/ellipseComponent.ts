@@ -1,15 +1,14 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, defaultBasicDirection, defaultFontSize, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, MathJaxProperty, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnappingInfo, SnapPoint, StrokeInfo, Text, TextAreaProperty, Undo } from "../internal";
+import { AdjustDragHandler, basicDirections, CanvasController, CircuitComponent, defaultBasicDirection, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, PositionedLabel, SelectionController, ShapeComponent, ShapeSaveObject, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices } from "../internal";
 import { referenceColor, resizeSVG, selectedBoxWidth, selectionColor, roundTikz } from "../utils/selectionHelper";
 
 export type EllipseSaveObject = ShapeSaveObject & {
-	firstPoint:SVG.Point
-	secondPoint:SVG.Point,
+	position:SVG.Point,
+	size:SVG.Point
 }
 
 export class EllipseComponent extends ShapeComponent{
-	private firstPoint:SVG.Point;
-	private secondPoint:SVG.Point;
+	private placePoint:SVG.Point
 
 	protected declare shapeVisualization:SVG.Ellipse;
 	protected declare selectionElement:SVG.Ellipse;
@@ -48,7 +47,7 @@ export class EllipseComponent extends ShapeComponent{
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
 		let relPositions:{anchorname:string,relPos:SVG.Point}[] = []
-		let halfSize = new SVG.Point(Math.abs(this.firstPoint.x-this.secondPoint.x)/2,Math.abs(this.firstPoint.y-this.secondPoint.y)/2)
+		let halfSize = this.size.div(2)
 		for (const anchor of basicDirections) {
 			if (anchor.key==defaultBasicDirection.key) {
 				continue
@@ -92,9 +91,7 @@ export class EllipseComponent extends ShapeComponent{
 			let originalSize:SVG.Point
 			const getInitialDim = ()=>{
 				originalPos = this.position.clone()
-				originalSize = this.firstPoint.sub(this.secondPoint)
-				originalSize.x = Math.abs(originalSize.x)
-				originalSize.y = Math.abs(originalSize.y)
+				originalSize = this.size.clone()
 			}
 	
 			for (const direction of basicDirections) {
@@ -127,14 +124,15 @@ export class EllipseComponent extends ShapeComponent{
 								pos = new SVG.Point(oppositePoint.x-oppositePoint.y,oppositePoint.y-oppositePoint.x).add(pos.x+pos.y).div(2)
 							}
 						}
+						let dirAbs = new SVG.Point(Math.abs(direction.direction.x),Math.abs(direction.direction.y))
 						let delta = pos.sub(startPoint)
-						let newHalfSize = originalSize.add(delta.mul(direction.direction)).div(2)
-						let newPos = originalPos.add(delta.mul(new SVG.Point(Math.abs(direction.direction.x)/2,Math.abs(direction.direction.y)/2)))
-						this.firstPoint = newPos.sub(newHalfSize)
-						this.secondPoint = newPos.add(newHalfSize)
+						
+						this.size.x = direction.direction.x?Math.abs(pos.x-oppositePoint.x):originalSize.x
+						this.size.y = direction.direction.y?Math.abs(pos.y-oppositePoint.y):originalSize.y
+						
+						this.position = originalPos.add(delta.mul(dirAbs.div(2)))
 						this.update()
-					},
-					// dragEnd:()=>{Undo.addState()}
+					}
 				})
 			}
 			this.update()
@@ -148,47 +146,35 @@ export class EllipseComponent extends ShapeComponent{
 	}
 
 	public moveTo(position: SVG.Point): void {
-		let delta = position.sub(this.position)
-		this.firstPoint = this.firstPoint.add(delta)
-		this.secondPoint = this.secondPoint.add(delta)
+		this.position = position
 		this.update()
 	}
 	public rotate(angleDeg: number): void {
-		this.firstPoint = this.firstPoint.rotate(angleDeg,this.position)
-		this.secondPoint = this.secondPoint.rotate(angleDeg,this.position)
+		this.size = new SVG.Point(this.size.y,this.size.x)
+		// this.rotationDeg+=angleDeg
+		// this.simplifyRotationAngle()
 		this.update()
 	}
 	public flip(horizontal: boolean): void {
 		//doesn't do anything for ellipses
 	}
 	protected update(): void {
-		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value 
-		let halfstroke = strokeWidth/2
-		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x),Math.min(this.firstPoint.y,this.secondPoint.y))
-		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x),Math.max(this.firstPoint.y,this.secondPoint.y))
+		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value
 
-		this.dragElement.move(upperLeft.x,upperLeft.y).size(lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
+		let transformMatrix = this.getTransformMatrix()
 
-		this.size = lowerRight.sub(upperLeft)
-		
-		upperLeft = upperLeft.add(halfstroke)
-		lowerRight = lowerRight.sub(halfstroke)
-		
-		this.position = lowerRight.add(upperLeft).div(2)
-		if (this.size.x<0) {
-			this.size.x=0
-		}
-		if (this.size.y<0) {
-			this.size.y=0
-		}
+		this.dragElement.size(this.size.x,this.size.y).center(this.position.x,this.position.y)
+		this.dragElement.transform(transformMatrix)
+
+		this.shapeVisualization.size(this.size.x<strokeWidth?0:this.size.x-strokeWidth,this.size.y<strokeWidth?0:this.size.y-strokeWidth)
+		this.shapeVisualization.center(this.position.x,this.position.y)
+		this.shapeVisualization.transform(transformMatrix)
 
 		this._isCircle=Math.abs(this.size.x-this.size.y)<1e-5
 		
-		this.shapeVisualization.size(this.size.x<strokeWidth?0:this.size.x-strokeWidth,this.size.y<strokeWidth?0:this.size.y-strokeWidth)
-		this.shapeVisualization.move(upperLeft.x,upperLeft.y)
-		this._bbox = new SVG.Box(upperLeft.x-halfstroke,upperLeft.y-halfstroke,this.size.x,this.size.y)
+		this._bbox = this.dragElement.bbox()
 		
-		this.relPosition = this.position.sub(upperLeft)
+		this.relPosition = this.position.sub(new SVG.Point(this.bbox.x,this.bbox.y))
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
@@ -203,9 +189,7 @@ export class EllipseComponent extends ShapeComponent{
 	}
 
 	public getPureBBox(): SVG.Box {
-		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x),Math.min(this.firstPoint.y,this.secondPoint.y))
-		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x),Math.max(this.firstPoint.y,this.secondPoint.y))
-		return new SVG.Box(upperLeft.x,upperLeft.y,lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
+		return this.bbox
 	}
 
 	public viewSelected(show: boolean): void {
@@ -233,8 +217,11 @@ export class EllipseComponent extends ShapeComponent{
 	public toJson(): EllipseSaveObject {
 		let data:EllipseSaveObject = {
 			type:"ellipse",
-			firstPoint:this.firstPoint.simplifyForJson(),
-			secondPoint:this.secondPoint.simplifyForJson()
+			position:this.position.simplifyForJson(),
+			size:this.size.simplifyForJson(),
+		}
+		if (this.rotationDeg) {
+			data.rotationDeg = this.rotationDeg
 		}
 
 		let fill:FillInfo={}
@@ -266,6 +253,10 @@ export class EllipseComponent extends ShapeComponent{
 			stroke.width = this.strokeInfo.width
 			shouldStroke = true
 		}
+		if (this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+			stroke.style = this.strokeInfo.style
+			shouldStroke = true
+		}
 		if (shouldStroke) {
 			data.stroke=stroke
 		}
@@ -286,8 +277,9 @@ export class EllipseComponent extends ShapeComponent{
 
 	static fromJson(saveObject: EllipseSaveObject): EllipseComponent {
 		let ellipseComponent = new EllipseComponent()
-		ellipseComponent.firstPoint = new SVG.Point(saveObject.firstPoint)
-		ellipseComponent.secondPoint = new SVG.Point(saveObject.secondPoint)
+		ellipseComponent.position = new SVG.Point(saveObject.position)
+		ellipseComponent.placePoint = saveObject.position
+		ellipseComponent.size = new SVG.Point(saveObject.size)
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
@@ -317,6 +309,11 @@ export class EllipseComponent extends ShapeComponent{
 				ellipseComponent.strokeInfo.width=new SVG.Number(saveObject.stroke.width)
 				ellipseComponent.strokeWidthProperty.value = ellipseComponent.strokeInfo.width
 				ellipseComponent.strokeWidthProperty.updateHTML()
+			}
+			if (saveObject.stroke.style) {
+				ellipseComponent.strokeInfo.style=saveObject.stroke.style
+				ellipseComponent.strokeStyleProperty.value = strokeStyleChoices.find(item=>item.key==saveObject.stroke.style)
+				ellipseComponent.strokeStyleProperty.updateHTML()
 			}
 		}
 
@@ -375,6 +372,10 @@ export class EllipseComponent extends ShapeComponent{
 			let width = this.strokeInfo.width.convertToUnit("pt").value
 			if (width!=0.4) {
 				optionsArray.push("line width="+width+"pt")
+			}
+
+			if (this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+				optionsArray.push(strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).name)
 			}
 		}
 
@@ -461,51 +462,57 @@ export class EllipseComponent extends ShapeComponent{
 		this.selectionElement?.remove()
 	}
 	public placeMove(pos: SVG.Point, ev?: Event): void {
-		if (!this.firstPoint) {
+		if (!this.placePoint) {
 			// not started placing
 			SnapCursorController.instance.moveTo(pos)
 		}else{
+			let secondPoint:SVG.Point
 			if (ev&&(ev as MouseEvent|TouchEvent).ctrlKey) {
-				// get closest point on one of the two diagonals
-				let diff = pos.sub(this.firstPoint)
+				// get point on one of the two diagonals
+				let diff = pos.sub(this.placePoint)
 				if (diff.x*diff.y<0) {
-					this.secondPoint = new SVG.Point(pos.x-pos.y,pos.y-pos.x).add(this.firstPoint.x+this.firstPoint.y).div(2)
+					secondPoint = new SVG.Point(pos.x-pos.y,pos.y-pos.x).add(this.placePoint.x+this.placePoint.y).div(2)
 				}else{
-					this.secondPoint = new SVG.Point(this.firstPoint.x-this.firstPoint.y,this.firstPoint.y-this.firstPoint.x).add(pos.x+pos.y).div(2)
+					secondPoint = new SVG.Point(this.placePoint.x-this.placePoint.y,this.placePoint.y-this.placePoint.x).add(pos.x+pos.y).div(2)
 				}
 			}else{
-				this.secondPoint = pos
+				secondPoint = pos
 			}
+			this.position = this.placePoint.add(secondPoint).div(2)
+			this.size = new SVG.Point(Math.abs(secondPoint.x-this.placePoint.x),Math.abs(secondPoint.y-this.placePoint.y))
 			this.update()
 		}
 	}
 	public placeStep(pos: SVG.Point, ev?: Event): boolean {
-		if (this.secondPoint) {
+		if (this.finishedPlacing) {
 			return true
 		}
-		if (!this.firstPoint){
-			this.firstPoint = pos
+		if (!this.placePoint) {
+			this.placePoint = pos
+			this.position = pos
+			this.size = new SVG.Point()
 			this.shapeVisualization.show()
-			this.placeMove(pos,ev)
 			this.updateTheme()
 			SnapCursorController.instance.visible=false
 			return false
-		}else{
-			this.secondPoint = pos
-			this.update()
-			return true
 		}
+
+		this.placeMove(pos,ev)
+		return true
 	}
 	public placeFinish(): void {
-		if (!this.firstPoint) {
+		if (this.finishedPlacing) {
+			return
+		}
+		if (!this.placePoint) {
 			this.placeStep(new SVG.Point())
 		}
-		if (!this.secondPoint) {
-			this.placeStep(new SVG.Point())
-		}
-		this.shapeVisualization.show()
-		this.draggable(true)		
+
+		this.finishedPlacing = true
 		this.update()
+		this.draggable(true)
+		this.shapeVisualization.show()
+		this.updateTheme()
 		SnapCursorController.instance.visible=false
 	}
 
@@ -516,14 +523,14 @@ export class EllipseComponent extends ShapeComponent{
 		}
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
+		let useBBox = this.bbox.transform(transformMatrix)
 		// get relevant positions and bounding boxes
 		let textPos:SVG.Point
 		if (this.positionChoice.value.key==defaultBasicDirection.key) {
 			textPos = new SVG.Point(this.bbox.cx,this.bbox.cy)
 		}else{
-			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
-			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction.div(this.positionChoice.value.direction.abs())))
+			let bboxHalfSize = new SVG.Point(useBBox.w/2,useBBox.h/2)
+			textPos = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction.div(this.positionChoice.value.direction.abs())))
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -540,7 +547,6 @@ export class EllipseComponent extends ShapeComponent{
 					return value
 				}
 			}
-			let useBBox = this.bbox.transform(transformMatrix)
 			let horizontalTextPosition = clamp(Math.round(2*(useBBox.cx-textPos.x)/useBBox.w),-1,1)		
 			let verticalTextPosition = clamp(Math.round(2*(useBBox.cy-textPos.y)/useBBox.h),-1,1)	
 			labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)

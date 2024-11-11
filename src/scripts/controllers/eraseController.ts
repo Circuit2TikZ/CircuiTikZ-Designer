@@ -57,7 +57,7 @@ export class EraseController {
 			return
 		}
 		
-		if (event instanceof TouchEvent && event.touches.length!==1) {
+		if (window.TouchEvent&&event instanceof TouchEvent && event.touches.length!==1) {
 			return
 		}
 		this.dragging = true
@@ -69,7 +69,7 @@ export class EraseController {
 		}
 		
 		if (event instanceof MouseEvent && (event.buttons & 1 || (event.type !== "mousemove" && event.button === 0 )) ||
-			event instanceof TouchEvent && window.TouchEvent && event.touches.length === 1) {
+			window.TouchEvent && event instanceof TouchEvent && window.TouchEvent && event.touches.length === 1) {
 			
 			this.findAndErase(CanvasController.eventToPoint(event,false));
 		}
@@ -79,7 +79,7 @@ export class EraseController {
 		if (event instanceof MouseEvent && event.button!==0) {
 			return
 		}
-		if (event instanceof TouchEvent && event.touches.length!==0) {
+		if (window.TouchEvent&&event instanceof TouchEvent && event.touches.length!==0) {
 			return
 		}
 		if (this.didErase) {			

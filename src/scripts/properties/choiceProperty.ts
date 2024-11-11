@@ -1,6 +1,11 @@
 import { EditableProperty, Undo } from "../internal";
 
-export class ChoiceProperty<T extends {key:string,name:string}> extends EditableProperty<T>{
+export type ChoiceEntry={
+	key:string,
+	name:string
+}
+
+export class ChoiceProperty<T extends ChoiceEntry> extends EditableProperty<T>{
 
 	private label:string
 	private selectElement:HTMLSelectElement

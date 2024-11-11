@@ -1,8 +1,9 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { EditableProperty, Undo } from "../internal"
+import { ChoiceEntry, EditableProperty, Undo } from "../internal"
+import sanitizeHtml from 'sanitize-html';
 
-export type FontSize={
-	key:string,name:string,size:number
+export type FontSize=ChoiceEntry&{
+	size:number
 }
 export const fontSizes:FontSize[]=[
 	{key:"tiny",name:"tiny",size:5},
@@ -20,10 +21,18 @@ export const defaultFontSize = fontSizes[4]
 
 export type Text = {
 	text:string,
-	align?:number,
+	align?:TextAlign,
 	justify?:number,
 	fontSize?:string,
-	innerSep?:SVG.Number
+	innerSep?:SVG.Number,
+	color?:string|"default"
+}
+
+export enum TextAlign{
+	LEFT,
+	CENTER,
+	RIGHT,
+	JUSTIFY
 }
 
 export class TextAreaProperty extends EditableProperty<Text>{
@@ -32,6 +41,7 @@ export class TextAreaProperty extends EditableProperty<Text>{
 	private alignLeft:HTMLInputElement
 	private alignCenter:HTMLInputElement
 	private alignRight:HTMLInputElement
+	private alignJustify:HTMLInputElement
 	private justifyStart:HTMLInputElement
 	private justifyCenter:HTMLInputElement
 	private justifyEnd:HTMLInputElement
@@ -126,6 +136,21 @@ export class TextAreaProperty extends EditableProperty<Text>{
 			alignRightLabel.setAttribute("for","alignRight")
 			alignDiv.appendChild(alignRightLabel)
 
+			//justify
+			this.alignJustify = document.createElement("input") as HTMLInputElement
+			this.alignJustify.classList.add("btn-check")
+			this.alignJustify.type = "radio"
+			this.alignJustify.name = "align"
+			this.alignJustify.id = "alignJustify"
+			this.alignJustify.addEventListener("change",ev=>{this.update();Undo.addState()})
+			alignDiv.appendChild(this.alignJustify)
+			
+			let alignJustifyLabel = document.createElement("label") as HTMLLabelElement
+			alignJustifyLabel.classList.add(...btnLabelClasses)
+			alignJustifyLabel.innerHTML="format_align_justify"
+			alignJustifyLabel.setAttribute("for","alignJustify")
+			alignDiv.appendChild(alignJustifyLabel)
+
 		}
 		rowTextArea.appendChild(alignDiv)
 
@@ -149,7 +174,7 @@ export class TextAreaProperty extends EditableProperty<Text>{
 
 			let justifyStartLabel = document.createElement("label") as HTMLLabelElement
 			justifyStartLabel.classList.add(...btnLabelClasses)
-			justifyStartLabel.innerHTML="align_start"
+			justifyStartLabel.innerHTML="vertical_align_top"
 			justifyStartLabel.setAttribute("for","justifyStart")
 			justifyDiv.appendChild(justifyStartLabel)
 			
@@ -164,7 +189,7 @@ export class TextAreaProperty extends EditableProperty<Text>{
 			
 			let justifyCenterLabel = document.createElement("label") as HTMLLabelElement
 			justifyCenterLabel.classList.add(...btnLabelClasses)
-			justifyCenterLabel.innerHTML="align_center"
+			justifyCenterLabel.innerHTML="vertical_align_center"
 			justifyCenterLabel.setAttribute("for","justifyCenter")
 			justifyDiv.appendChild(justifyCenterLabel)
 
@@ -179,7 +204,7 @@ export class TextAreaProperty extends EditableProperty<Text>{
 			
 			let justifyEndLabel = document.createElement("label") as HTMLLabelElement
 			justifyEndLabel.classList.add(...btnLabelClasses)
-			justifyEndLabel.innerHTML="align_end"
+			justifyEndLabel.innerHTML="vertical_align_bottom"
 			justifyEndLabel.setAttribute("for","justifyEnd")
 			justifyDiv.appendChild(justifyEndLabel)
 
@@ -190,9 +215,13 @@ export class TextAreaProperty extends EditableProperty<Text>{
 	}
 
 	private update(){
+		let sanitizedText = sanitizeHtml(this.input.value,{
+			allowedTags:[],
+			allowedAttributes:{},
+		})
 		let data:Text = {
-			text:this.input.value,
-			align:this.alignLeft.checked?-1:this.alignCenter.checked?0:1,
+			text:sanitizedText,
+			align:this.alignLeft.checked?TextAlign.LEFT:this.alignCenter.checked?TextAlign.CENTER:this.alignRight.checked?TextAlign.RIGHT:TextAlign.JUSTIFY,
 			justify:this.justifyStart.checked?-1:this.justifyCenter.checked?0:1
 		}		
 		this.updateValue(data)
@@ -202,14 +231,17 @@ export class TextAreaProperty extends EditableProperty<Text>{
 		if (this.input) {
 			this.input.value = this.value.text
 			switch (this.value.align) {
-				case -1:
+				case TextAlign.LEFT:
 					this.alignLeft.checked=true
 					break;
-				case 0:
+				case TextAlign.CENTER:
 					this.alignCenter.checked=true
 					break;
-				case 1:
+				case TextAlign.RIGHT:
 					this.alignRight.checked=true
+					break;
+				case TextAlign.JUSTIFY:
+					this.alignJustify.checked=true
 					break;
 				default:
 					break;

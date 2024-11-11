@@ -43,7 +43,7 @@ export class ComponentPlacer{
 		if (ev instanceof MouseEvent && ev.button!==0) {
 			return
 		}
-		if (ev instanceof TouchEvent && ev.touches.length!==0) {
+		if (window.TouchEvent&&ev instanceof TouchEvent && ev.touches.length!==0) {
 			return
 		}
 		let pt = ComponentPlacer.pointFromEvent(ev)
@@ -93,7 +93,7 @@ export class ComponentPlacer{
 			Undo.addState()
 			
 			// restart component placement for just finished component
-			if (!(ev instanceof TouchEvent)) {
+			if (window.TouchEvent&&!(ev instanceof TouchEvent)) {
 				this.placeComponent(this.component.copyForPlacement())
 			}else{
 				this._component = null

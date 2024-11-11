@@ -137,8 +137,9 @@ export class SnapController {
 		// 1. Calculate grid snap points
 		const canvasController = CanvasController.instance;
 		let gridSpacing: number = new SVG.Number(canvasController.majorGridSizecm/canvasController.majorGridSubdivisions, "cm").convertToUnit("px").value;
-		// take zoom level into account (canvas.ctm().a): zoomed in means smaller maximum distance
-		const maxSnapDistance = new SVG.Number(1, "cm").convertToUnit("px").value/CanvasController.instance.canvas.ctm().a
+		
+		// take zoom level into account (canvas.screenctm().a): zoomed in means smaller maximum distance
+		const maxSnapDistance = new SVG.Number(1, "cm").convertToUnit("px").value/CanvasController.instance.canvas.node.getScreenCTM().a
 
 		let relSnapPoints = this.movingSnapPoints.map((snapPoint)=>snapPoint.relToComponentAnchor().add(snapPoint.componentReference.position).sub(component.position));
 		if (this.additionalSnapPoints) {

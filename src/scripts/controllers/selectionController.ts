@@ -102,7 +102,7 @@ export class SelectionController {
 			return
 		}
 
-		if (evt instanceof TouchEvent && evt.touches.length>1) {
+		if (window.TouchEvent&&evt instanceof TouchEvent && evt.touches.length>1) {
 			this.currentlyDragging=false
 			this.selectionRectangle.size(0,0).move(0,0)
 			this.viewSelection(true)
@@ -137,7 +137,7 @@ export class SelectionController {
 			return
 		}
 
-		if (evt instanceof TouchEvent && evt.touches.length>0) {
+		if (window.TouchEvent&&evt instanceof TouchEvent && evt.touches.length>0) {
 			return
 		}
 		if (this.currentlyDragging) {

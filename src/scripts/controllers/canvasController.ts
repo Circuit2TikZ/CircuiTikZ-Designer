@@ -323,10 +323,11 @@ export class CanvasController {
 		//               /----------------\    /-----------------------\    /---\
 		// clientXY = event.touches?.[0] ?? event.changedTouches?.[0] ?? event;
 		let clientXY: SVG.Point
-		if (event instanceof TouchEvent) {
+		if (window.TouchEvent && event instanceof TouchEvent) {
 			let touch = event.touches.item(0) ?? event.changedTouches.item(0)
 			clientXY = new SVG.Point(touch.clientX, touch.clientY)
 		} else {
+			//@ts-ignore
 			clientXY = new SVG.Point(event.clientX, event.clientY)
 		}
 		if (!CanvasController.instance.invScreenCTM) {

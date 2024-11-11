@@ -1,5 +1,5 @@
 import { Modal } from "bootstrap";
-import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, WireSaveObject, CircuitComponent, SelectionMode, WireComponent, MainController, CanvasController, RectangleComponent, RectangleSaveObject, EllipseSaveObject, EllipseComponent } from "../internal";
+import { SelectionController,Undo, ExportController, ComponentSaveObject, NodeComponent, PathComponent, NodeSaveObject, PathSaveObject, WireSaveObject, CircuitComponent, SelectionMode, WireComponent, MainController, RectangleComponent, RectangleSaveObject, EllipseSaveObject, EllipseComponent } from "../internal";
 
 /**
  * Controller for saving and loading the progress in json format

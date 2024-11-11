@@ -1,17 +1,16 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, defaultBasicDirection, defaultFontSize, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, Text, TextAreaProperty } from "../internal";
+import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, defaultBasicDirection, defaultFontSize, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices, Text, TextAlign, TextAreaProperty } from "../internal";
 import { referenceColor, resizeSVG, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
-import sanitizeHtml from 'sanitize-html';
 
 export type RectangleSaveObject = ShapeSaveObject & {
-	firstPoint:SVG.Point
-	secondPoint:SVG.Point,
-	text?:Text&{innerSep?:SVG.Number,fontSize?:string}
+	position:SVG.Point
+	size:SVG.Point
+	text?:Text
 }
 
 export class RectangleComponent extends ShapeComponent{
-	private firstPoint:SVG.Point;
-	private secondPoint:SVG.Point;
+
+	private placePoint:SVG.Point
 
 	protected declare shapeVisualization:SVG.Rect;
 	protected declare selectionElement:SVG.Rect;
@@ -20,8 +19,12 @@ export class RectangleComponent extends ShapeComponent{
 	private textAreaProperty:TextAreaProperty
 	private textInnerSep:SliderProperty
 	private textFontSize:ChoiceProperty<FontSize>
+	private textColor:ColorProperty
 	private textForeign:SVG.ForeignObject
 	private textDiv:HTMLDivElement
+
+	// only used for text here
+	public rotationDeg = 0
 
 	public constructor(){
 		super()
@@ -45,7 +48,7 @@ export class RectangleComponent extends ShapeComponent{
 		this.snappingPoints = []
 
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
-		this.textAreaProperty = new TextAreaProperty({text:"",align:-1,justify:-1})
+		this.textAreaProperty = new TextAreaProperty({text:"",align:TextAlign.LEFT,justify:-1})
 		this.textAreaProperty.addChangeListener(ev=>{		
 			this.update()
 		})
@@ -58,6 +61,12 @@ export class RectangleComponent extends ShapeComponent{
 		this.textInnerSep = new SliderProperty("Inner sep",0,10,0.1,new SVG.Number(5,"pt"))
 		this.textInnerSep.addChangeListener((ev)=>{this.update()})
 		this.propertiesHTMLRows.push(this.textInnerSep.buildHTML())
+		
+		this.textColor = new ColorProperty("Color",null)
+		this.textColor.addChangeListener(ev=>{		
+			this.updateText()
+		})
+		this.propertiesHTMLRows.push(this.textColor.buildHTML())
 
 		this.textForeign = CanvasController.instance.canvas.foreignObject(0,0)
 		this.textForeign.node.setAttribute("overflow","visible")
@@ -67,6 +76,9 @@ export class RectangleComponent extends ShapeComponent{
 		this.textDiv.style.width = "100%"
 		this.textDiv.style.height = "100%"
 		this.textDiv.style.display = "flex"
+		this.textDiv.style.fontFamily = "Times New Roman"
+		this.textDiv.style.overflowWrap = "break-word"
+		this.textDiv.style.hyphens = "auto"
 		let textSpan = document.createElement("div") as HTMLDivElement
 		textSpan.style.width = "100%"
 		textSpan.style.display = "inline-block"
@@ -77,7 +89,7 @@ export class RectangleComponent extends ShapeComponent{
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
 		let relPositions:{anchorname:string,relPos:SVG.Point}[] = []
-		let halfSize = new SVG.Point(Math.abs(this.firstPoint.x-this.secondPoint.x)/2,Math.abs(this.firstPoint.y-this.secondPoint.y)/2)
+		let halfSize = this.size.div(2)
 		for (const anchor of basicDirections) {
 			if (anchor.key==defaultBasicDirection.key) {
 				continue
@@ -99,7 +111,7 @@ export class RectangleComponent extends ShapeComponent{
 	}
 
 	protected recalculateResizePoints(){
-		let halfsize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
+		let halfsize = this.size.div(2)
 		for (const [dir,viz] of this.resizeVisualizations) {
 			let pos = this.position.add(halfsize.mul(dir.direction))
 			viz.center(pos.x,pos.y)
@@ -115,9 +127,7 @@ export class RectangleComponent extends ShapeComponent{
 			let originalSize:SVG.Point
 			const getInitialDim = ()=>{
 				originalPos = this.position.clone()
-				originalSize = this.firstPoint.sub(this.secondPoint)
-				originalSize.x = Math.abs(originalSize.x)
-				originalSize.y = Math.abs(originalSize.y)
+				originalSize = this.size.clone()
 			}
 	
 			for (const direction of basicDirections) {
@@ -150,11 +160,13 @@ export class RectangleComponent extends ShapeComponent{
 								pos = new SVG.Point(oppositePoint.x-oppositePoint.y,oppositePoint.y-oppositePoint.x).add(pos.x+pos.y).div(2)
 							}
 						}
+						let dirAbs = new SVG.Point(Math.abs(direction.direction.x),Math.abs(direction.direction.y))
 						let delta = pos.sub(startPoint)
-						let newHalfSize = originalSize.add(delta.mul(direction.direction)).div(2)
-						let newPos = originalPos.add(delta.mul(new SVG.Point(Math.abs(direction.direction.x)/2,Math.abs(direction.direction.y)/2)))
-						this.firstPoint = newPos.sub(newHalfSize)
-						this.secondPoint = newPos.add(newHalfSize)
+						
+						this.size.x = direction.direction.x?Math.abs(pos.x-oppositePoint.x):originalSize.x
+						this.size.y = direction.direction.y?Math.abs(pos.y-oppositePoint.y):originalSize.y
+						
+						this.position = originalPos.add(delta.mul(dirAbs.div(2)))
 						this.update()
 					},
 				})
@@ -168,47 +180,45 @@ export class RectangleComponent extends ShapeComponent{
 			this.resizeVisualizations.clear()
 		}
 	}
+	
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix()
+	}
 
 	public moveTo(position: SVG.Point): void {
-		let delta = position.sub(this.position)
-		this.firstPoint = this.firstPoint.add(delta)
-		this.secondPoint = this.secondPoint.add(delta)
+		this.position = position
 		this.update()
 	}
 	public rotate(angleDeg: number): void {
-		this.firstPoint = this.firstPoint.rotate(angleDeg,this.position)
-		this.secondPoint = this.secondPoint.rotate(angleDeg,this.position)
+		this.size = new SVG.Point(this.size.y,this.size.x)
+		this.rotationDeg+=angleDeg
+		this.simplifyRotationAngle()
 		this.update()
 	}
 	public flip(horizontal: boolean): void {
-		//doesn't do anything for rectangles
+		if (this.textAreaProperty.value.text) {
+			if ((this.rotationDeg+(horizontal?0:90))%180==0) {
+				this.rotationDeg+=180
+				this.simplifyRotationAngle()
+			}
+		}
+		this.update()
 	}
 	protected update(): void {
-		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value 
-		let halfstroke = strokeWidth/2
-		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x),Math.min(this.firstPoint.y,this.secondPoint.y))
-		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x),Math.max(this.firstPoint.y,this.secondPoint.y))
+		let strokeWidth =this.strokeInfo.width.convertToUnit("px").value
 
-		this.dragElement.move(upperLeft.x,upperLeft.y).size(lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
+		let transformMatrix = this.getTransformMatrix()
 
-		this.size = lowerRight.sub(upperLeft)
-		
-		upperLeft = upperLeft.add(halfstroke)
-		lowerRight = lowerRight.sub(halfstroke)
-		
-		this.position = lowerRight.add(upperLeft).div(2)
-		if (this.size.x<0) {
-			this.size.x=0
-		}
-		if (this.size.y<0) {
-			this.size.y=0
-		}
+		this.dragElement.size(this.size.x,this.size.y).center(this.position.x,this.position.y)
+		this.dragElement.transform(transformMatrix)
 		
 		this.shapeVisualization.size(this.size.x<strokeWidth?0:this.size.x-strokeWidth,this.size.y<strokeWidth?0:this.size.y-strokeWidth)
-		this.shapeVisualization.move(upperLeft.x,upperLeft.y)
-		this._bbox = new SVG.Box(upperLeft.x-halfstroke,upperLeft.y-halfstroke,this.size.x,this.size.y)
+		this.shapeVisualization.center(this.position.x,this.position.y)
+		this.shapeVisualization.transform(transformMatrix)
+
+		this._bbox = this.dragElement.bbox()
 		
-		this.relPosition = this.position.sub(upperLeft)
+		this.relPosition = this.position.sub(new SVG.Point(this.bbox.x,this.bbox.y))
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
@@ -218,29 +228,31 @@ export class RectangleComponent extends ShapeComponent{
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			let lineWidth = selectedBoxWidth.convertToUnit("px").value
-			this.selectionElement.move(this.bbox.x-lineWidth/2,this.bbox.y-lineWidth/2);
-			this.selectionElement.attr("width",this.bbox.w+lineWidth);
-			this.selectionElement.attr("height",this.bbox.h+lineWidth);
+			
+			this.selectionElement.size(this.bbox.w+lineWidth,this.bbox.h+lineWidth)
+			this.selectionElement.center(this.position.x,this.position.y)
 		}
 	}
 
 	public getPureBBox(): SVG.Box {
-		let upperLeft = new SVG.Point(Math.min(this.firstPoint.x,this.secondPoint.x),Math.min(this.firstPoint.y,this.secondPoint.y))
-		let lowerRight = new SVG.Point(Math.max(this.firstPoint.x,this.secondPoint.x),Math.max(this.firstPoint.y,this.secondPoint.y))
-		return new SVG.Box(upperLeft.x,upperLeft.y,lowerRight.x-upperLeft.x,lowerRight.y-upperLeft.y)
+		return this.bbox
 	}
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.selectionElement?.remove()
-			this.selectionElement = CanvasController.instance.canvas.rect(this.bbox.w,this.bbox.h).move(this.bbox.x,this.bbox.y)
+			if (!this.selectionElement) {
+				this.selectionElement = CanvasController.instance.canvas.rect()
+				this.selectionElement.stroke({
+					width:selectedBoxWidth.convertToUnit("px").value,
+					dasharray:"3,3"
+				})
+				this.selectionElement.fill("none")
+			}
 			this.selectionElement.attr({
-				"stroke-width":selectedBoxWidth,
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
-				"stroke-dasharray":"3,3",
-				"fill":"none"
-			});
+			})
 			this.visualization.stroke("#f00")
+			this.recalculateSelectionVisuals()
 		} else {
 			this.selectionElement?.remove();
 			this.visualization.stroke("#000")
@@ -251,8 +263,11 @@ export class RectangleComponent extends ShapeComponent{
 	public toJson(): RectangleSaveObject {
 		let data:RectangleSaveObject = {
 			type:"rect",
-			firstPoint:this.firstPoint.simplifyForJson(),
-			secondPoint:this.secondPoint.simplifyForJson()
+			position:this.position.simplifyForJson(),
+			size:this.size.simplifyForJson(),
+		}
+		if (this.rotationDeg) {
+			data.rotationDeg = this.rotationDeg
 		}
 
 		let fill:FillInfo={}
@@ -284,6 +299,10 @@ export class RectangleComponent extends ShapeComponent{
 			stroke.width = this.strokeInfo.width
 			shouldStroke = true
 		}
+		if (this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+			stroke.style = this.strokeInfo.style
+			shouldStroke = true
+		}
 		if (shouldStroke) {
 			data.stroke=stroke
 		}
@@ -303,7 +322,7 @@ export class RectangleComponent extends ShapeComponent{
 			let textData:Text&{fontSize?:string,innerSep?:SVG.Number}={
 				text:this.textAreaProperty.value.text
 			}
-			if (this.textAreaProperty.value.align!==-1) {
+			if (this.textAreaProperty.value.align!==TextAlign.LEFT) {
 				textData.align=this.textAreaProperty.value.align
 			}
 			if (this.textAreaProperty.value.justify!==-1) {
@@ -315,6 +334,9 @@ export class RectangleComponent extends ShapeComponent{
 			if (this.textInnerSep.value.value!==5) {
 				textData.innerSep = this.textInnerSep.value
 			}
+			if (this.textColor.value) {
+				textData.color = this.textColor.value.toString()
+			}
 			data.text=textData
 		}
 
@@ -323,8 +345,13 @@ export class RectangleComponent extends ShapeComponent{
 
 	static fromJson(saveObject: RectangleSaveObject): RectangleComponent {
 		let rectComponent = new RectangleComponent()
-		rectComponent.firstPoint = new SVG.Point(saveObject.firstPoint)
-		rectComponent.secondPoint = new SVG.Point(saveObject.secondPoint)
+		rectComponent.position = new SVG.Point(saveObject.position)
+		rectComponent.placePoint = rectComponent.position
+		rectComponent.size = new SVG.Point(saveObject.size)
+
+		if (saveObject.rotationDeg) {
+			rectComponent.rotationDeg=saveObject.rotationDeg
+		}
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
@@ -356,6 +383,11 @@ export class RectangleComponent extends ShapeComponent{
 				rectComponent.strokeWidthProperty.value = rectComponent.strokeInfo.width
 				rectComponent.strokeWidthProperty.updateHTML()
 			}
+			if (saveObject.stroke.style) {
+				rectComponent.strokeInfo.style=saveObject.stroke.style
+				rectComponent.strokeStyleProperty.value = strokeStyleChoices.find(item=>item.key==saveObject.stroke.style)
+				rectComponent.strokeStyleProperty.updateHTML()
+			}
 		}
 
 		if (saveObject.label) {
@@ -377,7 +409,7 @@ export class RectangleComponent extends ShapeComponent{
 		if (saveObject.text) {
 			let text:Text={
 				text:saveObject.text.text,
-				align:saveObject.text.align??-1,
+				align:saveObject.text.align??TextAlign.LEFT,
 				justify:saveObject.text.justify??-1
 			}
 			rectComponent.textAreaProperty.value = text
@@ -386,6 +418,8 @@ export class RectangleComponent extends ShapeComponent{
 			rectComponent.textFontSize.updateHTML()
 			rectComponent.textInnerSep.value = saveObject.text.innerSep?new SVG.Number(saveObject.text.innerSep):new SVG.Number("5pt")
 			rectComponent.textInnerSep.updateHTML()
+			rectComponent.textColor.value = saveObject.text.color?new SVG.Color(saveObject.text.color):null
+			rectComponent.textColor.updateHTML()
 		}
 
 		rectComponent.placeFinish()
@@ -422,6 +456,9 @@ export class RectangleComponent extends ShapeComponent{
 			if (width!=0.4) {
 				optionsArray.push("line width="+width+"pt")
 			}
+			if (this.strokeInfo.style&&this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+				optionsArray.push(strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).name)
+			}
 		}
 
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
@@ -437,16 +474,25 @@ export class RectangleComponent extends ShapeComponent{
 
 		let textStr = ""
 		if (this.textAreaProperty.value.text) {
-			let dir = new SVG.Point(this.textAreaProperty.value.align,this.textAreaProperty.value.justify)
+			//treat justify like left aligned
+			let alignDir = this.textAreaProperty.value.align==TextAlign.JUSTIFY?-1:this.textAreaProperty.value.align-1
+			let dir = new SVG.Point(alignDir,this.textAreaProperty.value.justify)
+			
+			// which anchor and position corresponds to the direction?
 			let anchor = basicDirections.find(item=>item.direction.eq(dir)).name;
 			let pos = this.position.add(dir.mul(this.size.div(2)))
 			
+			// text dimensions
 			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width.times(0.5))
 			let textWidth = new SVG.Number(this.size.x,"px").minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2)).convertToUnit("cm")
 			
-			let fontStr = this.textFontSize.value.key==defaultFontSize.key?"":`\\${this.textFontSize.value.name}`
-			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==-1?"left":this.textAreaProperty.value.align==0?"center":"right"}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}]`
-			textStr = ` node ${options} at ${pos.toTikzString()}{${fontStr} ${this.textAreaProperty.value.text.replaceAll("\n","\\\\")}}`
+			let fontStr = this.textFontSize.value.key==defaultFontSize.key?"":`\\${this.textFontSize.value.name} `
+			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==TextAlign.LEFT?"left":this.textAreaProperty.value.align==TextAlign.CENTER?"center":this.textAreaProperty.value.align==TextAlign.RIGHT?"right":"justify"}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}${this.rotationDeg!=0?", rotate="+-this.rotationDeg:""}]`
+			
+			let latexStr = `${fontStr}${this.textAreaProperty.value.text.replaceAll("\n","\\\\")}`
+			latexStr = this.textColor.value?"\\textcolor"+this.textColor.value.toTikzString()+"{"+latexStr+"}":latexStr
+
+			textStr = ` node ${options} at ${pos.toTikzString()}{${latexStr}}`
 		}
 
 		let labelNodeStr = ""
@@ -468,8 +514,11 @@ export class RectangleComponent extends ShapeComponent{
 			posShift = posShift==""?"":"["+posShift+"]"
 
 			let posStr = this.positionChoice.value.key==defaultBasicDirection.key?id+".center":id+"."+this.positionChoice.value.name
+			
+			let latexStr = this.mathJaxLabel.value?"$"+this.mathJaxLabel.value+"$":""
+			latexStr = latexStr&&this.labelColor.value?"\\textcolor"+this.labelColor.value.toTikzString()+"{"+latexStr+"}":latexStr
 
-			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){$"+this.mathJaxLabel.value+"$}"
+			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){"+latexStr+"}"
 		}
 
 		let optionsStr = optionsArray.length>0?`[${optionsArray.join(", ")}]`:""
@@ -491,51 +540,57 @@ export class RectangleComponent extends ShapeComponent{
 		this.selectionElement?.remove()
 	}
 	public placeMove(pos: SVG.Point, ev?: Event): void {
-		if (!this.firstPoint) {
+		if (!this.placePoint) {
 			// not started placing
 			SnapCursorController.instance.moveTo(pos)
 		}else{
+			let secondPoint:SVG.Point
 			if (ev&&(ev as MouseEvent|TouchEvent).ctrlKey) {
-				// get closest point on one of the two diagonals
-				let diff = pos.sub(this.firstPoint)
+				// get point on one of the two diagonals
+				let diff = pos.sub(this.placePoint)
 				if (diff.x*diff.y<0) {
-					this.secondPoint = new SVG.Point(pos.x-pos.y,pos.y-pos.x).add(this.firstPoint.x+this.firstPoint.y).div(2)
+					secondPoint = new SVG.Point(pos.x-pos.y,pos.y-pos.x).add(this.placePoint.x+this.placePoint.y).div(2)
 				}else{
-					this.secondPoint = new SVG.Point(this.firstPoint.x-this.firstPoint.y,this.firstPoint.y-this.firstPoint.x).add(pos.x+pos.y).div(2)
+					secondPoint = new SVG.Point(this.placePoint.x-this.placePoint.y,this.placePoint.y-this.placePoint.x).add(pos.x+pos.y).div(2)
 				}
 			}else{
-				this.secondPoint = pos
+				secondPoint = pos
 			}
+			this.position = this.placePoint.add(secondPoint).div(2)
+			this.size = new SVG.Point(Math.abs(secondPoint.x-this.placePoint.x),Math.abs(secondPoint.y-this.placePoint.y))
 			this.update()
 		}
 	}
 	public placeStep(pos: SVG.Point, ev?: Event): boolean {
-		if (this.secondPoint) {
+		if (this.finishedPlacing) {
 			return true
 		}
-		if (!this.firstPoint){
-			this.firstPoint = pos
+		if (!this.placePoint) {
+			this.placePoint = pos
+			this.position = pos
+			this.size = new SVG.Point()
 			this.shapeVisualization.show()
-			this.placeMove(pos,ev)
 			this.updateTheme()
 			SnapCursorController.instance.visible=false
 			return false
-		}else{
-			this.secondPoint = pos
-			this.update()
-			return true
 		}
+
+		this.placeMove(pos,ev)
+		return true
 	}
 	public placeFinish(): void {
-		if (!this.firstPoint) {
+		if (this.finishedPlacing) {
+			return
+		}
+		if (!this.placePoint) {
 			this.placeStep(new SVG.Point())
 		}
-		if (!this.secondPoint) {
-			this.placeStep(new SVG.Point())
-		}
-		this.shapeVisualization.show()
-		this.draggable(true)		
+
+		this.finishedPlacing = true
 		this.update()
+		this.draggable(true)
+		this.shapeVisualization.show()
+		this.updateTheme()
 		SnapCursorController.instance.visible=false
 	}
 
@@ -546,14 +601,14 @@ export class RectangleComponent extends ShapeComponent{
 		}
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
+		let useBBox = this.bbox.transform(transformMatrix)
 		// get relevant positions and bounding boxes
 		let textPos:SVG.Point
 		if (this.positionChoice.value.key==defaultBasicDirection.key) {
-			textPos = new SVG.Point(this.bbox.cx,this.bbox.cy)
+			textPos = this.position
 		}else{
-			let bboxHalfSize = new SVG.Point(this.bbox.w/2,this.bbox.h/2)
-			let pos = new SVG.Point(this.bbox.cx,this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+			let bboxHalfSize = new SVG.Point(useBBox.w/2,useBBox.h/2)
+			textPos = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction))
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -570,7 +625,7 @@ export class RectangleComponent extends ShapeComponent{
 					return value
 				}
 			}
-			let useBBox = this.bbox.transform(transformMatrix)
+			
 			let horizontalTextPosition = clamp(Math.round(2*(useBBox.cx-textPos.x)/useBBox.w),-1,1)		
 			let verticalTextPosition = clamp(Math.round(2*(useBBox.cy-textPos.y)/useBBox.h),-1,1)	
 			labelRef = new SVG.Point(horizontalTextPosition,verticalTextPosition)
@@ -582,30 +637,38 @@ export class RectangleComponent extends ShapeComponent{
 		
 		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w,labelBBox.h)).add(labelRef.mul(labelDist))
 		
-		// acutally move the label
+		// actually move the label
 		let movePos = textPos.sub(ref)
 		labelSVG.transform(new SVG.Matrix({translate:[movePos.x,movePos.y]}))
 	}
 
 	private updateText(){
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-		this.textForeign.move(this.bbox.x+strokeWidth,this.bbox.y+strokeWidth)
+		let transformMatrix = new SVG.Matrix({
+			rotate:-this.rotationDeg,
+			origin:[this.position.x,this.position.y]
+		})
+		
 		let w = this.bbox.w-strokeWidth*2
 		let h = this.bbox.h-strokeWidth*2
-		this.textForeign.size(w<0?0:w,h<0?0:h)
+		let foreignBBox = new SVG.Box(this.bbox.x+strokeWidth,this.bbox.y+strokeWidth,w<0?0:w,h<0?0:h).transform(transformMatrix)
+		
+		this.textForeign.size(foreignBBox.w,foreignBBox.h)
+		this.textForeign.center(this.position.x,this.position.y)
+		this.textForeign.transform(transformMatrix)
 
-		let text = sanitizeHtml(this.textAreaProperty.value.text,{
-			allowedTags:[],
-			allowedAttributes:{},
-		})
+		let text = this.textAreaProperty.value.text
 
+		let textColor = "var(--bs-emphasis-color)"
+		if (this.textColor.value) {
+			textColor = this.textColor.value.toString()
+		}
+		
 		this.textDiv.children[0].innerHTML = text.replaceAll("\n","<br>")
-		this.textDiv.style.textAlign = this.textAreaProperty.value.align==-1?"start":this.textAreaProperty.value.align==0?"center":"end"
+		this.textDiv.style.textAlign = this.textAreaProperty.value.align==TextAlign.LEFT?"start":this.textAreaProperty.value.align==TextAlign.CENTER?"center":this.textAreaProperty.value.align==TextAlign.RIGHT?"end":"justify"
 		this.textDiv.style.alignItems = this.textAreaProperty.value.justify==-1?"start":this.textAreaProperty.value.justify==0?"center":"end"
 		this.textDiv.style.fontSize = this.textFontSize.value.size + "pt"
-		this.textDiv.style.fontFamily = "Times New Roman"
-		this.textDiv.style.overflowWrap = "break-word"
-		this.textDiv.style.hyphens = "auto"
+		this.textDiv.style.color = textColor
 		this.textDiv.style.padding = this.textInnerSep.value.convertToUnit("pt").toString()
 		this.textDiv.style.lineHeight = this.textFontSize.value.size*1.1 + "pt"
 	}
