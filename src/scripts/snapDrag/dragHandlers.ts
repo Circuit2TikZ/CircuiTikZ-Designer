@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, Undo } from "../internal";
+import { CanvasController, CircuitComponent, MainController, SelectionController, SelectionMode, SnapController, Undo } from "../internal";
 
 export type DragCallbacks = {
 	dragStart?(pos: SVG.Point, ev?:MouseEvent|TouchEvent):void
@@ -32,7 +32,6 @@ export class SnapDragHandler{
 
 	private startedDragging = false;
 	private didDrag = false;
-	private componentInSelection=false
 
 	constructor(componentReference:CircuitComponent, element:SVG.Element) {
 		this.componentReference = componentReference
@@ -68,11 +67,12 @@ export class SnapDragHandler{
 		this.element.forget("_draggable");
 	}
 
+	private dragOffset:SVG.Point
 	private dragStart(ev:DragEvent){
 		this.startedDragging = true;
 		this.element.node.classList.add("dragging");
 		this.element.parent().node.classList.add("dragging");
-		this.componentInSelection = this.componentReference.isSelected
+		this.dragOffset = this.componentReference.position.sub(CanvasController.eventToPoint(ev.detail.event,false))
 		SnapController.instance.updateSnapPoints(this.componentReference,false)
 	}
 	private dragMove(ev:DragEvent){
@@ -84,19 +84,13 @@ export class SnapDragHandler{
 		this.didDrag = true;
 		ev.preventDefault();
 
-		// the vector from the top left of the component bounding box to its postition vector
-		const relMid: SVG.Point = this.componentReference.relPosition || new SVG.Point(0, 0);
-		// the bounding box of the component for which the event occured
-		let box = ev.detail.box.transform(this.componentReference.getTransformMatrix())
-		
-		// emulate as if the component is always dragged from its center (i.e. the position vector)
-		const draggedPoint = new SVG.Point(box.x + relMid.x, box.y + relMid.y);
+		const draggedPoint = CanvasController.eventToPoint(ev.detail.event,false).add(this.dragOffset)
 
 		// calculate where the selection/component should be placed
 		let shiftKey = ev.detail.event.shiftKey
 		let destination = shiftKey?draggedPoint:SnapController.instance.snapPoint(draggedPoint,this.componentReference)
 
-		if (this.componentInSelection){
+		if (this.componentReference.isSelected){
 			//move the whole selection to the destination
 			SelectionController.instance.moveSelectionRel(destination.sub(this.componentReference.position))
 		}else{
@@ -139,7 +133,7 @@ export class SnapDragHandler{
 		}
 
 		// only recalculate snapping points after movement is done! (since they are part of the movement which would lead to eratic behaviour)
-		if (this.componentInSelection) {
+		if (this.componentReference.isSelected) {
 			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				component.recalculateSnappingPoints()
 			}
