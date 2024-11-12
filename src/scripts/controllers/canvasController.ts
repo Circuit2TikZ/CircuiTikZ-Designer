@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.panzoom.js";
-import { SnapController, Undo, CircuitComponent, MainController } from "../internal";
+import { SnapController, Undo, CircuitComponent, MainController, SelectionController } from "../internal";
 
 type PanningEventDetail = {
 	box:SVG.Box
@@ -64,6 +64,7 @@ export class CanvasController {
 	private zoomFactor = 0.1;
 	private zoomMin = 0.25;
 	private zoomMax = 10;
+	private zoomCurrent = 2;
 
 	/**
 	 * the last point on the canvas
@@ -84,6 +85,28 @@ export class CanvasController {
 		this.paper = SVG.SVG("#grid") as SVG.Rect;
 		this.xAxis = SVG.SVG("#xAxis") as SVG.Line;
 		this.yAxis = SVG.SVG("#yAxis") as SVG.Line;	
+
+		const panFactor = 20
+		let body = document.getElementsByTagName("body")[0]
+		document.addEventListener("keydown",(ev)=>{
+			// pan canvas manually/ move selection slightly			
+			if (ev.key.startsWith("Arrow")&&ev.target == body) {
+				let direction = new SVG.Point()
+				direction.x = ev.key=="ArrowRight"?1:ev.key=="ArrowLeft"?-1:0
+				direction.y = ev.key=="ArrowUp"?-1:ev.key=="ArrowDown"?1:0
+
+				if (SelectionController.instance.hasSelection()) {
+					SelectionController.instance.moveSelectionRel(direction.mul(1/this.zoomCurrent))
+				}else{
+					//move canvas
+					let currentViewBox = this.canvas.viewbox()
+					let newPos = new SVG.Point(currentViewBox.x,currentViewBox.y).add(direction.mul(panFactor/this.zoomCurrent))
+					// this.canvas.zoom(this.zoomCurrent,newPos)
+					this.canvas.viewbox(newPos.x,newPos.y,currentViewBox.w,currentViewBox.h)
+					this.movePaper({detail:{}} as CustomEvent)
+				}
+			}
+		})
 
 		// init viewBox
 		this.onResizeCanvas();
@@ -128,7 +151,7 @@ export class CanvasController {
 		box.x -= moveAmount
 		box.y += moveAmount
 		this.canvas.viewbox(box)
-		this.canvas.zoom(2,new SVG.Point())
+		this.canvas.zoom(this.zoomCurrent,new SVG.Point())
 
 		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
 
@@ -413,6 +436,9 @@ export class CanvasController {
 	 * Move paper/grid and axis on zoom/pan.
 	 */
 	private movePaper(evt: CustomEvent<PanningEventDetail> | CustomEvent<WheelZoomEventDetail> | CustomEvent<PinchZoomEventDetail>) {
+		if (evt.detail instanceof Object&&"level" in evt.detail) {
+			this.zoomCurrent = evt.detail.level
+		}
 		let box: SVG.Box = this.canvas.viewbox()
 		this.paper.move(box.x, box.y);
 		this.xAxis.attr({ x1: box.x, x2: box.x2 });
