@@ -13,7 +13,7 @@ $danger: #c50f3c;
 
 @import "dropdown_variables.scss";
 // import bootstrap:
-@import "bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap/scss/bootstrap";
 // override some bootstrap classes
 @import "dropdown_classes.scss";
 // @import "floatingActionButton.scss";
