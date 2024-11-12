@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, defaultBasicDirection, defaultFontSize, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices, Text, TextAlign, TextAreaProperty } from "../internal";
+import { AdjustDragHandler, basicDirections, CanvasController, ChoiceProperty, CircuitComponent, ColorProperty, dashArrayToPattern, defaultBasicDirection, defaultFontSize, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, FontSize, fontSizes, PositionedLabel, SectionHeaderProperty, SelectionController, ShapeComponent, ShapeSaveObject, SliderProperty, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices, Text, TextAlign, TextAreaProperty } from "../internal";
 import { referenceColor, resizeSVG, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper";
 
 export type RectangleSaveObject = ShapeSaveObject & {
@@ -457,7 +457,7 @@ export class RectangleComponent extends ShapeComponent{
 				optionsArray.push("line width="+width+"pt")
 			}
 			if (this.strokeInfo.style&&this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
-				optionsArray.push(strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).name)
+				optionsArray.push(dashArrayToPattern(this.strokeInfo.width,strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).dasharray))
 			}
 		}
 
@@ -480,14 +480,17 @@ export class RectangleComponent extends ShapeComponent{
 			
 			// which anchor and position corresponds to the direction?
 			let anchor = basicDirections.find(item=>item.direction.eq(dir)).name;
-			let pos = this.position.add(dir.mul(this.size.div(2)))
+
+			let bboxNoRotation = new SVG.Box(0,0,this.size.x,this.size.y).transform(new SVG.Matrix({rotate:-this.rotationDeg}))
+			let size = new SVG.Point(bboxNoRotation.w,bboxNoRotation.h)
+			let pos = this.position.add(dir.mul(size.div(2)).rotate(this.rotationDeg))
 			
 			// text dimensions
 			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width.times(0.5))
-			let textWidth = new SVG.Number(this.size.x,"px").minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2)).convertToUnit("cm")
+			let textWidth = new SVG.Number(size.x,"px").minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2)).convertToUnit("cm")
 			
 			let fontStr = this.textFontSize.value.key==defaultFontSize.key?"":`\\${this.textFontSize.value.name} `
-			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==TextAlign.LEFT?"left":this.textAreaProperty.value.align==TextAlign.CENTER?"center":this.textAreaProperty.value.align==TextAlign.RIGHT?"right":"justify"}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}${this.rotationDeg!=0?", rotate="+-this.rotationDeg:""}]`
+			let options = `[anchor=${anchor}, align=${this.textAreaProperty.value.align==TextAlign.LEFT?"left":this.textAreaProperty.value.align==TextAlign.CENTER?"center":this.textAreaProperty.value.align==TextAlign.RIGHT?"right":"justify"}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}${this.rotationDeg!=0?", rotate="+this.rotationDeg:""}]`
 			
 			let latexStr = `${fontStr}${this.textAreaProperty.value.text.replaceAll("\n","\\\\")}`
 			latexStr = this.textColor.value?"\\textcolor"+this.textColor.value.toTikzString()+"{"+latexStr+"}":latexStr

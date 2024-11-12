@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { AdjustDragHandler, basicDirections, CanvasController, CircuitComponent, defaultBasicDirection, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, PositionedLabel, SelectionController, ShapeComponent, ShapeSaveObject, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices } from "../internal";
+import { AdjustDragHandler, basicDirections, CanvasController, CircuitComponent, dashArrayToPattern, defaultBasicDirection, defaultStrokeStyleChoice, DirectionInfo, ExportController, FillInfo, PositionedLabel, SelectionController, ShapeComponent, ShapeSaveObject, SnapCursorController, SnapDragHandler, SnapPoint, StrokeInfo, strokeStyleChoices } from "../internal";
 import { referenceColor, resizeSVG, selectedBoxWidth, selectionColor, roundTikz } from "../utils/selectionHelper";
 
 export type EllipseSaveObject = ShapeSaveObject & {
@@ -375,7 +375,7 @@ export class EllipseComponent extends ShapeComponent{
 			}
 
 			if (this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
-				optionsArray.push(strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).name)
+				optionsArray.push(dashArrayToPattern(this.strokeInfo.width,strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).dasharray))
 			}
 		}
 
@@ -413,7 +413,10 @@ export class EllipseComponent extends ShapeComponent{
 
 			let posStr = this.positionChoice.value.key==defaultBasicDirection.key?id+".center":id+"."+this.positionChoice.value.name
 
-			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){$"+this.mathJaxLabel.value+"$}"
+			let latexStr = this.mathJaxLabel.value?"$"+this.mathJaxLabel.value+"$":""
+			latexStr = latexStr&&this.labelColor.value?"\\textcolor"+this.labelColor.value.toTikzString()+"{"+latexStr+"}":latexStr
+
+			labelNodeStr = " node["+labelStr+"] at ("+posShift+posStr+"){"+latexStr+"}"
 		}
 
 		let optionsStr = optionsArray.length>0?`[${optionsArray.join(", ")}]`:""

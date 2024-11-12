@@ -409,6 +409,11 @@ export class MainController {
 			}
 			return false;
 		})
+		hotkeys("t",()=>{
+			this.switchMode(Modes.DRAG_PAN)
+			ComponentPlacer.instance.placeComponent(new RectangleComponent())
+			return false;
+		})
 
 		// handle shortcuts for adding components
 		// shortcutDict maps the Shortcut key to the title attribute of the html element where the callback can be found

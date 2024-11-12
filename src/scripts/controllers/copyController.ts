@@ -29,7 +29,7 @@ export class CopyPaste {
 	
 			CopyPaste.clipboard = {
 				components:components,
-				selectionPos: new Point(bbox.x,bbox.y)
+				selectionPos: new Point(bbox.cx,bbox.cy)
 			}
 		}
 	}
