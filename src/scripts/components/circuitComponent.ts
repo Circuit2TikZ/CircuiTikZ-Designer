@@ -113,6 +113,8 @@ export abstract class CircuitComponent{
 	 */
 	public visualization: SVG.Element;
 
+	protected selectionElement:SVG.Element=null;
+
 	/**
 	 * A List of all the Snapping points of this component
 	 */
@@ -208,7 +210,14 @@ export abstract class CircuitComponent{
 	/**
 	 * update the graphics corresponding to the component selection visualization
 	 */
-	protected abstract recalculateSelectionVisuals():void
+	protected recalculateSelectionVisuals():void{
+		if (this.selectionElement) {
+			let box = this.visualization.bbox().transform(this.getTransformMatrix());
+			
+			this.selectionElement.size(box.w,box.h)
+			this.selectionElement.center(this.position.x,this.position.y)
+		}
+	}
 
 	/**
 	 * Show or hide the selection visualization of the component. This has to be distinct from the actual selection state due to how the selection controller works

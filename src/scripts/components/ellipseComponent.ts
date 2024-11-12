@@ -11,7 +11,6 @@ export class EllipseComponent extends ShapeComponent{
 	private placePoint:SVG.Point
 
 	protected declare shapeVisualization:SVG.Ellipse;
-	protected declare selectionElement:SVG.Ellipse;
 	protected declare dragElement:SVG.Ellipse
 
 	private _isCircle = false;

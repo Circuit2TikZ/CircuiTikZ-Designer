@@ -13,7 +13,6 @@ export class RectangleComponent extends ShapeComponent{
 	private placePoint:SVG.Point
 
 	protected declare shapeVisualization:SVG.Rect;
-	protected declare selectionElement:SVG.Rect;
 	protected declare dragElement:SVG.Rect
 
 	private textAreaProperty:TextAreaProperty
@@ -251,11 +250,11 @@ export class RectangleComponent extends ShapeComponent{
 			this.selectionElement.attr({
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 			})
-			this.visualization.stroke("#f00")
+			// this.visualization.stroke("#f00")
 			this.recalculateSelectionVisuals()
 		} else {
 			this.selectionElement?.remove();
-			this.visualization.stroke("#000")
+			// this.visualization.stroke("#000")
 			this.selectionElement = null
 		}
 		this.resizable(this.isSelected&&show&&SelectionController.instance.currentlySelectedComponents.length==1)

@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js";
-import { CanvasController, ChoiceEntry, ChoiceProperty, CircuitComponent, ComponentSaveObject, MainController, SectionHeaderProperty, SelectionController, SnapCursorController, SnappingInfo, SnapPoint } from "../internal"
+import { CanvasController, ChoiceEntry, ChoiceProperty, CircuitComponent, ColorProperty, ComponentSaveObject, dashArrayToPattern, defaultStrokeStyleChoice, MainController, SectionHeaderProperty, SelectionController, SliderProperty, SnapCursorController, SnappingInfo, SnapPoint, StrokeInfo, StrokeStyle, strokeStyleChoices } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers";
-import { lineRectIntersection, pointInsideRect, referenceColor, resizeSVG, selectionColor, selectionSize } from "../utils/selectionHelper";
+import { lineRectIntersection, pointInsideRect, referenceColor, resizeSVG, selectedBoxWidth, selectionColor, selectionSize } from "../utils/selectionHelper";
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -28,6 +28,7 @@ export type WireSaveObject = ComponentSaveObject &  {
 	segments: WireSegment[],
 	startArrow?:string,
 	endArrow?:string,
+	stroke?:StrokeInfo
 }
 
 export type ArrowTip= ChoiceEntry&{
@@ -53,6 +54,12 @@ export class WireComponent extends CircuitComponent{
 	public updateLabelPosition(): void {
 		//not needed for wires 
 	}
+
+	protected strokeInfo:StrokeInfo;
+	protected strokeColorProperty:ColorProperty
+	protected strokeOpacityProperty:SliderProperty
+	protected strokeWidthProperty:SliderProperty
+	protected strokeStyleProperty:ChoiceProperty<StrokeStyle>
 	
 	/**
 	 * the corner points when drawing
@@ -67,7 +74,6 @@ export class WireComponent extends CircuitComponent{
 
 	// essentially the main visualisation
 	private wire:SVG.Polyline
-	private wireWidth:SVG.Number
 	// a wider copy of wire, but invisible, Meant for dragging the wire
 	private draggableWire:SVG.Polyline
 
@@ -84,14 +90,16 @@ export class WireComponent extends CircuitComponent{
 		SnapCursorController.instance.visible = true
 		this.displayName = "Wire"
 
+		this.strokeInfo={
+			color:"default",
+			opacity:1,
+			width:new SVG.Number("0.4pt"),
+			style:defaultStrokeStyleChoice.key
+		}
+
 		this.visualization = CanvasController.instance.canvas.group()
 		this.wire = CanvasController.instance.canvas.polyline()
-		this.wireWidth = new SVG.Number("0.4pt").convertToUnit("px")
-		this.wire.attr({
-			fill: "none",
-			stroke: MainController.instance.darkMode?"#fff":"#000",
-			"stroke-width": this.wireWidth.toString(),
-		});
+		this.wire.fill("none")
 		this.draggableWire = CanvasController.instance.canvas.polyline()
 		this.draggableWire.attr({
 			fill: "none",
@@ -117,6 +125,42 @@ export class WireComponent extends CircuitComponent{
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.arrowEnd.buildHTML())
+
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Stroke").buildHTML())
+		this.strokeOpacityProperty = new SliderProperty("Opacity",0,100,1,new SVG.Number(this.strokeInfo.opacity*100,"%"))
+		this.strokeOpacityProperty.addChangeListener(ev=>{
+			this.strokeInfo.opacity = ev.value.value/100
+			this.updateTheme()
+		})
+
+		this.strokeColorProperty = new ColorProperty("Color",null)
+		this.strokeColorProperty.addChangeListener(ev=>{
+			if (ev.value==null) {
+				this.strokeInfo.color = "default"
+				this.strokeInfo.opacity=1
+			}else{
+				this.strokeInfo.color = ev.value.toRgb()
+				this.strokeInfo.opacity=this.strokeOpacityProperty.value.value/100
+			}			
+			this.updateTheme()
+		})
+		this.strokeWidthProperty = new SliderProperty("Width",0,10,0.1,this.strokeInfo.width)
+		this.strokeWidthProperty.addChangeListener(ev=>{
+			this.strokeInfo.width = ev.value
+			this.update()
+			this.updateTheme()
+		})
+		this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>("Style",strokeStyleChoices,defaultStrokeStyleChoice)
+		this.strokeStyleProperty.addChangeListener(ev=>{
+			this.strokeInfo.style = ev.value.key
+			this.updateTheme()
+		})
+		this.propertiesHTMLRows.push(this.strokeColorProperty.buildHTML())
+		this.propertiesHTMLRows.push(this.strokeOpacityProperty.buildHTML())
+		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
+		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
+
+		this.updateTheme()
 	}
 
 	private updateArrows(){
@@ -134,9 +178,17 @@ export class WireComponent extends CircuitComponent{
 	}
 
 	public updateTheme(): void {
-		if (!this.isSelected) {
-			this.wire.stroke(MainController.instance.darkMode?"#fff":"#000");
+		let strokeColor = this.strokeInfo.color
+		if (strokeColor=="default") {
+			strokeColor = "var(--bs-emphasis-color)"
 		}
+
+		this.wire.stroke({
+			color:strokeColor,
+			opacity:this.strokeInfo.opacity,
+			width:this.strokeInfo.opacity==0?0:this.strokeInfo.width.convertToUnit("px").value,
+			dasharray:this.strokeStyleProperty.value.dasharray.map(factor=>this.strokeInfo.width.times(factor).toString()).join(" ")
+		})
 	}
 
 	public getSnapPointTransformMatrix(): SVG.Matrix {
@@ -288,6 +340,7 @@ export class WireComponent extends CircuitComponent{
 		this.update()
 	}
 	protected update(): void {
+		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 		// generate all the points in the wire from the corner points and the wire directions
 		let pointArray:SVG.Point[] = [this.cornerPoints[0]]
 		for (let index = 0; index < this.wireDirections.length; index++) {
@@ -311,7 +364,7 @@ export class WireComponent extends CircuitComponent{
 			let firstRef = pointArray[1].sub(pointArray[0])
 			let firstRefLength = firstRef.abs()
 			if (firstRefLength>0) {
-				pointArray[0] = pointArray[0].add(firstRef.div(firstRefLength).mul(this.arrowStart.value.setBack*this.wireWidth.value))
+				pointArray[0] = pointArray[0].add(firstRef.div(firstRefLength).mul(strokeWidth*this.arrowStart.value.setBack))
 			}
 		}
 		
@@ -320,7 +373,7 @@ export class WireComponent extends CircuitComponent{
 			let secondRef = pointArray[numPoints-1].sub(pointArray[numPoints])
 			let secondRefLength = secondRef.abs()
 			if (secondRefLength>0) {
-				pointArray[numPoints] = pointArray[numPoints].add(secondRef.div(secondRefLength).mul(this.arrowEnd.value.setBack*this.wireWidth.value))
+				pointArray[numPoints] = pointArray[numPoints].add(secondRef.div(secondRefLength).mul(strokeWidth*this.arrowEnd.value.setBack))
 			}
 		}
 
@@ -332,7 +385,15 @@ export class WireComponent extends CircuitComponent{
 		this.draggableWire.plot(plotPoints)
 
 		//recalculate the bounding box and position
-		this._bbox = this.wire.bbox()
+		let min = new SVG.Point(Infinity,Infinity)
+		let max = new SVG.Point(-Infinity,-Infinity)
+		this.cornerPoints.forEach((point)=>{
+			if (min.x>point.x) min.x=point.x
+			if (min.y>point.y) min.y=point.y
+			if (max.x<point.x) max.x=point.x
+			if (max.y<point.y) max.y=point.y
+		})
+		this._bbox = new SVG.Box(min.x-strokeWidth/2,min.y-strokeWidth/2,max.x-min.x+strokeWidth,max.y-min.y+strokeWidth)
 		this.position = new SVG.Point(this._bbox.cx,this._bbox.cy)
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x,this._bbox.y))
 
@@ -352,7 +413,12 @@ export class WireComponent extends CircuitComponent{
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
 	}
-	protected recalculateSelectionVisuals(): void {}
+	protected recalculateSelectionVisuals(): void {
+		if (this.selectionElement) {			
+			this.selectionElement.size(this.bbox.w,this.bbox.h)
+			this.selectionElement.center(this.position.x,this.position.y)
+		}
+	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
 		//essentially check each wire segment if via a wire rect intersection
@@ -376,15 +442,21 @@ export class WireComponent extends CircuitComponent{
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.wire.attr({
+			if (!this.selectionElement) {
+				this.selectionElement = CanvasController.instance.canvas.rect()
+				this.selectionElement.stroke({
+					width:selectedBoxWidth.convertToUnit("px").value,
+					dasharray:"3,3"
+				})
+				this.selectionElement.fill("none")
+			}
+			this.selectionElement.attr({
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
-				// "stroke-width": selectedWireWidth,
-			});
+			})
+			this.recalculateSelectionVisuals()
 		} else {
-			this.wire.attr({
-				"stroke":MainController.instance.darkMode?"#fff":"#000",
-				// "stroke-width": "0.4pt",
-			});
+			this.selectionElement?.remove();
+			this.selectionElement = null
 		}
 		this.resizable(this.isSelected&&show&&SelectionController.instance.currentlySelectedComponents.length==1)
 	}
@@ -403,6 +475,29 @@ export class WireComponent extends CircuitComponent{
 			type:"wire",
 			start:this.cornerPoints[0].simplifyForJson(),
 			segments:others
+		}
+
+		let stroke:StrokeInfo={}
+		let shouldStroke = false
+		if (this.strokeInfo.color!="default") {
+			stroke.color = this.strokeInfo.color
+			shouldStroke = true
+		}		
+		if (this.strokeInfo.opacity!=1) {
+			stroke.opacity = this.strokeInfo.opacity
+			shouldStroke = true
+		}
+		
+		if (!this.strokeInfo.width.eq(new SVG.Number("0.4pt"))) {
+			stroke.width = this.strokeInfo.width
+			shouldStroke = true
+		}
+		if (this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+			stroke.style = this.strokeInfo.style
+			shouldStroke = true
+		}
+		if (shouldStroke) {
+			data.stroke=stroke
 		}
 
 		if (this.arrowStart.value.key!==defaultArrowTip.key) {
@@ -428,8 +523,31 @@ export class WireComponent extends CircuitComponent{
 			}
 			drawOptions.push(this.arrowEnd.value.tikz)
 		}
-		let drawOptionsStr = drawOptions.length>0?"["+drawOptions.join("")+"]":""
-		let outString = "\\draw"+drawOptionsStr+" "+this.cornerPoints[0].toTikzString()
+
+		let optionsArray:string[]=drawOptions.length>0?[drawOptions.join("")]:[]
+
+		if (this.strokeInfo.opacity>0) {
+			if (this.strokeInfo.color!=="default") {
+				let c = new SVG.Color(this.strokeInfo.color)
+				optionsArray.push("draw="+c.toTikzString())
+			}else{
+				optionsArray.push("draw")
+			}
+
+			if (this.strokeInfo.opacity!=1) {
+				optionsArray.push("draw opacity="+this.strokeInfo.opacity.toString())
+			}
+
+			let width = this.strokeInfo.width.convertToUnit("pt").value
+			if (width!=0.4) {
+				optionsArray.push("line width="+width+"pt")
+			}
+			if (this.strokeInfo.style&&this.strokeInfo.style!=defaultStrokeStyleChoice.key) {
+				optionsArray.push(dashArrayToPattern(this.strokeInfo.width,strokeStyleChoices.find(item=>item.key==this.strokeInfo.style).dasharray))
+			}
+		}
+		let optionsArrayStr = optionsArray.length>0?"["+optionsArray.join(", ")+"]":""
+		let outString = "\\draw"+optionsArrayStr+" "+this.cornerPoints[0].toTikzString()
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			const lastPoint = this.cornerPoints[index]
 			const point = this.cornerPoints[index+1];
@@ -566,6 +684,29 @@ export class WireComponent extends CircuitComponent{
 				// @ts-ignore: backwards compatibility
 				wireComponent.cornerPoints.push(new SVG.Point(point.x,point.y))
 				wireComponent.wireDirections.push(dir)
+			}
+		}
+		if (saveObject.stroke) {
+			
+			if (saveObject.stroke.color) {
+				wireComponent.strokeInfo.color=saveObject.stroke.color
+				wireComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
+				wireComponent.strokeColorProperty.updateHTML()
+			}
+			if (saveObject.stroke.opacity!=undefined) {
+				wireComponent.strokeInfo.opacity=saveObject.stroke.opacity
+				wireComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity*100,"%")
+				wireComponent.strokeOpacityProperty.updateHTML()
+			}			
+			if (saveObject.stroke.width) {
+				wireComponent.strokeInfo.width=new SVG.Number(saveObject.stroke.width)
+				wireComponent.strokeWidthProperty.value = wireComponent.strokeInfo.width
+				wireComponent.strokeWidthProperty.updateHTML()
+			}
+			if (saveObject.stroke.style) {
+				wireComponent.strokeInfo.style=saveObject.stroke.style
+				wireComponent.strokeStyleProperty.value = strokeStyleChoices.find(item=>item.key==saveObject.stroke.style)
+				wireComponent.strokeStyleProperty.updateHTML()
 			}
 		}
 		if (saveObject.startArrow) {

@@ -10,9 +10,7 @@ export type NodeSaveObject = CircuitikzSaveObject & {
 	flipY?:boolean
 }
 
-export class NodeComponent extends CircuitikzComponent{
-	private selectionRectangle: SVG.Rect = null;
-	
+export class NodeComponent extends CircuitikzComponent{	
 	public anchorChoice: ChoiceProperty<DirectionInfo>
 	public positionChoice: ChoiceProperty<DirectionInfo>
 
@@ -122,11 +120,11 @@ export class NodeComponent extends CircuitikzComponent{
 	}
 
 	protected recalculateSelectionVisuals(): void {
-		if (this.selectionRectangle) {
+		if (this.selectionElement) {
 			let box = this.symbolUse.bbox().transform(this.getTransformMatrix());
-			this.selectionRectangle.move(box.x,box.y);
-			this.selectionRectangle.attr("width",box.w);
-			this.selectionRectangle.attr("height",box.h);
+			
+			this.selectionElement.size(box.w,box.h)
+			this.selectionElement.move(box.x,box.y);
 		}
 	}
 
@@ -175,10 +173,10 @@ export class NodeComponent extends CircuitikzComponent{
 
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.selectionRectangle?.remove()
+			this.selectionElement?.remove()
 			let box = this.symbolUse.bbox().transform(this.getTransformMatrix());
-			this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h).move(box.x,box.y)
-			this.selectionRectangle.attr({
+			this.selectionElement = CanvasController.instance.canvas.rect(box.w,box.h).move(box.x,box.y)
+			this.selectionElement.attr({
 				"stroke-width":selectedBoxWidth,
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 				"stroke-dasharray":"3,3",
@@ -186,9 +184,9 @@ export class NodeComponent extends CircuitikzComponent{
 			});
 			this.visualization.stroke("#f00")
 		} else {
-			this.selectionRectangle?.remove();
+			this.selectionElement?.remove();
 			this.visualization.stroke("#000")
-			this.selectionRectangle = null
+			this.selectionElement = null
 		}
 	}
 	public toJson(): NodeSaveObject {

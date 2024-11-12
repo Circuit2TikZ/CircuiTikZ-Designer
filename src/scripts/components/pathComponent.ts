@@ -33,8 +33,6 @@ export class PathComponent extends CircuitikzComponent{
 
 	private pointsPlaced:0|1|2=0
 
-	private selectionRectangle: SVG.Rect = null;
-
 	private startSVG:SVG.Element;
 	private endSVG:SVG.Element;
 
@@ -230,11 +228,11 @@ export class PathComponent extends CircuitikzComponent{
 		this.recalculateSnappingPoints()
 	}
 	protected recalculateSelectionVisuals(): void {
-		if (this.selectionRectangle) {
+		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let moveVec = this.position.sub(this.referenceSymbol.relMid)
 
-			this.selectionRectangle.move(moveVec.x,moveVec.y)
+			this.selectionElement.move(moveVec.x,moveVec.y)
 									.transform({
 										rotate: -this.rotationDeg, 
 										ox: this.position.x, 
@@ -246,12 +244,12 @@ export class PathComponent extends CircuitikzComponent{
 	}
 	public viewSelected(show: boolean): void {
 		if (show) {
-			this.selectionRectangle?.remove()
+			this.selectionElement?.remove()
 			let box = this.symbolUse.bbox();
-			this.selectionRectangle = CanvasController.instance.canvas.rect(box.w,box.h)
+			this.selectionElement = CanvasController.instance.canvas.rect(box.w,box.h)
 			this.recalculateSelectionVisuals()
 
-			this.selectionRectangle.attr({
+			this.selectionElement.attr({
 				"stroke-width": selectedBoxWidth,
 				"stroke": this.isSelectionReference?referenceColor:selectionColor,
 				"stroke-dasharray":"3,3",
@@ -265,8 +263,8 @@ export class PathComponent extends CircuitikzComponent{
 				"stroke":this.isSelectionReference?referenceColor:selectionColor,
 			});
 		} else {
-			this.selectionRectangle?.remove();
-			this.selectionRectangle = null
+			this.selectionElement?.remove();
+			this.selectionElement = null
 			this.startLine.attr({
 				"stroke":MainController.instance.darkMode?"#fff":"#000",
 			});

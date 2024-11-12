@@ -60,7 +60,6 @@ export abstract class ShapeComponent extends CircuitComponent{
 	protected shapeVisualization:SVG.Element;
 	protected size:SVG.Point;
 
-	protected selectionElement:SVG.Element=null;
 	protected dragElement:SVG.Element
 	protected resizeVisualizations:Map<DirectionInfo,SVG.Element>
 
