@@ -419,9 +419,9 @@
 				</div>
 				<div class="modal-body">
 					<h1 class="fs-4">General</h1>
-					<table class="table table-striped">
+					<table class="table table-bordered border-secondary">
 						<thead>
-							<tr>
+							<tr class="table-active">
 								<th scope="col">Action</th>
 								<th scope="col">Keyboard & Mouse</th>
 								<th scope="col">Touch</th>
@@ -429,58 +429,58 @@
 						</thead>
 						<tbody class="table-group-divider">
 							<tr>
-								<td>Move Canvas</td>
+								<td class="table-active">Move <b>canvas</b></td>
 								<td>Hold right click and drag</td>
 								<td>Move with two touches</td>
 							</tr>
 							<tr>
-								<td>Zoom Canvas</td>
+								<td class="table-active">Zoom <b>canvas</b></td>
 								<td>Scroll</td>
 								<td>Zoom with two touches</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">
 							<tr>
-								<td>Deactivate snapping</td>
+								<td class="table-active">Deactivate <b>snapping</b></td>
 								<td>Hold Shift</td>
 								<td>-</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">
 							<tr>
-								<td>Start selection</td>
+								<td class="table-active">Start <b>selection</b></td>
 								<td>Hold left click and drag</td>
-								<td>-</td>
+								<td>Drag with one touch on canvas</td>
 							</tr>
 							<tr>
-								<td>Add to selection</td>
+								<td class="table-active">Add to <b>selection</b></td>
 								<td>Hold Shift before starting a selection</td>
 								<td>-</td>
 							</tr>
 							<tr>
-								<td>Remove from selection</td>
+								<td class="table-active">Remove from <b>selection</b></td>
 								<td>Hold Ctrl/⌘ before starting a selection</td>
 								<td>-</td>
 							</tr>
 							<tr>
-								<td>Delete selection</td>
+								<td class="table-active">Delete <b>selection</b></td>
 								<td>Press Del/Backspace while components are selected</td>
 								<td>-</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">
 							<tr>
-								<td>Preview wire segment</td>
+								<td class="table-active">Preview <b>wire</b> segment</td>
 								<td>Drag with left click</td>
 								<td>Drag with one touch</td>
 							</tr>
 							<tr>
-								<td>Place wire point</td>
+								<td class="table-active">Place <b>wire</b> point</td>
 								<td>Release left click</td>
 								<td>Release touch</td>
 							</tr>
 							<tr>
-								<td rowspan="2" class="align-middle">Finish wire</td>
+								<td rowspan="2" class="align-middle table-active">Finish <b>wire</b></td>
 								<td colspan="2" class="text-center">Click same wire point twice</td>
 							</tr>
 							<tr>
@@ -488,19 +488,19 @@
 								<td>-</td>
 							</tr>
 							<tr>
-								<td>Straight wire</td>
+								<td class="table-active">Straight <b>wire</b></td>
 								<td>Hold Ctrl/⌘</td>
 								<td>-</td>
 							</tr>
 							<tr>
-								<td>Cancel wire</td>
+								<td class="table-active">Cancel <b>wire</b></td>
 								<td>Press Esc</td>
 								<td>Click move tool</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">
 							<tr>
-								<td rowspan="2" class="align-middle">Add component</td>
+								<td rowspan="2" class="align-middle table-active">Add <b>component</b></td>
 								<td colspan="2" class="text-center">Component drawer ("+")</td>
 							</tr>
 							<tr>
@@ -508,24 +508,24 @@
 								<td></td>
 							</tr>
 							<tr>
-								<td>Move component</td>
+								<td class="table-active">Move <b>component</b></td>
 								<td>Hold left click and drag component</td>
 								<td>Drag component with one touch</td>
 							</tr>
 							<tr>
-								<td>Adjust component</td>
+								<td class="table-active">Adjust <b>component</b></td>
 								<td colspan="2" class="text-center">While one component selected:<br>Drag
 									adjustment points</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">
 							<tr>
-								<td>Align/Distribute components</td>
+								<td class="table-active"><b>Align/Distribute</b> components</td>
 								<td colspan="2" class="text-center">Select multiple components, then use
 									align/distribute buttons</td>
 							</tr>
 							<tr>
-								<td>Set Align/Distribute reference</td>
+								<td class="table-active">Set <b>Align/Distribute</b> reference</td>
 								<td colspan="2" class="text-center">Click an already selected component</td>
 							</tr>
 						</tbody>
@@ -628,6 +628,11 @@
 								<td></td>
 								<td>(Alt/⌥ +) .</td>
 								<td>Place (un-)connected terminal</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>T</td>
+								<td>Place rectangle/text</td>
 							</tr>
 						</tbody>
 						<tbody class="table-group-divider">

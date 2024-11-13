@@ -584,7 +584,7 @@ export class MainController {
 			addButton.classList.add("libComponent")
 			addButton.setAttribute("searchData", "rect rectangle")
 			addButton.ariaRoleDescription = "button"
-			addButton.title = "Rectangle"
+			addButton.title = "Rectangle/Text"
 
 			const listener = (ev: MouseEvent) => {
 				ev.preventDefault()
@@ -690,7 +690,6 @@ export class MainController {
 
 		this.addShapeComponentsToOffcanvas(leftOffcanvasAccordion, leftOffcanvasOC)
 
-		let firstGroup = true
 		for (const [groupName, symbols] of groupedSymbols.entries()) {
 			const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-")
 
@@ -701,16 +700,16 @@ export class MainController {
 			accordionItemHeader.classList.add("accordion-header")
 
 			const accordionItemButton = accordionItemHeader.appendChild(document.createElement("button"))
-			accordionItemButton.classList.add("accordion-button", firstGroup ? undefined : "collapsed")
+			accordionItemButton.classList.add("accordion-button", "collapsed")
 			accordionItemButton.innerText = groupName
 			accordionItemButton.setAttribute("aria-controls", collapseGroupID)
-			accordionItemButton.setAttribute("aria-expanded", firstGroup.toString())
+			accordionItemButton.setAttribute("aria-expanded", "false")
 			accordionItemButton.setAttribute("data-bs-target", "#" + collapseGroupID)
 			accordionItemButton.setAttribute("data-bs-toggle", "collapse")
 			accordionItemButton.type = "button"
 
 			const accordionItemCollapse = accordionGroup.appendChild(document.createElement("div"))
-			accordionItemCollapse.classList.add("accordion-collapse", "collapse", firstGroup ? "show" : undefined)
+			accordionItemCollapse.classList.add("accordion-collapse", "collapse")
 			accordionItemCollapse.id = collapseGroupID
 			accordionItemCollapse.setAttribute("data-bs-parent", "#leftOffcanvasAccordion")
 
@@ -755,8 +754,6 @@ export class MainController {
 				}
 				svgIcon.use(symbol.id())
 			}
-
-			firstGroup = false
 		}
 	}
 
