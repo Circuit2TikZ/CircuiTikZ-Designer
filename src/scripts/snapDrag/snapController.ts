@@ -96,10 +96,6 @@ export class SnapController {
 	 * show the snap points on the canvas (doesn't show grid points)
 	 */
 	public showSnapPoints() {
-		if (!this.whereSnap) {
-			this.whereSnap = CanvasController.instance.canvas.circle(2).fill("cyan")
-		}
-
 		this.fixedSnapPoints.forEach((snapPoint) => {
 			snapPoint.show(true, false)
 		})
@@ -109,6 +105,12 @@ export class SnapController {
 		this.additionalSnapPoints.forEach((snapPoint) => {
 			snapPoint.show(true, true)
 		})
+
+		if (!this.whereSnap) {
+			this.whereSnap = CanvasController.instance.canvas.circle(4).fill("none").stroke({
+				color: "var(--bs-yellow)",
+			})
+		}
 	}
 
 	/**
@@ -220,10 +222,10 @@ export class SnapController {
 		if (distStruct.fixedSnapPoint && this.whereSnap) {
 			if (distStruct.dist > maxSnapDistance * maxSnapDistance) {
 				this.whereSnap.hide()
-				this.whereSnap.move(pos.x - 1, pos.y - 1)
+				this.whereSnap.center(pos.x, pos.y)
 			} else {
 				this.whereSnap.show()
-				this.whereSnap.move(distStruct.fixedSnapPoint.x - 1, distStruct.fixedSnapPoint.y - 1)
+				this.whereSnap.center(distStruct.fixedSnapPoint.x, distStruct.fixedSnapPoint.y)
 			}
 		}
 
