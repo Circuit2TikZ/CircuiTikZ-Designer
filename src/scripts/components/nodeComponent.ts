@@ -139,10 +139,10 @@ export class NodeComponent extends CircuitikzComponent {
 
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
-			let box = this.symbolUse.bbox().transform(this.getTransformMatrix())
+			// use the saved position instead of the bounding box (bbox position fails in safari)
+			let moveVec = this.position.sub(this.referenceSymbol.relMid)
 
-			this.selectionElement.size(box.w, box.h)
-			this.selectionElement.move(box.x, box.y)
+			this.selectionElement.move(moveVec.x, moveVec.y).transform(this.getTransformMatrix())
 		}
 	}
 
