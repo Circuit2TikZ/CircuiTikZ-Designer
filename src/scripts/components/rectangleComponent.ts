@@ -100,6 +100,8 @@ export class RectangleComponent extends ShapeComponent {
 		})
 		this.propertiesHTMLRows.push(this.textColor.buildHTML())
 
+		this.addName()
+
 		this.textForeign = CanvasController.instance.canvas.foreignObject(0, 0)
 		this.textForeign.node.setAttribute("overflow", "visible")
 		this.textForeign.node.style.pointerEvents = "none"

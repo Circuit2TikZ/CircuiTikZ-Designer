@@ -40,6 +40,7 @@ export class EllipseComponent extends ShapeComponent {
 
 	public constructor() {
 		super()
+		this.addName()
 		this.displayName = "Ellipse"
 
 		this.shapeVisualization = CanvasController.instance.canvas.ellipse(0, 0)

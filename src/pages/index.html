@@ -419,38 +419,118 @@
 				</div>
 				<div class="modal-body">
 					<h1 class="fs-4">General</h1>
-					<dl>
-						<dt>Position Canvas</dt>
-						<dd>
-							-Hold <b>right click</b> and <b>drag</b> to move the canvas<br>
-							-<b>Scroll</b> to <b>zoom</b> the canvas in or out
-						</dd>
-						<dt>Snapping</dt>
-						<dd>- Hold <b>Shift</b> to turn <b>off</b> snapping</dd>
-						<dt>Wires</dt>
-						<dd>
-							- <b>Left click</b> to place a point of the wire<br>
-							- <b>Double click</b> to <b>finish</b> wire<br>
-							- <b>Right click</b> to <b>cancel</b> wire<br>
-							- Hold <b>Ctrl/⌘</b> for <b>straight</b> wire
-						</dd>
-						<dt>Components</dt>
-						<dd>
-							- Add components via the component drawer (top left "+") or via keyboard shortcuts.
-						</dd>
-						<dt>Selection</dt>
-						<dd>
-							- Hold <b>left click</b> and drag to select a region<br>
-							- Hold <b>Shift</b> before starting to select to <b>add</b> to the <b>current
-								selection</b><br>
-							- Hold <b>Ctrl/⌘</b> before starting to select to <b>subtract</b> from the <b>current
-								selection</b><br>
-							- Hold neither <b>Shift</b> nor <b>Ctrl/⌘</b> before starting to select to start a <b>new
-								selection</b>
-						</dd>
-					</dl>
-					<hr>
-					<h1 class="fs-4">Keyboard Shortcuts</h1>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Action</th>
+								<th scope="col">Keyboard & Mouse</th>
+								<th scope="col">Touch</th>
+							</tr>
+						</thead>
+						<tbody class="table-group-divider">
+							<tr>
+								<td>Move Canvas</td>
+								<td>Hold right click and drag</td>
+								<td>Move with two touches</td>
+							</tr>
+							<tr>
+								<td>Zoom Canvas</td>
+								<td>Scroll</td>
+								<td>Zoom with two touches</td>
+							</tr>
+						</tbody>
+						<tbody class="table-group-divider">
+							<tr>
+								<td>Deactivate snapping</td>
+								<td>Hold Shift</td>
+								<td>-</td>
+							</tr>
+						</tbody>
+						<tbody class="table-group-divider">
+							<tr>
+								<td>Start selection</td>
+								<td>Hold left click and drag</td>
+								<td>-</td>
+							</tr>
+							<tr>
+								<td>Add to selection</td>
+								<td>Hold Shift before starting a selection</td>
+								<td>-</td>
+							</tr>
+							<tr>
+								<td>Remove from selection</td>
+								<td>Hold Ctrl/⌘ before starting a selection</td>
+								<td>-</td>
+							</tr>
+							<tr>
+								<td>Delete selection</td>
+								<td>Press Del/Backspace while components are selected</td>
+								<td>-</td>
+							</tr>
+						</tbody>
+						<tbody class="table-group-divider">
+							<tr>
+								<td>Preview wire segment</td>
+								<td>Drag with left click</td>
+								<td>Drag with one touch</td>
+							</tr>
+							<tr>
+								<td>Place wire point</td>
+								<td>Release left click</td>
+								<td>Release touch</td>
+							</tr>
+							<tr>
+								<td rowspan="2" class="align-middle">Finish wire</td>
+								<td colspan="2" class="text-center">Click same wire point twice</td>
+							</tr>
+							<tr>
+								<td>Press Enter</td>
+								<td>-</td>
+							</tr>
+							<tr>
+								<td>Straight wire</td>
+								<td>Hold Ctrl/⌘</td>
+								<td>-</td>
+							</tr>
+							<tr>
+								<td>Cancel wire</td>
+								<td>Press Esc</td>
+								<td>Click move tool</td>
+							</tr>
+						</tbody>
+						<tbody class="table-group-divider">
+							<tr>
+								<td rowspan="2" class="align-middle">Add component</td>
+								<td colspan="2" class="text-center">Component drawer ("+")</td>
+							</tr>
+							<tr>
+								<td>Keyboard shortcuts (see below)</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>Move component</td>
+								<td>Hold left click and drag component</td>
+								<td>Drag component with one touch</td>
+							</tr>
+							<tr>
+								<td>Adjust component</td>
+								<td colspan="2" class="text-center">While one component selected:<br>Drag
+									adjustment points</td>
+							</tr>
+						</tbody>
+						<tbody class="table-group-divider">
+							<tr>
+								<td>Align/Distribute components</td>
+								<td colspan="2" class="text-center">Select multiple components, then use
+									align/distribute buttons</td>
+							</tr>
+							<tr>
+								<td>Set Align/Distribute reference</td>
+								<td colspan="2" class="text-center">Click an already selected component</td>
+							</tr>
+						</tbody>
+					</table>
+					<h1 class="fs-4 mt-5">Keyboard Shortcuts</h1>
 					<table class="table table-striped">
 						<thead>
 							<tr>

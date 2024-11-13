@@ -11,6 +11,9 @@ import {
 	ColorProperty,
 	SliderProperty,
 	ChoiceEntry,
+	SectionHeaderProperty,
+	TextProperty,
+	CircuitikzComponent,
 } from "../internal"
 import { rectRectIntersection } from "../utils/selectionHelper"
 
@@ -89,6 +92,12 @@ export abstract class CircuitComponent {
 	public displayName: string
 
 	/**
+	 * What will be used as the reference name in the tikz code (e.g. "\node[] (name) at (0,0){};"").
+	 * Not used for all components, e.g. wire
+	 */
+	public name: TextProperty
+
+	/**
 	 * If the component is currently selected by the selection controller
 	 */
 	private _isSelected: boolean = false
@@ -145,19 +154,22 @@ export abstract class CircuitComponent {
 		MainController.instance.addComponent(this)
 
 		this.displayName = "Circuit Component"
-		this.addZOrdering()
 		this.addPositioning()
+		this.addZOrdering()
 	}
 
+	/**
+	 * Add z-index ordering to the properties window
+	 */
 	protected addZOrdering() {
 		// all components should receive the possiblity to change their draw order/z order/depth
 		let ordering = new ButtonGridProperty(
 			2,
 			[
-				["To Foreground", ""],
-				["To Background", ""],
-				["Move Forward", ""],
-				["Move Backward", ""],
+				["Foreground", ""],
+				["Background", ""],
+				["Forward", ""],
+				["Backward", ""],
 			],
 			[
 				(ev) => CanvasController.instance.componentsToForeground([this]),
@@ -166,9 +178,13 @@ export abstract class CircuitComponent {
 				(ev) => CanvasController.instance.moveComponentsBackward([this]),
 			]
 		)
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Ordering").buildHTML())
 		this.propertiesHTMLRows.push(ordering.buildHTML())
 	}
 
+	/**
+	 * Add rotation and flipping to the properties window
+	 */
 	protected addPositioning() {
 		let positioning = new ButtonGridProperty(
 			2,
@@ -181,6 +197,38 @@ export abstract class CircuitComponent {
 			[(ev) => this.rotate(-90), (ev) => this.rotate(90), (ev) => this.flip(true), (ev) => this.flip(false)]
 		)
 		this.propertiesHTMLRows.push(positioning.buildHTML())
+	}
+
+	/**
+	 * Add the property for the tikz name to the properties window
+	 */
+	protected addName() {
+		this.name = new TextProperty("Name", "")
+		this.name.addChangeListener((ev) => {
+			if (ev.value === "") {
+				// no name is always valid
+				this.name.changeInvalidStatus("")
+				return
+			}
+			if (ev.value.match(invalidNameRegEx)) {
+				// check if characters are valid
+				this.name.changeInvalidStatus("Contains forbidden characters!")
+				return
+			}
+			for (const component of MainController.instance.circuitComponents) {
+				// check if another component with the same name already exists
+				if (component != this) {
+					if (ev.value !== "" && component.name.value == ev.value) {
+						this.name.updateValue(ev.previousValue, false)
+						this.name.changeInvalidStatus("Name is already taken!")
+						return
+					}
+				}
+			}
+			this.name.changeInvalidStatus("")
+		})
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("TikZ name").buildHTML())
+		this.propertiesHTMLRows.push(this.name.buildHTML())
 	}
 
 	/**

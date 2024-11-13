@@ -201,6 +201,7 @@ export class WireComponent extends CircuitComponent {
 	}
 
 	private updateArrows() {
+		//TODO don't use markers since they don't scale with the line width like in tikz
 		if (this.arrowStart.value.key == defaultArrowTip.key) {
 			this.wire.node.style.markerStart = ""
 		} else {

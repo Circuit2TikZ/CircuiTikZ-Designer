@@ -84,8 +84,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 	protected dragElement: SVG.Element
 	protected resizeVisualizations: Map<DirectionInfo, SVG.Element>
 
-	public name: TextProperty
-
 	protected fillColorProperty: ColorProperty
 	protected fillOpacityProperty: SliderProperty
 	protected strokeColorProperty: ColorProperty
@@ -112,35 +110,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 			width: new SVG.Number("1pt"),
 			style: defaultStrokeStyleChoice.key,
 		}
-
-		this.name = new TextProperty("Name", "")
-		this.name.addChangeListener((ev) => {
-			if (ev.value === "") {
-				// no name is always valid
-				this.name.changeInvalidStatus("")
-				return
-			}
-			if (ev.value.match(invalidNameRegEx)) {
-				// check if characters are valid
-				this.name.changeInvalidStatus("Contains forbidden characters!")
-				return
-			}
-			for (const component of MainController.instance.circuitComponents) {
-				// check if another component with the same name already exists
-				if (
-					(component instanceof CircuitikzComponent || component instanceof ShapeComponent) &&
-					component != this
-				) {
-					if (ev.value !== "" && component.name.value == ev.value) {
-						this.name.updateValue(ev.previousValue, false)
-						this.name.changeInvalidStatus("Name is already taken!")
-						return
-					}
-				}
-			}
-			this.name.changeInvalidStatus("")
-		})
-		this.propertiesHTMLRows.push(this.name.buildHTML())
 
 		//add color property
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Fill").buildHTML())

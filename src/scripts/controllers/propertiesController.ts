@@ -59,8 +59,8 @@ export class PropertyController {
 			[
 				["Rotate CW", "rotate_right"],
 				["Rotate CCW", "rotate_left"],
-				["Flip X", ["flip", "rotateText"]],
-				["Flip Y", "flip"],
+				["Flip vertically", ["flip", "rotateText"]],
+				["Flip horizontally", "flip"],
 			],
 			[
 				(ev) => SelectionController.instance.rotateSelection(-90),

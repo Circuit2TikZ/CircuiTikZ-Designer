@@ -4,10 +4,7 @@ import {
 	ComponentSaveObject,
 	ComponentSymbol,
 	InfoProperty,
-	invalidNameRegEx,
-	MainController,
 	SectionHeaderProperty,
-	TextProperty,
 } from "../internal"
 
 /**
@@ -29,11 +26,6 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 	protected symbolUse: SVG.Use
 
 	/**
-	 * What will be used as the reference name in the tikz code (e.g. "\node[] (name) at (0,0){};"")
-	 */
-	public name: TextProperty
-
-	/**
 	 * The reference to the symbol library component. Has metadata of the symbol
 	 * @param symbol which static symbol from the symbols.svg library to use
 	 */
@@ -41,32 +33,6 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		super()
 		this.displayName = symbol.displayName
 		this.referenceSymbol = symbol
-
-		this.name = new TextProperty("Name", "")
-		this.name.addChangeListener((ev) => {
-			if (ev.value === "") {
-				// no name is always valid
-				this.name.changeInvalidStatus("")
-				return
-			}
-			if (ev.value.match(invalidNameRegEx)) {
-				// check if characters are valid
-				this.name.changeInvalidStatus("Contains forbidden characters!")
-				return
-			}
-			for (const component of MainController.instance.circuitComponents) {
-				// check if another component with the same name already exists
-				if (component instanceof CircuitikzComponent && component != this) {
-					if (ev.value !== "" && component.name.value == ev.value) {
-						this.name.updateValue(ev.previousValue, false)
-						this.name.changeInvalidStatus("Name is already taken!")
-						return
-					}
-				}
-			}
-			this.name.changeInvalidStatus("")
-		})
-		this.propertiesHTMLRows.push(this.name.buildHTML())
 	}
 
 	protected addInfo() {

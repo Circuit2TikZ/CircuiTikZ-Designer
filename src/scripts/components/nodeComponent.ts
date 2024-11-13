@@ -72,6 +72,7 @@ export class NodeComponent extends CircuitikzComponent {
 			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
 		}
 
+		this.addName()
 		this.addInfo()
 
 		this.snappingPoints = symbol._pins.map((pin) => new SnapPoint(this, pin.name, pin.point))

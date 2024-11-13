@@ -147,6 +147,7 @@ export class PathComponent extends CircuitikzComponent {
 		this.invert.addChangeListener((ev) => updateWithTrack())
 		this.propertiesHTMLRows.push(this.invert.buildHTML())
 
+		this.addName()
 		this.addInfo()
 
 		this.snappingPoints = [
