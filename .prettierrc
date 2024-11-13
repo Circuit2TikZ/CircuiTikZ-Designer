@@ -5,6 +5,8 @@
 	"tabWidth": 4,
 	"trailingComma": "es5",
 	"useTabs": true,
+	"semi": false,
+	"experimentalTernaries": true,
 	"xmlQuoteAttributes": "double",
 	"xmlSelfClosingSpace": true,
 	"xmlSortAttributesByKey": false,

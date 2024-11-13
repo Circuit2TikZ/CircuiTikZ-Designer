@@ -33,4 +33,3 @@
         <xs:attribute ref="xml:id"/>
     </xs:attributeGroup>
 </xs:schema>
-

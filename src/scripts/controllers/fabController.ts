@@ -18,17 +18,17 @@
  */
 class FloatingActionButton {
 	/** @type {HTMLAnchorElement} */
-	#instance;
+	#instance
 	/** @type {?HTMLLIElement} */
-	#wrapperElement;
+	#wrapperElement
 	/** @type {HTMLElement} */
-	#container;
+	#container
 	/** @type {HTMLSpanElement|HTMLElement} */
-	#iconInstance;
+	#iconInstance
 	/** @type {?string} */
-	#additionalButtonClass;
+	#additionalButtonClass
 	/** @type {?function} */
-	#onclick;
+	#onclick
 
 	/**
 	 * Create a new floating action button (FAB) or wrap an existing FAB DOM.
@@ -40,29 +40,29 @@ class FloatingActionButton {
 	constructor(instance, isSubButton = true, desc) {
 		if (instance instanceof HTMLAnchorElement && instance.classList.contains("btn-floating")) {
 			// existing button
-			this.#instance = instance;
-			this.#wrapperElement = null;
-			this.#container = this.#instance.parentElement;
+			this.#instance = instance
+			this.#wrapperElement = null
+			this.#container = this.#instance.parentElement
 			this.#iconInstance = Array.prototype.find.call(
 				this.#instance.children,
 				(element) => element instanceof HTMLSpanElement || element.tagName === "I"
-			);
+			)
 		} else {
 			// create button
-			this.#container = instance;
-			this.#instance = document.createElement("a");
-			this.#instance.classList.add("btn", "btn-floating");
-			this.#iconInstance = this.#instance.appendChild(document.createElement("i"));
+			this.#container = instance
+			this.#instance = document.createElement("a")
+			this.#instance.classList.add("btn", "btn-floating")
+			this.#iconInstance = this.#instance.appendChild(document.createElement("i"))
 			if (isSubButton) {
 				// this.#instance.classList.add("btn-sm"); // small
-				this.#wrapperElement = this.#container.appendChild(document.createElement("li"));
-				this.#wrapperElement.appendChild(this.#instance);
+				this.#wrapperElement = this.#container.appendChild(document.createElement("li"))
+				this.#wrapperElement.appendChild(this.#instance)
 			} else {
-				this.#wrapperElement = null;
-				this.#container.appendChild(this.#instance);
+				this.#wrapperElement = null
+				this.#container.appendChild(this.#instance)
 			}
 		}
-		if (desc) this.buttonDescription = desc;
+		if (desc) this.buttonDescription = desc
 	}
 
 	/**
@@ -71,24 +71,24 @@ class FloatingActionButton {
 	 * @param {ButtonDescription} desc
 	 */
 	set buttonDescription(desc) {
-		this.#iconInstance.textContent = desc.icon || "";
-		this.#iconInstance.className = desc.iconClass || "material-symbols-outlined";
+		this.#iconInstance.textContent = desc.icon || ""
+		this.#iconInstance.className = desc.iconClass || "material-symbols-outlined"
 
-		if (this.#additionalButtonClass) this.#instance.classList.remove(this.#additionalButtonClass);
-		if (desc.buttonClass) this.#instance.classList.add(desc.buttonClass);
+		if (this.#additionalButtonClass) this.#instance.classList.remove(this.#additionalButtonClass)
+		if (desc.buttonClass) this.#instance.classList.add(desc.buttonClass)
 
-		this.#instance.style.color = desc.color || null;
-		this.#instance.style.backgroundColor = desc.backgroundColor || null;
-		this.#instance.title = desc.tooltip || "";
+		this.#instance.style.color = desc.color || null
+		this.#instance.style.backgroundColor = desc.backgroundColor || null
+		this.#instance.title = desc.tooltip || ""
 
-		this.onclick = desc.onclick;
+		this.onclick = desc.onclick
 	}
 
 	/**
 	 * Remove this FAB from its container.
 	 */
 	removeButton() {
-		this.#container.removeChild(this.#wrapperElement || this.#instance);
+		this.#container.removeChild(this.#wrapperElement || this.#instance)
 	}
 
 	/**
@@ -97,9 +97,9 @@ class FloatingActionButton {
 	 */
 	set onclick(callback) {
 		if (this.#onclick !== callback) {
-			if (this.#onclick) this.#instance.removeEventListener("click", this.#onclick);
-			this.#onclick = callback || null;
-			if (this.#onclick) this.#instance.addEventListener("click", this.#onclick);
+			if (this.#onclick) this.#instance.removeEventListener("click", this.#onclick)
+			this.#onclick = callback || null
+			if (this.#onclick) this.#instance.addEventListener("click", this.#onclick)
 		}
 	}
 }
@@ -110,25 +110,25 @@ class FloatingActionButton {
  */
 export class FABcontroller {
 	/** @type {FABcontroller} */
-	static #instance;
+	static #instance
 	/** @type {HTMLDivElement} */
-	#container;
+	#container
 	/** @type {HTMLUListElement} */
-	#subContainer;
+	#subContainer
 	/** @type {FloatingActionButton} */
-	#mainFAB;
+	#mainFAB
 	/** @type {FloatingActionButton[]} */
-	#subFABs = [];
+	#subFABs = []
 	/** @type {boolean} */
-	#visible = false;
+	#visible = false
 
 	/**
 	 * Do not call this constructor directly. Use {@see controller} instead, to get the singleton instance.
 	 */
 	constructor() {
-		this.#container = document.getElementById("floatingActionButtonContainer");
-		this.#subContainer = document.getElementById("subFloatingActionButtonContainer");
-		this.#mainFAB = new FloatingActionButton(document.getElementById("mainFAB", false));
+		this.#container = document.getElementById("floatingActionButtonContainer")
+		this.#subContainer = document.getElementById("subFloatingActionButtonContainer")
+		this.#mainFAB = new FloatingActionButton(document.getElementById("mainFAB", false))
 	}
 
 	/**
@@ -136,7 +136,7 @@ export class FABcontroller {
 	 * @returns {FABcontroller}
 	 */
 	static get controller() {
-		return FABcontroller.#instance || (FABcontroller.#instance = new FABcontroller());
+		return FABcontroller.#instance || (FABcontroller.#instance = new FABcontroller())
 	}
 
 	/**
@@ -144,7 +144,7 @@ export class FABcontroller {
 	 * @returns {boolean}
 	 */
 	get visible() {
-		return this.#visible;
+		return this.#visible
 	}
 
 	/**
@@ -153,8 +153,8 @@ export class FABcontroller {
 	 */
 	set visible(value) {
 		if (this.#visible !== value) {
-			this.#container.style.display = value ? "unset" : "none";
-			this.#visible = value;
+			this.#container.style.display = value ? "unset" : "none"
+			this.#visible = value
 		}
 	}
 
@@ -165,27 +165,27 @@ export class FABcontroller {
 	 * @param {ButtonDescription[]} [subButtons]
 	 */
 	setButtons(mainButton, subButtons) {
-		this.#mainFAB.buttonDescription = mainButton;
+		this.#mainFAB.buttonDescription = mainButton
 
-		if (!subButtons) subButtons = [];
+		if (!subButtons) subButtons = []
 
 		// remove sub buttons, if too many
 		if (subButtons.length < this.#subFABs.length) {
-			for (let button of this.#subFABs.splice(subButtons.length)) button.removeButton();
+			for (let button of this.#subFABs.splice(subButtons.length)) button.removeButton()
 		}
 
 		// update old sub-buttons
-		for (let i = 0; i < this.#subFABs.length; i++) this.#subFABs[i].buttonDescription = subButtons[i];
+		for (let i = 0; i < this.#subFABs.length; i++) this.#subFABs[i].buttonDescription = subButtons[i]
 
 		// add sub buttons, if more than old state
 		for (let i = this.#subFABs.length; i < subButtons.length; i++)
-			this.#subFABs.push(new FloatingActionButton(this.#subContainer, true, subButtons[i]));
+			this.#subFABs.push(new FloatingActionButton(this.#subContainer, true, subButtons[i]))
 	}
 
 	/**
 	 * Remove the callbacks/onclick(s) of the buttons.
 	 */
 	removeAllCallbacks() {
-		for (let button of [this.#mainFAB, ...this.#subFABs]) button.onclick = null;
+		for (let button of [this.#mainFAB, ...this.#subFABs]) button.onclick = null
 	}
 }

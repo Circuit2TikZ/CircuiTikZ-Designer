@@ -1,48 +1,47 @@
-import { EditableProperty, Undo } from "../internal";
+import { EditableProperty, Undo } from "../internal"
 
-export class MathJaxProperty extends EditableProperty<string>{
+export class MathJaxProperty extends EditableProperty<string> {
+	private input: HTMLInputElement
 
-	private input:HTMLInputElement
-
-	public constructor(initialValue?:string){
-		super(initialValue??"")
+	public constructor(initialValue?: string) {
+		super(initialValue ?? "")
 	}
 
 	public eq(first: string, second: string): boolean {
-		return first==second
+		return first == second
 	}
 	public buildHTML(): HTMLElement {
 		let row = this.getRow()
 
 		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col","col-md-12","col-xxl","my-0","input-group")
+		col.classList.add("col", "col-md-12", "col-xxl", "my-0", "input-group")
 		{
 			let formulaSpan1 = document.createElement("span") as HTMLSpanElement
 			formulaSpan1.classList.add("input-group-text")
 			formulaSpan1.innerHTML = "$"
 			col.appendChild(formulaSpan1)
-	
+
 			this.input = document.createElement("input") as HTMLInputElement
 			this.input.classList.add("form-control")
 			this.input.type = "text"
-			this.input.value = this.value??""
+			this.input.value = this.value ?? ""
 			col.appendChild(this.input)
-			
+
 			let formulaSpan2 = document.createElement("div") as HTMLDivElement
 			formulaSpan2.classList.add("input-group-text")
 			formulaSpan2.innerHTML = "$"
 			col.appendChild(formulaSpan2)
 
 			let previousState = ""
-			this.input.addEventListener("focusin",(ev)=>{
-				previousState = this.value??""
+			this.input.addEventListener("focusin", (ev) => {
+				previousState = this.value ?? ""
 			})
-			this.input.addEventListener("input",(ev)=>{
+			this.input.addEventListener("input", (ev) => {
 				this.updateValue(this.input.value)
 			})
 
-			this.input.addEventListener("focusout",(ev)=>{
-				if (this.value&&previousState!==this.value) {
+			this.input.addEventListener("focusout", (ev) => {
+				if (this.value && previousState !== this.value) {
 					Undo.addState()
 				}
 			})

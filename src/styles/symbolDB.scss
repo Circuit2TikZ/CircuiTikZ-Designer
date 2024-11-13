@@ -10,9 +10,9 @@
 	position: relative;
 
 	span {
-		position:absolute;
+		position: absolute;
 		top: calc(50% - 12px);
-		left:13px;
+		left: 13px;
 	}
 
 	input {
@@ -25,9 +25,9 @@
 // fix style when searching for symbols of first shown group
 .accordion-item:nth-child(1 of :not(.d-none)) {
 	border-top-left-radius: var(--bs-accordion-border-radius);
-    border-top-right-radius: var(--bs-accordion-border-radius);
+	border-top-right-radius: var(--bs-accordion-border-radius);
 	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
-	
+
 	// .accordion-header>button {
 	// 	background-color: transparent;
 	// }
@@ -36,8 +36,8 @@
 // fix style when searching for symbols of last shown group
 .accordion-item:nth-last-child(1 of :not(.d-none)) {
 	border-bottom-left-radius: var(--bs-accordion-border-radius);
-    border-bottom-right-radius: var(--bs-accordion-border-radius);
-	
+	border-bottom-right-radius: var(--bs-accordion-border-radius);
+
 	// .accordion-header>button {
 	// 	background-color: transparent;
 	// }

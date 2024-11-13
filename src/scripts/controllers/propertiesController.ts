@@ -1,102 +1,156 @@
-import { AlignmentMode, ButtonGridProperty, CanvasController, CircuitComponent, DistributionMode, SectionHeaderProperty, SelectionController } from "../internal";
+import {
+	AlignmentMode,
+	ButtonGridProperty,
+	CanvasController,
+	CircuitComponent,
+	DistributionMode,
+	SectionHeaderProperty,
+	SelectionController,
+} from "../internal"
 
 export type FormEntry = {
-	originalObject: object;
-	propertyName: string;
-	inputType: string;
-	currentValue: any;
+	originalObject: object
+	propertyName: string
+	inputType: string
+	currentValue: any
 }
 
-export class PropertyController{
-	private static _instance: PropertyController;
+export class PropertyController {
+	private static _instance: PropertyController
 	public static get instance(): PropertyController {
 		if (!PropertyController._instance) {
 			PropertyController._instance = new PropertyController()
 		}
-		return PropertyController._instance;
+		return PropertyController._instance
 	}
 
 	private gridProperties: HTMLDivElement
 	private propertiesEntries: HTMLDivElement
 	private propertiesTitle: HTMLElement
 
-	private constructor(){
+	private constructor() {
 		this.propertiesTitle = document.getElementById("propertiesTitle") as HTMLElement
 		this.gridProperties = document.getElementById("grid-properties") as HTMLDivElement
 		this.propertiesEntries = document.getElementById("propertiesEntries") as HTMLDivElement
 	}
 
-	update(){
+	update() {
 		let components = SelectionController.instance.currentlySelectedComponents
 		this.clearForm()
 
-		if (components.length>1) {
+		if (components.length > 1) {
 			this.setMultiForm(components)
-		}else if (components.length===1) {
-			this.setForm(components[0]);
-		}else{
+		} else if (components.length === 1) {
+			this.setForm(components[0])
+		} else {
 			this.setFormGrid()
 		}
 	}
 
-	private setMultiForm(components:CircuitComponent[]){
+	private setMultiForm(components: CircuitComponent[]) {
 		//TODO multicomponent edit
 
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = "Selection"
 
-		let rows:HTMLElement[]=[]
-		let positioning = new ButtonGridProperty(2,[["Rotate CW","rotate_right"],["Rotate CCW","rotate_left"],["Flip X",["flip","rotateText"]],["Flip Y","flip"]],[
-			(ev)=>SelectionController.instance.rotateSelection(-90),
-			(ev)=>SelectionController.instance.rotateSelection(90),
-			(ev)=>SelectionController.instance.flipSelection(true),
-			(ev)=>SelectionController.instance.flipSelection(false)
-		])
+		let rows: HTMLElement[] = []
+		let positioning = new ButtonGridProperty(
+			2,
+			[
+				["Rotate CW", "rotate_right"],
+				["Rotate CCW", "rotate_left"],
+				["Flip X", ["flip", "rotateText"]],
+				["Flip Y", "flip"],
+			],
+			[
+				(ev) => SelectionController.instance.rotateSelection(-90),
+				(ev) => SelectionController.instance.rotateSelection(90),
+				(ev) => SelectionController.instance.flipSelection(true),
+				(ev) => SelectionController.instance.flipSelection(false),
+			]
+		)
 		rows.push(positioning.buildHTML())
 
 		rows.push(new SectionHeaderProperty("Ordering").buildHTML())
-		let ordering = new ButtonGridProperty(2,[["Foreground",""],["Background",""],["Forward",""],["Backward",""]],[
-			(ev)=>CanvasController.instance.componentsToForeground(SelectionController.instance.currentlySelectedComponents),
-			(ev)=>CanvasController.instance.componentsToBackground(SelectionController.instance.currentlySelectedComponents),
-			(ev)=>CanvasController.instance.moveComponentsForward(SelectionController.instance.currentlySelectedComponents),
-			(ev)=>CanvasController.instance.moveComponentsBackward(SelectionController.instance.currentlySelectedComponents)
-		])
+		let ordering = new ButtonGridProperty(
+			2,
+			[
+				["Foreground", ""],
+				["Background", ""],
+				["Forward", ""],
+				["Backward", ""],
+			],
+			[
+				(ev) =>
+					CanvasController.instance.componentsToForeground(
+						SelectionController.instance.currentlySelectedComponents
+					),
+				(ev) =>
+					CanvasController.instance.componentsToBackground(
+						SelectionController.instance.currentlySelectedComponents
+					),
+				(ev) =>
+					CanvasController.instance.moveComponentsForward(
+						SelectionController.instance.currentlySelectedComponents
+					),
+				(ev) =>
+					CanvasController.instance.moveComponentsBackward(
+						SelectionController.instance.currentlySelectedComponents
+					),
+			]
+		)
 		rows.push(ordering.buildHTML())
 
 		rows.push(new SectionHeaderProperty("Align").buildHTML())
-		let alignment = new ButtonGridProperty(3,[
-			["","align_horizontal_left"],["","align_horizontal_center"],["","align_horizontal_right"],
-			["","align_vertical_top"],["","align_vertical_center"],["","align_vertical_bottom"]],[
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.START,true),
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.CENTER,true),
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.END,true),
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.START,false),
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.CENTER,false),
-			(ev)=>SelectionController.instance.alignSelection(AlignmentMode.END,false),
-		])
+		let alignment = new ButtonGridProperty(
+			3,
+			[
+				["", "align_horizontal_left"],
+				["", "align_horizontal_center"],
+				["", "align_horizontal_right"],
+				["", "align_vertical_top"],
+				["", "align_vertical_center"],
+				["", "align_vertical_bottom"],
+			],
+			[
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.START, true),
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.CENTER, true),
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.END, true),
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.START, false),
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.CENTER, false),
+				(ev) => SelectionController.instance.alignSelection(AlignmentMode.END, false),
+			]
+		)
 		rows.push(alignment.buildHTML())
 
 		rows.push(new SectionHeaderProperty("Distribute").buildHTML())
-		let distribute = new ButtonGridProperty(2,[
-			["Center","horizontal_distribute"],["Spacing","align_justify_space_even"],
-			["Center","vertical_distribute"],["Spacing","align_space_even"]],[
-			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.CENTER,true),
-			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.SPACE,true),
-			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.CENTER,false),
-			(ev)=>SelectionController.instance.distributeSelection(DistributionMode.SPACE,false),
-		])
+		let distribute = new ButtonGridProperty(
+			2,
+			[
+				["Center", "horizontal_distribute"],
+				["Spacing", "align_justify_space_even"],
+				["Center", "vertical_distribute"],
+				["Spacing", "align_space_even"],
+			],
+			[
+				(ev) => SelectionController.instance.distributeSelection(DistributionMode.CENTER, true),
+				(ev) => SelectionController.instance.distributeSelection(DistributionMode.SPACE, true),
+				(ev) => SelectionController.instance.distributeSelection(DistributionMode.CENTER, false),
+				(ev) => SelectionController.instance.distributeSelection(DistributionMode.SPACE, false),
+			]
+		)
 		rows.push(distribute.buildHTML())
 
 		this.propertiesEntries.append(...rows)
 	}
 
-	private setForm(component:CircuitComponent){		
+	private setForm(component: CircuitComponent) {
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = component.displayName
 		this.propertiesEntries.append(...component.propertiesHTMLRows)
 	}
-	
-	private setFormGrid(){
+
+	private setFormGrid() {
 		this.gridProperties.classList.remove("d-none")
 		this.propertiesTitle.innerText = "Grid settings"
 
@@ -106,36 +160,36 @@ export class PropertyController{
 		let majorSlider = document.getElementById("majorSliderInput") as HTMLInputElement
 		majorSlider.value = CanvasController.instance.majorGridSizecm.toString()
 
-		minorSlider.addEventListener('input',(ev)=>{
+		minorSlider.addEventListener("input", (ev) => {
 			this.changeGrid(CanvasController.instance.majorGridSizecm, Number.parseFloat(minorSlider.value))
 		})
 
-		majorSlider.addEventListener('input',(ev)=>{
+		majorSlider.addEventListener("input", (ev) => {
 			this.changeGrid(Number.parseFloat(majorSlider.value), CanvasController.instance.majorGridSubdivisions)
 		})
 
-		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)		
+		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
 	}
 
-	private changeGrid(majorSizecm: number, majorSubdivisions: number){
+	private changeGrid(majorSizecm: number, majorSubdivisions: number) {
 		CanvasController.instance.changeGrid(majorSizecm, majorSubdivisions)
 
 		let majorLabel = document.getElementById("majorLabel")
-		majorLabel.innerText = majorSizecm+" cm"
+		majorLabel.innerText = majorSizecm + " cm"
 
-		let minorLabel = document.getElementById("minorLabel")		
+		let minorLabel = document.getElementById("minorLabel")
 		minorLabel.innerText = majorSubdivisions.toString()
 
-		let gridInfo = document.getElementById("gridInfo")		
-		gridInfo.innerText = (majorSizecm/majorSubdivisions).toLocaleString(undefined, {maximumFractionDigits:2}) + " cm"
+		let gridInfo = document.getElementById("gridInfo")
+		gridInfo.innerText =
+			(majorSizecm / majorSubdivisions).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " cm"
 	}
 
-	private clearForm(){
+	private clearForm() {
 		this.propertiesTitle.innerText = "Properties"
 		this.gridProperties.classList.add("d-none")
 		this.propertiesEntries.classList.add("d-none")
-		this.propertiesEntries.innerText=""
-
+		this.propertiesEntries.innerText = ""
 
 		while (this.propertiesEntries.lastElementChild) {
 			this.propertiesEntries.removeChild(this.propertiesEntries.lastElementChild)

@@ -13,17 +13,22 @@
  * @param {function(Element): boolean} [additionalFilter] - filter function returning true if node matches the criteria
  * @returns {Element|null} the found node or null if not found
  */
-export function getNamedTag(root: Element, tagName: string, namespaceURI: string, additionalFilter: (arg0: Element) => boolean = null): Element | null {
-	tagName = tagName.toLowerCase();
+export function getNamedTag(
+	root: Element,
+	tagName: string,
+	namespaceURI: string,
+	additionalFilter: (arg0: Element) => boolean = null
+): Element | null {
+	tagName = tagName.toLowerCase()
 	return Array.prototype.find.call(
 		root.children,
 		(node: Element) =>
 			// node.nodeType === Node.ELEMENT_NODE && // node instanceof Element; not needed if .children is used
-			(namespaceURI
-				? tagName == node.localName.toLowerCase() && namespaceURI == node.namespaceURI
-				: node.tagName.toLowerCase() === tagName) &&
+			(namespaceURI ?
+				tagName == node.localName.toLowerCase() && namespaceURI == node.namespaceURI
+			:	node.tagName.toLowerCase() === tagName) &&
 			(!additionalFilter || additionalFilter(node))
-	);
+	)
 }
 
 /**
@@ -35,13 +40,18 @@ export function getNamedTag(root: Element, tagName: string, namespaceURI: string
  * @param {function(Element): boolean} [additionalFilter] - filter function returning true if node matches the criteria
  * @returns {Element[]} the filtered nodes (may be empty)
  */
-export function getNamedTags(root: Element, tagName: string, namespaceURI: string, additionalFilter: (arg0: Element) => boolean = null): Element[] {
+export function getNamedTags(
+	root: Element,
+	tagName: string,
+	namespaceURI: string,
+	additionalFilter: (arg0: Element) => boolean = null
+): Element[] {
 	return Array.prototype.filter.call(
 		/** @type {HTMLCollection} */ root.children,
 		(/** @type {Element} */ node: Element) =>
-			(namespaceURI
-				? tagName == node.localName.toLowerCase() && namespaceURI == node.namespaceURI
-				: node.tagName.toLowerCase() === tagName) &&
+			(namespaceURI ?
+				tagName == node.localName.toLowerCase() && namespaceURI == node.namespaceURI
+			:	node.tagName.toLowerCase() === tagName) &&
 			(!additionalFilter || additionalFilter(node))
-	);
+	)
 }

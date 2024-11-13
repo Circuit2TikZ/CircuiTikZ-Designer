@@ -4,8 +4,8 @@
  * @module impSVGNumber
  */
 
-import * as SVG from "@svgdotjs/svg.js";
-import { roundTikz } from "./selectionHelper";
+import * as SVG from "@svgdotjs/svg.js"
+import { roundTikz } from "./selectionHelper"
 
 declare module "@svgdotjs/svg.js" {
 	interface Number {
@@ -14,86 +14,86 @@ declare module "@svgdotjs/svg.js" {
 		 * @param unit - the unit to convert to
 		 * @returns {Number}
 		 */
-		convertToUnit(unit: "px" | "in" | "cm" | "mm" | "pt" | "pc"): Number;
+		convertToUnit(unit: "px" | "in" | "cm" | "mm" | "pt" | "pc"): Number
 		/**
 		 * Converts number alike values to a plain `number` in the unit pixel.
 		 * @static
 		 * @param number
 		 * @returns {number} a plain `number` in px
 		 */
-		ensureInPx(number: string | number | Number): number;
+		ensureInPx(number: string | number | Number): number
 		/**
 		 * Divides this number by another svg number.
 		 * Returns a new instance.
 		 * @param number - the divisor
 		 * @returns the result
 		 */
-		divide(number: Number | number): Number;
+		divide(number: Number | number): Number
 		/**
 		 * Subtracts another svg number.
 		 * Returns a new instance.
 		 * @param number - the subtrahend
 		 * @returns the result
 		 */
-		minus(number: Number | number): Number;
+		minus(number: Number | number): Number
 		/**
 		 * Calculates the sum of this number and another svg number.
 		 * Returns a new instance.
 		 * @param number - the other summand
 		 * @returns the result
 		 */
-		plus(number: Number | number): Number;
+		plus(number: Number | number): Number
 		/**
 		 * Multiplies this number with another svg number.
 		 * Returns a new instance.
 		 * @param number - the other operand
 		 * @returns the result
 		 */
-		times(number: Number | number): Number;
+		times(number: Number | number): Number
 		/**
 		 * Calculates the exponentiation using this number as base.
 		 * Returns a new instance.
 		 * @param exponent - the exponent
 		 * @returns the result
 		 */
-		pow(exponent: number): Number;
+		pow(exponent: number): Number
 		/**
 		 * Calculates the remainder (modulo) of an division.
 		 * Returns a new instance.
 		 * @param number - the divisor
 		 * @returns the result
 		 */
-		mod(number: number): Number;
+		mod(number: number): Number
 		/**
 		 * Checks if this svg number is greater than the other one.
 		 * @param number - the other number
 		 * @returns the result
 		 */
-		gt(number: Number | number): boolean;
+		gt(number: Number | number): boolean
 		/**
 		 * Checks if this svg number is greater than the other one or equal.
 		 * @param number - the other number
 		 * @returns the result
 		 */
-		gte(number: Number | number): boolean;
+		gte(number: Number | number): boolean
 		/**
 		 * Checks if this svg number is less than the other one.
 		 * @param number - the other number
 		 * @returns the result
 		 */
-		lt(number: Number | number): boolean;
+		lt(number: Number | number): boolean
 		/**
 		 * Checks if this svg number is less than the other one or equal.
 		 * @param number - the other number
 		 * @returns the result
 		 */
-		lte(number: Number | number): boolean;
+		lte(number: Number | number): boolean
 		/**
 		 * Checks if this svg number is equal the other one.
 		 * @param number - the other number
 		 * @returns the result
 		 */
-		eq(number: Number | number): boolean;
+		eq(number: Number | number): boolean
 	}
 
 	interface Point {
@@ -102,47 +102,47 @@ declare module "@svgdotjs/svg.js" {
 		 * @param other - the other point
 		 * @returns the squared distance (px^2)
 		 */
-		distanceSquared(other: Point): number;
+		distanceSquared(other: Point): number
 		/**
 		 * Calculate the distance of two points.
 		 * @param other - the other point
 		 * @returns the squared distance (px)
 		 */
-		distance(other: Point): number;
+		distance(other: Point): number
 		/**
 		 * Calculate the length of the vector resp. the distance from (0|0).
 		 * @returns the squared length (px^2)
 		 */
-		absSquared(): number;
+		absSquared(): number
 		/**
 		 * Calculate the length of the vector resp. the distance from (0|0).
 		 * @returns the length (px)
 		 */
-		abs(): number;
+		abs(): number
 		/**
 		 * Subtracts another svg point.
 		 * Returns a new instance.
 		 */
-		sub(other: Point|number): Point;
+		sub(other: Point | number): Point
 		/**
 		 * Calculates the sum of this and another svg point.
 		 * Returns a new instance.
 		 */
-		add(other: Point|number): Point;
+		add(other: Point | number): Point
 		/**
 		 * Calculates the multiplication of this point and another svg point or number (elementwise).
 		 * Returns a new instance.
 		 */
-		mul(other: Point|number): Point;
+		mul(other: Point | number): Point
 		/**
 		 * Calculates the division of this point and another svg point or number (elementwise).
 		 * Returns a new instance.
 		 */
-		div(other: number|Point): Point;
+		div(other: number | Point): Point
 		/**
 		 * calculates the dot product between this point and the other point
 		 */
-		dot(other:SVG.Point):number
+		dot(other: SVG.Point): number
 		/**
 		 * Rotate the Coordinate around `centerCoord`. The rotation is counter clockwise, like the default mathematical
 		 * rotation.
@@ -151,33 +151,32 @@ declare module "@svgdotjs/svg.js" {
 		 * @param inRad - set to `true`, if the angle is in radians
 		 * @returns the result
 		 */
-		rotate(angle: number, centerCoord?: Point, inRad?: boolean): Point;
+		rotate(angle: number, centerCoord?: Point, inRad?: boolean): Point
 		/**
 		 * Checks if to points are equal up to a given epsilon(how far the Xs and Ys can be apart to still count as being equal)
 		 *
 		 * @returns true if the points are equal
 		 */
-		eq(other:Point, eps?:number):boolean
-		toTikzString(): string;
-		simplifyForJson():Point;
+		eq(other: Point, eps?: number): boolean
+		toTikzString(): string
+		simplifyForJson(): Point
 	}
 
-	interface Color{
+	interface Color {
 		/**
 		 * convert the color to tikz format
 		 */
-		toTikzString():string
+		toTikzString(): string
 	}
 }
 
-
 type ToUnit = {
-	px: number;
-	in: number;
-	cm: number;
-	mm: number;
-	pt: number;
-	pc: number;
+	px: number
+	in: number
+	cm: number
+	mm: number
+	pt: number
+	pc: number
 }
 
 /**
@@ -235,14 +234,14 @@ const unitConvertMap = {
 		pt: 12,
 		pc: 1,
 	},
-};
+}
 
 /**
  * List of unit names. The unit with the lowest index is the most preferred one.
  *
  * @type {string[]}
  */
-const unitPriority: string[] = ["px", "in", "pt", "pc", "cm", "mm"];
+const unitPriority: string[] = ["px", "in", "pt", "pc", "cm", "mm"]
 
 /**
  * Convert two values to the same unit. The priority for unit is determined using {@link unitPriority}.
@@ -253,28 +252,28 @@ const unitPriority: string[] = ["px", "in", "pt", "pc", "cm", "mm"];
  * @returns {SVG.Number[]} an array of both numbers
  */
 function toSameUnit(thisNumber: SVG.Number, otherNumber: SVG.Number | number): SVG.Number[] {
-	const thisNumberUnit = thisNumber.unit || "px"; // Empty == "px"
-	const otherNumberUnit = otherNumber instanceof SVG.Number? otherNumber.unit || "px" : "px";
+	const thisNumberUnit = thisNumber.unit || "px" // Empty == "px"
+	const otherNumberUnit = otherNumber instanceof SVG.Number ? otherNumber.unit || "px" : "px"
 
-	let numberA:SVG.Number = new SVG.Number(thisNumber)
-	let numberB:SVG.Number
+	let numberA: SVG.Number = new SVG.Number(thisNumber)
+	let numberB: SVG.Number
 	if (!(otherNumber instanceof SVG.Number)) {
-		numberB = new SVG.Number(otherNumber, thisNumberUnit); // assume same unit
+		numberB = new SVG.Number(otherNumber, thisNumberUnit) // assume same unit
 	} else if (thisNumberUnit !== otherNumberUnit) {
-		const thisNumberPrio = unitPriority.indexOf(thisNumberUnit);
-		const otherNumberPrio = unitPriority.indexOf(otherNumberUnit);
+		const thisNumberPrio = unitPriority.indexOf(thisNumberUnit)
+		const otherNumberPrio = unitPriority.indexOf(otherNumberUnit)
 
-		numberB = new SVG.Number(otherNumber);
+		numberB = new SVG.Number(otherNumber)
 		if (thisNumberPrio < otherNumberPrio) {
-			numberB = numberB.convertToUnit(thisNumberUnit);
-		} else{
-			numberA = numberA.convertToUnit(otherNumberUnit);
-		} 
-	}else{
-		numberB = new SVG.Number(otherNumber);
+			numberB = numberB.convertToUnit(thisNumberUnit)
+		} else {
+			numberA = numberA.convertToUnit(otherNumberUnit)
+		}
+	} else {
+		numberB = new SVG.Number(otherNumber)
 	}
 
-	return [numberA, numberB];
+	return [numberA, numberB]
 }
 
 SVG.extend(SVG.Number, {
@@ -290,10 +289,10 @@ SVG.extend(SVG.Number, {
 	 */
 	convertToUnit(unit: "px" | "in" | "cm" | "mm" | "pt" | "pc"): SVG.Number {
 		/** @type {ToUnit} */
-		const factors: ToUnit = unitConvertMap[this.unit || "px"] || null;
-		const factor = factors?.[unit] ?? null;
-		if (factor !== null) return new SVG.Number(this.value * factor, unit);
-		else throw new Error("Invalid unit");
+		const factors: ToUnit = unitConvertMap[this.unit || "px"] || null
+		const factor = factors?.[unit] ?? null
+		if (factor !== null) return new SVG.Number(this.value * factor, unit)
+		else throw new Error("Invalid unit")
 	},
 
 	/**
@@ -305,9 +304,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	divide(number: SVG.Number | number): SVG.Number {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value /= otherNumber.value;
-		return thisNumber;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		thisNumber.value /= otherNumber.value
+		return thisNumber
 	},
 
 	/**
@@ -319,9 +318,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	minus(number: SVG.Number | number): SVG.Number {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value -= otherNumber.value;
-		return thisNumber;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		thisNumber.value -= otherNumber.value
+		return thisNumber
 	},
 
 	/**
@@ -333,9 +332,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	plus(number: SVG.Number | number): SVG.Number {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value += otherNumber.value;
-		return thisNumber;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		thisNumber.value += otherNumber.value
+		return thisNumber
 	},
 
 	/**
@@ -347,9 +346,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	times(number: SVG.Number | number): SVG.Number {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		thisNumber.value *= otherNumber.value;
-		return thisNumber;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		thisNumber.value *= otherNumber.value
+		return thisNumber
 	},
 
 	/**
@@ -361,9 +360,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	pow(exponent: number): SVG.Number {
-		let thisNumber = new SVG.Number(this);
-		thisNumber.value **= exponent;
-		return thisNumber;
+		let thisNumber = new SVG.Number(this)
+		thisNumber.value **= exponent
+		return thisNumber
 	},
 
 	/**
@@ -375,9 +374,9 @@ SVG.extend(SVG.Number, {
 	 * @returns {SVG.Number} the result
 	 */
 	mod(number: number): SVG.Number {
-		let thisNumber = new SVG.Number(this);
-		thisNumber.value %= number;
-		return thisNumber;
+		let thisNumber = new SVG.Number(this)
+		thisNumber.value %= number
+		return thisNumber
 	},
 
 	/**
@@ -388,8 +387,8 @@ SVG.extend(SVG.Number, {
 	 * @returns {boolean} the result
 	 */
 	gt(number: SVG.Number | number): boolean {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber.value > otherNumber.value;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		return thisNumber.value > otherNumber.value
 	},
 
 	/**
@@ -400,8 +399,8 @@ SVG.extend(SVG.Number, {
 	 * @returns {boolean} the result
 	 */
 	gte(number: SVG.Number | number): boolean {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber.value >= otherNumber.value;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		return thisNumber.value >= otherNumber.value
 	},
 
 	/**
@@ -412,8 +411,8 @@ SVG.extend(SVG.Number, {
 	 * @returns {boolean} the result
 	 */
 	lt(number: SVG.Number | number): boolean {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber.value < otherNumber.value;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		return thisNumber.value < otherNumber.value
 	},
 
 	/**
@@ -424,8 +423,8 @@ SVG.extend(SVG.Number, {
 	 * @returns {boolean} the result
 	 */
 	lte(number: SVG.Number | number): boolean {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber.value <= otherNumber.value;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		return thisNumber.value <= otherNumber.value
 	},
 
 	/**
@@ -436,10 +435,10 @@ SVG.extend(SVG.Number, {
 	 * @returns {boolean} the result
 	 */
 	eq(number: SVG.Number | number): boolean {
-		let [thisNumber, otherNumber] = toSameUnit(this, number);
-		return thisNumber.value == otherNumber.value;
+		let [thisNumber, otherNumber] = toSameUnit(this, number)
+		return thisNumber.value == otherNumber.value
 	},
-});
+})
 
 /**
  * Converts number alike values to a plain `number` in the unit pixel.
@@ -451,19 +450,19 @@ SVG.extend(SVG.Number, {
  * @returns {number} a plain `number` in px
  */
 export function ensureInPx(nmbr: string | number | SVG.Number | SVGLength): number {
-	if (nmbr instanceof SVG.Number) return nmbr.convertToUnit("px").value;
-	let num = Number(nmbr);
-	if (Number.isNaN(num)){
+	if (nmbr instanceof SVG.Number) return nmbr.convertToUnit("px").value
+	let num = Number(nmbr)
+	if (Number.isNaN(num)) {
 		if (typeof nmbr === "string") {
-			return new SVG.Number(nmbr).convertToUnit("px").value;
-		}else if(typeof nmbr === "number"){
-			return new SVG.Number(nmbr).convertToUnit("px").value;
-		}else{
+			return new SVG.Number(nmbr).convertToUnit("px").value
+		} else if (typeof nmbr === "number") {
+			return new SVG.Number(nmbr).convertToUnit("px").value
+		} else {
 			nmbr.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX)
-			return nmbr.value;
+			return nmbr.value
 		}
-	} else return num;
-};
+	} else return num
+}
 
 SVG.extend(SVG.Point, {
 	/**
@@ -474,7 +473,7 @@ SVG.extend(SVG.Point, {
 	 * @returns {number} the squared distance (px^2)
 	 */
 	distanceSquared(other: SVG.Point): number {
-		return (this.x - other.x) ** 2 + (this.y - other.y) ** 2;
+		return (this.x - other.x) ** 2 + (this.y - other.y) ** 2
 	},
 
 	/**
@@ -485,7 +484,7 @@ SVG.extend(SVG.Point, {
 	 * @returns {number} the squared distance (px)
 	 */
 	distance(other: SVG.Point): number {
-		return Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2);
+		return Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2)
 	},
 
 	/**
@@ -495,7 +494,7 @@ SVG.extend(SVG.Point, {
 	 * @returns {number} the squared length (px^2)
 	 */
 	absSquared(): number {
-		return this.x ** 2 + this.y ** 2;
+		return this.x ** 2 + this.y ** 2
 	},
 
 	/**
@@ -505,7 +504,7 @@ SVG.extend(SVG.Point, {
 	 * @returns {number} the length (px)
 	 */
 	abs(): number {
-		return Math.sqrt(this.x ** 2 + this.y ** 2);
+		return Math.sqrt(this.x ** 2 + this.y ** 2)
 	},
 
 	/**
@@ -516,11 +515,11 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point|number} other - the subtrahend
 	 * @returns {SVG.Point} the result
 	 */
-	sub(other: SVG.Point|number): SVG.Point {
+	sub(other: SVG.Point | number): SVG.Point {
 		if (other instanceof SVG.Point) {
-			return new SVG.Point(this.x - other.x, this.y - other.y);
-		}else{
-			return new SVG.Point(this.x - other, this.y - other);
+			return new SVG.Point(this.x - other.x, this.y - other.y)
+		} else {
+			return new SVG.Point(this.x - other, this.y - other)
 		}
 	},
 
@@ -532,40 +531,40 @@ SVG.extend(SVG.Point, {
 	 * @param {SVG.Point|number} other - the other summand
 	 * @returns {SVG.Point} the result
 	 */
-	add(other: SVG.Point|number): SVG.Point {
+	add(other: SVG.Point | number): SVG.Point {
 		if (other instanceof SVG.Point) {
-			return new SVG.Point(this.x + other.x, this.y + other.y);
-		}else{
-			return new SVG.Point(this.x + other, this.y + other);
+			return new SVG.Point(this.x + other.x, this.y + other.y)
+		} else {
+			return new SVG.Point(this.x + other, this.y + other)
 		}
 	},
 	/**
 	 * Calculates the multiplication of this point and another svg point or number (elementwise).
 	 * Returns a new instance.
 	 */
-	mul(other: SVG.Point|number): SVG.Point {
+	mul(other: SVG.Point | number): SVG.Point {
 		if (other instanceof SVG.Point) {
-			return new SVG.Point(this.x * other.x, this.y * other.y);
-		}else{
-			return new SVG.Point(this.x * other, this.y * other);
+			return new SVG.Point(this.x * other.x, this.y * other.y)
+		} else {
+			return new SVG.Point(this.x * other, this.y * other)
 		}
 	},
 	/**
 	 * Calculates the division of this point and another svg point or number (elementwise).
 	 * Returns a new instance.
 	 */
-	div(other: SVG.Point|number): SVG.Point {
+	div(other: SVG.Point | number): SVG.Point {
 		if (other instanceof SVG.Point) {
-			return new SVG.Point(this.x / other.x, this.y / other.y);
-		}else{
-			return new SVG.Point(this.x / other, this.y / other);
+			return new SVG.Point(this.x / other.x, this.y / other.y)
+		} else {
+			return new SVG.Point(this.x / other, this.y / other)
 		}
 	},
 	/**
 	 * calculates the dot product between this point and the other point
 	 */
-	dot(other:SVG.Point):number{
-		return this.x*other.x+this.y*other.y
+	dot(other: SVG.Point): number {
+		return this.x * other.x + this.y * other.y
 	},
 
 	/**
@@ -579,23 +578,23 @@ SVG.extend(SVG.Point, {
 	 * @returns {SVG.Point} the result
 	 */
 	rotate(angle: number, centerCoord: SVG.Point, inRad: boolean = false): SVG.Point {
-		let result = centerCoord ? this.sub(centerCoord) : this.clone();
+		let result = centerCoord ? this.sub(centerCoord) : this.clone()
 
-		const oldX = result.x;
-		const oldY = result.y;
+		const oldX = result.x
+		const oldY = result.y
 		const radians = inRad ? angle : (Math.PI / 180) * angle,
 			cos = Math.cos(radians),
-			sin = Math.sin(radians);
+			sin = Math.sin(radians)
 
-		result.x = cos * oldX + sin * oldY;
-		result.y = -sin * oldX + cos * oldY;
+		result.x = cos * oldX + sin * oldY
+		result.y = -sin * oldX + cos * oldY
 
 		if (!!centerCoord) {
-			result.x += centerCoord.x;
-			result.y += centerCoord.y;
+			result.x += centerCoord.x
+			result.y += centerCoord.y
 		}
 
-		return result;
+		return result
 	},
 	/**
 	 * Checks if to points are equal up to a given epsilon(how far the Xs and Ys can be apart to still count as being equal)
@@ -604,8 +603,8 @@ SVG.extend(SVG.Point, {
 	 * @param [eps=1e-7] how far the points can be apart
 	 * @returns true if the points are equal
 	 */
-	eq(other:SVG.Point, eps:number=1e-7):boolean{
-		if ((this.x > other.x-eps) && (this.x < other.x+eps) && (this.y > other.y-eps) && (this.y < other.y+eps)) {
+	eq(other: SVG.Point, eps: number = 1e-7): boolean {
+		if (this.x > other.x - eps && this.x < other.x + eps && this.y > other.y - eps && this.y < other.y + eps) {
 			return true
 		}
 		return false
@@ -620,19 +619,19 @@ SVG.extend(SVG.Point, {
 	 * @returns {string} the TikZ representation, e.g. "(0.1, 1.23)"
 	 */
 	toTikzString(): string {
-		return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`;
+		return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`
 	},
-	simplifyForJson(digits:2|3|4|5=3): SVG.Point{
-		let factor = 10**digits
-		return new SVG.Point(Math.round(this.x*factor)/factor,Math.round(this.y*factor)/factor)
-	}
-});
+	simplifyForJson(digits: 2 | 3 | 4 | 5 = 3): SVG.Point {
+		let factor = 10 ** digits
+		return new SVG.Point(Math.round(this.x * factor) / factor, Math.round(this.y * factor) / factor)
+	},
+})
 
-SVG.extend(SVG.Color,{
-	toTikzString():string{
-		let color:SVG.Color = this.rgb()
+SVG.extend(SVG.Color, {
+	toTikzString(): string {
+		let color: SVG.Color = this.rgb()
 		return `{rgb,255:red,${color.r.toFixed(0)};green,${color.g.toFixed(0)};blue,${color.b.toFixed(0)}}`
-	}
+	},
 })
 
 //helper functions
@@ -644,8 +643,8 @@ SVG.extend(SVG.Color,{
  * @param B second point on the line
  * @returns array of the closest point on the line S to the point P and t: how far along the line the point is according to S=A+t*(B-A). A value between 0 and 1 indicates the point is on the line segment AB
  */
-export const closestPointOnLine = (P:SVG.Point, A:SVG.Point, B:SVG.Point): [SVG.Point, number] => {
+export const closestPointOnLine = (P: SVG.Point, A: SVG.Point, B: SVG.Point): [SVG.Point, number] => {
 	let dir = B.sub(A)
-	let t = P.sub(A).dot(dir)/(dir.dot(dir))
+	let t = P.sub(A).dot(dir) / dir.dot(dir)
 	return [A.add(dir.mul(t)), t]
 }

@@ -1,15 +1,15 @@
-import { EditableProperty } from "../internal";
+import { EditableProperty } from "../internal"
 
-export class SectionHeaderProperty extends EditableProperty<string>{
-	private labelElement:HTMLElement
+export class SectionHeaderProperty extends EditableProperty<string> {
+	private labelElement: HTMLElement
 
 	public eq(first: string, second: string): boolean {
-		return first==second
+		return first == second
 	}
 	public buildHTML(): HTMLElement {
 		this.labelElement = document.createElement("span") as HTMLSpanElement
-		this.labelElement.classList.add("col-12","form-label","mb-0")
-		this.labelElement.innerHTML = this.value??""
+		this.labelElement.classList.add("col-12", "form-label", "mb-0")
+		this.labelElement.innerHTML = this.value ?? ""
 
 		let row = this.getRow()
 		row.appendChild(this.labelElement)
@@ -20,5 +20,4 @@ export class SectionHeaderProperty extends EditableProperty<string>{
 			this.labelElement.innerHTML = this.value
 		}
 	}
-
 }

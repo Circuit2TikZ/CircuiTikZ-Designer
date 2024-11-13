@@ -17,27 +17,83 @@
 		<symbol id="snapCursor" viewBox="0 0 14 14">
 			<circle cx="7" cy="7" fill="none" stroke="var(--bs-emphasis-color)" stroke-width="1.5" r="6" />
 		</symbol>
-		<marker id="latex" refX="0"	refY="5" markerWidth="10" markerHeight="10"	orient="auto-start-reverse"	markerUnits="strokeWidth">
+		<marker
+			id="latex"
+			refX="0"
+			refY="5"
+			markerWidth="10"
+			markerHeight="10"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
 			<path stroke="none" fill="context-stroke" d="M 0 0 L 10 5 L 0 10 z" />
 		</marker>
-		<marker	id="latexR" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse" markerUnits="strokeWidth">
+		<marker
+			id="latexR"
+			refX="10"
+			refY="5"
+			markerWidth="10"
+			markerHeight="10"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
 			<path stroke="none" fill="context-stroke" d="M 10 0 L 10 10 L 0 5 z" />
 		</marker>
-		<marker id="to" refX="8" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="strokeWidth">
-			<path stroke="context-stroke" fill="none" d="M 3.5 1 C 4 3.5 8 6 8.5 6" stroke-linecap="round"/>
-			<path stroke="context-stroke" fill="none" d="M 8.5 6 C 8 6 4 8.5 3.5 11" stroke-linecap="round"/>
+		<marker
+			id="to"
+			refX="8"
+			refY="6"
+			markerWidth="12"
+			markerHeight="12"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
+			<path stroke="context-stroke" fill="none" d="M 3.5 1 C 4 3.5 8 6 8.5 6" stroke-linecap="round" />
+			<path stroke="context-stroke" fill="none" d="M 8.5 6 C 8 6 4 8.5 3.5 11" stroke-linecap="round" />
 		</marker>
-		<marker	id="toR" refX="4" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="strokeWidth">
-			<path stroke="context-stroke" fill="none" d="M 8.5 1 C 8 3.5 4 6 3.5 6" stroke-linecap="round"/>
-			<path stroke="context-stroke" fill="none" d="M 3.5 6 C 4 6 8 8.5 8.5 11" stroke-linecap="round"/>
+		<marker
+			id="toR"
+			refX="4"
+			refY="6"
+			markerWidth="12"
+			markerHeight="12"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
+			<path stroke="context-stroke" fill="none" d="M 8.5 1 C 8 3.5 4 6 3.5 6" stroke-linecap="round" />
+			<path stroke="context-stroke" fill="none" d="M 3.5 6 C 4 6 8 8.5 8.5 11" stroke-linecap="round" />
 		</marker>
-		<marker	id="stealth" refX="3" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse" markerUnits="strokeWidth">
+		<marker
+			id="stealth"
+			refX="3"
+			refY="5"
+			markerWidth="10"
+			markerHeight="10"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
 			<path stroke="none" fill="context-stroke" d="M 0 0 L 10 5 L 0 10 L 3 5 z" />
 		</marker>
-		<marker	id="stealthR" refX="7" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse" markerUnits="strokeWidth">
+		<marker
+			id="stealthR"
+			refX="7"
+			refY="5"
+			markerWidth="10"
+			markerHeight="10"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
 			<path stroke="none" fill="context-stroke" d="M 10 0 L 7 5 L 10 10 L 0 5 z" />
 		</marker>
-		<marker	id="line" refX="5" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse" markerUnits="strokeWidth">
+		<marker
+			id="line"
+			refX="5"
+			refY="5"
+			markerWidth="10"
+			markerHeight="10"
+			orient="auto-start-reverse"
+			markerUnits="strokeWidth"
+		>
 			<path stroke="context-stroke" fill="none" d="M 5 0 L 5 10" />
 		</marker>
 	</defs>

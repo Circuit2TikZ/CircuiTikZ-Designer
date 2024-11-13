@@ -15,21 +15,21 @@
  */
 export async function waitForDOMLoaded(doc = document, targetState = "interactive") {
 	/** @type {DocumentReadyState[]} */
-	const targetStates = targetState == "complete" ? ["complete"] : ["interactive", "complete"];
+	const targetStates = targetState == "complete" ? ["complete"] : ["interactive", "complete"]
 	if (!targetStates.includes(doc.readyState)) {
 		// not yet loaded
 		return new Promise((resolve) => {
 			const eventListener = (/** @type {Event} */ event) => {
 				if (targetStates.includes(event.target.readyState)) {
 					// DOM loaded
-					doc.removeEventListener("readystatechange", eventListener);
-					resolve(event.target);
+					doc.removeEventListener("readystatechange", eventListener)
+					resolve(event.target)
 				}
-			};
-			doc.addEventListener("readystatechange", eventListener);
-		});
+			}
+			doc.addEventListener("readystatechange", eventListener)
+		})
 	}
-	return doc;
+	return doc
 }
 
 /**
@@ -48,21 +48,21 @@ export async function waitForDOMLoaded(doc = document, targetState = "interactiv
  */
 export async function waitForElementLoaded(id, doc = document) {
 	/** @type {HTMLElement|null} */
-	let element;
+	let element
 	if (id instanceof HTMLElement) {
-		element = id;
+		element = id
 	} else {
 		// Minimum document state: DOM loaded
-		doc = await waitForDOMLoaded(doc, "interactive") as Document;
-		element = doc.getElementById(id);
-		if (!element) return element; // Not found
+		doc = (await waitForDOMLoaded(doc, "interactive")) as Document
+		element = doc.getElementById(id)
+		if (!element) return element // Not found
 	}
 
 	// There is no good solution for scripts --> entire document should be loaded completely
-	if (element instanceof HTMLScriptElement) return waitForDOMLoaded(doc, "complete").then(() => element);
+	if (element instanceof HTMLScriptElement) return waitForDOMLoaded(doc, "complete").then(() => element)
 
-	const objDocumentStates = ["inactive", "complete"];
-	const SVG_MIME = "image/svg+xml";
+	const objDocumentStates = ["inactive", "complete"]
+	const SVG_MIME = "image/svg+xml"
 
 	if (
 		!(element instanceof HTMLImageElement || element instanceof HTMLObjectElement) || // element without external source? --> done
@@ -73,9 +73,9 @@ export async function waitForElementLoaded(id, doc = document) {
 					objDocumentStates.includes(element.getSVGDocument?.()?.readyState ?? "")) ||
 				(element.type !== SVG_MIME && objDocumentStates.includes(element.contentDocument?.readyState ?? ""))))
 	)
-		return element;
+		return element
 
-	return new Promise((resolve) => element.addEventListener("load", () => resolve(element), { once: true }));
+	return new Promise((resolve) => element.addEventListener("load", () => resolve(element), { once: true }))
 }
 
 /**
@@ -86,7 +86,7 @@ export async function waitForElementLoaded(id, doc = document) {
  */
 export function waitForElementHasChildren(element) {
 	return new Promise((resolve) => {
-		if (element.children && element.children.length > 0) resolve(element);
-		window.requestAnimationFrame(() => waitForElementHasChildren(element).then(() => resolve(element)));
-	});
+		if (element.children && element.children.length > 0) resolve(element)
+		window.requestAnimationFrame(() => waitForElementHasChildren(element).then(() => resolve(element)))
+	})
 }
