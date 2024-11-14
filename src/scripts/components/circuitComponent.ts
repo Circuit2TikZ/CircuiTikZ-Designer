@@ -13,7 +13,6 @@ import {
 	ChoiceEntry,
 	SectionHeaderProperty,
 	TextProperty,
-	CircuitikzComponent,
 } from "../internal"
 import { rectRectIntersection } from "../utils/selectionHelper"
 
@@ -63,6 +62,19 @@ export const basicDirections: DirectionInfo[] = [
 	{ key: "southwest", name: "south west", direction: new SVG.Point(-1, 1), pointer: "nesw-resize" },
 ]
 export const defaultBasicDirection = basicDirections[0]
+
+export function getClosestPointerFromDirection(direction: SVG.Point): string {
+	let minValue = Infinity
+	let minPointer = "move"
+	basicDirections.slice(2).forEach((item) => {
+		const diffLength = item.direction.sub(direction).absSquared()
+		if (diffLength < minValue) {
+			minValue = diffLength
+			minPointer = item.pointer
+		}
+	})
+	return minPointer
+}
 
 /**
  * Every component in the circuit should be deriving from this class.
@@ -124,8 +136,6 @@ export abstract class CircuitComponent {
 	public get bbox(): SVG.Box {
 		return this._bbox
 	}
-
-	public abstract getPureBBox(): SVG.Box
 
 	/**
 	 * the SVG.js Element which represents the visualization/graphics of the component on the canvas. Should probably always be a group containing more svg components
@@ -359,16 +369,8 @@ export abstract class CircuitComponent {
 	}
 
 	/**
-	 * The transformation matrix applied to the snapping points might be different than the transformation matrix of the component. Override this!
-	 * @returns the snapping point transformation matrix
-	 */
-	public getSnapPointTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix(this.visualization.transform())
-	}
-
-	/**
 	 * Update the position of all snapping points associated with this component.
-	 * @param matrix which matrix to use. probably the one returned by {@link getSnapPointTransformMatrix}
+	 * @param matrix which matrix to use. probably the one returned by {@link getTransformMatrix}
 	 */
 	public recalculateSnappingPoints(matrix?: SVG.Matrix) {
 		for (const snappingPoint of this.snappingPoints) {

@@ -14,7 +14,6 @@ export class SnapPoint extends SVG.Point {
 	public componentReference: CircuitComponent // to which component this snapPoint belongs
 	private anchorName: string // the name of the snap point (i.e. G, D, S, center...)
 	private relPosition: SVG.Point // the position of this snapPoint relative to the component center
-	private relPositionTransformed: SVG.Point // the position of this snapPoint relative to the component center
 
 	private element: SVG.Element
 
@@ -26,14 +25,13 @@ export class SnapPoint extends SVG.Point {
 		this.recalculate()
 	}
 
-	public recalculate(transformMatrix: SVG.Matrix = this.componentReference.getSnapPointTransformMatrix()) {
-		this.relPositionTransformed = this.relPosition.transform(transformMatrix)
-		this.x = this.relPositionTransformed.x + this.componentReference.position.x
-		this.y = this.relPositionTransformed.y + this.componentReference.position.y
+	public recalculate(transformMatrix: SVG.Matrix = this.componentReference.getTransformMatrix()) {
+		const point = this.relPosition.transform(transformMatrix)
+		this.x = point.x
+		this.y = point.y
 
 		if (this.element) {
-			let bbox = this.element.bbox()
-			this.element.move(this.x - bbox.w / 2, this.y - bbox.h / 2)
+			this.element.center(this.x, this.y)
 		}
 	}
 
@@ -42,7 +40,7 @@ export class SnapPoint extends SVG.Point {
 	}
 
 	public relToComponentAnchor(): SVG.Point {
-		return this.relPositionTransformed
+		return this.sub(this.componentReference.position)
 	}
 
 	public show(show = true, moving = false) {

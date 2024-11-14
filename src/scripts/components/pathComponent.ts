@@ -52,6 +52,9 @@ export class PathComponent extends CircuitikzComponent {
 	private posStart: SVG.Point
 	private posEnd: SVG.Point
 
+	//the untransformed bounding box of the symbol use
+	private symbolBBox: SVG.Box
+
 	private startLine: SVG.Line
 	private endLine: SVG.Line
 	private dragStartLine: SVG.Line
@@ -101,6 +104,7 @@ export class PathComponent extends CircuitikzComponent {
 			.stroke({ width: selectionSize, color: "transparent" })
 
 		this.symbolUse = CanvasController.instance.canvas.use(this.referenceSymbol)
+		this.symbolBBox = this.symbolUse.bbox()
 		this.visualization.add(this.symbolUse)
 		this.visualization.add(this.startLine)
 		this.visualization.add(this.endLine)
@@ -155,7 +159,7 @@ export class PathComponent extends CircuitikzComponent {
 			new SnapPoint(this, null, new SVG.Point(0, 0)),
 			...this.referenceSymbol._pins
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
-				.map((pin) => new SnapPoint(this, pin.name, pin.point)),
+				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))),
 		]
 	}
 
@@ -204,18 +208,11 @@ export class PathComponent extends CircuitikzComponent {
 		this.update()
 	}
 
-	public getSnapPointTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix({
-			rotate: -this.rotationDeg,
-			scaleX: this.mirror.value ? -1 : 1,
-			scaleY: this.invert.value ? -1 : 1,
-		})
-	}
-
-	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		this.snappingPoints[0].updateRelPosition(this.posStart.sub(this.position).rotate(-this.rotationDeg))
-		this.snappingPoints[1].updateRelPosition(this.posEnd.sub(this.position).rotate(-this.rotationDeg))
-		super.recalculateSnappingPoints(matrix ?? this.getSnapPointTransformMatrix())
+	public recalculateSnappingPoints(): void {
+		const inverseTransform = this.getTransformMatrix().inverse()
+		this.snappingPoints[0].updateRelPosition(this.posStart.transform(inverseTransform))
+		this.snappingPoints[1].updateRelPosition(this.posEnd.transform(inverseTransform))
+		super.recalculateSnappingPoints()
 	}
 
 	public getSnappingInfo(): SnappingInfo {
@@ -234,22 +231,15 @@ export class PathComponent extends CircuitikzComponent {
 
 	protected update(): void {
 		this.position = this.posStart.add(this.posEnd).div(2)
-		const tl = this.position.sub(this.referenceSymbol.relMid)
 
 		const angle = Math.atan2(this.posStart.y - this.posEnd.y, this.posEnd.x - this.posStart.x)
 		this.rotationDeg = (angle * 180) / Math.PI
 
-		this.symbolUse.move(tl.x, tl.y)
-		this.symbolUse.transform({
-			rotate: -this.rotationDeg,
-			ox: this.position.x,
-			oy: this.position.y,
-			scaleY: this.mirror.value ? -1 : 1,
-			scaleX: this.invert.value ? -1 : 1,
-		})
+		let m = this.getTransformMatrix()
+		this.symbolUse.transform(m)
 
-		let startEnd = this.relSymbolStart.rotate(this.rotationDeg).add(this.position)
-		let endStart = this.relSymbolEnd.rotate(this.rotationDeg).add(this.position)
+		let startEnd = this.relSymbolStart.add(this.referenceSymbol.relMid).transform(m)
+		let endStart = this.relSymbolEnd.add(this.referenceSymbol.relMid).transform(m)
 
 		this.recalculateResizePoints()
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
@@ -267,22 +257,14 @@ export class PathComponent extends CircuitikzComponent {
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
-			let moveVec = this.position.sub(this.referenceSymbol.relMid)
-
-			this.selectionElement.move(moveVec.x, moveVec.y).transform({
-				rotate: -this.rotationDeg,
-				ox: this.position.x,
-				oy: this.position.y,
-				scaleY: this.mirror.value ? -1 : 1,
-				scaleX: this.invert.value ? -1 : 1,
-			})
+			let bbox = this.symbolBBox
+			this.selectionElement.size(bbox.w, bbox.h).transform(this.getTransformMatrix())
 		}
 	}
 	public viewSelected(show: boolean): void {
 		if (show) {
 			this.selectionElement?.remove()
-			let box = this.symbolUse.bbox()
-			this.selectionElement = CanvasController.instance.canvas.rect(box.w, box.h)
+			this.selectionElement = CanvasController.instance.canvas.rect(0, 0)
 			this.recalculateSelectionVisuals()
 
 			this.selectionElement.attr({
@@ -311,6 +293,21 @@ export class PathComponent extends CircuitikzComponent {
 		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 
+	public getTransformMatrix(): SVG.Matrix {
+		const symbolRel = this.referenceSymbol.relMid
+		return new SVG.Matrix({
+			scaleX: this.invert.value ? -1 : 1,
+			scaleY: this.mirror.value ? -1 : 1,
+			translate: [-symbolRel.x, -symbolRel.y],
+			origin: [symbolRel.x, symbolRel.y],
+		}).lmultiply(
+			new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				translate: [this.position.x, this.position.y],
+			})
+		)
+	}
+
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
 		if (this.pointsPlaced < 2) {
 			return false
@@ -323,11 +320,10 @@ export class PathComponent extends CircuitikzComponent {
 			return true
 		}
 
-		// get bounding box of the center symbol in the rotated frame but without rotation
-		let bbox = this.symbolUse.bbox()
+		const bbox = this.symbolBBox
 		// get the corner points of the bounding box and rotate each of them to their proper positions
-		let transform = new SVG.Matrix({ rotate: -this.rotationDeg, ox: this.position.x, oy: this.position.y })
-		let boxPoints = [
+		const transform = this.getTransformMatrix()
+		const boxPoints = [
 			new SVG.Point(bbox.x, bbox.y).transform(transform),
 			new SVG.Point(bbox.x2, bbox.y).transform(transform),
 			new SVG.Point(bbox.x2, bbox.y2).transform(transform),
@@ -360,22 +356,6 @@ export class PathComponent extends CircuitikzComponent {
 
 		// no intersection between the selection rect and the component
 		return false
-	}
-
-	public getPureBBox(): SVG.Box {
-		return this.symbolUse
-			.bbox()
-			.transform(
-				new SVG.Matrix({
-					rotate: -this.rotationDeg,
-					ox: this.position.x,
-					oy: this.position.y,
-					scaleY: this.mirror.value ? -1 : 1,
-					scaleX: this.invert.value ? -1 : 1,
-				})
-			)
-			.merge(this.startLine.bbox())
-			.merge(this.endLine.bbox())
 	}
 
 	public toJson(): PathSaveObject {
@@ -475,10 +455,10 @@ export class PathComponent extends CircuitikzComponent {
 		this.isResizing = resize
 		if (resize) {
 			this.startSVG = resizeSVG()
-			this.startSVG.node.style.cursor = "grab"
+			this.startSVG.node.style.cursor = "move"
 
 			this.endSVG = resizeSVG()
-			this.endSVG.node.style.cursor = "grab"
+			this.endSVG.node.style.cursor = "move"
 
 			let startPos: SVG.Point
 			let endPos: SVG.Point

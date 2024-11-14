@@ -78,10 +78,6 @@ export const defaultArrowTip = arrowTips[0]
  * The component responsible for multi segmented wires (polylines)/wires
  */
 export class WireComponent extends CircuitComponent {
-	public updateLabelPosition(): void {
-		//not needed for wires
-	}
-
 	protected strokeInfo: StrokeInfo
 	protected strokeColorProperty: ColorProperty
 	protected strokeOpacityProperty: SliderProperty
@@ -231,13 +227,8 @@ export class WireComponent extends CircuitComponent {
 		})
 	}
 
-	public getSnapPointTransformMatrix(): SVG.Matrix {
-		// snap points don't have to be transformed for wires
-		return new SVG.Matrix()
-	}
-
-	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		super.recalculateSnappingPoints()
+	public recalculateSnappingPoints(): void {
+		super.recalculateSnappingPoints(this.getTransformMatrix())
 	}
 
 	public getSnappingInfo(): SnappingInfo {
@@ -348,8 +339,8 @@ export class WireComponent extends CircuitComponent {
 		}
 	}
 
-	public getPureBBox(): SVG.Box {
-		return this.wire.bbox()
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix()
 	}
 
 	public moveTo(position: SVG.Point): void {
@@ -454,12 +445,14 @@ export class WireComponent extends CircuitComponent {
 
 		//recalculate the snapping point offsets
 		if (this.snappingPoints.length == pointsNoArrow.length) {
+			//update the existing snap points
 			for (let index = 0; index < this.snappingPoints.length; index++) {
 				const snapPoint = this.snappingPoints[index]
 				const point = pointsNoArrow[index]
-				snapPoint.updateRelPosition(point.sub(this.position))
+				snapPoint.updateRelPosition(point)
 			}
 		} else {
+			// a point was added -> redo snap points
 			this.snappingPoints = pointsNoArrow.map(
 				(point, idx) =>
 					new SnapPoint(
@@ -467,7 +460,7 @@ export class WireComponent extends CircuitComponent {
 						idx == 0 ? "START"
 						: idx == pointsNoArrow.length - 1 ? "END"
 						: "",
-						point.sub(this.position)
+						point
 					)
 			)
 		}
@@ -801,5 +794,8 @@ export class WireComponent extends CircuitComponent {
 		wireComponent.placeFinish()
 
 		return wireComponent
+	}
+	public updateLabelPosition(): void {
+		//not needed for wires
 	}
 }

@@ -33,6 +33,8 @@ export class NodeComponent extends CircuitikzComponent {
 	public anchorChoice: ChoiceProperty<DirectionInfo>
 	public positionChoice: ChoiceProperty<DirectionInfo>
 
+	private symbolBBox: SVG.Box
+
 	public flipStateX: boolean
 	public flipStateY: boolean
 
@@ -43,6 +45,7 @@ export class NodeComponent extends CircuitikzComponent {
 		this.symbolUse = CanvasController.instance.canvas.use(symbol)
 		this.visualization = CanvasController.instance.canvas.group()
 		this.visualization.add(this.symbolUse)
+		this.symbolBBox = this.symbolUse.bbox()
 		this.rotationDeg = 0
 
 		{
@@ -75,34 +78,34 @@ export class NodeComponent extends CircuitikzComponent {
 		this.addName()
 		this.addInfo()
 
-		this.snappingPoints = symbol._pins.map((pin) => new SnapPoint(this, pin.name, pin.point))
+		this.snappingPoints = symbol._pins.map(
+			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))
+		)
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
+		const symbolRel = this.referenceSymbol.relMid
 		return new SVG.Matrix({
-			rotate: -this.rotationDeg,
-			origin: [this.position.x, this.position.y],
 			scaleX: this.flipStateX ? -1 : 1,
 			scaleY: this.flipStateY ? -1 : 1,
-		})
+			translate: [-symbolRel.x, -symbolRel.y],
+			origin: [symbolRel.x, symbolRel.y],
+		}).lmultiply(
+			new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				translate: [this.position.x, this.position.y],
+			})
+		)
 	}
 
-	public getSnapPointTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix({
-			rotate: -this.rotationDeg,
-			scaleX: this.flipStateX ? -1 : 1,
-			scaleY: this.flipStateY ? -1 : 1,
-		})
-	}
-
-	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		super.recalculateSnappingPoints(matrix ?? this.getSnapPointTransformMatrix())
+	public recalculateSnappingPoints(): void {
+		super.recalculateSnappingPoints()
 	}
 
 	public getSnappingInfo(): SnappingInfo {
 		return {
 			trackedSnappingPoints: this.snappingPoints,
-			additionalSnappingPoints: [new SnapPoint(this, "center", new SVG.Point())],
+			additionalSnappingPoints: [new SnapPoint(this, "center", this.referenceSymbol.relMid)],
 		}
 	}
 
@@ -119,12 +122,10 @@ export class NodeComponent extends CircuitikzComponent {
 				this.rotationDeg = 0
 			}
 		}
-		const tl = this.position.sub(this.referenceSymbol.relMid)
-		this.symbolUse.move(tl.x, tl.y)
 		let m = this.getTransformMatrix()
 		this.symbolUse.transform(m)
-
 		this._bbox = this.symbolUse.bbox().transform(m)
+
 		this.updateLabelPosition()
 
 		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
@@ -133,26 +134,17 @@ export class NodeComponent extends CircuitikzComponent {
 		this.recalculateSnappingPoints()
 	}
 
-	public getPureBBox(): SVG.Box {
-		return this.symbolUse.bbox().transform(this.getTransformMatrix())
-	}
-
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
-			let moveVec = this.position.sub(this.referenceSymbol.relMid)
-
-			this.selectionElement.move(moveVec.x, moveVec.y).transform(this.getTransformMatrix())
+			let bbox = this.symbolBBox
+			this.selectionElement.size(bbox.w, bbox.h).transform(this.getTransformMatrix())
 		}
 	}
 
 	public moveTo(position: SVG.Point) {
 		this.position = position.clone()
 		this.update()
-		this.symbolUse.move(
-			this.position.x - this.referenceSymbol.relMid.x,
-			this.position.y - this.referenceSymbol.relMid.y
-		)
 	}
 
 	public rotate(angleDeg: number): void {
@@ -195,8 +187,7 @@ export class NodeComponent extends CircuitikzComponent {
 	public viewSelected(show: boolean): void {
 		if (show) {
 			this.selectionElement?.remove()
-			let box = this.symbolUse.bbox().transform(this.getTransformMatrix())
-			this.selectionElement = CanvasController.instance.canvas.rect(box.w, box.h).move(box.x, box.y)
+			this.selectionElement = CanvasController.instance.canvas.rect(0, 0)
 			this.selectionElement.attr({
 				"stroke-width": selectedBoxWidth,
 				stroke: this.isSelectionReference ? referenceColor : selectionColor,
@@ -204,6 +195,7 @@ export class NodeComponent extends CircuitikzComponent {
 				fill: "none",
 			})
 			this.visualization.stroke("#f00")
+			this.recalculateSelectionVisuals()
 		} else {
 			this.selectionElement?.remove()
 			this.visualization.stroke("#000")
@@ -424,7 +416,9 @@ export class NodeComponent extends CircuitikzComponent {
 		// get relevant positions and bounding boxes
 		let textPos: SVG.Point
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPos = this.referenceSymbol._textPosition.point.add(this.position).transform(transformMatrix)
+			textPos = this.referenceSymbol._textPosition.point
+				.add(this.referenceSymbol.relMid)
+				.transform(transformMatrix)
 		} else {
 			let bboxHalfSize = new SVG.Point(this.bbox.w / 2, this.bbox.h / 2)
 			let pos = new SVG.Point(this.bbox.cx, this.bbox.cy)

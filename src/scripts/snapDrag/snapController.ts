@@ -39,7 +39,7 @@ export class SnapController {
 	private constructor() {}
 
 	public recalculateAdditionalSnapPoints() {
-		this.additionalSnapPoints.forEach((snapPoint) => snapPoint.recalculate(new SVG.Matrix()))
+		this.additionalSnapPoints.forEach((snapPoint) => snapPoint.recalculate())
 	}
 
 	public updateSnapPoints(currentComponent: CircuitComponent, adjustOnly = false) {

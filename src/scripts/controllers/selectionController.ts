@@ -373,7 +373,7 @@ export class SelectionController {
 		let direction = horizontal ? new SVG.Point(1, 0) : new SVG.Point(0, 1)
 		let referencePosition: SVG.Point
 		if (this.referenceComponent) {
-			let elementBBox = this.referenceComponent.getPureBBox()
+			let elementBBox = this.referenceComponent.bbox
 			let elementHalfSize = new SVG.Point(elementBBox.w / 2, elementBBox.h / 2)
 			referencePosition = new SVG.Point(elementBBox.cx, elementBBox.cy).add(
 				elementHalfSize.mul(direction).mul(mode)
@@ -382,7 +382,7 @@ export class SelectionController {
 			referencePosition = selectionCenter.add(halfSelectionSize.mul(direction).mul(mode))
 		}
 		for (const element of this.currentlySelectedComponents) {
-			let elementBBox = element.getPureBBox()
+			let elementBBox = element.bbox
 			let elementHalfSize = new SVG.Point(elementBBox.w / 2, elementBBox.h / 2)
 			let elementReferencePoint = new SVG.Point(elementBBox.cx, elementBBox.cy).add(
 				elementHalfSize.mul(direction).mul(mode)
@@ -401,7 +401,7 @@ export class SelectionController {
 
 		let refPos: SVG.Point
 		let bboxes = this.currentlySelectedComponents.map((c) => {
-			let bbox = c.getPureBBox()
+			let bbox = c.bbox
 			if (c == this.referenceComponent) {
 				refPos = c.position
 			}

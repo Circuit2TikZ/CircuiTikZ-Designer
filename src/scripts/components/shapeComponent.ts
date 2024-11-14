@@ -13,14 +13,13 @@ import {
 	MathJaxProperty,
 	basicDirections,
 	defaultBasicDirection,
-	invalidNameRegEx,
-	MainController,
-	CircuitikzComponent,
 	SnappingInfo,
 	SnapDragHandler,
-	Undo,
 	ChoiceEntry,
+	SnapCursorController,
+	AdjustDragHandler,
 } from "../internal"
+import { selectedBoxWidth } from "../utils/selectionHelper"
 
 export type ShapeSaveObject = ComponentSaveObject & {
 	rotationDeg?: number
@@ -93,6 +92,8 @@ export abstract class ShapeComponent extends CircuitComponent {
 
 	protected anchorChoice: ChoiceProperty<DirectionInfo>
 	protected positionChoice: ChoiceProperty<DirectionInfo>
+
+	protected placePoint: SVG.Point
 
 	public constructor() {
 		super()
@@ -211,6 +212,70 @@ export abstract class ShapeComponent extends CircuitComponent {
 			})
 			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
 		}
+		SnapCursorController.instance.visible = true
+		this.snappingPoints = []
+		CanvasController.instance.canvas.add(this.visualization)
+	}
+
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix({
+			rotate: -this.rotationDeg,
+			origin: [this.position.x, this.position.y],
+		})
+	}
+
+	public moveTo(position: SVG.Point): void {
+		this.position = position
+		this.update()
+	}
+
+	public rotate(angleDeg: number): void {
+		this.rotationDeg += angleDeg
+		this.simplifyRotationAngle()
+		this.update()
+		this.resizable(!this.isResizing)
+		this.resizable(!this.isResizing)
+	}
+
+	public flip(horizontal: boolean): void {
+		this.rotationDeg = (horizontal ? 180 : 0) - this.rotationDeg
+		this.simplifyRotationAngle()
+		this.update()
+	}
+
+	protected update(): void {
+		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
+
+		let transformMatrix = this.getTransformMatrix()
+
+		this.dragElement.size(this.size.x, this.size.y).center(this.position.x, this.position.y)
+		this.dragElement.transform(transformMatrix)
+
+		this.shapeVisualization.size(
+			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
+			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
+		)
+		this.shapeVisualization.center(this.position.x, this.position.y)
+		this.shapeVisualization.transform(transformMatrix)
+
+		this._bbox = this.dragElement.bbox().transform(transformMatrix)
+
+		this.relPosition = this.position.sub(new SVG.Point(this.bbox.x, this.bbox.y))
+		this.recalculateSelectionVisuals()
+		this.recalculateSnappingPoints()
+		this.recalculateResizePoints()
+		this.updateLabelPosition()
+	}
+
+	protected recalculateSelectionVisuals(): void {
+		if (this.selectionElement) {
+			let lineWidth = selectedBoxWidth.convertToUnit("px").value
+
+			this.selectionElement
+				.size(this.size.x + lineWidth, this.size.y + lineWidth)
+				.center(this.position.x, this.position.y)
+				.transform(this.getTransformMatrix())
+		}
 	}
 
 	public updateTheme(): void {
@@ -245,6 +310,19 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.labelRendering?.fill(labelColor)
 	}
 
+	public remove(): void {
+		for (const [dir, viz] of this.resizeVisualizations) {
+			AdjustDragHandler.snapDrag(this, viz, false)
+			viz.remove()
+		}
+		SnapDragHandler.snapDrag(this, false)
+		this.visualization.remove()
+		this.draggable(false)
+		this.resizable(false)
+		this.viewSelected(false)
+		this.selectionElement?.remove()
+	}
+
 	public getSnappingInfo(): SnappingInfo {
 		return {
 			trackedSnappingPoints: this.snappingPoints,
@@ -259,5 +337,72 @@ export abstract class ShapeComponent extends CircuitComponent {
 			this.dragElement.node.classList.remove("draggable")
 		}
 		SnapDragHandler.snapDrag(this, drag, this.dragElement)
+	}
+
+	public placeMove(pos: SVG.Point, ev?: Event): void {
+		if (!this.placePoint) {
+			// not started placing
+			SnapCursorController.instance.moveTo(pos)
+		} else {
+			let secondPoint: SVG.Point
+			if (ev && (ev as MouseEvent | TouchEvent).ctrlKey) {
+				// get point on one of the two diagonals
+				let diff = pos.sub(this.placePoint)
+				if (diff.x * diff.y < 0) {
+					secondPoint = new SVG.Point(pos.x - pos.y, pos.y - pos.x)
+						.add(this.placePoint.x + this.placePoint.y)
+						.div(2)
+				} else {
+					secondPoint = new SVG.Point(
+						this.placePoint.x - this.placePoint.y,
+						this.placePoint.y - this.placePoint.x
+					)
+						.add(pos.x + pos.y)
+						.div(2)
+				}
+			} else {
+				secondPoint = pos
+			}
+			this.position = this.placePoint.add(secondPoint).div(2)
+			this.size = new SVG.Point(
+				Math.abs(secondPoint.x - this.placePoint.x),
+				Math.abs(secondPoint.y - this.placePoint.y)
+			)
+			this.update()
+		}
+	}
+
+	public placeStep(pos: SVG.Point, ev?: Event): boolean {
+		if (this.finishedPlacing) {
+			return true
+		}
+		if (!this.placePoint) {
+			this.placePoint = pos
+			this.position = pos
+			this.size = new SVG.Point()
+			this.shapeVisualization.show()
+			this.updateTheme()
+			SnapCursorController.instance.visible = false
+			return false
+		}
+
+		this.placeMove(pos, ev)
+		return true
+	}
+
+	public placeFinish(): void {
+		if (this.finishedPlacing) {
+			return
+		}
+		if (!this.placePoint) {
+			this.placeStep(new SVG.Point())
+		}
+
+		this.finishedPlacing = true
+		this.update()
+		this.draggable(true)
+		this.shapeVisualization.show()
+		this.updateTheme()
+		SnapCursorController.instance.visible = false
 	}
 }

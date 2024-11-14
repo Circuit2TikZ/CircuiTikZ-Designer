@@ -10,12 +10,11 @@ import {
 	DirectionInfo,
 	ExportController,
 	FillInfo,
+	getClosestPointerFromDirection,
 	PositionedLabel,
 	SelectionController,
 	ShapeComponent,
 	ShapeSaveObject,
-	SnapCursorController,
-	SnapDragHandler,
 	SnapPoint,
 	StrokeInfo,
 	strokeStyleChoices,
@@ -28,14 +27,11 @@ export type EllipseSaveObject = ShapeSaveObject & {
 }
 
 export class EllipseComponent extends ShapeComponent {
-	private placePoint: SVG.Point
-
 	protected declare shapeVisualization: SVG.Ellipse
 	protected declare dragElement: SVG.Ellipse
 
-	private _isCircle = false
 	public get isCircle() {
-		return this._isCircle
+		return Math.abs(this.size.x - this.size.y) < 1e-5
 	}
 
 	public constructor() {
@@ -53,16 +49,8 @@ export class EllipseComponent extends ShapeComponent {
 		})
 
 		this.visualization.add(this.shapeVisualization)
-		CanvasController.instance.canvas.add(this.visualization)
 
 		this.visualization.add(this.dragElement)
-
-		SnapCursorController.instance.visible = true
-		this.snappingPoints = []
-	}
-
-	public getTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
@@ -82,22 +70,22 @@ export class EllipseComponent extends ShapeComponent {
 
 		if (!this.snappingPoints || this.snappingPoints.length == 0) {
 			for (const element of relPositions) {
-				this.snappingPoints.push(new SnapPoint(this, element.anchorname, element.relPos))
+				this.snappingPoints.push(new SnapPoint(this, element.anchorname, element.relPos.add(this.position)))
 			}
 		} else {
 			for (let index = 0; index < relPositions.length; index++) {
 				const relPos = relPositions[index].relPos
 				const snappingPoint = this.snappingPoints[index]
-				snappingPoint.updateRelPosition(relPos)
-				snappingPoint.recalculate(new SVG.Matrix())
+				snappingPoint.updateRelPosition(relPos.add(this.position))
+				snappingPoint.recalculate()
 			}
 		}
 	}
 
 	protected recalculateResizePoints() {
-		let halfsize = new SVG.Point(this.bbox.w / 2, this.bbox.h / 2)
+		let halfsize = this.size.div(2)
 		for (const [dir, viz] of this.resizeVisualizations) {
-			let pos = this.position.add(halfsize.mul(dir.direction))
+			let pos = this.position.add(halfsize.mul(dir.direction).rotate(this.rotationDeg))
 			viz.center(pos.x, pos.y)
 		}
 	}
@@ -109,20 +97,20 @@ export class EllipseComponent extends ShapeComponent {
 		if (resize) {
 			let originalPos: SVG.Point
 			let originalSize: SVG.Point
+			let transformMatrixInv: SVG.Matrix
 			const getInitialDim = () => {
 				originalPos = this.position.clone()
 				originalSize = this.size.clone()
+				transformMatrixInv = this.getTransformMatrix().inverse()
 			}
 
 			for (const direction of basicDirections) {
 				if (direction.key == defaultBasicDirection.key || direction.key == "center") {
 					continue
 				}
-
+				const directionTransformed = direction.direction.rotate(this.rotationDeg)
 				let viz = resizeSVG()
-				if (direction.pointer) {
-					viz.node.style.cursor = direction.pointer
-				}
+				viz.node.style.cursor = getClosestPointerFromDirection(directionTransformed)
 				this.resizeVisualizations.set(direction, viz)
 
 				let startPoint: SVG.Point
@@ -130,11 +118,11 @@ export class EllipseComponent extends ShapeComponent {
 				AdjustDragHandler.snapDrag(this, viz, true, {
 					dragStart: (pos) => {
 						getInitialDim()
-						let box = viz.bbox()
-						startPoint = new SVG.Point(box.cx, box.cy)
+						startPoint = originalPos.add(direction.direction.mul(originalSize).div(2))
 						oppositePoint = originalPos.add(direction.direction.mul(originalSize).div(-2))
 					},
 					dragMove: (pos, ev) => {
+						pos = pos.transform(transformMatrixInv)
 						if (
 							ev &&
 							(ev as MouseEvent | TouchEvent).ctrlKey &&
@@ -161,8 +149,11 @@ export class EllipseComponent extends ShapeComponent {
 						this.size.x = direction.direction.x ? Math.abs(pos.x - oppositePoint.x) : originalSize.x
 						this.size.y = direction.direction.y ? Math.abs(pos.y - oppositePoint.y) : originalSize.y
 
-						this.position = originalPos.add(delta.mul(dirAbs.div(2)))
+						this.position = originalPos.add(delta.mul(dirAbs.div(2)).rotate(this.rotationDeg))
 						this.update()
+					},
+					dragEnd: () => {
+						return true
 					},
 				})
 			}
@@ -174,56 +165,6 @@ export class EllipseComponent extends ShapeComponent {
 			}
 			this.resizeVisualizations.clear()
 		}
-	}
-
-	public moveTo(position: SVG.Point): void {
-		this.position = position
-		this.update()
-	}
-	public rotate(angleDeg: number): void {
-		this.size = new SVG.Point(this.size.y, this.size.x)
-		// this.rotationDeg+=angleDeg
-		// this.simplifyRotationAngle()
-		this.update()
-	}
-	public flip(horizontal: boolean): void {
-		//doesn't do anything for ellipses
-	}
-	protected update(): void {
-		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-
-		let transformMatrix = this.getTransformMatrix()
-
-		this.dragElement.size(this.size.x, this.size.y).center(this.position.x, this.position.y)
-		this.dragElement.transform(transformMatrix)
-
-		this.shapeVisualization.size(
-			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
-			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
-		)
-		this.shapeVisualization.center(this.position.x, this.position.y)
-		this.shapeVisualization.transform(transformMatrix)
-
-		this._isCircle = Math.abs(this.size.x - this.size.y) < 1e-5
-
-		this._bbox = this.dragElement.bbox()
-
-		this.relPosition = this.position.sub(new SVG.Point(this.bbox.x, this.bbox.y))
-		this.recalculateSelectionVisuals()
-		this.recalculateSnappingPoints()
-		this.recalculateResizePoints()
-		this.updateLabelPosition()
-	}
-	protected recalculateSelectionVisuals(): void {
-		if (this.selectionElement) {
-			let lineWidth = selectedBoxWidth.convertToUnit("px").value
-			this.selectionElement.center(this.position.x, this.position.y)
-			this.selectionElement.size(this.bbox.w + 2 * lineWidth, this.bbox.h + 2 * lineWidth)
-		}
-	}
-
-	public getPureBBox(): SVG.Box {
-		return this.bbox
 	}
 
 	public viewSelected(show: boolean): void {
@@ -239,11 +180,9 @@ export class EllipseComponent extends ShapeComponent {
 			this.selectionElement.attr({
 				stroke: this.isSelectionReference ? referenceColor : selectionColor,
 			})
-			this.visualization.stroke("#f00")
 			this.recalculateSelectionVisuals()
 		} else {
 			this.selectionElement?.remove()
-			this.visualization.stroke("#000")
 			this.selectionElement = null
 		}
 		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
@@ -511,82 +450,6 @@ export class EllipseComponent extends ShapeComponent {
 
 	public copyForPlacement(): CircuitComponent {
 		return new EllipseComponent()
-	}
-	public remove(): void {
-		for (const [dir, viz] of this.resizeVisualizations) {
-			AdjustDragHandler.snapDrag(this, viz, false)
-			viz.remove()
-		}
-		SnapDragHandler.snapDrag(this, false)
-		this.visualization.remove()
-		this.draggable(false)
-		this.resizable(false)
-		this.viewSelected(false)
-		this.selectionElement?.remove()
-	}
-	public placeMove(pos: SVG.Point, ev?: Event): void {
-		if (!this.placePoint) {
-			// not started placing
-			SnapCursorController.instance.moveTo(pos)
-		} else {
-			let secondPoint: SVG.Point
-			if (ev && (ev as MouseEvent | TouchEvent).ctrlKey) {
-				// get point on one of the two diagonals
-				let diff = pos.sub(this.placePoint)
-				if (diff.x * diff.y < 0) {
-					secondPoint = new SVG.Point(pos.x - pos.y, pos.y - pos.x)
-						.add(this.placePoint.x + this.placePoint.y)
-						.div(2)
-				} else {
-					secondPoint = new SVG.Point(
-						this.placePoint.x - this.placePoint.y,
-						this.placePoint.y - this.placePoint.x
-					)
-						.add(pos.x + pos.y)
-						.div(2)
-				}
-			} else {
-				secondPoint = pos
-			}
-			this.position = this.placePoint.add(secondPoint).div(2)
-			this.size = new SVG.Point(
-				Math.abs(secondPoint.x - this.placePoint.x),
-				Math.abs(secondPoint.y - this.placePoint.y)
-			)
-			this.update()
-		}
-	}
-	public placeStep(pos: SVG.Point, ev?: Event): boolean {
-		if (this.finishedPlacing) {
-			return true
-		}
-		if (!this.placePoint) {
-			this.placePoint = pos
-			this.position = pos
-			this.size = new SVG.Point()
-			this.shapeVisualization.show()
-			this.updateTheme()
-			SnapCursorController.instance.visible = false
-			return false
-		}
-
-		this.placeMove(pos, ev)
-		return true
-	}
-	public placeFinish(): void {
-		if (this.finishedPlacing) {
-			return
-		}
-		if (!this.placePoint) {
-			this.placeStep(new SVG.Point())
-		}
-
-		this.finishedPlacing = true
-		this.update()
-		this.draggable(true)
-		this.shapeVisualization.show()
-		this.updateTheme()
-		SnapCursorController.instance.visible = false
 	}
 
 	private labelPos: DirectionInfo
