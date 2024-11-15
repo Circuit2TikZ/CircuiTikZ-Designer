@@ -8,7 +8,7 @@ export class SectionHeaderProperty extends EditableProperty<string> {
 	}
 	public buildHTML(): HTMLElement {
 		this.labelElement = document.createElement("span") as HTMLSpanElement
-		this.labelElement.classList.add("col-12", "form-label", "mb-0")
+		this.labelElement.classList.add("col-12", "form-label", "mb-0", "fw-bold")
 		this.labelElement.innerHTML = this.value ?? ""
 
 		let row = this.getRow()

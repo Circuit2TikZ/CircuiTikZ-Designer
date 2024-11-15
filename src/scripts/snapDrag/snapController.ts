@@ -8,8 +8,7 @@ import { CanvasController, CircuitComponent, MainController, SnapPoint } from ".
 type DistStruct = {
 	dist: number
 	vector?: SVG.Point
-	movingSnapPoint?: SVG.Point
-	fixedSnapPoint?: SVG.Point
+	snapPoints?: SVG.Point[]
 }
 
 export type SnappingInfo = {
@@ -34,7 +33,7 @@ export class SnapController {
 	private movingSnapPoints: SnapPoint[] = []
 	private additionalSnapPoints: SnapPoint[] = []
 
-	private whereSnap: SVG.Element
+	private whereSnap: SVG.Element[] = []
 
 	private constructor() {}
 
@@ -43,8 +42,6 @@ export class SnapController {
 	}
 
 	public updateSnapPoints(currentComponent: CircuitComponent, adjustOnly = false) {
-		let show = this.whereSnap ? true : false
-
 		//reset
 		this.fixedSnapPoints.forEach((snapPoint) => snapPoint.show(false))
 		this.movingSnapPoints.forEach((snapPoint) => snapPoint.show(false))
@@ -85,7 +82,7 @@ export class SnapController {
 			}
 		}
 
-		if (show) {
+		if (this.whereSnap.length > 0) {
 			this.showSnapPoints()
 		} else {
 			this.hideSnapPoints()
@@ -105,20 +102,12 @@ export class SnapController {
 		this.additionalSnapPoints.forEach((snapPoint) => {
 			snapPoint.show(true, true)
 		})
-
-		if (!this.whereSnap) {
-			this.whereSnap = CanvasController.instance.canvas.circle(4).fill("none").stroke({
-				color: "var(--bs-yellow)",
-			})
-		}
 	}
 
 	/**
 	 * hide the snap points again
 	 */
 	public hideSnapPoints() {
-		this.whereSnap?.remove()
-		this.whereSnap = null
 		// remove all the snap point visualizations from the svg canvas
 		this.fixedSnapPoints.forEach((snapPoint) => {
 			snapPoint.show(false)
@@ -129,6 +118,9 @@ export class SnapController {
 		this.additionalSnapPoints.forEach((snapPoint) => {
 			snapPoint.show(false)
 		})
+		while (this.whereSnap.length > 0) {
+			this.whereSnap.pop().remove()
+		}
 	}
 
 	/**
@@ -146,6 +138,7 @@ export class SnapController {
 		// take zoom level into account (canvas.screenctm().a): zoomed in means smaller maximum distance
 		const maxSnapDistance =
 			new SVG.Number(1, "cm").convertToUnit("px").value / CanvasController.instance.canvas.node.getScreenCTM().a
+		const maxSnapDistance2 = maxSnapDistance * maxSnapDistance
 
 		let relSnapPoints = this.movingSnapPoints.map((snapPoint) =>
 			snapPoint.relToComponentAnchor().add(snapPoint.componentReference.position).sub(component.position)
@@ -174,18 +167,9 @@ export class SnapController {
 				const x = Math.round(movSnapPoint.x / gridSpacing) * gridSpacing
 				const y = Math.round(movSnapPoint.y / gridSpacing) * gridSpacing
 				const gridPoint = new SVG.Point(x, y)
-				const vector = gridPoint.sub(movSnapPoint)
-				const squaredDistance = vector.absSquared()
-				if (squaredDistance > prevVal.dist) return prevVal
-				else
-					return {
-						dist: squaredDistance,
-						vector: vector,
-						movingSnapPoint: movSnapPoint,
-						fixedSnapPoint: gridPoint,
-					}
+				return this.reduceSinglePointPair(movSnapPoint, gridPoint, prevVal, maxSnapDistance2)
 			},
-			{ dist: Number.MAX_VALUE }
+			{ dist: Number.MAX_VALUE, snapPoints: [] }
 		)
 
 		// 2. calculate bounds where a closer point could lie
@@ -210,26 +194,37 @@ export class SnapController {
 		)
 
 		// 4. snap to non grid points
-		if (filteredFixSnapPoints.length > 0)
+		if (filteredFixSnapPoints.length > 0) {
 			distStruct = this.getSnapDistStruct(movingSnapPoints, filteredFixSnapPoints, distStruct)
-
-		// 5. Calculate snapped point using vector
-		if (distStruct.dist > maxSnapDistance * maxSnapDistance) {
-			// only snap if the snap distance is not too long
-			distStruct.vector = new SVG.Point(0, 0)
 		}
 
-		if (distStruct.fixedSnapPoint && this.whereSnap) {
-			if (distStruct.dist > maxSnapDistance * maxSnapDistance) {
-				this.whereSnap.hide()
-				this.whereSnap.center(pos.x, pos.y)
-			} else {
-				this.whereSnap.show()
-				this.whereSnap.center(distStruct.fixedSnapPoint.x, distStruct.fixedSnapPoint.y)
-			}
+		// 5. Calculate snapped point using vector
+		if (distStruct.snapPoints.length == 0) {
+			distStruct.vector = new SVG.Point()
+		} else {
+			this.positionSnapPoints(distStruct.snapPoints)
 		}
 
 		return distStruct.vector.add(pos)
+	}
+
+	private positionSnapPoints(positions: SVG.Point[]) {
+		while (positions.length < this.whereSnap.length) {
+			this.whereSnap.pop().remove()
+		}
+		while (positions.length > this.whereSnap.length) {
+			this.whereSnap.push(
+				CanvasController.instance.canvas.circle(4).fill("none").stroke({
+					color: "var(--bs-yellow)",
+				})
+			)
+		}
+
+		for (let index = 0; index < positions.length; index++) {
+			const position = positions[index]
+			const snap = this.whereSnap[index]
+			snap.center(position.x, position.y)
+		}
 	}
 
 	/**
@@ -240,24 +235,43 @@ export class SnapController {
 	private getSnapDistStruct(
 		movingSnapPoints: SVG.Point[],
 		fixedSnapPoints: SVG.Point[],
-		initialDistStruct?: DistStruct
+		initialDistStruct?: DistStruct,
+		maxSnapDistance2?: number
 	): DistStruct {
-		if (!initialDistStruct) initialDistStruct = { dist: Number.MAX_VALUE, vector: null }
+		if (!initialDistStruct) initialDistStruct = { dist: Number.MAX_VALUE, snapPoints: [] }
+		if (!maxSnapDistance2) {
+			maxSnapDistance2 = Number.MAX_VALUE
+		}
 		return movingSnapPoints.reduce(
 			(prevVal: DistStruct, movSnapPoint): DistStruct =>
 				fixedSnapPoints.reduce((prevVal: DistStruct, fixSnapPoint: SVG.Point): DistStruct => {
-					const vector = fixSnapPoint.sub(movSnapPoint)
-					const squaredDistance = vector.absSquared()
-					if (squaredDistance > prevVal.dist) return prevVal
-					else
-						return {
-							dist: squaredDistance,
-							vector: vector,
-							movingSnapPoint: movSnapPoint,
-							fixedSnapPoint: fixSnapPoint,
-						}
+					return this.reduceSinglePointPair(movSnapPoint, fixSnapPoint, prevVal, maxSnapDistance2)
 				}, prevVal),
 			initialDistStruct
 		)
+	}
+
+	private reduceSinglePointPair(
+		movingSnapPoint: SVG.Point,
+		fixedSnapPoint: SVG.Point,
+		previousDist: DistStruct,
+		maxSnapDistance2: number
+	): DistStruct {
+		const vector = fixedSnapPoint.sub(movingSnapPoint)
+		// check if the already established move vector makes the current point pair intersect, i.e. the vectors are the same
+		if (previousDist.vector?.eq(vector)) {
+			//if so, we are done and add the point to the array
+			previousDist.snapPoints.push(fixedSnapPoint)
+			return previousDist
+		}
+		const squaredDistance = vector.absSquared()
+		if (squaredDistance > previousDist.dist || squaredDistance > maxSnapDistance2) {
+			return previousDist
+		}
+
+		previousDist.dist = squaredDistance
+		previousDist.vector = vector
+		previousDist.snapPoints = [fixedSnapPoint]
+		return previousDist
 	}
 }
