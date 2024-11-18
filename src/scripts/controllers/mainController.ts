@@ -752,7 +752,13 @@ export class MainController {
 
 				let svgIcon = SVG.SVG().addTo(addButton)
 				if (symbol.viewBox) {
-					svgIcon.viewbox(symbol.viewBox).width(symbol.viewBox.width).height(symbol.viewBox.height)
+					let viewBox = new SVG.Box(symbol.viewBox)
+					viewBox.width += symbol.maxStroke
+					viewBox.height += symbol.maxStroke
+					viewBox.x -= symbol.maxStroke / 2
+					viewBox.y -= symbol.maxStroke / 2
+
+					svgIcon.viewbox(viewBox).width(viewBox.width).height(viewBox.height)
 				}
 				svgIcon.use(symbol.id()).stroke(defaultStroke).fill(defaultFill).node.style.color = defaultStroke
 			}

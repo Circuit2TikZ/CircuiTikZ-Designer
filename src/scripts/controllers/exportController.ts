@@ -152,7 +152,7 @@ export class ExportController {
 		MainController.instance.updateTheme()
 
 		//Get the canvas
-		let svgObj = CanvasController.instance.canvas.clone(true, false) //document.getElementById("canvas").cloneNode(true) as SVGSVGElement
+		let svgObj = CanvasController.instance.canvas.clone(true, false)
 
 		svgObj.node.removeAttribute("xmlns:svgjs")
 		svgObj.node.removeAttribute("class")
@@ -169,6 +169,7 @@ export class ExportController {
 		svgObj.node.removeChild(svgObj.node.getElementById("selectionRectangle"))
 
 		svgObj.node.removeChild(svgObj.node.getElementById("snapCursorUse"))
+		//TODO delete unused marker definitions
 
 		// delete path points for moving paths around
 		for (const element of svgObj.node.querySelectorAll(".draggable.pathPoint")) {
