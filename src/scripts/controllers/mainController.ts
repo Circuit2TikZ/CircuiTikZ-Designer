@@ -25,6 +25,8 @@ import {
 	EraseController,
 	RectangleComponent,
 	EllipseComponent,
+	defaultStroke,
+	defaultFill,
 } from "../internal"
 
 type SaveState = {
@@ -194,7 +196,7 @@ export class MainController {
 
 			// prepare symbolDB for colorTheme
 			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
-				this.addFill(g)
+				this.preprocessSymbolColors(g)
 			}
 
 			const htmlElement = document.documentElement
@@ -606,7 +608,7 @@ export class MainController {
 			let svgIcon = SVG.SVG().addTo(addButton)
 			svgIcon.viewbox(0, 0, 17, 12)
 			svgIcon.rect(15, 10).move(1, 1).fill("none").stroke({
-				color: "var(--bs-emphasis-color)",
+				color: defaultStroke,
 				width: 1,
 			})
 		}
@@ -638,7 +640,7 @@ export class MainController {
 			let svgIcon = SVG.SVG().addTo(addButton)
 			svgIcon.viewbox(0, 0, 17, 12)
 			svgIcon.ellipse(15, 10).move(1, 1).fill("none").stroke({
-				color: "var(--bs-emphasis-color)",
+				color: defaultStroke,
 				width: 1,
 			})
 		}
@@ -752,7 +754,7 @@ export class MainController {
 				if (symbol.viewBox) {
 					svgIcon.viewbox(symbol.viewBox).width(symbol.viewBox.width).height(symbol.viewBox.height)
 				}
-				svgIcon.use(symbol.id())
+				svgIcon.use(symbol.id()).stroke(defaultStroke).fill(defaultFill).node.style.color = defaultStroke
 			}
 		}
 	}
@@ -873,34 +875,10 @@ export class MainController {
 		if (this.darkModeLast == this.darkMode) {
 			return
 		}
-		const light = "#fff"
-		const dark = "#000"
-		const node = this.symbolsSVG.defs().node
-
-		// toggle stroke and fill for each element if the attribute exists on this element
-		for (const g of node.querySelectorAll("g,path,use")) {
-			let currentStroke = g.getAttribute("stroke")
-			if (currentStroke && !(currentStroke === "none" || currentStroke === "transparent")) {
-				if (currentStroke === light) {
-					g.setAttribute("stroke", dark)
-				} else if (currentStroke === dark) {
-					g.setAttribute("stroke", light)
-				}
-			}
-			let currentFill = g.getAttribute("fill")
-			if (currentFill && !(currentFill === "none" || currentFill === "transparent")) {
-				if (currentFill === light) {
-					g.setAttribute("fill", dark)
-				} else if (currentFill === dark) {
-					g.setAttribute("fill", light)
-				}
-			}
-		}
 
 		for (const instance of this.circuitComponents) {
 			instance.updateTheme()
 		}
-		SelectionController.instance.updateTheme()
 
 		this.darkModeLast = this.darkMode
 	}
@@ -910,6 +888,39 @@ export class MainController {
 	 * called once on initialization
 	 * @param {Element} node
 	 */
+	private preprocessSymbolColors(node: Element) {
+		let elementsWithFill = node.querySelectorAll("[fill]")
+		let elementsWithStroke = node.querySelectorAll("[stroke]")
+
+		//this group
+		let currentFill = node.getAttribute("fill")
+		if (currentFill == "#fff") {
+			node.setAttribute("fill", "currentFill")
+		}
+		let currentStroke = node.getAttribute("stroke")
+		if (currentStroke == "#000") {
+			node.setAttribute("stroke", "currentStroke")
+		}
+
+		for (const element of elementsWithFill) {
+			let currentFill = element.getAttribute("fill")
+
+			if (currentFill == "#fff") {
+				element.setAttribute("fill", "currentFill")
+			}
+		}
+
+		for (const element of elementsWithStroke) {
+			let currentStroke = element.getAttribute("stroke")
+
+			if (currentStroke == "#000") {
+				element.setAttribute("stroke", "currentStroke")
+			}
+		}
+
+		this.addFill(node)
+	}
+
 	private addFill(node: Element) {
 		let hasFill = node.getAttribute("fill") !== null
 		if (hasFill) {
@@ -920,7 +931,7 @@ export class MainController {
 				this.addFill(element)
 			} else {
 				if (!element.getAttribute("fill")) {
-					element.setAttribute("fill", "#000")
+					element.setAttribute("fill", "currentColor")
 				}
 			}
 		}

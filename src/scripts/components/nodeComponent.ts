@@ -19,7 +19,7 @@ import {
 	SnappingInfo,
 	SnapPoint,
 } from "../internal"
-import { referenceColor, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
+import { roundTikz, selectedBoxWidth } from "../utils/selectionHelper"
 
 export type NodeSaveObject = CircuitikzSaveObject & {
 	position: { x: number; y: number }
@@ -33,8 +33,6 @@ export class NodeComponent extends CircuitikzComponent {
 	public anchorChoice: ChoiceProperty<DirectionInfo>
 	public positionChoice: ChoiceProperty<DirectionInfo>
 
-	private symbolBBox: SVG.Box
-
 	public flipStateX: boolean
 	public flipStateY: boolean
 
@@ -42,10 +40,9 @@ export class NodeComponent extends CircuitikzComponent {
 		super(symbol)
 		this.position = new SVG.Point()
 		this.relPosition = symbol.relMid
-		this.symbolUse = CanvasController.instance.canvas.use(symbol)
 		this.visualization = CanvasController.instance.canvas.group()
 		this.visualization.add(this.symbolUse)
-		this.symbolBBox = this.symbolUse.bbox()
+
 		this.rotationDeg = 0
 
 		{
@@ -81,6 +78,8 @@ export class NodeComponent extends CircuitikzComponent {
 		this.snappingPoints = symbol._pins.map(
 			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))
 		)
+
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
@@ -124,7 +123,7 @@ export class NodeComponent extends CircuitikzComponent {
 		}
 		let m = this.getTransformMatrix()
 		this.symbolUse.transform(m)
-		this._bbox = this.symbolUse.bbox().transform(m)
+		this._bbox = this.symbolBBox.transform(m)
 
 		this.updateLabelPosition()
 
@@ -135,10 +134,23 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	protected recalculateSelectionVisuals(): void {
-		if (this.selectionElement) {
+		if (this.selectionElement.visible()) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.symbolBBox
-			this.selectionElement.size(bbox.w, bbox.h).transform(this.getTransformMatrix())
+			let maxStroke = this.referenceSymbol.maxStroke
+
+			this.selectionElement
+				.size(bbox.w + maxStroke + selectedBoxWidth, bbox.h + maxStroke + selectedBoxWidth)
+				.transform(
+					this.getTransformMatrix().multiply(
+						new SVG.Matrix({
+							translate: [
+								bbox.x - (selectedBoxWidth + maxStroke) / 2,
+								bbox.y - (selectedBoxWidth + maxStroke) / 2,
+							],
+						})
+					)
+				)
 		}
 	}
 
@@ -184,24 +196,6 @@ export class NodeComponent extends CircuitikzComponent {
 		this.update()
 	}
 
-	public viewSelected(show: boolean): void {
-		if (show) {
-			this.selectionElement?.remove()
-			this.selectionElement = CanvasController.instance.canvas.rect(0, 0)
-			this.selectionElement.attr({
-				"stroke-width": selectedBoxWidth,
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-				"stroke-dasharray": "3,3",
-				fill: "none",
-			})
-			this.visualization.stroke("#f00")
-			this.recalculateSelectionVisuals()
-		} else {
-			this.selectionElement?.remove()
-			this.visualization.stroke("#000")
-			this.selectionElement = null
-		}
-	}
 	public toJson(): NodeSaveObject {
 		let data: NodeSaveObject = {
 			type: "node",

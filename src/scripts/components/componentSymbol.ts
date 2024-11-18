@@ -1,6 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { ensureInPx } from "../utils/impSVGNumber"
 import { getNamedTag, getNamedTags } from "../utils/xmlHelper"
+import { CanvasController } from "../internal"
 
 const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
 
@@ -26,6 +27,7 @@ type SymbolBaseInformation = {
 	groupName?: string
 	mid: SVG.Point
 	viewBox?: SVG.Box
+	maxStroke?: number
 }
 
 /**
@@ -66,6 +68,8 @@ export class ComponentSymbol extends SVG.Symbol {
 	_textPosition: TikZAnchor | null = null
 	_defaultAnchor: TikZAnchor | null = null
 
+	maxStroke: number = 0
+
 	/**
 	 * Creates a new symbol from a `SVGSymbolElement`.
 	 *
@@ -89,6 +93,7 @@ export class ComponentSymbol extends SVG.Symbol {
 		this.groupName = baseInformation.groupName
 		this.relMid = baseInformation.mid
 		this.viewBox = baseInformation.viewBox
+		this.maxStroke = baseInformation.maxStroke
 
 		// parse additional options (key, value or just key)
 		let tikzOptions =
@@ -146,6 +151,24 @@ export class ComponentSymbol extends SVG.Symbol {
 		const shapeName = componentInformation?.getAttribute("shapeName") ?? null
 		const groupName = componentInformation?.getAttribute("groupName") ?? null
 
+		let maxStroke = 0
+		if (symbolElement.id) {
+			// udpate the bbox for a tighter fit
+			symbolElement.querySelectorAll("[stroke-width]").forEach((item) => {
+				let strokeWidth = Number.parseFloat(item.getAttribute("stroke-width"))
+				maxStroke = strokeWidth > maxStroke ? strokeWidth : maxStroke
+			})
+
+			let use = CanvasController.instance.canvas.use(symbolElement.id)
+			let usenode = use.node as SVGGraphicsElement
+			const domrect = usenode.getBBox({ stroke: true })
+			use.remove()
+
+			let box = new SVG.Box(domrect.x, domrect.y, domrect.width, domrect.height)
+
+			componentInformation.setAttribute("viewBox", box.toString())
+		}
+
 		const mid: SVG.Point = new SVG.Point(
 			ensureInPx(componentInformation?.getAttribute("refX") || 0),
 			ensureInPx(componentInformation?.getAttribute("refY") || 0)
@@ -168,6 +191,7 @@ export class ComponentSymbol extends SVG.Symbol {
 			groupName: groupName,
 			mid: mid,
 			viewBox: viewBox,
+			maxStroke: maxStroke,
 		}
 	}
 

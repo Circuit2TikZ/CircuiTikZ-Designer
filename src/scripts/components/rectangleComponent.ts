@@ -9,6 +9,7 @@ import {
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
+	defaultStroke,
 	defaultStrokeStyleChoice,
 	DirectionInfo,
 	ExportController,
@@ -18,7 +19,6 @@ import {
 	getClosestPointerFromDirection,
 	PositionedLabel,
 	SectionHeaderProperty,
-	SelectionController,
 	ShapeComponent,
 	ShapeSaveObject,
 	SliderProperty,
@@ -29,7 +29,7 @@ import {
 	TextAlign,
 	TextAreaProperty,
 } from "../internal"
-import { referenceColor, resizeSVG, roundTikz, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
+import { resizeSVG, roundTikz } from "../utils/selectionHelper"
 
 export type RectangleSaveObject = ShapeSaveObject & {
 	position: SVG.Point
@@ -109,6 +109,8 @@ export class RectangleComponent extends ShapeComponent {
 		this.textDiv.appendChild(textSpan)
 		this.textForeign.node.appendChild(this.textDiv)
 		this.visualization.add(this.textForeign)
+
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
@@ -227,26 +229,6 @@ export class RectangleComponent extends ShapeComponent {
 		this.updateText()
 	}
 
-	public viewSelected(show: boolean): void {
-		if (show) {
-			if (!this.selectionElement) {
-				this.selectionElement = CanvasController.instance.canvas.rect(0, 0)
-				this.selectionElement.stroke({
-					width: selectedBoxWidth.convertToUnit("px").value,
-					dasharray: "3,3",
-				})
-				this.selectionElement.fill("none")
-			}
-			this.selectionElement.attr({
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-			})
-			this.recalculateSelectionVisuals()
-		} else {
-			this.selectionElement?.remove()
-			this.selectionElement = null
-		}
-		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
-	}
 	public toJson(): RectangleSaveObject {
 		let data: RectangleSaveObject = {
 			type: "rect",
@@ -633,7 +615,7 @@ export class RectangleComponent extends ShapeComponent {
 
 		let text = this.textAreaProperty.value.text
 
-		let textColor = "var(--bs-emphasis-color)"
+		let textColor = defaultStroke
 		if (this.textColor.value) {
 			textColor = this.textColor.value.toString()
 		}

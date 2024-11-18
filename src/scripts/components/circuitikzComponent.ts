@@ -1,8 +1,11 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
+	CanvasController,
 	CircuitComponent,
 	ComponentSaveObject,
 	ComponentSymbol,
+	defaultFill,
+	defaultStroke,
 	InfoProperty,
 	SectionHeaderProperty,
 } from "../internal"
@@ -25,6 +28,9 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 	 */
 	protected symbolUse: SVG.Use
 
+	//the untransformed bounding box of the symbol use
+	protected symbolBBox: SVG.Box
+
 	/**
 	 * The reference to the symbol library component. Has metadata of the symbol
 	 * @param symbol which static symbol from the symbols.svg library to use
@@ -33,6 +39,11 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		super()
 		this.displayName = symbol.displayName
 		this.referenceSymbol = symbol
+		this.symbolUse = CanvasController.instance.canvas.use(symbol)
+		this.symbolUse.fill(defaultFill)
+		this.symbolUse.stroke(defaultStroke)
+		this.symbolUse.node.style.color = defaultStroke
+		this.symbolBBox = this.referenceSymbol.viewBox
 	}
 
 	protected addInfo() {

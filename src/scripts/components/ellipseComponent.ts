@@ -12,14 +12,13 @@ import {
 	FillInfo,
 	getClosestPointerFromDirection,
 	PositionedLabel,
-	SelectionController,
 	ShapeComponent,
 	ShapeSaveObject,
 	SnapPoint,
 	StrokeInfo,
 	strokeStyleChoices,
 } from "../internal"
-import { referenceColor, resizeSVG, selectedBoxWidth, selectionColor, roundTikz } from "../utils/selectionHelper"
+import { resizeSVG, roundTikz } from "../utils/selectionHelper"
 
 export type EllipseSaveObject = ShapeSaveObject & {
 	position: SVG.Point
@@ -51,6 +50,8 @@ export class EllipseComponent extends ShapeComponent {
 		this.visualization.add(this.shapeVisualization)
 
 		this.visualization.add(this.dragElement)
+
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
@@ -167,26 +168,6 @@ export class EllipseComponent extends ShapeComponent {
 		}
 	}
 
-	public viewSelected(show: boolean): void {
-		if (show) {
-			if (!this.selectionElement) {
-				this.selectionElement = CanvasController.instance.canvas.ellipse()
-				this.selectionElement.stroke({
-					width: selectedBoxWidth.convertToUnit("px").value,
-					dasharray: "3,3",
-				})
-				this.selectionElement.fill("none")
-			}
-			this.selectionElement.attr({
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-			})
-			this.recalculateSelectionVisuals()
-		} else {
-			this.selectionElement?.remove()
-			this.selectionElement = null
-		}
-		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
-	}
 	public toJson(): EllipseSaveObject {
 		let data: EllipseSaveObject = {
 			type: "ellipse",

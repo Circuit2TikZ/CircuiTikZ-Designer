@@ -7,6 +7,7 @@ import {
 	ColorProperty,
 	ComponentSaveObject,
 	dashArrayToPattern,
+	defaultStroke,
 	defaultStrokeStyleChoice,
 	MainController,
 	SectionHeaderProperty,
@@ -20,15 +21,7 @@ import {
 	strokeStyleChoices,
 } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers"
-import {
-	lineRectIntersection,
-	pointInsideRect,
-	referenceColor,
-	resizeSVG,
-	selectedBoxWidth,
-	selectionColor,
-	selectionSize,
-} from "../utils/selectionHelper"
+import { lineRectIntersection, pointInsideRect, resizeSVG, selectionSize } from "../utils/selectionHelper"
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -193,6 +186,8 @@ export class WireComponent extends CircuitComponent {
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
 
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
+
 		this.updateTheme()
 	}
 
@@ -214,7 +209,7 @@ export class WireComponent extends CircuitComponent {
 	public updateTheme(): void {
 		let strokeColor = this.strokeInfo.color
 		if (strokeColor == "default") {
-			strokeColor = "var(--bs-emphasis-color)"
+			strokeColor = defaultStroke
 		}
 
 		this.wire.stroke({
@@ -498,23 +493,7 @@ export class WireComponent extends CircuitComponent {
 	}
 
 	public viewSelected(show: boolean): void {
-		if (show) {
-			if (!this.selectionElement) {
-				this.selectionElement = CanvasController.instance.canvas.rect()
-				this.selectionElement.stroke({
-					width: selectedBoxWidth.convertToUnit("px").value,
-					dasharray: "3,3",
-				})
-				this.selectionElement.fill("none")
-			}
-			this.selectionElement.attr({
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-			})
-			this.recalculateSelectionVisuals()
-		} else {
-			this.selectionElement?.remove()
-			this.selectionElement = null
-		}
+		super.viewSelected(show)
 		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 

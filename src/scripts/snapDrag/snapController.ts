@@ -259,7 +259,7 @@ export class SnapController {
 	): DistStruct {
 		const vector = fixedSnapPoint.sub(movingSnapPoint)
 		// check if the already established move vector makes the current point pair intersect, i.e. the vectors are the same
-		if (previousDist.vector?.eq(vector)) {
+		if (previousDist.vector?.eq(vector, 1e-2)) {
 			//if so, we are done and add the point to the array
 			previousDist.snapPoints.push(fixedSnapPoint)
 			return previousDist

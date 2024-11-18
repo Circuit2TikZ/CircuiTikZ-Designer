@@ -17,8 +17,8 @@ import {
 	MathJaxProperty,
 	SliderProperty,
 	SectionHeaderProperty,
-	SelectionController,
 	ColorProperty,
+	defaultStroke,
 } from "../internal"
 import {
 	lineRectIntersection,
@@ -52,9 +52,6 @@ export class PathComponent extends CircuitikzComponent {
 	private posStart: SVG.Point
 	private posEnd: SVG.Point
 
-	//the untransformed bounding box of the symbol use
-	private symbolBBox: SVG.Box
-
 	private startLine: SVG.Line
 	private endLine: SVG.Line
 	private dragStartLine: SVG.Line
@@ -76,35 +73,26 @@ export class PathComponent extends CircuitikzComponent {
 		super(symbol)
 		SnapCursorController.instance.visible = true
 
-		let startPinIndex = this.referenceSymbol._pins.findIndex((value) => value.name === "START")
-		let endPinIndex = this.referenceSymbol._pins.findIndex((value) => value.name === "END")
+		let startPinIndex = symbol._pins.findIndex((value) => value.name === "START")
+		let endPinIndex = symbol._pins.findIndex((value) => value.name === "END")
 
-		this.relSymbolStart = this.referenceSymbol._pins.at(startPinIndex).point
-		this.relSymbolEnd = this.referenceSymbol._pins.at(endPinIndex).point
+		this.relSymbolStart = symbol._pins.at(startPinIndex).point
+		this.relSymbolEnd = symbol._pins.at(endPinIndex).point
 
 		this.visualization = CanvasController.instance.canvas.group()
 
-		let lineAttr = {
-			fill: "none",
-			stroke: MainController.instance.darkMode ? "#fff" : "#000",
-			"stroke-width": "0.4pt",
-		}
-		this.startLine = CanvasController.instance.canvas.line()
-		this.startLine.attr(lineAttr)
-		this.endLine = CanvasController.instance.canvas.line()
-		this.endLine.attr(lineAttr)
+		this.startLine = CanvasController.instance.canvas
+			.line()
+			.fill("none")
+			.stroke({ color: defaultStroke, width: 0.5 })
+		this.endLine = this.startLine.clone(true)
 
 		this.dragStartLine = CanvasController.instance.canvas
 			.line()
 			.fill("none")
 			.stroke({ width: selectionSize, color: "transparent" })
-		this.dragEndLine = CanvasController.instance.canvas
-			.line()
-			.fill("none")
-			.stroke({ width: selectionSize, color: "transparent" })
+		this.dragEndLine = this.dragStartLine.clone(true)
 
-		this.symbolUse = CanvasController.instance.canvas.use(this.referenceSymbol)
-		this.symbolBBox = this.symbolUse.bbox()
 		this.visualization.add(this.symbolUse)
 		this.visualization.add(this.startLine)
 		this.visualization.add(this.endLine)
@@ -161,14 +149,8 @@ export class PathComponent extends CircuitikzComponent {
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
 				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))),
 		]
-	}
 
-	public updateTheme(): void {
-		super.updateTheme()
-		if (!this.isSelected) {
-			this.startLine.stroke(MainController.instance.darkMode ? "#fff" : "#000")
-			this.endLine.stroke(MainController.instance.darkMode ? "#fff" : "#000")
-		}
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public moveTo(position: SVG.Point): void {
@@ -203,7 +185,7 @@ export class PathComponent extends CircuitikzComponent {
 			this.posStart = newPos2
 			this.posEnd = newPos1
 		}
-		this.mirror.updateValue(!this.mirror.value)
+		this.mirror.updateValue(!this.mirror.value, true)
 
 		this.update()
 	}
@@ -241,6 +223,12 @@ export class PathComponent extends CircuitikzComponent {
 		let startEnd = this.relSymbolStart.add(this.referenceSymbol.relMid).transform(m)
 		let endStart = this.relSymbolEnd.add(this.referenceSymbol.relMid).transform(m)
 
+		if (this.invert.value) {
+			let switchPos = startEnd
+			startEnd = endStart
+			endStart = switchPos
+		}
+
 		this.recalculateResizePoints()
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
@@ -254,43 +242,27 @@ export class PathComponent extends CircuitikzComponent {
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 	}
+
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.symbolBBox
-			this.selectionElement.size(bbox.w, bbox.h).transform(this.getTransformMatrix())
+			this.selectionElement
+				.size(bbox.w + selectedBoxWidth, bbox.h + selectedBoxWidth)
+				.transform(this.getTransformMatrix())
 		}
 	}
-	public viewSelected(show: boolean): void {
-		if (show) {
-			this.selectionElement?.remove()
-			this.selectionElement = CanvasController.instance.canvas.rect(0, 0)
-			this.recalculateSelectionVisuals()
 
-			this.selectionElement.attr({
-				"stroke-width": selectedBoxWidth,
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-				"stroke-dasharray": "3,3",
-				fill: "none",
-			})
+	public viewSelected(show: boolean): void {
+		super.viewSelected(show)
+		if (show) {
 			// also paint the lines leading to the symbol
-			this.startLine.attr({
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-			})
-			this.endLine.attr({
-				stroke: this.isSelectionReference ? referenceColor : selectionColor,
-			})
+			this.startLine.stroke(this.isSelectionReference ? referenceColor : selectionColor)
+			this.endLine.stroke(this.isSelectionReference ? referenceColor : selectionColor)
 		} else {
-			this.selectionElement?.remove()
-			this.selectionElement = null
-			this.startLine.attr({
-				stroke: MainController.instance.darkMode ? "#fff" : "#000",
-			})
-			this.endLine.attr({
-				stroke: MainController.instance.darkMode ? "#fff" : "#000",
-			})
+			this.startLine.stroke(defaultStroke)
+			this.endLine.stroke(defaultStroke)
 		}
-		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 
 	public getTransformMatrix(): SVG.Matrix {

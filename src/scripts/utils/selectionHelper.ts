@@ -1,7 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { CanvasController } from "../internal"
 
-export const selectedBoxWidth = new SVG.Number("0.6pt")
+export const selectedBoxWidth = 0.5
 export const selectionColor = "var(--bs-red)"
 export const referenceColor = "var(--bs-teal)"
 

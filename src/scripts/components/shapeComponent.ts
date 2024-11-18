@@ -7,7 +7,6 @@ import {
 	DirectionInfo,
 	PositionedLabel,
 	SliderProperty,
-	TextProperty,
 	CanvasController,
 	SectionHeaderProperty,
 	MathJaxProperty,
@@ -18,6 +17,8 @@ import {
 	ChoiceEntry,
 	SnapCursorController,
 	AdjustDragHandler,
+	defaultStroke,
+	SelectionController,
 } from "../internal"
 import { selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -269,7 +270,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
-			let lineWidth = selectedBoxWidth.convertToUnit("px").value
+			let lineWidth = selectedBoxWidth
 
 			this.selectionElement
 				.size(this.size.x + lineWidth, this.size.y + lineWidth)
@@ -281,7 +282,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 	public updateTheme(): void {
 		let strokeColor = this.strokeInfo.color
 		if (strokeColor == "default") {
-			strokeColor = "var(--bs-emphasis-color)"
+			strokeColor = defaultStroke
 		}
 
 		let fillColor = this.fillInfo.color
@@ -302,7 +303,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 			opacity: this.fillInfo.opacity,
 		})
 
-		let labelColor = "var(--bs-emphasis-color)"
+		let labelColor = defaultStroke
 		if (this.labelColor.value) {
 			labelColor = this.labelColor.value.toString()
 		}
@@ -328,6 +329,11 @@ export abstract class ShapeComponent extends CircuitComponent {
 			trackedSnappingPoints: this.snappingPoints,
 			additionalSnappingPoints: [],
 		}
+	}
+
+	public viewSelected(show: boolean): void {
+		super.viewSelected(show)
+		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 
 	public draggable(drag: boolean): void {

@@ -1,5 +1,12 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { MainController, PropertyController, CanvasController, CircuitComponent, Undo } from "../internal"
+import {
+	MainController,
+	PropertyController,
+	CanvasController,
+	CircuitComponent,
+	Undo,
+	defaultStroke,
+} from "../internal"
 
 export enum SelectionMode {
 	RESET,
@@ -36,10 +43,13 @@ export class SelectionController {
 	private constructor() {
 		this.selectionStartPosition = new SVG.Point()
 		this.selectionRectangle = CanvasController.instance.canvas.rect(0, 0).move(0, 0)
-		this.selectionRectangle.attr("stroke-width", "0.5pt")
-		this.selectionRectangle.attr("stroke", "black")
-		this.selectionRectangle.attr("fill", "none")
-		this.selectionRectangle.attr("id", "selectionRectangle")
+		this.selectionRectangle
+			.stroke({
+				width: 0.5,
+				color: defaultStroke,
+			})
+			.fill("none")
+			.id("selectionRectangle")
 		this.selectionEnabled = true
 		this.currentlyDragging = false
 		this.selectionMode = SelectionMode.RESET
@@ -162,10 +172,6 @@ export class SelectionController {
 			SelectionController._instance = new SelectionController()
 		}
 		return SelectionController._instance
-	}
-
-	public updateTheme() {
-		this.selectionRectangle.stroke(MainController.instance.darkMode ? "#fff" : "#000")
 	}
 
 	private updateSelectionWithRectangle() {

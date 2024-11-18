@@ -14,7 +14,7 @@ import {
 	SectionHeaderProperty,
 	TextProperty,
 } from "../internal"
-import { rectRectIntersection } from "../utils/selectionHelper"
+import { rectRectIntersection, referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
 
 /**
  * names cannot contain punctuation, parentheses and some other symbols
@@ -75,6 +75,9 @@ export function getClosestPointerFromDirection(direction: SVG.Point): string {
 	})
 	return minPointer
 }
+
+export const defaultStroke = "var(--bs-emphasis-color)"
+export const defaultFill = "var(--bs-body-bg)"
 
 /**
  * Every component in the circuit should be deriving from this class.
@@ -303,7 +306,22 @@ export abstract class CircuitComponent {
 	 * Show or hide the selection visualization of the component. This has to be distinct from the actual selection state due to how the selection controller works
 	 * @param show if the component should appear selected or not
 	 */
-	public abstract viewSelected(show: boolean): void
+	public viewSelected(show: boolean): void {
+		if (show) {
+			CanvasController.instance.canvas.put(this.selectionElement)
+			this.selectionElement.show()
+			this.selectionElement
+				.stroke({
+					width: selectedBoxWidth,
+					color: this.isSelectionReference ? referenceColor : selectionColor,
+					dasharray: "4, 2",
+				})
+				.fill("none")
+			this.recalculateSelectionVisuals()
+		} else {
+			this.selectionElement.hide()
+		}
+	}
 
 	protected isSelectionReference = false
 	public setAsSelectionReference(): void {
@@ -329,7 +347,7 @@ export abstract class CircuitComponent {
 	 * update the visuals to comply with dark/light mode
 	 */
 	public updateTheme() {
-		let labelColor = "var(--bs-emphasis-color)"
+		let labelColor = defaultStroke
 		if (this.labelColor.value) {
 			labelColor = this.labelColor.value.toString()
 		}

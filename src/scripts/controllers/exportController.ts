@@ -1,6 +1,12 @@
-import * as SVG from "@svgdotjs/svg.js"
 import { Modal, Tooltip } from "bootstrap"
-import { SelectionController, MainController, CircuitikzComponent, CanvasController } from "../internal"
+import {
+	SelectionController,
+	MainController,
+	CircuitikzComponent,
+	CanvasController,
+	defaultStroke,
+	defaultFill,
+} from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
 const parserXML = require("@prettier/plugin-xml").default
@@ -168,19 +174,13 @@ export class ExportController {
 		for (const element of svgObj.node.querySelectorAll(".draggable.pathPoint")) {
 			element.remove()
 		}
+		for (const element of svgObj.node.querySelectorAll("line.draggable")) {
+			element.remove()
+		}
 
 		// delete path points for moving paths around
 		for (const element of svgObj.node.querySelectorAll("use")) {
 			element.removeAttribute("class")
-		}
-
-		for (const elementGroup of svgObj.find("g") as SVG.List<SVG.G>) {
-			if (elementGroup.node.getAttribute("stroke") == "currentColor") {
-				elementGroup.node.removeAttribute("stroke")
-			}
-			if (elementGroup.node.getAttribute("fill") == "currentColor") {
-				elementGroup.node.removeAttribute("fill")
-			}
 		}
 
 		// change bounding box to include all elements
@@ -233,6 +233,7 @@ export class ExportController {
 		// convert to text and make pretty
 		let tempDiv = document.createElement("div")
 		tempDiv.appendChild(svgObj.node)
+		tempDiv.innerHTML = tempDiv.innerHTML.replaceAll(defaultStroke, "#000").replaceAll(defaultFill, "#fff")
 		prettier
 			.format(tempDiv.innerHTML.replaceAll("<br>", "<br/>"), {
 				parser: "xml",
