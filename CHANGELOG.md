@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0]
+
+### Added
+
+- Rectangle(square) and Ellipse(circle) components
+- Text via the rectangle component
+- New shortcut: T for placing rectangles/text
+- Label coloring
+- Label positioning:
+    - Gap to the component for adjusting the distance
+    - Choosing the side for path components
+    - Choose anchor and position for other components
+- Aligning and distributing components
+- Wires now moveable
+- Wire points can be edited
+- Can add basic arrows to wire endpoints
+- More z-order control (move forward or backward)
+- Can now also rotate and flip components on mobile via buttons in the properties window
+- Color fill for rectangle and ellipse components
+- Stroke options for wires, rectangle and ellipse components
+- Better snapping visualizations
+
+### Changed
+
+- The titlebar now shows actions only if the device has enough available space, otherwise collapses them into a toggle menu
+- Path component adjustment points now look the same as other adjustment points
+- Page layout on mobile
+
+### Fixed
+
+- Mobile controls. Can now use mobile with slightly reduces functionality
+- Selection visualisation/bounding boxes now more consistent
+- Many small bugfixes
+
 ## [0.4.2]
 
 ### Fixed
