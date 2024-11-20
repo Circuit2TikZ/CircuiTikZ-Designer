@@ -109,8 +109,6 @@ export class RectangleComponent extends ShapeComponent {
 		this.textDiv.appendChild(textSpan)
 		this.textForeign.node.appendChild(this.textDiv)
 		this.visualization.add(this.textForeign)
-
-		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {

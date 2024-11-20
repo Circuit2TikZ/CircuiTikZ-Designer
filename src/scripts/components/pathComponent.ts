@@ -149,8 +149,6 @@ export class PathComponent extends CircuitikzComponent {
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
 				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))),
 		]
-
-		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public moveTo(position: SVG.Point): void {

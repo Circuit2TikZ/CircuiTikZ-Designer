@@ -50,8 +50,6 @@ export class EllipseComponent extends ShapeComponent {
 		this.visualization.add(this.shapeVisualization)
 
 		this.visualization.add(this.dragElement)
-
-		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {

@@ -6,6 +6,8 @@ import {
 	CanvasController,
 	defaultStroke,
 	defaultFill,
+	WireComponent,
+	defaultArrowTip,
 } from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
@@ -157,29 +159,24 @@ export class ExportController {
 		svgObj.node.removeAttribute("xmlns:svgjs")
 		svgObj.node.removeAttribute("class")
 		svgObj.node.removeAttribute("id")
+
 		//remove not needed parts
-		let defs: HTMLElement = svgObj.node.children[0] as HTMLElement
-		defs.removeChild(svgObj.node.getElementById("smallGridPattern"))
-		defs.removeChild(svgObj.node.getElementById("gridPattern"))
-		defs.removeChild(svgObj.node.getElementById("snapCursor"))
+		let defs: HTMLElement = svgObj.node.getElementById("backgroundDefs") as HTMLElement
+		defs.innerHTML = ""
 
 		svgObj.node.removeChild(svgObj.node.getElementById("grid"))
 		svgObj.node.removeChild(svgObj.node.getElementById("xAxis"))
 		svgObj.node.removeChild(svgObj.node.getElementById("yAxis"))
 		svgObj.node.removeChild(svgObj.node.getElementById("selectionRectangle"))
-
 		svgObj.node.removeChild(svgObj.node.getElementById("snapCursorUse"))
-		//TODO delete unused marker definitions
 
-		// delete path points for moving paths around
-		for (const element of svgObj.node.querySelectorAll(".draggable.pathPoint")) {
-			element.remove()
-		}
-		for (const element of svgObj.node.querySelectorAll("line.draggable")) {
+		// delete other not needed elements for export
+		for (const element of svgObj.node.querySelectorAll(
+			".draggable.pathPoint, line.draggable, polyline.draggable, .selectionElement"
+		)) {
 			element.remove()
 		}
 
-		// delete path points for moving paths around
 		for (const element of svgObj.node.querySelectorAll("use")) {
 			element.removeAttribute("class")
 		}
@@ -201,6 +198,14 @@ export class ExportController {
 			if (instance instanceof CircuitikzComponent) {
 				let symbol = instance.referenceSymbol.node
 				usedSymbols.push(document.getElementById(symbol.id))
+			}
+			if (instance instanceof WireComponent) {
+				if (instance.arrowStart.value.key != defaultArrowTip.key) {
+					usedSymbols.push(document.getElementById(instance.arrowStart.value.key))
+				}
+				if (instance.arrowEnd.value.key != defaultArrowTip.key) {
+					usedSymbols.push(document.getElementById(instance.arrowEnd.value.key))
+				}
 			}
 		}
 		// remove duplicates

@@ -78,8 +78,6 @@ export class NodeComponent extends CircuitikzComponent {
 		this.snappingPoints = symbol._pins.map(
 			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))
 		)
-
-		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
 
 	public getTransformMatrix(): SVG.Matrix {

@@ -145,7 +145,7 @@ export abstract class CircuitComponent {
 	 */
 	public visualization: SVG.Element
 
-	protected selectionElement: SVG.Element = null
+	public selectionElement: SVG.Element = null
 
 	/**
 	 * A List of all the Snapping points of this component
@@ -165,6 +165,8 @@ export abstract class CircuitComponent {
 		this.relPosition = new SVG.Point()
 		//every time a component is initialized, it should be added to the component list for housekeeping
 		MainController.instance.addComponent(this)
+		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
+		this.selectionElement.node.classList.add("selectionElement")
 
 		this.displayName = "Circuit Component"
 		this.addPositioning()

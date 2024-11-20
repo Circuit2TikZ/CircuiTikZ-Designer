@@ -54,17 +54,26 @@ export type WireSaveObject = ComponentSaveObject & {
 export type ArrowTip = ChoiceEntry & {
 	tikz: string
 	setBack: number
+	strokeFactor?: number
+	refXY?: SVG.Point
 }
 
 export const arrowTips: ArrowTip[] = [
 	{ key: "none", name: "none", tikz: "", setBack: 0 },
-	{ key: "stealth", name: "stealth", tikz: "stealth", setBack: 7 },
-	{ key: "stealthR", name: "stealth reversed", tikz: "stealth reversed", setBack: 3 },
-	{ key: "latex", name: "latex", tikz: "latex", setBack: 10 },
-	{ key: "latexR", name: "latex reversed", tikz: "latex reversed", setBack: 0 },
-	{ key: "to", name: "to", tikz: "to", setBack: 1 },
-	{ key: "toR", name: "to reversed", tikz: "to reversed", setBack: 4 },
-	{ key: "line", name: "line", tikz: "|", setBack: 0 },
+	{ key: "stealth", name: "stealth", tikz: "stealth", setBack: 0.5 },
+	{ key: "stealthR", name: "stealth reversed", tikz: "stealth reversed", setBack: 0.5 },
+	{ key: "latex", name: "latex", tikz: "latex", setBack: 0.5 },
+	{ key: "latexR", name: "latex reversed", tikz: "latex reversed", setBack: 0.5 },
+	{ key: "to", name: "to", tikz: "to", setBack: 0.1, strokeFactor: 0.7, refXY: new SVG.Point(-1, -0.6) },
+	{
+		key: "toR",
+		name: "to reversed",
+		tikz: "to reversed",
+		setBack: 0.5,
+		strokeFactor: 0.7,
+		refXY: new SVG.Point(-1, -0.6),
+	},
+	{ key: "line", name: "line", tikz: "|", setBack: 0, strokeFactor: 1, refXY: new SVG.Point(-0.5, -0.5) },
 ]
 export const defaultArrowTip = arrowTips[0]
 /**
@@ -96,8 +105,12 @@ export class WireComponent extends CircuitComponent {
 	// the svg elements where adjusting the wire is possible
 	private adjustmentPoints: SVG.Element[] = []
 
-	private arrowEnd: ChoiceProperty<ArrowTip>
-	private arrowStart: ChoiceProperty<ArrowTip>
+	public arrowEnd: ChoiceProperty<ArrowTip>
+	public arrowStart: ChoiceProperty<ArrowTip>
+	private startArrowElement: SVG.Element
+	private endArrowElement: SVG.Element
+
+	public static arrowSymbols: Map<string, SVGSymbolElement>
 
 	constructor() {
 		super()
@@ -130,14 +143,14 @@ export class WireComponent extends CircuitComponent {
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Arrows").buildHTML())
 		this.arrowStart = new ChoiceProperty("Start", arrowTips, defaultArrowTip)
 		this.arrowStart.addChangeListener((ev) => {
-			this.updateArrows()
+			this.updateArrowTypes()
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.arrowStart.buildHTML())
 
 		this.arrowEnd = new ChoiceProperty("End", arrowTips, defaultArrowTip)
 		this.arrowEnd.addChangeListener((ev) => {
-			this.updateArrows()
+			this.updateArrowTypes()
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.arrowEnd.buildHTML())
@@ -186,23 +199,73 @@ export class WireComponent extends CircuitComponent {
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
 
-		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
-
 		this.updateTheme()
+
+		if (!WireComponent.arrowSymbols) {
+			WireComponent.arrowSymbols = new Map<string, SVGSymbolElement>()
+			for (const tip of arrowTips) {
+				WireComponent.arrowSymbols.set(tip.key, document.getElementById(tip.key) as any)
+			}
+		}
 	}
 
-	private updateArrows() {
-		//TODO don't use markers since they don't scale with the line width like in tikz
-		if (this.arrowStart.value.key == defaultArrowTip.key) {
-			this.wire.node.style.markerStart = ""
-		} else {
-			this.wire.node.style.markerStart = `url(#${this.arrowStart.value.key})`
+	private lineWidthToArrowScale(): number {
+		let scale = this.strokeInfo.width.convertToUnit("pt").value * 4.5 + 2.8 // magic numbers for converting the line width to the
+		return scale
+	}
+
+	private updateArrowTypes() {
+		this.startArrowElement?.remove()
+		if (this.arrowStart.value.key != defaultArrowTip.key) {
+			this.startArrowElement = CanvasController.instance.canvas
+				.use(this.arrowStart.value.key)
+				.stroke("var(--bs-emphasis-color)")
+				.addTo(this.visualization)
 		}
 
-		if (this.arrowEnd.value.key == defaultArrowTip.key) {
-			this.wire.node.style.markerEnd = ""
-		} else {
-			this.wire.node.style.markerEnd = `url(#${this.arrowEnd.value.key})`
+		this.endArrowElement?.remove()
+		if (this.arrowEnd.value.key != defaultArrowTip.key) {
+			this.endArrowElement = CanvasController.instance.canvas
+				.use(this.arrowEnd.value.key)
+				.stroke("var(--bs-emphasis-color)")
+				.addTo(this.visualization)
+		}
+	}
+
+	private updateArrowTransforms(startArrowReference: SVG.Point, endArrowReference: SVG.Point) {
+		const scale = this.lineWidthToArrowScale()
+		const strokeWidth = this.strokeInfo.width.convertToUnit("px").value / scale
+
+		if (this.arrowStart.value.key != defaultArrowTip.key) {
+			let wireDirection = this.cornerPoints.at(0).sub(startArrowReference)
+			let rotationAngleDeg = (Math.atan2(wireDirection.y, wireDirection.x) * 180) / Math.PI
+
+			let refXY = this.arrowStart.value.refXY ?? new SVG.Point(-1, -0.5)
+
+			this.startArrowElement.transform(
+				new SVG.Matrix({
+					translate: this.cornerPoints.at(0).toArray(),
+					rotate: rotationAngleDeg,
+					scale: [scale, scale],
+				}).multiply({ translate: refXY.toArray() })
+			)
+			this.startArrowElement.attr("stroke-width", strokeWidth * (this.arrowStart.value.strokeFactor ?? 0))
+		}
+
+		if (this.arrowEnd.value.key != defaultArrowTip.key) {
+			let wireDirection = this.cornerPoints.at(-1).sub(endArrowReference)
+			let rotationAngleDeg = (Math.atan2(wireDirection.y, wireDirection.x) * 180) / Math.PI
+
+			let refXY = this.arrowEnd.value.refXY ?? new SVG.Point(-1, -0.5)
+
+			this.endArrowElement.transform(
+				new SVG.Matrix({
+					translate: this.cornerPoints.at(-1).toArray(),
+					rotate: rotationAngleDeg,
+					scale: [scale, scale],
+				}).multiply({ translate: refXY.toArray() })
+			)
+			this.endArrowElement.attr("stroke-width", strokeWidth * (this.arrowEnd.value.strokeFactor ?? 0))
 		}
 	}
 
@@ -392,12 +455,13 @@ export class WireComponent extends CircuitComponent {
 		let pointsNoArrow = pointArray.map((point) => point.clone())
 
 		// adjust end points for arrow heads
+		const arrowSize = this.lineWidthToArrowScale()
 		if (this.arrowStart.value.key !== defaultArrowTip.key) {
 			let firstRef = pointArray[1].sub(pointArray[0])
 			let firstRefLength = firstRef.abs()
 			if (firstRefLength > 0) {
 				pointArray[0] = pointArray[0].add(
-					firstRef.div(firstRefLength).mul(strokeWidth * this.arrowStart.value.setBack)
+					firstRef.div(firstRefLength).mul(arrowSize * this.arrowStart.value.setBack)
 				)
 			}
 		}
@@ -408,7 +472,7 @@ export class WireComponent extends CircuitComponent {
 			let secondRefLength = secondRef.abs()
 			if (secondRefLength > 0) {
 				pointArray[numPoints] = pointArray[numPoints].add(
-					secondRef.div(secondRefLength).mul(strokeWidth * this.arrowEnd.value.setBack)
+					secondRef.div(secondRefLength).mul(arrowSize * this.arrowEnd.value.setBack)
 				)
 			}
 		}
@@ -464,6 +528,7 @@ export class WireComponent extends CircuitComponent {
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
+		this.updateArrowTransforms(pointArray.at(1), pointArray.at(-2))
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
@@ -709,7 +774,7 @@ export class WireComponent extends CircuitComponent {
 		]
 
 		this.draggable(true)
-		this.updateArrows()
+		this.updateArrowTypes()
 		this.update()
 
 		this.finishedPlacing = true
