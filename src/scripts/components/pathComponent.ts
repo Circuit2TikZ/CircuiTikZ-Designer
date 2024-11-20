@@ -305,7 +305,8 @@ export class PathComponent extends CircuitikzComponent {
 			return true
 		}
 
-		//TODO technically, the function will return false if the complete selection rectangle is inside the component bounding box. Should the component be selected in this case? And if yes, is it even important to look at this edge case?
+		//necessary to check if the complete selection rect is inside the component
+		let selectionRectInside = true
 
 		// if at least one line defined by 2 of the 4 corner points intersects the selection rect -> should select
 		for (let index = 0; index < boxPoints.length; index++) {
@@ -321,11 +322,15 @@ export class PathComponent extends CircuitikzComponent {
 				)
 			) {
 				return true
+			} else {
+				selectionRectInside =
+					selectionRectInside &&
+					p2.sub(p1).rotate(-90).dot(new SVG.Point(selectionRectangle.cx, selectionRectangle.cy).sub(p1)) > 0
 			}
 		}
 
-		// no intersection between the selection rect and the component
-		return false
+		// no intersection between the selection rect and the component or selection rect inside component
+		return selectionRectInside
 	}
 
 	public toJson(): PathSaveObject {
