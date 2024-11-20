@@ -21,7 +21,13 @@ import {
 	strokeStyleChoices,
 } from "../internal"
 import { AdjustDragHandler, SnapDragHandler } from "../snapDrag/dragHandlers"
-import { lineRectIntersection, pointInsideRect, resizeSVG, selectionSize } from "../utils/selectionHelper"
+import {
+	lineRectIntersection,
+	pointInsideRect,
+	resizeSVG,
+	selectedBoxWidth,
+	selectionSize,
+} from "../utils/selectionHelper"
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -216,6 +222,7 @@ export class WireComponent extends CircuitComponent {
 
 	private updateArrowTypes() {
 		this.startArrowElement?.remove()
+		this.startArrowElement = null
 		if (this.arrowStart.value.key != defaultArrowTip.key) {
 			this.startArrowElement = CanvasController.instance.canvas
 				.use(this.arrowStart.value.key)
@@ -224,6 +231,7 @@ export class WireComponent extends CircuitComponent {
 		}
 
 		this.endArrowElement?.remove()
+		this.endArrowElement = null
 		if (this.arrowEnd.value.key != defaultArrowTip.key) {
 			this.endArrowElement = CanvasController.instance.canvas
 				.use(this.arrowEnd.value.key)
@@ -388,7 +396,6 @@ export class WireComponent extends CircuitComponent {
 		}
 	}
 	protected recalculateResizePoints() {
-		let halfsize = new SVG.Point(this.bbox.w / 2, this.bbox.h / 2)
 		for (let index = 0; index < this.adjustmentPoints.length; index++) {
 			const viz = this.adjustmentPoints[index]
 			const point = this.cornerPoints[index]
@@ -437,7 +444,7 @@ export class WireComponent extends CircuitComponent {
 	protected update(): void {
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 		// generate all the points in the wire from the corner points and the wire directions
-		let pointArray: SVG.Point[] = [this.cornerPoints[0]]
+		let pointArray: SVG.Point[] = [this.cornerPoints[0].clone()]
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			const direction = this.wireDirections[index]
 
@@ -448,8 +455,13 @@ export class WireComponent extends CircuitComponent {
 			} else if (direction == WireDirection.VH && lastPoint.x != point.x && lastPoint.y != point.y) {
 				pointArray.push(new SVG.Point(lastPoint.x, point.y))
 			}
-			pointArray.push(point)
+			pointArray.push(point.clone())
 		}
+
+		let startArrowRef = pointArray.at(1).clone()
+		startArrowRef = startArrowRef.eq(this.cornerPoints.at(0)) ? pointArray.at(2).clone() : startArrowRef
+		let endArrowRef = pointArray.at(-2).clone()
+		endArrowRef = endArrowRef.eq(this.cornerPoints.at(-1)) ? pointArray.at(-3).clone() : endArrowRef
 
 		// first update the relative positions of the snapping points w.r.t. the wire, i.e. the start and end positions
 		let pointsNoArrow = pointArray.map((point) => point.clone())
@@ -476,6 +488,9 @@ export class WireComponent extends CircuitComponent {
 				)
 			}
 		}
+
+		//update arrows. has to be done before bbox calculation, otherwise, the arrow tips are not shown in the bounding box
+		this.updateArrowTransforms(startArrowRef, endArrowRef)
 
 		// actually plot the points
 		this.wire.clear()
@@ -528,12 +543,31 @@ export class WireComponent extends CircuitComponent {
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
-		this.updateArrowTransforms(pointArray.at(1), pointArray.at(-2))
 	}
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
-			this.selectionElement.size(this.bbox.w, this.bbox.h)
-			this.selectionElement.center(this.position.x, this.position.y)
+			let bbox = new SVG.Box(this.bbox)
+			bbox.width += selectedBoxWidth
+			bbox.height += selectedBoxWidth
+
+			if (this.startArrowElement) {
+				bbox = bbox.merge(
+					new SVG.Box(
+						(this.startArrowElement.node as SVGGraphicsElement).getBBox({ stroke: true })
+					).transform(new SVG.Matrix(this.startArrowElement.transform()))
+				)
+			}
+
+			if (this.endArrowElement) {
+				bbox = bbox.merge(
+					new SVG.Box((this.endArrowElement.node as SVGGraphicsElement).getBBox({ stroke: true })).transform(
+						new SVG.Matrix(this.endArrowElement.transform())
+					)
+				)
+			}
+
+			this.selectionElement.size(bbox.width, bbox.height)
+			this.selectionElement.center(bbox.cx, bbox.cy)
 		}
 	}
 
