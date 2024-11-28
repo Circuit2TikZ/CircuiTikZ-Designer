@@ -42,9 +42,7 @@ export function linelineIntersection(line1: SVG.Line | number[][], line2: SVG.Li
 	return t >= 0 && t <= 1 && u >= 0 && u <= 1
 }
 
-export function lineRectIntersection(line: SVG.Line | number[][], rect: SVG.Box) {
-	let l = line instanceof SVG.Line ? line.array() : line
-
+export function lineRectIntersection(line: SVG.Line | [[number, number], [number, number]], rect: SVG.Box) {
 	let boxPoints = [
 		[rect.x, rect.y],
 		[rect.x2, rect.y],
@@ -53,10 +51,16 @@ export function lineRectIntersection(line: SVG.Line | number[][], rect: SVG.Box)
 		[rect.x, rect.y],
 	]
 
+	// line and any line of rect intersect?
 	for (let index = 0; index < boxPoints.length - 1; index++) {
 		if (linelineIntersection(line, [boxPoints[index], boxPoints[index + 1]])) {
 			return true
 		}
+	}
+
+	// line inside rect?
+	if (pointInsideRect(line instanceof SVG.Line ? new SVG.Point(line.cx(), line.cy()) : line[0], rect)) {
+		return true
 	}
 
 	return false
@@ -87,12 +91,7 @@ export function rectRectIntersection(rect1: SVG.Box, rect2: SVG.Box): boolean {
 	return true
 }
 
-/**
- *
- * @param {[number,number]|SVG.Point} point
- * @param {SVG.Box} rect
- */
-export function pointInsideRect(point: SVG.Point, rect: SVG.Box): boolean {
+export function pointInsideRect(point: SVG.Point | [number, number], rect: SVG.Box): boolean {
 	let p = point instanceof SVG.Point ? [point.x, point.y] : point
 	return p[0] >= rect.x && p[0] <= rect.x2 && p[1] >= rect.y && p[1] <= rect.y2
 }

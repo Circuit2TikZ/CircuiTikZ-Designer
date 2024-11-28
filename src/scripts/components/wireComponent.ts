@@ -459,9 +459,11 @@ export class WireComponent extends CircuitComponent {
 		}
 
 		let startArrowRef = pointArray.at(1).clone()
-		startArrowRef = startArrowRef.eq(this.cornerPoints.at(0)) ? pointArray.at(2).clone() : startArrowRef
+		startArrowRef =
+			startArrowRef.eq(this.cornerPoints.at(0)) ? (pointArray.at(2) ?? new SVG.Point()).clone() : startArrowRef
 		let endArrowRef = pointArray.at(-2).clone()
-		endArrowRef = endArrowRef.eq(this.cornerPoints.at(-1)) ? pointArray.at(-3).clone() : endArrowRef
+		endArrowRef =
+			endArrowRef.eq(this.cornerPoints.at(-1)) ? (pointArray.at(-3) ?? new SVG.Point()).clone() : endArrowRef
 
 		// first update the relative positions of the snapping points w.r.t. the wire, i.e. the start and end positions
 		let pointsNoArrow = pointArray.map((point) => point.clone())
@@ -583,7 +585,7 @@ export class WireComponent extends CircuitComponent {
 				allPointsInside = pointInsideRect(new SVG.Point(p2), selectionRectangle)
 			}
 
-			if (lineRectIntersection(wireSegment, selectionRectangle)) {
+			if (lineRectIntersection(wireSegment as [[number, number], [number, number]], selectionRectangle)) {
 				return true
 			}
 		}

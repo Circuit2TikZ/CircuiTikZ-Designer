@@ -27,6 +27,7 @@ import {
 	EllipseComponent,
 	defaultStroke,
 	defaultFill,
+	PolygonComponent,
 } from "../internal"
 
 type SaveState = {
@@ -643,6 +644,48 @@ export class MainController {
 				color: defaultStroke,
 				width: 1,
 			})
+		}
+
+		//Add Polygon
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "polygon")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Polygon"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+				this.switchMode(Modes.COMPONENT)
+
+				if (ComponentPlacer.instance.component) {
+					ComponentPlacer.instance.placeCancel()
+				}
+
+				let newComponent = new PolygonComponent()
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(0, 0, 17, 12)
+			svgIcon
+				.polygon([
+					[1, 1],
+					[16, 1],
+					[15, 11],
+					[11, 9],
+					[5, 11],
+				])
+				.fill("none")
+				.stroke({
+					color: defaultStroke,
+					width: 1,
+				})
 		}
 	}
 
