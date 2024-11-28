@@ -1,4 +1,4 @@
-import { EditableProperty } from "../internal"
+import { EditableProperty, Undo } from "../internal"
 
 export class BooleanProperty extends EditableProperty<boolean> {
 	private checkBox: HTMLInputElement
@@ -34,6 +34,7 @@ export class BooleanProperty extends EditableProperty<boolean> {
 		col.appendChild(checkBoxContainerX)
 		this.checkBox.addEventListener("change", (ev) => {
 			this.updateValue(this.checkBox.checked)
+			Undo.addState()
 		})
 		row.appendChild(col)
 		return row

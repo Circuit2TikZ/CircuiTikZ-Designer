@@ -40,8 +40,6 @@ export type PathSaveObject = CircuitikzSaveObject & {
 	start: { x: number; y: number }
 	end: { x: number; y: number }
 	label?: PathLabel
-	mirror?: boolean
-	invert?: boolean
 }
 
 export type PathOrientation = {
@@ -101,12 +99,6 @@ export class PathComponent extends CircuitikzComponent {
 		this.visualization.add(this.dragEndLine)
 		this.visualization.hide()
 
-		let updateWithTrack = (track: boolean = true) => {
-			this.update()
-			if (track) {
-				Undo.addState()
-			}
-		}
 		{
 			//label section
 			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
@@ -133,11 +125,17 @@ export class PathComponent extends CircuitikzComponent {
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Symbol Orientation").buildHTML())
 
 		this.mirror = new BooleanProperty("Mirror", false)
-		this.mirror.addChangeListener((ev) => updateWithTrack())
+		this.mirror.addChangeListener((ev) => {
+			this.scaleState.y *= -1
+			this.update()
+		})
 		this.propertiesHTMLRows.push(this.mirror.buildHTML())
 
 		this.invert = new BooleanProperty("Invert", false)
-		this.invert.addChangeListener((ev) => updateWithTrack())
+		this.invert.addChangeListener((ev) => {
+			this.scaleState.x *= -1
+			this.update()
+		})
 		this.propertiesHTMLRows.push(this.invert.buildHTML())
 
 		this.addName()
@@ -268,8 +266,8 @@ export class PathComponent extends CircuitikzComponent {
 	public getTransformMatrix(): SVG.Matrix {
 		const symbolRel = this.referenceSymbol.relMid
 		return new SVG.Matrix({
-			scaleX: this.invert.value ? -1 : 1,
-			scaleY: this.mirror.value ? -1 : 1,
+			scaleX: this.scaleState.x,
+			scaleY: this.scaleState.y,
 			translate: [-symbolRel.x, -symbolRel.y],
 			origin: [symbolRel.x, symbolRel.y],
 		}).lmultiply(
@@ -353,11 +351,8 @@ export class PathComponent extends CircuitikzComponent {
 			color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 		}
 
-		if (this.mirror.value) {
-			data.mirror = this.mirror.value
-		}
-		if (this.invert.value) {
-			data.invert = this.invert.value
+		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
+			data.scale = this.scaleState
 		}
 
 		return data
@@ -365,6 +360,9 @@ export class PathComponent extends CircuitikzComponent {
 	public toTikzString(): string {
 		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
 		let shouldDist = this.labelDistance.value && distStr != "0.0cm"
+
+		const scaleFactor =
+			this.scaleProperty.value.value != 1 ? new SVG.Number(this.scaleProperty.value.value * 1.4, "cm") : undefined
 
 		let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
 		latexStr =
@@ -387,6 +385,7 @@ export class PathComponent extends CircuitikzComponent {
 			:	"") +
 			(this.mirror.value ? ", mirror" : "") +
 			(this.invert.value ? ", invert" : "") +
+			(scaleFactor ? ",/tikz/circuitikz/bipoles/length=" + scaleFactor.value.toPrecision(3) : "") +
 			"] " +
 			this.posEnd.toTikzString() +
 			";"
@@ -508,10 +507,15 @@ export class PathComponent extends CircuitikzComponent {
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced = 2
 
-		pathComponent.mirror.value = saveObject.mirror ?? false
+		if (saveObject.scale) {
+			pathComponent.scaleState = new SVG.Point(saveObject.scale)
+		}
+		pathComponent.mirror.value = pathComponent.scaleState.y < 0
 		pathComponent.mirror.updateHTML()
-		pathComponent.invert.value = saveObject.invert ?? false
+		pathComponent.invert.value = pathComponent.scaleState.x < 0
 		pathComponent.invert.updateHTML()
+		pathComponent.scaleProperty.value = new SVG.Number(Math.abs(pathComponent.scaleState.x))
+		pathComponent.scaleProperty.updateHTML()
 
 		if (saveObject.name) {
 			pathComponent.name.value = saveObject.name
@@ -569,7 +573,7 @@ export class PathComponent extends CircuitikzComponent {
 
 		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
 		let referenceoffsetY =
-			this.mirror.value ? this.referenceSymbol.relMid.y - symbolBBox.h : -this.referenceSymbol.relMid.y
+			this.scaleState.y < 0 ? this.referenceSymbol.relMid.y - symbolBBox.h : -this.referenceSymbol.relMid.y
 
 		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
 		let referenceOffsetX = 0

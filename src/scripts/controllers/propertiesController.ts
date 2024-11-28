@@ -169,6 +169,8 @@ export class PropertyController {
 		})
 
 		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
+
+		//TODO add reset viewport button but save the viewport in localstorage
 	}
 
 	private changeGrid(majorSizecm: number, majorSubdivisions: number) {

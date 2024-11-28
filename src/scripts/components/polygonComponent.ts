@@ -145,7 +145,6 @@ export class PolygonComponent extends ShapeComponent {
 					dragStart: (pos) => {
 						getInitialDim()
 						startPoint = new SVG.Point(point)
-						console.log(this.points.length)
 					},
 					dragMove: (pos, ev) => {
 						pos = pos.transform(transformMatrixInv)
@@ -191,8 +190,8 @@ export class PolygonComponent extends ShapeComponent {
 		if (this.rotationDeg) {
 			data.rotationDeg = this.rotationDeg
 		}
-		if (this.flipState.x != 1 && this.flipState.y != 1) {
-			data.scale = this.flipState
+		if (this.scaleState.x != 1 && this.scaleState.y != 1) {
+			data.scale = this.scaleState
 		}
 
 		let fill: FillInfo = {}
@@ -255,7 +254,7 @@ export class PolygonComponent extends ShapeComponent {
 		polygonComponent.placeFinish()
 
 		polygonComponent.rotationDeg = saveObject.rotationDeg ?? 0
-		polygonComponent.flipState = saveObject.scale ?? new SVG.Point(1, 1)
+		polygonComponent.scaleState = saveObject.scale ?? new SVG.Point(1, 1)
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
@@ -417,15 +416,13 @@ export class PolygonComponent extends ShapeComponent {
 		return false
 	}
 
-	private flipState = new SVG.Point(1, 1)
+	private scaleState = new SVG.Point(1, 1)
 	public flip(horizontal: boolean): void {
-		// this.flipState.x *= !horizontal ? -1 : 1
-		// this.flipState.y *= horizontal ? -1 : 1
 		if (horizontal) {
-			this.flipState.y *= -1
+			this.scaleState.y *= -1
 			this.rotationDeg *= -1
 		} else {
-			this.flipState.y *= -1
+			this.scaleState.y *= -1
 			this.rotationDeg = 180 - this.rotationDeg
 		}
 	}
@@ -434,7 +431,7 @@ export class PolygonComponent extends ShapeComponent {
 		return new SVG.Matrix({
 			rotate: -this.rotationDeg,
 			origin: [0, 0],
-			scale: [this.flipState.x, this.flipState.y],
+			scale: [this.scaleState.x, this.scaleState.y],
 			translate: [this.position.x, this.position.y],
 		})
 	}

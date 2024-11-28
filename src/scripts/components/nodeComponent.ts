@@ -25,16 +25,11 @@ export type NodeSaveObject = CircuitikzSaveObject & {
 	position: { x: number; y: number }
 	label?: PositionedLabel
 	rotation?: number
-	flipX?: boolean
-	flipY?: boolean
 }
 
 export class NodeComponent extends CircuitikzComponent {
 	public anchorChoice: ChoiceProperty<DirectionInfo>
 	public positionChoice: ChoiceProperty<DirectionInfo>
-
-	public flipStateX: boolean
-	public flipStateY: boolean
 
 	constructor(symbol: ComponentSymbol) {
 		super(symbol)
@@ -83,8 +78,8 @@ export class NodeComponent extends CircuitikzComponent {
 	public getTransformMatrix(): SVG.Matrix {
 		const symbolRel = this.referenceSymbol.relMid
 		return new SVG.Matrix({
-			scaleX: this.flipStateX ? -1 : 1,
-			scaleY: this.flipStateY ? -1 : 1,
+			scaleX: this.scaleState.x,
+			scaleY: this.scaleState.y,
 			translate: [-symbolRel.x, -symbolRel.y],
 			origin: [symbolRel.x, symbolRel.y],
 		}).lmultiply(
@@ -107,18 +102,6 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	protected update() {
-		// if flip has different x and y signs and 180 degrees turn, simplify to flip only
-		if (this.rotationDeg == 180) {
-			if (this.flipStateX ? !this.flipStateY : this.flipStateY) {
-				this.flipStateX = !this.flipStateX
-				this.flipStateY = !this.flipStateY
-				this.rotationDeg = 0
-			} else if (this.flipStateX && this.flipStateY) {
-				this.flipStateX = false
-				this.flipStateY = false
-				this.rotationDeg = 0
-			}
-		}
 		let m = this.getTransformMatrix()
 		this.symbolUse.transform(m)
 		this._bbox = this.symbolBBox.transform(m)
@@ -163,34 +146,16 @@ export class NodeComponent extends CircuitikzComponent {
 
 		this.update()
 	}
+
 	public flip(horizontal: boolean): void {
-		let flipX = this.flipStateX
-		let flipY = this.flipStateY
-
-		if (this.rotationDeg % 180 == 0) {
-			if (horizontal) {
-				flipY = !flipY
-			} else {
-				flipX = !flipX
-			}
+		if (horizontal) {
+			this.scaleState.y *= -1
+			this.rotationDeg *= -1
 		} else {
-			if (horizontal) {
-				flipX = !flipX
-			} else {
-				flipY = !flipY
-			}
+			this.scaleState.y *= -1
+			this.rotationDeg = 180 - this.rotationDeg
 		}
-
-		// double flipping equals rotation by 180 deg
-		if (flipX && flipY) {
-			flipX = false
-			flipY = false
-			this.rotationDeg += 180
-			this.simplifyRotationAngle()
-		}
-		this.flipStateX = flipX
-		this.flipStateY = flipY
-
+		this.simplifyRotationAngle()
 		this.update()
 	}
 
@@ -203,11 +168,8 @@ export class NodeComponent extends CircuitikzComponent {
 		if (this.rotationDeg !== 0) {
 			data.rotation = this.rotationDeg
 		}
-		if (this.flipStateX) {
-			data.flipX = true
-		}
-		if (this.flipStateY) {
-			data.flipY = true
+		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
+			data.scale = this.scaleState
 		}
 		if (this.name.value) {
 			data.name = this.name.value
@@ -260,8 +222,8 @@ export class NodeComponent extends CircuitikzComponent {
 				let newdir = this.positionChoice.value.direction.transform(
 					new SVG.Matrix({
 						rotate: -this.rotationDeg,
-						scaleX: this.flipStateX ? -1 : 1,
-						scaleY: this.flipStateY ? -1 : 1,
+						scaleX: this.scaleState.x,
+						scaleY: this.scaleState.y,
 					})
 				)
 
@@ -284,8 +246,8 @@ export class NodeComponent extends CircuitikzComponent {
 			this.referenceSymbol.tikzName +
 			(optionsString ? ", " + optionsString : "") +
 			(this.rotationDeg !== 0 ? `, rotate=${this.rotationDeg}` : "") +
-			(this.flipStateX ? `, xscale=-1` : "") +
-			(this.flipStateY ? `, yscale=-1` : "") +
+			(this.scaleState.x != 1 ? `, xscale=${this.scaleState.x}` : "") +
+			(this.scaleState.y != 1 ? `, yscale=${this.scaleState.y}` : "") +
 			"] " +
 			(id ? "(" + id + ") " : "") +
 			"at " +
@@ -347,11 +309,8 @@ export class NodeComponent extends CircuitikzComponent {
 			nodeComponent.rotationDeg = saveObject.rotation
 		}
 
-		if (saveObject.flipX) {
-			nodeComponent.flipStateX = saveObject.flipX
-		}
-		if (saveObject.flipY) {
-			nodeComponent.flipStateY = saveObject.flipY
+		if (saveObject.scale) {
+			nodeComponent.scaleState = new SVG.Point(saveObject.scale)
 		}
 
 		if (saveObject.name) {
@@ -391,8 +350,7 @@ export class NodeComponent extends CircuitikzComponent {
 	public copyForPlacement(): NodeComponent {
 		let newComponent = new NodeComponent(this.referenceSymbol)
 		newComponent.rotationDeg = this.rotationDeg
-		newComponent.flipStateX = this.flipStateX
-		newComponent.flipStateY = this.flipStateY
+		newComponent.scaleState = new SVG.Point(this.scaleState)
 		return newComponent
 	}
 

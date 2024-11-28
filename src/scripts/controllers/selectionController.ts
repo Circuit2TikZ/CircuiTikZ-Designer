@@ -321,7 +321,6 @@ export class SelectionController {
 			let diffToCenter = component.position.sub(overallCenter)
 			component.flip(horizontal)
 			component.moveRel(new SVG.Point(diffToCenter.x * flipX, diffToCenter.y * flipY))
-			component.recalculateSnappingPoints()
 		}
 	}
 

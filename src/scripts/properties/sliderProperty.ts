@@ -91,26 +91,33 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 			Undo.addState()
 		})
 
-		this.unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
-		col.appendChild(this.unitLabel)
+		if (this.value.unit) {
+			this.unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
+			this.unitLabel.innerText = this.value.unit
+			col.appendChild(this.unitLabel)
+		}
+
 		row.appendChild(col)
 		return row
 	}
 
 	private updateNumberInput() {
 		this.numberInput.value = this.value.value.toString()
-		this.unitLabel.innerText = this.value.unit
+		if (this.unitLabel) {
+			this.unitLabel.innerText = this.value.unit
+		}
 	}
 
 	private updateSliderInput() {
 		this.sliderInput.value = this.value.value.toString()
-		this.unitLabel.innerText = this.value.unit
+		if (this.unitLabel) {
+			this.unitLabel.innerText = this.value.unit
+		}
 	}
 
 	public updateHTML(): void {
 		if (this.sliderInput) {
-			this.sliderInput.value = this.value.value.toString()
-			this.numberInput.value = this.value.value.toString()
+			this.updateSliderInput()
 			this.updateNumberInput()
 		}
 	}

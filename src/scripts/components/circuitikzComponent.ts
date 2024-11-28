@@ -8,6 +8,7 @@ import {
 	defaultStroke,
 	InfoProperty,
 	SectionHeaderProperty,
+	SliderProperty,
 } from "../internal"
 
 /**
@@ -16,6 +17,7 @@ import {
 export type CircuitikzSaveObject = ComponentSaveObject & {
 	id: string
 	name?: string
+	scale?: SVG.Point
 }
 
 /**
@@ -31,6 +33,9 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 	//the untransformed bounding box of the symbol use
 	protected symbolBBox: SVG.Box
 
+	protected scaleProperty: SliderProperty
+	protected scaleState: SVG.Point
+
 	/**
 	 * The reference to the symbol library component. Has metadata of the symbol
 	 * @param symbol which static symbol from the symbols.svg library to use
@@ -44,6 +49,17 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		this.symbolUse.stroke(defaultStroke)
 		this.symbolUse.node.style.color = defaultStroke
 		this.symbolBBox = this.referenceSymbol.viewBox
+
+		this.scaleState = new SVG.Point(1, 1)
+		this.scaleProperty = new SliderProperty("Scale", 0, 5, 0.01, new SVG.Number(1))
+		this.scaleProperty.addChangeListener((ev) => {
+			this.scaleState = new SVG.Point(
+				Math.sign(this.scaleState.x) * ev.value.value,
+				Math.sign(this.scaleState.y) * ev.value.value
+			)
+			this.update()
+		})
+		this.propertiesHTMLRows.push(this.scaleProperty.buildHTML())
 	}
 
 	protected addInfo() {
