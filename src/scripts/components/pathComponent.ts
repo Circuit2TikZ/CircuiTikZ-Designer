@@ -19,6 +19,7 @@ import {
 	SectionHeaderProperty,
 	ColorProperty,
 	defaultStroke,
+	SelectionController,
 } from "../internal"
 import {
 	lineRectIntersection,
@@ -263,6 +264,7 @@ export class PathComponent extends CircuitikzComponent {
 			this.startLine.stroke(defaultStroke)
 			this.endLine.stroke(defaultStroke)
 		}
+		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
@@ -397,6 +399,7 @@ export class PathComponent extends CircuitikzComponent {
 			AdjustDragHandler.snapDrag(this, this.endSVG, false)
 			this.endSVG.remove()
 		}
+		this.resizable(false)
 		this.visualization.remove()
 		this.viewSelected(false)
 		this.labelRendering?.remove()

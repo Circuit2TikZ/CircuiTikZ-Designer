@@ -234,8 +234,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.rotationDeg += angleDeg
 		this.simplifyRotationAngle()
 		this.update()
-		this.resizable(!this.isResizing)
-		this.resizable(!this.isResizing)
 	}
 
 	public flip(horizontal: boolean): void {
