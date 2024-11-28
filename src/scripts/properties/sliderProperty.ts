@@ -11,6 +11,7 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 	private step: number
 
 	private label: string
+	private sliderInput: HTMLInputElement
 	private numberInput: HTMLInputElement
 	private unitLabel: HTMLLabelElement
 
@@ -53,49 +54,64 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 		distanceLabel.setAttribute("for", "labelDistanceSlider")
 		col.appendChild(distanceLabel)
 
+		this.sliderInput = document.createElement("input") as HTMLInputElement
+		this.sliderInput.classList.add("form-range", "w-25", "flex-grow-1", "h-100", "px-2", "border")
+		this.sliderInput.id = "labelDistanceSlider"
+		this.sliderInput.type = "range"
+		this.sliderInput.min = this.min.toString()
+		this.sliderInput.max = this.max.toString()
+		this.sliderInput.step = this.step.toString()
+		this.sliderInput.value = this.value.value.toString()
+		col.appendChild(this.sliderInput)
+
 		this.numberInput = document.createElement("input") as HTMLInputElement
-		this.numberInput.classList.add("form-range", "w-25", "flex-grow-1", "h-100", "px-2", "border")
-		this.numberInput.id = "labelDistanceSlider"
-		this.numberInput.type = "range"
-		this.numberInput.min = this.min.toString()
-		this.numberInput.max = this.max.toString()
-		this.numberInput.step = this.step.toString()
+		this.numberInput.classList.add("form-control", "fs-6")
+		this.numberInput.type = "number"
 		this.numberInput.value = this.value.value.toString()
+		this.numberInput.min = this.min.toString()
+		this.numberInput.step = this.step.toString()
 		col.appendChild(this.numberInput)
 
-		this.unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
-		// this.unitLabel.style.width="30%"
-		let update = () => {
-			this.updateValue(new SVG.Number(Number.parseFloat(this.numberInput.value), this.value.unit))
-			this.updateUnitLabel()
+		let sliderChanged = () => {
+			this.updateValue(new SVG.Number(Number.parseFloat(this.sliderInput.value), this.value.unit))
+			this.updateNumberInput()
 		}
-		update()
-		col.appendChild(this.unitLabel)
+		let numberChanged = () => {
+			this.updateValue(new SVG.Number(Number.parseFloat(this.numberInput.value), this.value.unit))
+			this.updateSliderInput()
+		}
 
-		this.numberInput.addEventListener("input", update)
-		this.numberInput.addEventListener("change", () => {
+		this.numberInput.addEventListener("input", numberChanged)
+		this.numberInput.addEventListener("focusout", () => {
 			Undo.addState()
 		})
 
+		this.sliderInput.addEventListener("input", sliderChanged)
+		this.sliderInput.addEventListener("change", () => {
+			Undo.addState()
+		})
+
+		this.unitLabel = distanceLabel.cloneNode(true) as HTMLLabelElement
+		col.appendChild(this.unitLabel)
 		row.appendChild(col)
 		return row
 	}
 
-	private updateUnitLabel() {
-		this.unitLabel.innerText =
-			this.value.value.toLocaleString(undefined, {
-				minimumFractionDigits: this.fractionDigits,
-				maximumFractionDigits: this.fractionDigits,
-				// minimumIntegerDigits:this.integerDigits,
-			}) +
-			" " +
-			this.value.unit
+	private updateNumberInput() {
+		this.numberInput.value = this.value.value.toString()
+		this.unitLabel.innerText = this.value.unit
+	}
+
+	private updateSliderInput() {
+		this.sliderInput.value = this.value.value.toString()
+		this.unitLabel.innerText = this.value.unit
 	}
 
 	public updateHTML(): void {
-		if (this.numberInput) {
+		if (this.sliderInput) {
+			this.sliderInput.value = this.value.value.toString()
 			this.numberInput.value = this.value.value.toString()
-			this.updateUnitLabel()
+			this.updateNumberInput()
 		}
 	}
 }
