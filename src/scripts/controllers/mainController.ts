@@ -541,7 +541,7 @@ export class MainController {
 		this.modeSwitchButtons.modeDrawLine.addEventListener(
 			"click",
 			() => {
-				this.switchMode(Modes.COMPONENT)
+				this.switchMode(Modes.DRAG_PAN)
 				this.modeSwitchButtons.modeDrawLine.classList.add("selected")
 				ComponentPlacer.instance.placeComponent(new WireComponent())
 			},
