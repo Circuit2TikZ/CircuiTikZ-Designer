@@ -4,6 +4,7 @@ import {
 	CanvasController,
 	CircuitComponent,
 	DistributionMode,
+	GroupComponent,
 	SectionHeaderProperty,
 	SelectionController,
 } from "../internal"
@@ -100,6 +101,14 @@ export class PropertyController {
 			]
 		)
 		rows.push(ordering.buildHTML())
+
+		rows.push(new SectionHeaderProperty("Grouping").buildHTML())
+		let grouping = new ButtonGridProperty(
+			1,
+			[["Group", ""]],
+			[(ev) => GroupComponent.group(SelectionController.instance.currentlySelectedComponents)]
+		)
+		rows.push(grouping.buildHTML())
 
 		rows.push(new SectionHeaderProperty("Align").buildHTML())
 		let alignment = new ButtonGridProperty(

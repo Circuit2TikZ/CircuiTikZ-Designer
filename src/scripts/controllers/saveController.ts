@@ -19,6 +19,8 @@ import {
 	EllipseComponent,
 	PolygonSaveObject,
 	PolygonComponent,
+	GroupComponent,
+	GroupSaveObject,
 } from "../internal"
 
 /**
@@ -171,6 +173,8 @@ export class SaveController {
 				return EllipseComponent.fromJson(saveJson as EllipseSaveObject)
 			case "polygon":
 				return PolygonComponent.fromJson(saveJson as PolygonSaveObject)
+			case "group":
+				return GroupComponent.fromJson(saveJson as GroupSaveObject)
 			default:
 				throw new Error("type " + saveJson.type + " not known")
 		}

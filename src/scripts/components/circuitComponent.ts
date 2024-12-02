@@ -13,6 +13,7 @@ import {
 	ChoiceEntry,
 	SectionHeaderProperty,
 	TextProperty,
+	GroupComponent,
 } from "../internal"
 import { rectRectIntersection, referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
 
@@ -111,6 +112,8 @@ export abstract class CircuitComponent {
 	 * Not used for all components, e.g. wire
 	 */
 	public name: TextProperty
+
+	public parentGroup: GroupComponent = null
 
 	/**
 	 * If the component is currently selected by the selection controller
@@ -350,7 +353,7 @@ export abstract class CircuitComponent {
 	 */
 	public updateTheme() {
 		let labelColor = defaultStroke
-		if (this.labelColor.value) {
+		if (this.labelColor && this.labelColor.value) {
 			labelColor = this.labelColor.value.toString()
 		}
 		this.labelRendering?.fill(labelColor)
