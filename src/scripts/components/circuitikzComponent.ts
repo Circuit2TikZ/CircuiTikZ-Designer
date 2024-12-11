@@ -57,4 +57,24 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 			this.propertiesHTMLRows.push(new InfoProperty("Options", tikzOptions).buildHTML())
 		}
 	}
+
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		let symbolID = this.referenceSymbol.id()
+		if (!defs.has(symbolID)) {
+			const symbol = this.referenceSymbol.clone(true, false)
+			symbol.removeElement(symbol.find("metadata")[0])
+			symbol.removeElement(symbol.find('ellipse[stroke="none"][fill="transparent"]')[0])
+			defs.set(symbolID, symbol)
+		}
+		this.labelRendering?.addClass("labelRendering")
+		const copiedSVG = this.visualization.clone(true)
+		if (this.labelRendering) {
+			if (!this.mathJaxLabel.value) {
+				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
+			}
+			this.labelRendering.removeClass("labelRendering")
+			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
+		}
+		return copiedSVG
+	}
 }

@@ -40,7 +40,6 @@ export class NodeComponent extends CircuitikzComponent {
 		super(symbol)
 		this.position = new SVG.Point()
 		this.relPosition = symbol.relMid
-		this.visualization = CanvasController.instance.canvas.group()
 		this.visualization.add(this.symbolUse)
 
 		this.rotationDeg = 0

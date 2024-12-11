@@ -541,6 +541,20 @@ export class RectangleComponent extends ShapeComponent {
 		let optionsStr = optionsArray.length > 0 ? `[${optionsArray.join(", ")}]` : ""
 		return `\\node${optionsStr}${id ? "(" + id + ")" : ""} at ${this.position.toTikzString()}{}${textStr}${labelNodeStr};`
 	}
+
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		const copiedSVG = super.toSVG(defs)
+
+		if (!this.textAreaProperty.value.text) {
+			const foreignObject = copiedSVG.find("foreignObject")
+			if (foreignObject.length > 0) {
+				copiedSVG.removeElement(foreignObject[0])
+			}
+		}
+
+		return copiedSVG
+	}
+
 	public copyForPlacement(): CircuitComponent {
 		return new RectangleComponent()
 	}

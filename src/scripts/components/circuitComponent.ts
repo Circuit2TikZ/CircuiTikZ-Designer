@@ -166,6 +166,8 @@ export abstract class CircuitComponent {
 		//every time a component is initialized, it should be added to the component list for housekeeping
 		MainController.instance.addComponent(this)
 
+		this.visualization = CanvasController.instance.canvas.group()
+
 		this.displayName = "Circuit Component"
 		this.addPositioning()
 		this.addZOrdering()
@@ -370,6 +372,12 @@ export abstract class CircuitComponent {
 	 * convert this component into a draw command for CircuiTikz
 	 */
 	public abstract toTikzString(): string
+
+	/**
+	 * convert this component to be used with the svg export, i.e. clone the visualization and remove everything which is not needed
+	 * @param defs which definitions this component uses should be added to the map<id, element>. defs should be checked before adding to avoid duplicates
+	 */
+	public abstract toSVG(defs: Map<string, SVG.Element>): SVG.Element
 	/**
 	 * Convert a ComponentSaveObject to a component. Calling CircuitComponent.fromJson(A.{@link toJson}()) should essentially produce an exact copy of the component "A". Override this in your subclass!
 	 * @param saveObject An object of a derived type of ComponentSaveOject, which encompasses all information necessary to initalize this component type
@@ -463,10 +471,7 @@ export abstract class CircuitComponent {
 				}
 
 				for (const id of removeIDs) {
-					let element = CanvasController.instance.canvas.node.getElementById(id)
-					if (element) {
-						CanvasController.instance.canvas.node.removeChild(element)
-					}
+					CanvasController.instance.canvas.find(id)[0]?.remove()
 				}
 			}
 

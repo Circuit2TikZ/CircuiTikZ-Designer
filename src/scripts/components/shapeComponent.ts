@@ -98,8 +98,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 
 	public constructor() {
 		super()
-
-		this.visualization = CanvasController.instance.canvas.group()
 		this.resizeVisualizations = new Map<DirectionInfo, SVG.Element>()
 
 		this.fillInfo = {
@@ -408,5 +406,33 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.shapeVisualization.show()
 		this.updateTheme()
 		SnapCursorController.instance.visible = false
+	}
+
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		if (this.labelRendering) {
+			const backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
+
+			for (const element of this.labelRendering.find("use")) {
+				const id = element.node.getAttribute("xlink:href")
+				if (!defs.has(id)) {
+					const symbol = backgroundDefs.findOne(id) as SVG.Element
+					defs.set(id, symbol.clone(true, false))
+				}
+			}
+		}
+		this.labelRendering?.addClass("labelRendering")
+		const copiedSVG = this.visualization.clone(true)
+		if (this.labelRendering) {
+			if (!this.mathJaxLabel.value) {
+				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
+			}
+			this.labelRendering.removeClass("labelRendering")
+			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
+		}
+		copiedSVG.removeElement(copiedSVG.find(".draggable")[0])
+
+		const viz = copiedSVG.findOne('[fill-opacity="0"][stroke-opacity="0"]')
+		viz?.remove()
+		return copiedSVG
 	}
 }

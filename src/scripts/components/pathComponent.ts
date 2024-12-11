@@ -80,8 +80,6 @@ export class PathComponent extends CircuitikzComponent {
 		this.relSymbolStart = symbol._pins.at(startPinIndex).point
 		this.relSymbolEnd = symbol._pins.at(endPinIndex).point
 
-		this.visualization = CanvasController.instance.canvas.group()
-
 		this.startLine = CanvasController.instance.canvas
 			.line()
 			.fill("none")
@@ -389,6 +387,15 @@ export class PathComponent extends CircuitikzComponent {
 			";"
 		)
 	}
+
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		const copiedSVG = super.toSVG(defs)
+		for (const line of copiedSVG.find("line.draggable")) {
+			copiedSVG.removeElement(line)
+		}
+		return copiedSVG
+	}
+
 	public remove(): void {
 		SnapDragHandler.snapDrag(this, false)
 		if (this.startSVG) {
