@@ -155,24 +155,7 @@ export class ExportController {
 		//Get the canvas
 		let svgObj = new SVG.Svg()
 		svgObj.node.style.fontSize = "10pt"
-
-		// bounding box to include all elements
-		let bbox: SVG.Box = null
-		for (const component of MainController.instance.circuitComponents) {
-			if (bbox == null) {
-				bbox = component.bbox
-			} else {
-				bbox = bbox.merge(component.bbox)
-			}
-		}
-		if (bbox) {
-			//make bbox 1px larger in every direction to not cut of tiny bits of some objects
-			bbox.x -= 1
-			bbox.y -= 1
-			bbox.width += 2
-			bbox.height += 2
-			svgObj.viewbox(bbox)
-		}
+		svgObj.node.style.overflow = "visible"
 
 		// get all used node/symbol names
 		let defsMap: Map<string, SVG.Element> = new Map<string, SVG.Element>()
@@ -192,6 +175,17 @@ export class ExportController {
 
 		for (const component of components) {
 			svgObj.add(component)
+		}
+
+		// bounding box to include all elements
+		let bbox = svgObj.bbox()
+		if (bbox) {
+			//make bbox 2px larger in every direction to not cut of tiny bits of some objects
+			bbox.x -= 2
+			bbox.y -= 2
+			bbox.width += 4
+			bbox.height += 4
+			svgObj.viewbox(bbox)
 		}
 
 		// convert to text and make pretty

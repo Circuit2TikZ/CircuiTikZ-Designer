@@ -69,10 +69,18 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		this.labelRendering?.addClass("labelRendering")
 		const copiedSVG = this.visualization.clone(true)
 		if (this.labelRendering) {
+			this.labelRendering.removeClass("labelRendering")
 			if (!this.mathJaxLabel.value) {
 				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
+			} else {
+				for (const use of copiedSVG.find(".labelRendering")[0].find("use")) {
+					const id = use.node.getAttribute("xlink:href")
+					if (!defs.has(id)) {
+						defs.set(id, CanvasController.instance.canvas.find(id)[0].clone(true, false))
+					}
+				}
 			}
-			this.labelRendering.removeClass("labelRendering")
+
 			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
 		}
 		return copiedSVG

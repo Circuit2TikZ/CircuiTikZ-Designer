@@ -6,6 +6,7 @@ import {
 	ChoiceProperty,
 	CircuitComponent,
 	ColorProperty,
+	convertForeignObjectTextToNativeSVGText,
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
@@ -45,7 +46,7 @@ export class RectangleComponent extends ShapeComponent {
 	private textInnerSep: SliderProperty
 	private textFontSize: ChoiceProperty<FontSize>
 	private textColor: ColorProperty
-	private textForeign: SVG.ForeignObject
+	private textSVG: SVG.ForeignObject
 	private textDiv: HTMLDivElement
 
 	public constructor() {
@@ -91,24 +92,6 @@ export class RectangleComponent extends ShapeComponent {
 		this.propertiesHTMLRows.push(this.textColor.buildHTML())
 
 		this.addName()
-
-		this.textForeign = CanvasController.instance.canvas.foreignObject(0, 0)
-		this.textForeign.node.setAttribute("overflow", "visible")
-		this.textForeign.node.style.pointerEvents = "none"
-		this.textDiv = document.createElement("div") as HTMLDivElement
-		this.textDiv.classList.add("unselectable")
-		this.textDiv.style.width = "100%"
-		this.textDiv.style.height = "100%"
-		this.textDiv.style.display = "flex"
-		this.textDiv.style.fontFamily = "Times New Roman"
-		this.textDiv.style.overflowWrap = "break-word"
-		this.textDiv.style.hyphens = "auto"
-		let textSpan = document.createElement("div") as HTMLDivElement
-		textSpan.style.width = "100%"
-		textSpan.style.display = "inline-block"
-		this.textDiv.appendChild(textSpan)
-		this.textForeign.node.appendChild(this.textDiv)
-		this.visualization.add(this.textForeign)
 
 		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
@@ -288,7 +271,7 @@ export class RectangleComponent extends ShapeComponent {
 		}
 
 		if (this.textAreaProperty.value && this.textAreaProperty.value.text !== "") {
-			let textData: Text & { fontSize?: string; innerSep?: SVG.Number } = {
+			let textData: Text = {
 				text: this.textAreaProperty.value.text,
 			}
 			if (this.textAreaProperty.value.align !== TextAlign.LEFT) {
@@ -542,19 +525,6 @@ export class RectangleComponent extends ShapeComponent {
 		return `\\node${optionsStr}${id ? "(" + id + ")" : ""} at ${this.position.toTikzString()}{}${textStr}${labelNodeStr};`
 	}
 
-	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		const copiedSVG = super.toSVG(defs)
-
-		if (!this.textAreaProperty.value.text) {
-			const foreignObject = copiedSVG.find("foreignObject")
-			if (foreignObject.length > 0) {
-				copiedSVG.removeElement(foreignObject[0])
-			}
-		}
-
-		return copiedSVG
-	}
-
 	public copyForPlacement(): CircuitComponent {
 		return new RectangleComponent()
 	}
@@ -608,45 +578,33 @@ export class RectangleComponent extends ShapeComponent {
 	}
 
 	private updateText() {
-		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-		let transformMatrix = new SVG.Matrix({
-			rotate: -this.rotationDeg,
-			origin: [this.position.x, this.position.y],
-		})
+		this.textSVG?.remove()
+		if (this.textAreaProperty.value.text) {
+			let textData: Text = {
+				text: this.textAreaProperty.value.text,
+			}
+			textData.align = this.textAreaProperty.value.align
+			textData.justify = this.textAreaProperty.value.justify
+			textData.fontSize = this.textFontSize.value.key
 
-		let w = this.bbox.w - strokeWidth * 2
-		let h = this.bbox.h - strokeWidth * 2
-		let foreignBBox = new SVG.Box(
-			this.bbox.x + strokeWidth,
-			this.bbox.y + strokeWidth,
-			w < 0 ? 0 : w,
-			h < 0 ? 0 : h
-		).transform(transformMatrix)
+			textData.color = this.textColor.value?.toString() ?? "var(--bs-emphasis-color)"
 
-		this.textForeign.size(foreignBBox.w, foreignBBox.h)
-		this.textForeign.center(this.position.x, this.position.y)
-		this.textForeign.transform(transformMatrix)
+			const innerSep = this.textInnerSep.value.convertToUnit("px").value
+			let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
+			let w = this.size.x - strokeWidth * 2 - 2 * innerSep
+			let h = this.size.y - strokeWidth * 2 - 2 * innerSep
+			const textPos = this.position.sub(new SVG.Point(w > 0 ? w : 0, h > 0 ? h : 0).div(2))
+			const textBox = new SVG.Box(textPos.x, textPos.y, w > 0 ? w : 0, h > 0 ? h : 0)
+			this.textSVG = convertForeignObjectTextToNativeSVGText(textData, textBox)
 
-		let text = this.textAreaProperty.value.text
+			let transformMatrix = new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				origin: [this.position.x, this.position.y],
+			})
+			this.textSVG.transform(transformMatrix)
+			this.textSVG.node.style.pointerEvents = "none"
 
-		let textColor = defaultStroke
-		if (this.textColor.value) {
-			textColor = this.textColor.value.toString()
+			this.visualization.add(this.textSVG)
 		}
-
-		this.textDiv.children[0].innerHTML = text.replaceAll("\n", "<br>")
-		this.textDiv.style.textAlign =
-			this.textAreaProperty.value.align == TextAlign.LEFT ? "start"
-			: this.textAreaProperty.value.align == TextAlign.CENTER ? "center"
-			: this.textAreaProperty.value.align == TextAlign.RIGHT ? "end"
-			: "justify"
-		this.textDiv.style.alignItems =
-			this.textAreaProperty.value.justify == -1 ? "start"
-			: this.textAreaProperty.value.justify == 0 ? "center"
-			: "end"
-		this.textDiv.style.fontSize = this.textFontSize.value.size + "pt"
-		this.textDiv.style.color = textColor
-		this.textDiv.style.padding = this.textInnerSep.value.convertToUnit("pt").toString()
-		this.textDiv.style.lineHeight = this.textFontSize.value.size * 1.1 + "pt"
 	}
 }

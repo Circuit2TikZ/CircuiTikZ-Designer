@@ -39,3 +39,5 @@ export * from "./snapDrag/dragHandlers"
 export * from "./snapDrag/snapController"
 export * from "./snapDrag/snapCursor"
 export * from "./snapDrag/snapPoint"
+// other
+export * from "./utils/textHelper"
