@@ -700,9 +700,33 @@ export class WireComponent extends CircuitComponent {
 			if (dir == WireDirection.VH && lastPoint.x == point.x) {
 				dir = WireDirection.Straight
 			}
+			if (!dir) {
+				dir = WireDirection.Straight
+			}
 			outString += " " + dir + " " + point.toTikzString()
 		}
 		return outString + ";"
+	}
+
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		if (this.arrowStart.value != defaultArrowTip) {
+			const id = this.arrowStart.value.key
+			if (!defs.has(id)) {
+				const marker = document.getElementById(id).cloneNode(true)
+				defs.set(id, new SVG.Element(marker))
+			}
+		}
+		if (this.arrowEnd.value != defaultArrowTip) {
+			const id = this.arrowEnd.value.key
+			if (!defs.has(id)) {
+				const marker = document.getElementById(id).cloneNode(true)
+				defs.set(id, new SVG.Element(marker))
+			}
+		}
+
+		const copiedSVG = this.visualization.clone(true)
+		copiedSVG.removeElement(copiedSVG.find("polyline.draggable")[0])
+		return copiedSVG
 	}
 
 	public copyForPlacement(): WireComponent {

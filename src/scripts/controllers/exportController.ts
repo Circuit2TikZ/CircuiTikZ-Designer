@@ -7,12 +7,11 @@ import {
 	defaultStroke,
 	defaultFill,
 	WireComponent,
-	defaultArrowTip,
 } from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
+import * as SVG from "@svgdotjs/svg.js"
 const parserXML = require("@prettier/plugin-xml").default
-// import pretty = require('../../../node_modules/pretty');
 
 /**
  * Contains export functions and controls the "exportModal" (~dialog).
@@ -154,86 +153,39 @@ export class ExportController {
 		MainController.instance.updateTheme()
 
 		//Get the canvas
-		let svgObj = CanvasController.instance.canvas.clone(true, false)
-
-		svgObj.node.removeAttribute("xmlns:svgjs")
-		svgObj.node.removeAttribute("class")
-		svgObj.node.removeAttribute("id")
-
-		//remove not needed parts
-		let defs: HTMLElement = svgObj.node.getElementById("backgroundDefs") as HTMLElement
-		defs.innerHTML = ""
-
-		svgObj.node.removeChild(svgObj.node.getElementById("grid"))
-		svgObj.node.removeChild(svgObj.node.getElementById("xAxis"))
-		svgObj.node.removeChild(svgObj.node.getElementById("yAxis"))
-		svgObj.node.removeChild(svgObj.node.getElementById("selectionRectangle"))
-		svgObj.node.removeChild(svgObj.node.getElementById("snapCursorUse"))
-
-		// delete other not needed elements for export
-		for (const element of svgObj.node.querySelectorAll(
-			".draggable.pathPoint, line.draggable, polyline.draggable, .selectionElement"
-		)) {
-			element.remove()
-		}
-
-		for (const element of svgObj.node.querySelectorAll("use")) {
-			element.removeAttribute("class")
-		}
-
-		// change bounding box to include all elements
-		let bbox = svgObj.bbox()
-		if (bbox) {
-			//make bbox 1px larger in every direction to not cut of tiny bits of some objects
-			bbox.x -= 1
-			bbox.y -= 1
-			bbox.width += 2
-			bbox.height += 2
-			svgObj.viewbox(bbox)
-		}
+		let svgObj = new SVG.Svg()
+		svgObj.node.style.fontSize = "10pt"
+		svgObj.node.style.overflow = "visible"
 
 		// get all used node/symbol names
-		let usedSymbols = []
+		let defsMap: Map<string, SVG.Element> = new Map<string, SVG.Element>()
+		let components: SVG.Element[] = []
 		for (const instance of MainController.instance.circuitComponents) {
-			if (instance instanceof CircuitikzComponent) {
-				let symbol = instance.referenceSymbol.node
-				usedSymbols.push(document.getElementById(symbol.id))
-			}
-			if (instance instanceof WireComponent) {
-				if (instance.arrowStart.value.key != defaultArrowTip.key) {
-					usedSymbols.push(document.getElementById(instance.arrowStart.value.key))
-				}
-				if (instance.arrowEnd.value.key != defaultArrowTip.key) {
-					usedSymbols.push(document.getElementById(instance.arrowEnd.value.key))
-				}
-			}
-		}
-		// remove duplicates
-		usedSymbols = [...new Set(usedSymbols)]
-
-		// remove metadata tags
-		let optimizedSymbols = []
-		for (const symbol of usedSymbols) {
-			let s = symbol.cloneNode(true)
-			// probably only ever needs to remove one metadata tag
-			for (const metadataElement of s.getElementsByTagName("metadata")) {
-				s.removeChild(metadataElement)
-			}
-			// remove selection ellipse
-			for (const ellipseElement of s.getElementsByTagName("ellipse")) {
-				if (
-					ellipseElement.getAttribute("stroke") == "none" &&
-					ellipseElement.getAttribute("fill") == "transparent"
-				) {
-					s.removeChild(ellipseElement)
-				}
-			}
-			optimizedSymbols.push(s)
+			components.push(instance.toSVG(defsMap))
 		}
 
 		// add to defs
-		for (const element of optimizedSymbols) {
-			defs.appendChild(element)
+		if (defsMap.size > 0) {
+			const defs = new SVG.Defs()
+			for (const element of defsMap) {
+				defs.add(element[1])
+			}
+			svgObj.add(defs)
+		}
+
+		for (const component of components) {
+			svgObj.add(component)
+		}
+
+		// bounding box to include all elements
+		let bbox = svgObj.bbox()
+		if (bbox) {
+			//make bbox 2px larger in every direction to not cut of tiny bits of some objects
+			bbox.x -= 2
+			bbox.y -= 2
+			bbox.width += 4
+			bbox.height += 4
+			svgObj.viewbox(bbox)
 		}
 
 		// convert to text and make pretty
