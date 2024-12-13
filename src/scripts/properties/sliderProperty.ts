@@ -17,13 +17,22 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 
 	private fractionDigits: number
 	private integerDigits: number
+	private restrictToRange: boolean
 
-	public constructor(label: string, min: number, max: number, step: number, initalValue?: SVG.Number) {
+	public constructor(
+		label: string,
+		min: number,
+		max: number,
+		step: number,
+		initalValue?: SVG.Number,
+		restrictToRange: boolean = false
+	) {
 		super(initalValue)
 		this.label = label
 		this.min = min
 		this.max = max
 		this.step = step
+		this.restrictToRange = restrictToRange
 
 		if (step > 0) {
 			this.fractionDigits = 0
@@ -77,8 +86,11 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 			this.updateNumberInput()
 		}
 		let numberChanged = () => {
-			this.updateValue(new SVG.Number(Number.parseFloat(this.numberInput.value), this.value.unit))
-			this.updateSliderInput()
+			const newValue = Number.parseFloat(this.numberInput.value)
+			if (this.restrictToRange && (newValue < this.min || newValue > this.max)) {
+				this.updateValue(new SVG.Number(newValue, this.value.unit))
+				this.updateSliderInput()
+			}
 		}
 
 		this.numberInput.addEventListener("input", numberChanged)
