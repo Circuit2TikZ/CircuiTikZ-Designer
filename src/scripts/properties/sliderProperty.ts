@@ -78,6 +78,7 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 		this.numberInput.type = "number"
 		this.numberInput.value = this.value.value.toString()
 		this.numberInput.min = this.min.toString()
+		this.numberInput.max = this.max.toString()
 		this.numberInput.step = this.step.toString()
 		col.appendChild(this.numberInput)
 
@@ -86,8 +87,13 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 			this.updateNumberInput()
 		}
 		let numberChanged = () => {
-			const newValue = Number.parseFloat(this.numberInput.value)
-			if (this.restrictToRange && (newValue < this.min || newValue > this.max)) {
+			let newValue = Number.parseFloat(this.numberInput.value)
+
+			if (!isNaN(newValue)) {
+				if (this.restrictToRange) {
+					newValue = newValue < this.min ? this.min : newValue
+					newValue = newValue > this.max ? this.max : newValue
+				}
 				this.updateValue(new SVG.Number(newValue, this.value.unit))
 				this.updateSliderInput()
 			}
@@ -95,6 +101,7 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 
 		this.numberInput.addEventListener("input", numberChanged)
 		this.numberInput.addEventListener("focusout", () => {
+			this.updateNumberInput()
 			Undo.addState()
 		})
 
@@ -108,6 +115,9 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 			this.unitLabel.innerText = this.value.unit
 			col.appendChild(this.unitLabel)
 		}
+
+		this.updateNumberInput()
+		this.updateSliderInput()
 
 		row.appendChild(col)
 		return row

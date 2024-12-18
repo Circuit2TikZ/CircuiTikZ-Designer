@@ -310,6 +310,7 @@ export class NodeComponent extends CircuitikzComponent {
 
 		if (saveObject.scale) {
 			nodeComponent.scaleState = new SVG.Point(saveObject.scale)
+			nodeComponent.scaleProperty.updateValue(new SVG.Number(Math.abs(saveObject.scale.x)), true)
 		}
 
 		if (saveObject.name) {

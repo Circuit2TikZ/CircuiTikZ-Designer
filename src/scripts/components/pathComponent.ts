@@ -516,6 +516,7 @@ export class PathComponent extends CircuitikzComponent {
 
 		if (saveObject.scale) {
 			pathComponent.scaleState = new SVG.Point(saveObject.scale)
+			pathComponent.scaleProperty.updateValue(new SVG.Number(Math.abs(saveObject.scale.x)), true)
 		}
 		pathComponent.mirror.value = pathComponent.scaleState.y < 0
 		pathComponent.mirror.updateHTML()

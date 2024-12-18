@@ -51,7 +51,7 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		this.symbolBBox = this.referenceSymbol.viewBox
 
 		this.scaleState = new SVG.Point(1, 1)
-		this.scaleProperty = new SliderProperty("Scale", 0.01, 10, 0.01, new SVG.Number(1), true)
+		this.scaleProperty = new SliderProperty("Scale", 0.1, 10, 0.01, new SVG.Number(1), true)
 		this.scaleProperty.addChangeListener((ev) => {
 			this.scaleState = new SVG.Point(
 				Math.sign(this.scaleState.x) * ev.value.value,
