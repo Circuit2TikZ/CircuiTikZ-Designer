@@ -10,6 +10,7 @@ import {
 	SelectionController,
 	SelectionMode,
 	SnappingInfo,
+	Undo,
 } from "../internal"
 import { rectRectIntersection } from "../utils/selectionHelper"
 
@@ -22,10 +23,12 @@ export class GroupComponent extends CircuitComponent {
 
 	constructor(components: CircuitComponent[]) {
 		super()
-		MainController.instance.circuitComponents.pop()
+		MainController.instance.circuitComponents.pop() // add later at specific index instead
 		this.displayName = "Group"
 		this.snappingPoints = []
 		this.groupedComponents.push(...components)
+		const idx = this.visualization.parent().index(components[0].visualization)
+		this.visualization.parent().add(this.visualization, idx)
 		let firstIndex = -1
 		for (const component of components) {
 			const idx = MainController.instance.circuitComponents.indexOf(component)
@@ -33,37 +36,39 @@ export class GroupComponent extends CircuitComponent {
 			MainController.instance.circuitComponents.splice(idx, 1)
 			component.parentGroup = this
 			component.viewSelected(false)
+			this.visualization.add(component.visualization)
 		}
 
-		MainController.instance.circuitComponents.splice(firstIndex, 0, this)
+		MainController.instance.circuitComponents.splice(firstIndex, 0, this) // added here
 
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Grouping").buildHTML())
 		let grouping = new ButtonGridProperty(1, [["Ungroup", ""]], [(ev) => this.ungroup()])
 		this.propertiesHTMLRows.push(grouping.buildHTML())
 
-		this.visualization = CanvasController.instance.canvas.group()
 		this.update()
 		SelectionController.instance.selectComponents([this], SelectionMode.RESET)
-		this.snappingPoints = this.groupedComponents
-			.map((component) => component.snappingPoints)
-			.reduce((prev, current) => {
-				return prev.concat(current)
-			}, [])
+		this.snappingPoints = this.groupedComponents.map((component) => component.snappingPoints).flat()
 	}
 
 	public static group(circuitComponents: CircuitComponent[]) {
 		new GroupComponent(circuitComponents)
+		Undo.addState()
 	}
 
 	public ungroup() {
 		const idx = MainController.instance.circuitComponents.indexOf(this)
 		MainController.instance.circuitComponents.splice(idx, 1, ...this.groupedComponents)
-		this.viewSelected(false)
-		this.groupedComponents.forEach((component) => {
+		const parent = this.visualization.parent()
+		const currentIdx = parent.index(this.visualization)
+		for (let index = 0; index < this.groupedComponents.length; index++) {
+			const component = this.groupedComponents[index]
 			component.parentGroup = null
-		})
+			parent.add(component.visualization, currentIdx + index)
+		}
+		this.groupedComponents = []
 		SelectionController.instance.selectComponents(this.groupedComponents, SelectionMode.RESET)
-		this.visualization.remove()
+		this.remove()
+		Undo.addState()
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
@@ -71,14 +76,17 @@ export class GroupComponent extends CircuitComponent {
 	}
 
 	public getSnappingInfo(): SnappingInfo {
-		//TODO
 		return { additionalSnappingPoints: [], trackedSnappingPoints: this.snappingPoints }
 	}
 	public draggable(drag: boolean): void {
-		//Not needed; dragging handled by child components
+		for (const element of this.groupedComponents) {
+			element.draggable(drag)
+		}
 	}
 	public resizable(resize: boolean): void {
-		//No resizing for now
+		for (const element of this.groupedComponents) {
+			element.resizable(resize)
+		}
 	}
 	protected recalculateResizePoints(): void {
 		//No resizing for now
@@ -91,10 +99,19 @@ export class GroupComponent extends CircuitComponent {
 		this.update()
 	}
 	public rotate(angleDeg: number): void {
-		throw new Error("Method not implemented.")
+		for (const element of this.groupedComponents) {
+			element.moveTo(element.position.rotate(angleDeg, this.position))
+			element.rotate(angleDeg)
+		}
 	}
 	public flip(horizontal: boolean): void {
-		throw new Error("Method not implemented.")
+		for (const element of this.groupedComponents) {
+			const moveRel = element.position
+				.sub(this.position)
+				.mul(new SVG.Point(horizontal ? 0 : -2, horizontal ? -2 : 0))
+			element.moveRel(moveRel)
+			element.flip(horizontal)
+		}
 	}
 	protected update(): void {
 		this._bbox = undefined
@@ -144,15 +161,24 @@ export class GroupComponent extends CircuitComponent {
 		}
 		return outStr.join("\n")
 	}
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		let group = new SVG.G()
+		for (const element of this.groupedComponents) {
+			group.add(element.toSVG(defs))
+		}
+		return group
+	}
 	public copyForPlacement(): CircuitComponent {
 		//not needed
 		return
 	}
 	public remove(): void {
+		this.viewSelected(false)
+		this.selectionElement?.remove()
 		for (const component of this.groupedComponents) {
 			component.remove()
 		}
-		MainController.instance.circuitComponents.splice(MainController.instance.circuitComponents.indexOf(this), 1)
+		this.visualization.remove()
 	}
 	public placeMove(pos: SVG.Point, ev?: Event): void {
 		//not needed
