@@ -7,6 +7,7 @@ import {
 	GroupComponent,
 	SectionHeaderProperty,
 	SelectionController,
+	Undo,
 } from "../internal"
 
 export type FormEntry = {
@@ -58,16 +59,38 @@ export class PropertyController {
 		let positioning = new ButtonGridProperty(
 			2,
 			[
-				["Rotate CW", "rotate_right"],
-				["Rotate CCW", "rotate_left"],
+				["Rotate 90° CW", "rotate_right"],
+				["Rotate 90° CCW", "rotate_left"],
+				["Rotate 45° CW", "rotate_right"],
+				["Rotate 45° CCW", "rotate_left"],
 				["Flip vertically", ["flip", "rotateText"]],
 				["Flip horizontally", "flip"],
 			],
 			[
-				(ev) => SelectionController.instance.rotateSelection(-90),
-				(ev) => SelectionController.instance.rotateSelection(90),
-				(ev) => SelectionController.instance.flipSelection(true),
-				(ev) => SelectionController.instance.flipSelection(false),
+				(ev) => {
+					SelectionController.instance.rotateSelection(-90)
+					Undo.addState()
+				},
+				(ev) => {
+					SelectionController.instance.rotateSelection(90)
+					Undo.addState()
+				},
+				(ev) => {
+					SelectionController.instance.rotateSelection(-45)
+					Undo.addState()
+				},
+				(ev) => {
+					SelectionController.instance.rotateSelection(45)
+					Undo.addState()
+				},
+				(ev) => {
+					SelectionController.instance.flipSelection(true)
+					Undo.addState()
+				},
+				(ev) => {
+					SelectionController.instance.flipSelection(false)
+					Undo.addState()
+				},
 			]
 		)
 		rows.push(positioning.buildHTML())

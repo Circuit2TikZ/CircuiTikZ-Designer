@@ -14,6 +14,7 @@ import {
 	SectionHeaderProperty,
 	TextProperty,
 	GroupComponent,
+	Undo,
 } from "../internal"
 import { rectRectIntersection, referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
 
@@ -209,12 +210,39 @@ export abstract class CircuitComponent {
 		let positioning = new ButtonGridProperty(
 			2,
 			[
-				["Rotate CW", "rotate_right"],
-				["Rotate CCW", "rotate_left"],
+				["Rotate 90° CW", "rotate_right"],
+				["Rotate 90° CCW", "rotate_left"],
+				["Rotate 45° CW", "rotate_right"],
+				["Rotate 45° CCW ", "rotate_left"],
 				["Flip vertically", ["flip", "rotateText"]],
 				["Flip horizontally", "flip"],
 			],
-			[(ev) => this.rotate(-90), (ev) => this.rotate(90), (ev) => this.flip(true), (ev) => this.flip(false)]
+			[
+				(ev) => {
+					this.rotate(-90)
+					Undo.addState()
+				},
+				(ev) => {
+					this.rotate(90)
+					Undo.addState()
+				},
+				(ev) => {
+					this.rotate(-45)
+					Undo.addState()
+				},
+				(ev) => {
+					this.rotate(45)
+					Undo.addState()
+				},
+				(ev) => {
+					this.flip(true)
+					Undo.addState()
+				},
+				(ev) => {
+					this.flip(false)
+					Undo.addState()
+				},
+			]
 		)
 		this.propertiesHTMLRows.push(positioning.buildHTML())
 	}

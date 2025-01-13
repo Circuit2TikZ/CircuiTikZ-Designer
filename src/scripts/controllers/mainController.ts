@@ -333,8 +333,8 @@ export class MainController {
 			if (this.mode == Modes.COMPONENT) {
 				ComponentPlacer.instance.placeRotate(90)
 			} else {
-				SelectionController.instance.rotateSelection(90)
 				if (SelectionController.instance.hasSelection()) {
+					SelectionController.instance.rotateSelection(90)
 					Undo.addState()
 				}
 			}
