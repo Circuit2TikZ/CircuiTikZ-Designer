@@ -1,7 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
 	ButtonGridProperty,
-	CanvasController,
 	CircuitComponent,
 	ComponentSaveObject,
 	MainController,
@@ -65,8 +64,8 @@ export class GroupComponent extends CircuitComponent {
 			component.parentGroup = null
 			parent.add(component.visualization, currentIdx + index)
 		}
-		this.groupedComponents = []
 		SelectionController.instance.selectComponents(this.groupedComponents, SelectionMode.RESET)
+		this.groupedComponents = []
 		this.remove()
 		Undo.addState()
 	}

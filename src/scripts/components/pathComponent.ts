@@ -408,6 +408,7 @@ export class PathComponent extends CircuitikzComponent {
 			AdjustDragHandler.snapDrag(this, this.endSVG, false)
 			this.endSVG.remove()
 		}
+		this.selectionElement?.remove()
 		this.resizable(false)
 		this.visualization.remove()
 		this.viewSelected(false)

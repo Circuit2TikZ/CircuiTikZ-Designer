@@ -237,7 +237,7 @@ export abstract class CircuitComponent {
 			}
 			for (const component of MainController.instance.circuitComponents) {
 				// check if another component with the same name already exists
-				if (component != this) {
+				if (component != this && component.name) {
 					if (ev.value !== "" && component.name.value == ev.value) {
 						this.name.updateValue(ev.previousValue, false)
 						this.name.changeInvalidStatus("Name is already taken!")

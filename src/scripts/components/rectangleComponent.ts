@@ -442,6 +442,10 @@ export class RectangleComponent extends ShapeComponent {
 				"cm"
 		)
 
+		if (this.rotationDeg != 0) {
+			optionsArray.push(`rotate=${this.rotationDeg}`)
+		}
+
 		let id = this.name.value
 		if (!id && this.mathJaxLabel.value) {
 			id = ExportController.instance.createExportID("Rect")
@@ -457,15 +461,11 @@ export class RectangleComponent extends ShapeComponent {
 			// which anchor and position corresponds to the direction?
 			let anchor = basicDirections.find((item) => item.direction.eq(dir)).name
 
-			let bboxNoRotation = new SVG.Box(0, 0, this.size.x, this.size.y).transform(
-				new SVG.Matrix({ rotate: -this.rotationDeg })
-			)
-			let size = new SVG.Point(bboxNoRotation.w, bboxNoRotation.h)
-			let pos = this.position.add(dir.mul(size.div(2)).rotate(this.rotationDeg))
+			let pos = this.position.add(dir.mul(this.size.div(2)).rotate(this.rotationDeg))
 
 			// text dimensions
 			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width.times(0.5))
-			let textWidth = new SVG.Number(size.x, "px")
+			let textWidth = new SVG.Number(this.size.x, "px")
 				.minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2))
 				.convertToUnit("cm")
 

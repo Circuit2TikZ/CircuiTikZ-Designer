@@ -132,7 +132,6 @@ export class WireComponent extends CircuitComponent {
 			style: defaultStrokeStyleChoice.key,
 		}
 
-		this.visualization = CanvasController.instance.canvas.group()
 		this.wire = CanvasController.instance.canvas.polyline()
 		this.wire.fill("none")
 		this.draggableWire = CanvasController.instance.canvas.polyline()
@@ -736,6 +735,7 @@ export class WireComponent extends CircuitComponent {
 	public remove(): void {
 		this.visualization.remove()
 		this.viewSelected(false)
+		this.selectionElement?.remove()
 		if (this.finishedPlacing) {
 			this.draggable(false)
 		}

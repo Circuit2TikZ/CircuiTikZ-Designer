@@ -256,6 +256,7 @@ export class SelectionController {
 		}
 
 		this.viewSelection()
+		PropertyController.instance.update()
 	}
 
 	public getOverallBoundingBox(): SVG.Box {

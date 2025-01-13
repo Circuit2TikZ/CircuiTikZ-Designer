@@ -258,6 +258,7 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 	public remove(): void {
 		SnapDragHandler.snapDrag(this, false)
+		this.selectionElement?.remove()
 		this.visualization.remove()
 		this.viewSelected(false)
 		this.labelRendering?.remove()
