@@ -102,6 +102,7 @@ export class GroupComponent extends CircuitComponent {
 			element.moveTo(element.position.rotate(angleDeg, this.position))
 			element.rotate(angleDeg)
 		}
+		this.update()
 	}
 	public flip(horizontal: boolean): void {
 		for (const element of this.groupedComponents) {
@@ -111,6 +112,7 @@ export class GroupComponent extends CircuitComponent {
 			element.moveRel(moveRel)
 			element.flip(horizontal)
 		}
+		this.update()
 	}
 	protected update(): void {
 		this._bbox = undefined

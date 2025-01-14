@@ -30,7 +30,7 @@ import {
 	TextAlign,
 	TextAreaProperty,
 } from "../internal"
-import { resizeSVG, roundTikz } from "../utils/selectionHelper"
+import { rectRectIntersection, resizeSVG, roundTikz } from "../utils/selectionHelper"
 
 export type RectangleSaveObject = ShapeSaveObject & {
 	position: SVG.Point
@@ -117,6 +117,16 @@ export class RectangleComponent extends ShapeComponent {
 				snappingPoint.recalculate()
 			}
 		}
+	}
+
+	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
+		const rect = new SVG.Box(
+			this.position.x - this.size.x / 2,
+			this.position.y - this.size.y / 2,
+			this.size.x,
+			this.size.y
+		)
+		return rectRectIntersection(rect, selectionRectangle, this.rotationDeg)
 	}
 
 	protected recalculateResizePoints() {
@@ -301,9 +311,7 @@ export class RectangleComponent extends ShapeComponent {
 		rectComponent.placePoint = rectComponent.position
 		rectComponent.size = new SVG.Point(saveObject.size)
 
-		if (saveObject.rotationDeg) {
-			rectComponent.rotationDeg = saveObject.rotationDeg
-		}
+		rectComponent.rotationDeg = saveObject.rotationDeg ?? 0
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
@@ -536,14 +544,19 @@ export class RectangleComponent extends ShapeComponent {
 		}
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
-		let useBBox = this.bbox.transform(transformMatrix)
+		let bbox = new SVG.Box(
+			this.position.x - this.size.x / 2,
+			this.position.y - this.size.y / 2,
+			this.size.x,
+			this.size.y
+		)
 		// get relevant positions and bounding boxes
-		let textPos: SVG.Point
-		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPos = this.position
-		} else {
-			let bboxHalfSize = new SVG.Point(useBBox.w / 2, useBBox.h / 2)
-			textPos = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+		let textPos = this.position
+		let textPosNoTrans = this.position
+		if (this.positionChoice.value.key != defaultBasicDirection.key) {
+			let bboxHalfSize = this.size.div(2)
+			textPosNoTrans = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+			textPos = textPosNoTrans.transform(transformMatrix)
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -561,9 +574,11 @@ export class RectangleComponent extends ShapeComponent {
 				}
 			}
 
-			let horizontalTextPosition = clamp(Math.round((2 * (useBBox.cx - textPos.x)) / useBBox.w), -1, 1)
-			let verticalTextPosition = clamp(Math.round((2 * (useBBox.cy - textPos.y)) / useBBox.h), -1, 1)
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition)
+			let horizontalTextPosition = clamp(Math.round((2 * (bbox.cx - textPosNoTrans.x)) / bbox.w), -1, 1)
+			let verticalTextPosition = clamp(Math.round((2 * (bbox.cy - textPosNoTrans.y)) / bbox.h), -1, 1)
+			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition).rotate(this.rotationDeg)
+			labelRef.x = Math.round(labelRef.x)
+			labelRef.y = Math.round(labelRef.y)
 			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))
 		} else {
 			this.labelPos = this.anchorChoice.value

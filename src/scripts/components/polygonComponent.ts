@@ -90,7 +90,7 @@ export class PolygonComponent extends ShapeComponent {
 		}
 	}
 
-	private bboxFromPoints(points: SVG.Point[]): SVG.Box {
+	private static bboxFromPoints(points: SVG.Point[]): SVG.Box {
 		let minX = Number.MAX_VALUE
 		let maxX = -Number.MAX_VALUE
 		let minY = Number.MAX_VALUE
@@ -155,7 +155,7 @@ export class PolygonComponent extends ShapeComponent {
 						pos = pos.add(posOffset)
 
 						this.points[index] = pos
-						const bbox = this.bboxFromPoints(this.points)
+						const bbox = PolygonComponent.bboxFromPoints(this.points)
 						const posDelta = new SVG.Point(bbox.cx, bbox.cy)
 						posOffset = posOffset.sub(posDelta)
 
@@ -387,8 +387,9 @@ export class PolygonComponent extends ShapeComponent {
 			labelNodeStr = " node[" + labelStr + "] at " + posStr + "{" + latexStr + "}"
 		}
 
+		const transformMatrix = this.getTransformMatrix()
 		let pointsStr = this.points
-			.map((point) => point.add(this.position).toTikzString())
+			.map((point) => point.transform(transformMatrix).toTikzString())
 			.concat(["cycle"])
 			.join(" -- ")
 
@@ -425,6 +426,7 @@ export class PolygonComponent extends ShapeComponent {
 			this.scaleState.y *= -1
 			this.rotationDeg = 180 - this.rotationDeg
 		}
+		this.update()
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
@@ -443,7 +445,7 @@ export class PolygonComponent extends ShapeComponent {
 
 		let pointsArray: [number, number][] = this.points.map((point) => point.toArray())
 
-		const bbox = this.bboxFromPoints(this.points)
+		const bbox = PolygonComponent.bboxFromPoints(this.points)
 
 		this.size = new SVG.Point(bbox.w, bbox.h)
 		this._bbox = bbox.transform(transformMatrix)
@@ -500,7 +502,7 @@ export class PolygonComponent extends ShapeComponent {
 			}
 			this.placingPoints[this.placingPoints.length - 1] = secondPoint
 
-			let bbox = this.bboxFromPoints(this.placingPoints)
+			let bbox = PolygonComponent.bboxFromPoints(this.placingPoints)
 			this.position = new SVG.Point(bbox.cx, bbox.cy)
 
 			this.size = new SVG.Point(bbox.w, bbox.h)
@@ -550,7 +552,7 @@ export class PolygonComponent extends ShapeComponent {
 			return
 		}
 
-		let bbox = this.bboxFromPoints(this.placingPoints)
+		let bbox = PolygonComponent.bboxFromPoints(this.placingPoints)
 
 		this.position = new SVG.Point(bbox.cx, bbox.cy)
 		this.size = new SVG.Point(bbox.w, bbox.h)
@@ -576,14 +578,18 @@ export class PolygonComponent extends ShapeComponent {
 			return
 		}
 		let labelSVG = this.labelRendering
-		let transformMatrix = this.getTransformMatrix()
-		let bbox = this.bbox.transform(transformMatrix.lmultiply({ translate: [-this.position.x, -this.position.y] }))
+
 		// get relevant positions and bounding boxes
-		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			this.textPos = new SVG.Point(this.bbox.cx, this.bbox.cy)
-		} else {
+		let transformMatrix = this.getTransformMatrix()
+		let bbox = PolygonComponent.bboxFromPoints(this.points)
+
+		this.textPos = new SVG.Point(this.bbox.cx, this.bbox.cy)
+		let textPosNoTrans = new SVG.Point()
+		if (this.positionChoice.value.key != defaultBasicDirection.key) {
 			let bboxHalfSize = new SVG.Point(bbox.w / 2, bbox.h / 2)
-			this.textPos = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+
+			textPosNoTrans = bboxHalfSize.mul(this.positionChoice.value.direction)
+			this.textPos = textPosNoTrans.transform(transformMatrix)
 		}
 		let labelBBox = labelSVG.bbox()
 
@@ -591,7 +597,7 @@ export class PolygonComponent extends ShapeComponent {
 		let labelRef: SVG.Point
 		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
 		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
-			let clamp = function (value: number, min: number, max: number) {
+			let clamp = function (value: number, min: number = -1, max: number = 1) {
 				if (value < min) {
 					return min
 				} else if (value > max) {
@@ -600,9 +606,11 @@ export class PolygonComponent extends ShapeComponent {
 					return value
 				}
 			}
-			let horizontalTextPosition = clamp(Math.round((2 * (bbox.cx - this.textPos.x)) / bbox.w), -1, 1)
-			let verticalTextPosition = clamp(Math.round((2 * (bbox.cy - this.textPos.y)) / bbox.h), -1, 1)
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition)
+			let horizontalTextPosition = clamp(Math.round((2 * (bbox.cx - textPosNoTrans.x)) / bbox.w))
+			let verticalTextPosition = clamp(Math.round((2 * (bbox.cy - textPosNoTrans.y)) / bbox.h))
+			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition).rotate(this.rotationDeg)
+			labelRef.x = Math.round(labelRef.x)
+			labelRef.y = Math.round(labelRef.y)
 			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))
 		} else {
 			this.labelPos = this.anchorChoice.value

@@ -220,11 +220,13 @@ export class NodeComponent extends CircuitikzComponent {
 			if (this.positionChoice.value.key != "default") {
 				let newdir = this.positionChoice.value.direction.transform(
 					new SVG.Matrix({
-						rotate: -this.rotationDeg,
+						rotate: this.rotationDeg,
 						scaleX: this.scaleState.x,
 						scaleY: this.scaleState.y,
 					})
 				)
+
+				newdir = new SVG.Point(Math.round(newdir.x), Math.round(newdir.y))
 
 				pos = basicDirections.find((item) => item.direction.eq(newdir)).name
 			}
@@ -357,24 +359,20 @@ export class NodeComponent extends CircuitikzComponent {
 
 	private labelPos: DirectionInfo
 	public updateLabelPosition(): void {
-		// currently working only with 90 deg rotation steps
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
 			return
 		}
-		let label = this.mathJaxLabel.value
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
 		// get relevant positions and bounding boxes
-		let textPos: SVG.Point
+		let textPosNoTrans: SVG.Point
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPos = this.referenceSymbol._textPosition.point
-				.add(this.referenceSymbol.relMid)
-				.transform(transformMatrix)
+			textPosNoTrans = this.referenceSymbol._textPosition.point.add(this.referenceSymbol.relMid)
 		} else {
-			let bboxHalfSize = new SVG.Point(this.bbox.w / 2, this.bbox.h / 2)
-			let pos = new SVG.Point(this.bbox.cx, this.bbox.cy)
-			textPos = pos.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+			let bboxHalfSize = new SVG.Point(this.symbolBBox.w / 2, this.symbolBBox.h / 2)
+			textPosNoTrans = bboxHalfSize.add(bboxHalfSize.mul(this.positionChoice.value.direction))
 		}
+		let textPos = textPosNoTrans.transform(transformMatrix)
 		let labelBBox = labelSVG.bbox()
 
 		// calculate where on the label the anchor point should be
@@ -390,10 +388,12 @@ export class NodeComponent extends CircuitikzComponent {
 					return value
 				}
 			}
-			let useBBox = this.symbolUse.bbox().transform(transformMatrix)
-			let horizontalTextPosition = clamp(Math.round((2 * (useBBox.cx - textPos.x)) / useBBox.w), -1, 1)
-			let verticalTextPosition = clamp(Math.round((2 * (useBBox.cy - textPos.y)) / useBBox.h), -1, 1)
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition)
+			let useBBox = this.symbolUse.bbox()
+			let horizontalTextPosition = clamp(Math.round((2 * (useBBox.cx - textPosNoTrans.x)) / useBBox.w), -1, 1)
+			let verticalTextPosition = clamp(Math.round((2 * (useBBox.cy - textPosNoTrans.y)) / useBBox.h), -1, 1)
+			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition).rotate(this.rotationDeg)
+			labelRef.x = Math.round(labelRef.x)
+			labelRef.y = Math.round(labelRef.y)
 
 			//reset to center before actually checking where it should go
 			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))

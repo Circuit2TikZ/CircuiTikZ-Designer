@@ -390,11 +390,11 @@ export abstract class CircuitComponent {
 	}
 
 	/**
-	 * helper method to always be between -180 and 180 degrees. TODO could be optimized to not use while loops but a closed form solution
+	 * helper method to always be between -180 and 180 degrees.
 	 */
 	public simplifyRotationAngle() {
-		while (this.rotationDeg > 180) this.rotationDeg -= 360
-		while (this.rotationDeg <= -180) this.rotationDeg += 360
+		// modulo with extra steps since js modulo is weird for negative numbers
+		this.rotationDeg = ((((this.rotationDeg + 180) % 360) + 360) % 360) - 180
 	}
 
 	/**

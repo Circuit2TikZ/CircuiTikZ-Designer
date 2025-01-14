@@ -66,29 +66,66 @@ export function lineRectIntersection(line: SVG.Line | [[number, number], [number
 	return false
 }
 
+let circle: SVG.Circle
+let rect: SVG.Rect
+
 /**
  * check if two rectangles intersect
  * @param {SVG.Box} rect1
  * @param {SVG.Box} rect2
  * @returns {boolean}
  */
-export function rectRectIntersection(rect1: SVG.Box, rect2: SVG.Box): boolean {
-	let l1 = new SVG.Point(rect1.x, rect1.y)
-	let r1 = new SVG.Point(rect1.x2, rect1.y2)
-	let l2 = new SVG.Point(rect2.x, rect2.y)
-	let r2 = new SVG.Point(rect2.x2, rect2.y2)
+export function rectRectIntersection(rect1: SVG.Box, rect2: SVG.Box, rotationDeg1: number = 0): boolean {
+	if (rotationDeg1 == 0) {
+		let l1 = new SVG.Point(rect1.x, rect1.y)
+		let r1 = new SVG.Point(rect1.x2, rect1.y2)
+		let l2 = new SVG.Point(rect2.x, rect2.y)
+		let r2 = new SVG.Point(rect2.x2, rect2.y2)
 
-	// If one rectangle is on left side of other
-	if (l1.x > r2.x || l2.x > r1.x) {
-		return false
+		// If one rectangle is on left side of other
+		if (l1.x > r2.x || l2.x > r1.x) {
+			return false
+		}
+
+		// If one rectangle is above other
+		if (r1.y < l2.y || r2.y < l1.y) {
+			return false
+		}
+
+		return true
 	}
 
-	// If one rectangle is above other
-	if (r1.y < l2.y || r2.y < l1.y) {
-		return false
+	const rect1Center = new SVG.Point(rect1.cx, rect1.cy)
+
+	// rect2 center inside rect1?
+	if (pointInsideRect(new SVG.Point(rect2.cx, rect2.cy).rotate(-rotationDeg1, rect1Center), rect1)) {
+		return true
 	}
 
-	return true
+	let boxPoints = [
+		[rect1.x, rect1.y],
+		[rect1.x2, rect1.y],
+		[rect1.x2, rect1.y2],
+		[rect1.x, rect1.y2],
+	]
+	const points = boxPoints.map((point) => new SVG.Point(point[0], point[1]).rotate(rotationDeg1, rect1Center))
+
+	for (let index = 0; index < points.length - 1; index++) {
+		const A = points[index]
+		const B = points[(index + 1) % points.length]
+
+		if (
+			lineRectIntersection(
+				[
+					[A.x, A.y],
+					[B.x, B.y],
+				],
+				rect2
+			)
+		) {
+			return true
+		}
+	}
 }
 
 export function pointInsideRect(point: SVG.Point | [number, number], rect: SVG.Box): boolean {

@@ -666,8 +666,6 @@ export class WireComponent extends CircuitComponent {
 			if (this.strokeInfo.color !== "default") {
 				let c = new SVG.Color(this.strokeInfo.color)
 				optionsArray.push("draw=" + c.toTikzString())
-			} else {
-				optionsArray.push("draw")
 			}
 
 			if (this.strokeInfo.opacity != 1) {

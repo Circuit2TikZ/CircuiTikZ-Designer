@@ -18,7 +18,7 @@ import {
 	StrokeInfo,
 	strokeStyleChoices,
 } from "../internal"
-import { resizeSVG, roundTikz } from "../utils/selectionHelper"
+import { pointInsideRect, resizeSVG, roundTikz } from "../utils/selectionHelper"
 
 export type EllipseSaveObject = ShapeSaveObject & {
 	position: SVG.Point
@@ -233,6 +233,8 @@ export class EllipseComponent extends ShapeComponent {
 		ellipseComponent.placePoint = saveObject.position
 		ellipseComponent.size = new SVG.Point(saveObject.size)
 
+		ellipseComponent.rotationDeg = saveObject.rotationDeg ?? 0
+
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
 				ellipseComponent.fillInfo.color = saveObject.fill.color
@@ -348,15 +350,19 @@ export class EllipseComponent extends ShapeComponent {
 		optionsArray.push("inner sep=0")
 		optionsArray.push(
 			"minimum width=" +
-				roundTikz(new SVG.Number(this.bbox.w - strokeWidth, "px").convertToUnit("cm").value) +
+				roundTikz(new SVG.Number(this.size.x - strokeWidth, "px").convertToUnit("cm").value) +
 				"cm"
 		)
 		if (!this.isCircle) {
 			optionsArray.push(
 				"minimum height=" +
-					roundTikz(new SVG.Number(this.bbox.h - strokeWidth, "px").convertToUnit("cm").value) +
+					roundTikz(new SVG.Number(this.size.y - strokeWidth, "px").convertToUnit("cm").value) +
 					"cm"
 			)
+		}
+
+		if (this.rotationDeg != 0) {
+			optionsArray.push(`rotate=${this.rotationDeg}`)
 		}
 
 		let id = this.name.value
@@ -406,25 +412,51 @@ export class EllipseComponent extends ShapeComponent {
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
-		//rescale ellipse and rectangle to a unit circle and rectangle (and move rectangle to equivalent position)
-		let ellipseExtendsInv = new SVG.Point(2 / this.bbox.w, 2 / this.bbox.h)
-		let rectPos = new SVG.Point(selectionRectangle.cx, selectionRectangle.cy)
-		let rectExtendsHalf = new SVG.Point(selectionRectangle.w / 2, selectionRectangle.h / 2)
-		rectPos = this.position.add(rectPos.sub(this.position).mul(ellipseExtendsInv))
-		rectExtendsHalf = rectExtendsHalf.mul(ellipseExtendsInv)
+		if (pointInsideRect(this.position, selectionRectangle)) {
+			// if the center of the ellipse is inside the rectangle -> done
+			return true
+		}
+		//the corner points of the selection rectangle
+		let boxPoints = [
+			[selectionRectangle.x, selectionRectangle.y],
+			[selectionRectangle.x2, selectionRectangle.y],
+			[selectionRectangle.x2, selectionRectangle.y2],
+			[selectionRectangle.x, selectionRectangle.y2],
+		]
 
-		// check absolute difference of rectangle and circle centers
-		let diff = new SVG.Point(Math.abs(this.position.x - rectPos.x), Math.abs(this.position.y - rectPos.y))
+		// apply transformation, which transforms the ellipse into a unit circle at the origin, to the box points -> the box points now describe some rotated parallelogram instead of a rectangle. this essentially transforms the calculation to an easier problem
+		const points = boxPoints.map((point) =>
+			new SVG.Point(point[0], point[1]).sub(this.position).rotate(-this.rotationDeg).div(this.size.div(2))
+		)
 
-		//outside
-		let r = 1 // radius/squared radius of ellipse(now circle)
-		if (diff.x > rectExtendsHalf.x + r || diff.y > rectExtendsHalf.y + r) return false
+		for (let index = 0; index < points.length - 1; index++) {
+			const A = points[index]
+			const B = points[(index + 1) % points.length]
 
-		//inside
-		if (diff.x <= rectExtendsHalf.x || diff.y <= rectExtendsHalf.y) return true
+			if (A.absSquared() <= 1 || B.absSquared() <= 1) {
+				// at least one corner point of the parallelogram is in the unit circle -> collision
+				return true
+			}
 
-		//rounded corner check
-		return (diff.x - rectExtendsHalf.x) ** 2 + (diff.y - rectExtendsHalf.y) ** 2 <= r
+			// from here: no corner point of the current line segment is in the unit circle -> check if line segement cuts through the unit circle
+
+			const AB = B.sub(A)
+			const AC = A.mul(-1)
+
+			// t*AB is the projection of AC onto AB, i.e. the closest point of the line described by A and B to the origin
+			const t = AC.dot(AB) / AB.absSquared()
+
+			if (t <= 1 && t >= 0) {
+				// the closest point of the line through A and B to the origin lies on the line segment AB -> collision possible
+				const P = A.add(AB.mul(t))
+				if (P.absSquared() <= 1) {
+					// the closest point lies inside the unit circle -> collision
+					return true
+				}
+			}
+		}
+
+		return false
 	}
 
 	public copyForPlacement(): CircuitComponent {
