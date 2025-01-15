@@ -124,12 +124,12 @@ export class PolygonComponent extends ShapeComponent {
 		}
 		this.isResizing = resize
 		if (resize) {
-			let originalPos: SVG.Point
-			let originalSize: SVG.Point
+			// let originalPos: SVG.Point
+			// let originalSize: SVG.Point
 			let transformMatrixInv: SVG.Matrix
 			const getInitialDim = () => {
-				originalPos = this.position.clone()
-				originalSize = this.size.clone()
+				// originalPos = this.position.clone()
+				// originalSize = this.size.clone()
 				transformMatrixInv = this.getTransformMatrix().inverse()
 			}
 
@@ -190,7 +190,7 @@ export class PolygonComponent extends ShapeComponent {
 		if (this.rotationDeg) {
 			data.rotationDeg = this.rotationDeg
 		}
-		if (this.scaleState.x != 1 && this.scaleState.y != 1) {
+		if (this.scaleState.x != 1 || this.scaleState.y != 1) {
 			data.scale = this.scaleState
 		}
 
@@ -419,13 +419,9 @@ export class PolygonComponent extends ShapeComponent {
 
 	private scaleState = new SVG.Point(1, 1)
 	public flip(horizontal: boolean): void {
-		if (horizontal) {
-			this.scaleState.y *= -1
-			this.rotationDeg *= -1
-		} else {
-			this.scaleState.y *= -1
-			this.rotationDeg = 180 - this.rotationDeg
-		}
+		this.scaleState.y *= -1
+		this.rotationDeg = (horizontal ? 180 : 0) - this.rotationDeg
+		this.simplifyRotationAngle()
 		this.update()
 	}
 

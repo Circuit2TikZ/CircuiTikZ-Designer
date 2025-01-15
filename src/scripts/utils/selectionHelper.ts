@@ -66,9 +66,6 @@ export function lineRectIntersection(line: SVG.Line | [[number, number], [number
 	return false
 }
 
-let circle: SVG.Circle
-let rect: SVG.Rect
-
 /**
  * check if two rectangles intersect
  * @param {SVG.Box} rect1
