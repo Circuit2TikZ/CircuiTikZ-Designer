@@ -383,7 +383,9 @@ export class PathComponent extends CircuitikzComponent {
 			:	"") +
 			(this.mirror.value ? ", mirror" : "") +
 			(this.invert.value ? ", invert" : "") +
-			(scaleFactor ? ",/tikz/circuitikz/bipoles/length=" + scaleFactor.value.toPrecision(3) : "") +
+			(scaleFactor ?
+				",/tikz/circuitikz/bipoles/length=" + scaleFactor.value.toPrecision(3) + scaleFactor.unit
+			:	"") +
 			"] " +
 			this.posEnd.toTikzString() +
 			";"
