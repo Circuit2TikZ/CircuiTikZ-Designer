@@ -24,25 +24,25 @@
 			<circle cx="7" cy="7" fill="none" stroke="var(--bs-emphasis-color)" stroke-width="1.5" r="6" />
 		</symbol>
 		<symbol id="latex">
-			<path stroke="none" fill="context-stroke" d="M 0 0.125 C 0.375 0.375 1 0.5 1 0.5 C 1 0.5 0.375 0.625 0 0.875 z" />
+			<path stroke="none" d="M 0 0.125 C 0.375 0.375 1 0.5 1 0.5 C 1 0.5 0.375 0.625 0 0.875 z" />
 		</symbol>
 		<symbol id="latexR">
-			<path stroke="none" fill="context-stroke" d="M 1 0.125 C 0.625 0.375 0 0.5 0 0.5 C 0 0.5 0.625 0.625 1 0.875 z" />
+			<path stroke="none" d="M 1 0.125 C 0.625 0.375 0 0.5 0 0.5 C 0 0.5 0.625 0.625 1 0.875 z" />
 		</symbol>
 		<symbol id="to">
-			<path stroke="context-stroke" fill="none" d="M.5.1C.5.3.9.6 1 .6M.5 1.1C.5.9.9.6 1 .6" stroke-linecap="round" />
+			<path fill="none" d="M.5.1C.5.3.9.6 1 .6M.5 1.1C.5.9.9.6 1 .6" stroke-linecap="round" />
 		</symbol>
 		<symbol id="toR">
-			<path stroke="context-stroke" fill="none" d="M1 .1C1 .3.6.6.5.6M1 1.1C1 .9.6.6.5.6" stroke-linecap="round" />
+			<path fill="none" d="M1 .1C1 .3.6.6.5.6M1 1.1C1 .9.6.6.5.6" stroke-linecap="round" />
 		</symbol>
 		<symbol id="stealth">
-			<path stroke="none" fill="context-stroke" d="M0 0 1 .5 0 1 .3.5" stroke-linecap="round" />
+			<path stroke="none" d="M0 0 1 .5 0 1 .3.5" stroke-linecap="round" />
 		</symbol>
 		<symbol id="stealthR">
-			<path stroke="none" fill="context-stroke" d="M1 0 0 .5 1 1 .7.5" stroke-linecap="round" />
+			<path stroke="none" d="M1 0 0 .5 1 1 .7.5" stroke-linecap="round" />
 		</symbol>
 		<symbol id="line">
-			<path stroke="context-stroke" fill="none" d="M .5 0 L .5 1" />
+			<path fill="none" d="M .5 0 L .5 1" />
 		</symbol>
 	</defs>
 	<rect id="grid" x="0" y="0" width="100%" height="100%" fill="url(#gridPattern)" />

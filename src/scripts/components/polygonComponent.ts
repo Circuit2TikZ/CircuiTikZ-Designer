@@ -420,7 +420,7 @@ export class PolygonComponent extends ShapeComponent {
 	private scaleState = new SVG.Point(1, 1)
 	public flip(horizontal: boolean): void {
 		this.scaleState.y *= -1
-		this.rotationDeg = (horizontal ? 180 : 0) - this.rotationDeg
+		this.rotationDeg = (horizontal ? 0 : 180) - this.rotationDeg
 		this.simplifyRotationAngle()
 		this.update()
 	}

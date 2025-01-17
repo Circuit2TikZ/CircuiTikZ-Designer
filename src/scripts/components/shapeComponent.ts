@@ -235,7 +235,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 	}
 
 	public flip(horizontal: boolean): void {
-		this.rotationDeg = (horizontal ? 180 : 0) - this.rotationDeg
+		this.rotationDeg = (horizontal ? 0 : 180) - this.rotationDeg
 		this.simplifyRotationAngle()
 		this.update()
 	}

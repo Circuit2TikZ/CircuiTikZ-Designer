@@ -77,7 +77,7 @@ export const arrowTips: ArrowTip[] = [
 		key: "toR",
 		name: "to reversed",
 		tikz: "to reversed",
-		setBack: 0.5,
+		setBack: 0.4,
 		strokeFactor: 0.7,
 		refXY: new SVG.Point(-1, -0.6),
 	},
@@ -151,14 +151,14 @@ export class WireComponent extends CircuitComponent {
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Arrows").buildHTML())
 		this.arrowStart = new ChoiceProperty("Start", arrowTips, defaultArrowTip)
 		this.arrowStart.addChangeListener((ev) => {
-			this.updateArrowTypes()
+			this.updateArrowTypesAndColors()
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.arrowStart.buildHTML())
 
 		this.arrowEnd = new ChoiceProperty("End", arrowTips, defaultArrowTip)
 		this.arrowEnd.addChangeListener((ev) => {
-			this.updateArrowTypes()
+			this.updateArrowTypesAndColors()
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.arrowEnd.buildHTML())
@@ -174,6 +174,8 @@ export class WireComponent extends CircuitComponent {
 		this.strokeOpacityProperty.addChangeListener((ev) => {
 			this.strokeInfo.opacity = ev.value.value / 100
 			this.updateTheme()
+			this.updateArrowTypesAndColors()
+			this.update()
 		})
 
 		this.strokeColorProperty = new ColorProperty("Color", null)
@@ -186,6 +188,8 @@ export class WireComponent extends CircuitComponent {
 				this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
 			}
 			this.updateTheme()
+			this.updateArrowTypesAndColors()
+			this.update()
 		})
 		this.strokeWidthProperty = new SliderProperty("Width", 0, 10, 0.1, this.strokeInfo.width)
 		this.strokeWidthProperty.addChangeListener((ev) => {
@@ -222,23 +226,36 @@ export class WireComponent extends CircuitComponent {
 		return scale
 	}
 
-	private updateArrowTypes() {
+	private updateArrowTypesAndColors() {
+		let arrowColor = this.strokeInfo.color
+		if (arrowColor == "default") {
+			arrowColor = defaultStroke
+		}
+
 		this.startArrowElement?.remove()
 		this.startArrowElement = null
 		if (this.arrowStart.value.key != defaultArrowTip.key) {
-			this.startArrowElement = CanvasController.instance.canvas
-				.use(this.arrowStart.value.key)
-				.stroke("var(--bs-emphasis-color)")
-				.addTo(this.visualization)
+			this.startArrowElement = CanvasController.instance.canvas.group()
+			this.startArrowElement.addTo(this.visualization)
+			this.startArrowElement.stroke({ color: arrowColor, opacity: this.strokeInfo.opacity })
+			this.startArrowElement.fill({ color: arrowColor, opacity: this.strokeInfo.opacity })
+			const arrowPath = document.getElementById(this.arrowStart.value.key)
+			for (const element of arrowPath.children) {
+				this.startArrowElement.node.append(element.cloneNode(true))
+			}
 		}
 
 		this.endArrowElement?.remove()
 		this.endArrowElement = null
 		if (this.arrowEnd.value.key != defaultArrowTip.key) {
-			this.endArrowElement = CanvasController.instance.canvas
-				.use(this.arrowEnd.value.key)
-				.stroke("var(--bs-emphasis-color)")
-				.addTo(this.visualization)
+			this.endArrowElement = CanvasController.instance.canvas.group()
+			this.endArrowElement.addTo(this.visualization)
+			this.endArrowElement.stroke({ color: arrowColor, opacity: this.strokeInfo.opacity })
+			this.endArrowElement.fill({ color: arrowColor, opacity: this.strokeInfo.opacity })
+			const arrowPath = document.getElementById(this.arrowEnd.value.key)
+			for (const element of arrowPath.children) {
+				this.endArrowElement.node.append(element.cloneNode(true))
+			}
 		}
 	}
 
@@ -391,7 +408,14 @@ export class WireComponent extends CircuitComponent {
 						this.update()
 					},
 					dragEnd: () => {
-						return this.cornerPoints[index].eq(startPos)
+						const bbox = WireComponent.bboxFromPoints(this.cornerPoints)
+						const delta = new SVG.Point(bbox.cx, bbox.cy)
+						this.cornerPoints = this.cornerPoints.map((point) => point.sub(delta))
+						this.position = this.position.add(
+							delta.transform(new SVG.Matrix({ rotate: -this.rotationDeg, scaleY: this.scaleState.y }))
+						)
+						this.update()
+						return this.cornerPoints[index].eq(startPos.sub(delta))
 					},
 				})
 			}
@@ -435,7 +459,7 @@ export class WireComponent extends CircuitComponent {
 	private scaleState: SVG.Point
 	public flip(horizontal: boolean): void {
 		this.scaleState.y *= -1
-		this.rotationDeg = (horizontal ? 180 : 0) - this.rotationDeg
+		this.rotationDeg = (horizontal ? 0 : 180) - this.rotationDeg
 		this.simplifyRotationAngle()
 		this.update()
 	}
@@ -455,19 +479,7 @@ export class WireComponent extends CircuitComponent {
 
 	protected update(): void {
 		// generate all the points in the wire from the corner points and the wire directions
-		let pointArray: SVG.Point[] = [this.cornerPoints[0].clone()]
-		for (let index = 0; index < this.wireDirections.length; index++) {
-			const direction = this.wireDirections[index]
-
-			const previousPoint = this.cornerPoints[index]
-			const point = this.cornerPoints[index + 1]
-			if (direction == WireDirection.HV && previousPoint.x != point.x && previousPoint.y != point.y) {
-				pointArray.push(new SVG.Point(point.x, previousPoint.y))
-			} else if (direction == WireDirection.VH && previousPoint.x != point.x && previousPoint.y != point.y) {
-				pointArray.push(new SVG.Point(previousPoint.x, point.y))
-			}
-			pointArray.push(point.clone())
-		}
+		let pointArray = this.pointsFromCornerPoints()
 
 		let startArrowRef = pointArray.at(1).clone()
 		startArrowRef =
@@ -546,12 +558,30 @@ export class WireComponent extends CircuitComponent {
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
 	}
+
+	private pointsFromCornerPoints() {
+		let pointArray: SVG.Point[] = [this.cornerPoints[0].clone()]
+		for (let index = 0; index < this.wireDirections.length; index++) {
+			const direction = this.wireDirections[index]
+
+			const previousPoint = this.cornerPoints[index]
+			const point = this.cornerPoints[index + 1]
+			if (direction == WireDirection.HV && previousPoint.x != point.x && previousPoint.y != point.y) {
+				pointArray.push(new SVG.Point(point.x, previousPoint.y))
+			} else if (direction == WireDirection.VH && previousPoint.x != point.x && previousPoint.y != point.y) {
+				pointArray.push(new SVG.Point(previousPoint.x, point.y))
+			}
+			pointArray.push(point.clone())
+		}
+		return pointArray
+	}
+
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
 			const transformMatrix = this.getTransformMatrix()
 			const transformMatrixInv = transformMatrix.inverse()
 
-			let bbox = WireComponent.bboxFromPoints(this.wire.array().map((point) => new SVG.Point(point)))
+			let bbox = WireComponent.bboxFromPoints(this.cornerPoints)
 			const strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 			bbox = new SVG.Box(
 				bbox.x - strokeWidth / 2,
@@ -576,14 +606,14 @@ export class WireComponent extends CircuitComponent {
 
 			this.selectionElement.size(bbox.width, bbox.height)
 			this.selectionElement.center(bbox.cx, bbox.cy)
-			this.selectionElement.transform(this.getTransformMatrix())
+			this.selectionElement.transform(transformMatrix)
 		}
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
 		//essentially check each wire segment via a wire rect intersection
 		const transformMatrix = this.getTransformMatrix()
-		let pointsArray = this.wire.array().map((point) => new SVG.Point(point).transform(transformMatrix))
+		let pointsArray = this.pointsFromCornerPoints().map((point) => point.transform(transformMatrix))
 
 		for (let idx = 0; idx < pointsArray.length - 1; idx++) {
 			const p1 = pointsArray[idx]
@@ -711,21 +741,35 @@ export class WireComponent extends CircuitComponent {
 			}
 		}
 		let optionsArrayStr = optionsArray.length > 0 ? "[" + optionsArray.join(", ") + "]" : ""
-		let outString = "\\draw" + optionsArrayStr + " " + this.cornerPoints[0].toTikzString()
-		for (let index = 0; index < this.wireDirections.length; index++) {
-			const lastPoint = this.cornerPoints[index]
-			const point = this.cornerPoints[index + 1]
-			let dir = this.wireDirections[index]
-			if (dir == WireDirection.HV && lastPoint.y == point.y) {
-				dir = WireDirection.Straight
+		const transformMatrix = this.getTransformMatrix()
+
+		let outString = "\\draw" + optionsArrayStr + " "
+		if ((this.rotationDeg + 180) % 90 != 0) {
+			// add points between corner points
+			let pointArray = this.pointsFromCornerPoints().map((point) => point.transform(transformMatrix))
+
+			outString += pointArray[0].toTikzString()
+			for (let index = 1; index < pointArray.length; index++) {
+				outString += " -- " + pointArray[index].toTikzString()
 			}
-			if (dir == WireDirection.VH && lastPoint.x == point.x) {
-				dir = WireDirection.Straight
+		} else {
+			let pointArray = this.cornerPoints.map((point) => point.transform(transformMatrix))
+			outString += pointArray[0].toTikzString()
+			for (let index = 0; index < this.wireDirections.length; index++) {
+				const previousPoint = pointArray[index]
+				const point = pointArray[index + 1]
+				let dir = this.wireDirections[index]
+				if (dir == WireDirection.HV && previousPoint.y == point.y) {
+					dir = WireDirection.Straight
+				}
+				if (dir == WireDirection.VH && previousPoint.x == point.x) {
+					dir = WireDirection.Straight
+				}
+				if (!dir) {
+					dir = WireDirection.Straight
+				}
+				outString += " " + dir + " " + point.toTikzString()
 			}
-			if (!dir) {
-				dir = WireDirection.Straight
-			}
-			outString += " " + dir + " " + point.toTikzString()
 		}
 		return outString + ";"
 	}
@@ -885,7 +929,7 @@ export class WireComponent extends CircuitComponent {
 		// ]
 
 		this.draggable(true)
-		this.updateArrowTypes()
+		this.updateArrowTypesAndColors()
 		this.update()
 		this.updateTheme()
 
@@ -952,7 +996,7 @@ export class WireComponent extends CircuitComponent {
 			wireComponent.arrowEnd.value = arrowTips.find((item) => item.key == saveObject.endArrow)
 			wireComponent.arrowEnd.updateHTML()
 		}
-		wireComponent.updateArrowTypes()
+		wireComponent.updateArrowTypesAndColors()
 
 		wireComponent.updateTheme()
 		wireComponent.update()
