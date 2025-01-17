@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0]
+
+### Added
+
+- Rotate components by 45 degrees with a dedicated button in the properties window
+- Scale circuitikz components (This also scales the line width, which is not the case with TikZ, i.e. what you see in CircuiTikZ-Designer will be slightly different than what you get in TikZ so keep that in mind)
+- Can now group and ungroup components
+
+### Changed
+
+- No more ForeignObjects are used in the SVG components and export. This should dramatically increase compatibility of the SVG export with 3rd party software.
+
+### Fixed
+
+- The grid was not drawn exactly where it should have been drawn
+- Many other small fixes
+
 ## [0.5.2]
 
 ### Fixed
