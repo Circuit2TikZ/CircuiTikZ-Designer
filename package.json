@@ -1,6 +1,6 @@
 {
 	"name": "circutikz-pwa",
-	"version": "0.5.2",
+	"version": "0.6.0",
 	"private": "true",
 	"description": "A GUI for drawing CircuiTikZ circuits",
 	"license": "GPL-3.0-only",
