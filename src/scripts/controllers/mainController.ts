@@ -820,7 +820,7 @@ export class MainController {
 		let text = element.value
 		let regex = null
 		try {
-			regex = new RegExp(text, "i")
+			regex = new RegExp(".*" + text.split("").join(".*") + ".*", "i")
 			element.classList.remove("is-invalid")
 			feedbacktext.classList.add("d-none")
 		} catch (e) {
