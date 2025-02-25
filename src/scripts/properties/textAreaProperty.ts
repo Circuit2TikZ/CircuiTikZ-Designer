@@ -62,6 +62,7 @@ export class TextAreaProperty extends EditableProperty<Text> {
 			this.input = document.createElement("textArea") as HTMLTextAreaElement
 			this.input.classList.add("form-control")
 			this.input.value = this.value.text ?? ""
+			this.input.placeholder = "write here..."
 			inputDiv.appendChild(this.input)
 		}
 		rowTextArea.appendChild(inputDiv)

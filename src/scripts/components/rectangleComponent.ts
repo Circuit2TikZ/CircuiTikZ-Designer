@@ -49,8 +49,11 @@ export class RectangleComponent extends ShapeComponent {
 	private textSVG: SVG.ForeignObject
 	private textDiv: HTMLDivElement
 
-	public constructor() {
+	private createAsText: boolean
+
+	public constructor(createAsText: boolean = false) {
 		super()
+		this.createAsText = createAsText
 		this.displayName = "Rectangle"
 
 		this.shapeVisualization = CanvasController.instance.canvas.rect(0, 0)
@@ -67,7 +70,14 @@ export class RectangleComponent extends ShapeComponent {
 		this.visualization.add(this.dragElement)
 
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
-		this.textAreaProperty = new TextAreaProperty({ text: "", align: TextAlign.LEFT, justify: -1 })
+		this.textAreaProperty = new TextAreaProperty({
+			text: createAsText ? "text component" : "",
+			align: TextAlign.LEFT,
+			justify: -1,
+		})
+		if (createAsText) {
+			this.strokeStyleProperty.value = strokeStyleChoices[1]
+		}
 		this.textAreaProperty.addChangeListener((ev) => {
 			this.update()
 		})
@@ -397,6 +407,23 @@ export class RectangleComponent extends ShapeComponent {
 		return rectComponent
 	}
 
+	/**
+	 * override placeFinish: change the default look of the component if the rectangle was created as a text component
+	 */
+	public placeFinish(): void {
+		super.placeFinish()
+		if (this.createAsText) {
+			this.strokeOpacityProperty.value = new SVG.Number(0, "%")
+			this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
+			this.updateTheme()
+			this.strokeOpacityProperty.updateHTML()
+			this.strokeStyleProperty.value = strokeStyleChoices[0]
+			this.strokeStyleProperty.updateHTML()
+			this.textAreaProperty.value = { text: "" }
+			this.textAreaProperty.updateHTML()
+		}
+	}
+
 	public toTikzString(): string {
 		let optionsArray: string[] = ["shape=rectangle"]
 		if (this.fillInfo.opacity > 0) {
@@ -534,7 +561,7 @@ export class RectangleComponent extends ShapeComponent {
 	}
 
 	public copyForPlacement(): CircuitComponent {
-		return new RectangleComponent()
+		return new RectangleComponent(this.createAsText)
 	}
 
 	private labelPos: DirectionInfo

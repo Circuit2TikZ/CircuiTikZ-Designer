@@ -5,6 +5,8 @@ import {
 	MainController,
 	Modes,
 	PropertyController,
+	SelectionController,
+	SelectionMode,
 	SnapController,
 	Undo,
 } from "../internal"
@@ -23,6 +25,8 @@ export class ComponentPlacer {
 	public get component(): CircuitComponent | null {
 		return this._component
 	}
+
+	private previousComponent: CircuitComponent | null = null
 
 	private constructor() {
 		this.placeStep = this.placeStep.bind(this)
@@ -102,6 +106,7 @@ export class ComponentPlacer {
 
 			// restart component placement for just finished component
 			if (window.TouchEvent && !(ev instanceof TouchEvent)) {
+				this.previousComponent = this.component
 				this.placeComponent(this.component.copyForPlacement())
 			} else {
 				this._component = null
@@ -112,7 +117,7 @@ export class ComponentPlacer {
 
 	/**
 	 * cancel the component placement
-	 * @param ev which event is responsible for the cancellastion
+	 * @param ev which event is responsible for the cancellation
 	 */
 	public placeCancel(ev?: KeyboardEvent) {
 		let component = this.component
@@ -121,6 +126,10 @@ export class ComponentPlacer {
 			MainController.instance.removeComponent(component)
 			this._component = null
 		}
+		if (this.previousComponent) {
+			SelectionController.instance.selectComponents([this.previousComponent], SelectionMode.RESET)
+		}
+		this.previousComponent = null
 		this.cleanUp()
 		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}

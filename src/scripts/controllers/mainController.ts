@@ -28,6 +28,7 @@ import {
 	defaultStroke,
 	defaultFill,
 	PolygonComponent,
+	TextAlign,
 } from "../internal"
 
 type SaveState = {
@@ -440,7 +441,7 @@ export class MainController {
 		})
 		hotkeys("t", () => {
 			this.switchMode(Modes.DRAG_PAN)
-			ComponentPlacer.instance.placeComponent(new RectangleComponent())
+			ComponentPlacer.instance.placeComponent(new RectangleComponent(true))
 			return false
 		})
 
@@ -555,7 +556,7 @@ export class MainController {
 
 	private addShapeComponentsToOffcanvas(leftOffcanvasAccordion: HTMLDivElement, leftOffcanvasOC: Offcanvas) {
 		// Add shapes accordion area
-		let groupName = "Shapes"
+		let groupName = "Basic"
 		const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-")
 
 		const accordionGroup = leftOffcanvasAccordion.appendChild(document.createElement("div"))
@@ -581,6 +582,34 @@ export class MainController {
 		const accordionItemBody = accordionItemCollapse.appendChild(document.createElement("div"))
 		accordionItemBody.classList.add("accordion-body", "iconLibAccordionBody")
 
+		//Add Text
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "text")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Text"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new RectangleComponent(true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -14, 30, 15)
+			svgIcon.text((add) => {
+				add.tspan("Text").fill({ color: defaultStroke })
+			})
+		}
+
 		//Add rectangle
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
@@ -591,13 +620,9 @@ export class MainController {
 
 			const listener = (ev: MouseEvent) => {
 				ev.preventDefault()
-				this.switchMode(Modes.COMPONENT)
 
-				if (ComponentPlacer.instance.component) {
-					ComponentPlacer.instance.placeCancel()
-				}
-
-				let newComponent = new RectangleComponent()
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new RectangleComponent(false)
 				ComponentPlacer.instance.placeComponent(newComponent)
 
 				leftOffcanvasOC.hide()

@@ -286,7 +286,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 			fillColor = "none"
 		}
 
-		this.shapeVisualization.stroke({
+		this.shapeVisualization?.stroke({
 			color: strokeColor,
 			opacity: this.strokeInfo.opacity,
 			width: this.strokeInfo.opacity == 0 ? 0 : this.strokeInfo.width.convertToUnit("px").value,
@@ -294,7 +294,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 				.map((factor) => this.strokeInfo.width.times(factor).toString())
 				.join(" "),
 		})
-		this.shapeVisualization.fill({
+		this.shapeVisualization?.fill({
 			color: fillColor,
 			opacity: this.fillInfo.opacity,
 		})
