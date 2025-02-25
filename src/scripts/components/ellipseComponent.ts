@@ -182,7 +182,7 @@ export class EllipseComponent extends ShapeComponent {
 			fill.color = this.fillInfo.color
 			shouldFill = true
 		}
-		if (this.fillInfo.opacity != 0) {
+		if (this.fillInfo.opacity != 1) {
 			fill.opacity = this.fillInfo.opacity
 			shouldFill = true
 		}

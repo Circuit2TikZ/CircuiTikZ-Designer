@@ -102,7 +102,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 
 		this.fillInfo = {
 			color: "default",
-			opacity: 0,
+			opacity: 1,
 		}
 		this.strokeInfo = {
 			color: "default",
@@ -130,7 +130,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.fillColorProperty.addChangeListener((ev) => {
 			if (ev.value == null) {
 				this.fillInfo.color = "default"
-				this.fillInfo.opacity = 0
+				this.fillInfo.opacity = 1
 			} else {
 				this.fillInfo.color = ev.value.toRgb()
 				this.fillInfo.opacity = this.fillOpacityProperty.value.value / 100
