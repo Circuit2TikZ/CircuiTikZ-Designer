@@ -712,6 +712,109 @@ export class MainController {
 					width: 1,
 				})
 		}
+
+		//Add straight line
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight line")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Straight line"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(0, 0, 17, 12)
+			svgIcon.line(2, 10, 15, 2).stroke({ color: defaultStroke, width: 1, opacity: 1 })
+		}
+
+		//Add straight arrow
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight arrow")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Straight arrow"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(true, true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -1, 12, 6)
+			svgIcon
+				.polygon([
+					[6, 0],
+					[10, 2],
+					[6, 4],
+					[6, 2.2],
+					[0, 2.2],
+					[0, 1.8],
+					[6, 1.8],
+				])
+				.rotate(-30, 5, 2)
+				.fill({ color: defaultStroke })
+		}
+
+		//Add arrow
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight arrow")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Straight arrow"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(false, true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -2, 12, 8)
+			svgIcon
+				.polyline([
+					[0, 5],
+					[5, 5],
+					[5, 0],
+					[9.1, 0],
+				])
+				.stroke({ color: defaultStroke, width: 0.5 })
+			svgIcon
+				.polygon([
+					[9, -1],
+					[10.5, 0],
+					[9, 1],
+				])
+				.fill({ color: defaultStroke })
+		}
 	}
 
 	/**

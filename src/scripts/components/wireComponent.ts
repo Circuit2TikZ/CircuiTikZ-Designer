@@ -120,8 +120,13 @@ export class WireComponent extends CircuitComponent {
 
 	public static arrowSymbols: Map<string, SVGSymbolElement>
 
-	constructor() {
+	private onlyStraight: boolean
+	private defaultArrowHead: boolean
+
+	constructor(onlyStraight: boolean = false, defaultArrowHead: boolean = false) {
 		super()
+		this.onlyStraight = onlyStraight
+		this.defaultArrowHead = defaultArrowHead
 		this.cornerPoints = []
 		this.wireDirections = []
 		SnapCursorController.instance.visible = true
@@ -156,7 +161,7 @@ export class WireComponent extends CircuitComponent {
 		})
 		this.propertiesHTMLRows.push(this.arrowStart.buildHTML())
 
-		this.arrowEnd = new ChoiceProperty("End", arrowTips, defaultArrowTip)
+		this.arrowEnd = new ChoiceProperty("End", arrowTips, this.defaultArrowHead ? arrowTips[3] : defaultArrowTip)
 		this.arrowEnd.addChangeListener((ev) => {
 			this.updateArrowTypesAndColors()
 			this.update()
@@ -219,6 +224,7 @@ export class WireComponent extends CircuitComponent {
 				WireComponent.arrowSymbols.set(tip.key, document.getElementById(tip.key) as any)
 			}
 		}
+		this.updateArrowTypesAndColors()
 	}
 
 	private lineWidthToArrowScale(): number {
@@ -796,7 +802,7 @@ export class WireComponent extends CircuitComponent {
 	}
 
 	public copyForPlacement(): WireComponent {
-		return new WireComponent()
+		return new WireComponent(this.onlyStraight, this.defaultArrowHead)
 	}
 
 	public remove(): void {
@@ -852,7 +858,7 @@ export class WireComponent extends CircuitComponent {
 	}
 
 	private wireDirectionFromDirectionVec(directionVec: SVG.Point, ev?: MouseEvent | TouchEvent): WireDirection {
-		if (ev && (ev.ctrlKey || (MainController.instance.isMac && ev.metaKey))) {
+		if (this.onlyStraight || (ev && (ev.ctrlKey || (MainController.instance.isMac && ev.metaKey)))) {
 			return WireDirection.Straight
 		} else if (directionVec.x != 0) {
 			return WireDirection.HV
