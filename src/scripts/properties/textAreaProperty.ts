@@ -26,6 +26,7 @@ export type Text = {
 	fontSize?: string
 	innerSep?: SVG.Number
 	color?: string | "default"
+	showPlaceholderText?: boolean
 }
 
 export enum TextAlign {
@@ -37,6 +38,8 @@ export enum TextAlign {
 
 export class TextAreaProperty extends EditableProperty<Text> {
 	private input: HTMLTextAreaElement
+
+	private checkBox: HTMLInputElement
 
 	private alignLeft: HTMLInputElement
 	private alignCenter: HTMLInputElement
@@ -80,6 +83,29 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				Undo.addState()
 			}
 		})
+
+		let col = document.createElement("div") as HTMLDivElement
+		col.classList.add("col-12", "my-0")
+		let checkBoxContainerX = document.createElement("div") as HTMLDivElement
+		checkBoxContainerX.classList.add("form-check", "form-switch")
+		{
+			this.checkBox = document.createElement("input") as HTMLInputElement
+			this.checkBox.classList.add("form-check-input")
+			this.checkBox.setAttribute("type", "checkbox")
+			this.checkBox.setAttribute("role", "switch")
+			this.checkBox.checked = this.value.showPlaceholderText
+			checkBoxContainerX.appendChild(this.checkBox)
+
+			let labelElementX = document.createElement("label") as HTMLLabelElement
+			labelElementX.classList.add("form-check-label")
+			labelElementX.innerHTML = "show default text"
+			checkBoxContainerX.appendChild(labelElementX)
+		}
+		col.appendChild(checkBoxContainerX)
+		this.checkBox.addEventListener("change", (ev) => {
+			this.update()
+		})
+		rowTextArea.appendChild(col)
 
 		const btnLabelClasses = [
 			"btn",
@@ -260,6 +286,7 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				this.justifyStart.checked ? -1
 				: this.justifyCenter.checked ? 0
 				: 1,
+			showPlaceholderText: this.checkBox.checked,
 		}
 		this.updateValue(data)
 	}
@@ -296,10 +323,16 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				default:
 					break
 			}
+			this.checkBox.checked = this.value.showPlaceholderText ?? false
 		}
 	}
 
 	public eq(first: Text, second: Text): boolean {
-		return first.text == second.text && first.align == second.align && first.justify == second.justify
+		return (
+			first.text == second.text &&
+			first.align == second.align &&
+			first.justify == second.justify &&
+			first.showPlaceholderText == second.showPlaceholderText
+		)
 	}
 }

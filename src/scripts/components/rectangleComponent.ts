@@ -46,8 +46,7 @@ export class RectangleComponent extends ShapeComponent {
 	private textInnerSep: SliderProperty
 	private textFontSize: ChoiceProperty<FontSize>
 	private textColor: ColorProperty
-	private textSVG: SVG.ForeignObject
-	private textDiv: HTMLDivElement
+	private textSVG: SVG.Text
 
 	private createAsText: boolean
 
@@ -71,14 +70,16 @@ export class RectangleComponent extends ShapeComponent {
 
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
 		this.textAreaProperty = new TextAreaProperty({
-			text: createAsText ? "text component" : "",
+			text: "",
 			align: TextAlign.LEFT,
 			justify: -1,
+			showPlaceholderText: this.createAsText,
 		})
 		if (createAsText) {
 			this.strokeStyleProperty.value = strokeStyleChoices[1]
 		}
 		this.textAreaProperty.addChangeListener((ev) => {
+			this.createAsText = ev.value.showPlaceholderText
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.textAreaProperty.buildHTML())
@@ -290,26 +291,35 @@ export class RectangleComponent extends ShapeComponent {
 			data.label = labelWithoutRender
 		}
 
-		if (this.textAreaProperty.value && this.textAreaProperty.value.text !== "") {
+		if (this.textAreaProperty.value) {
 			let textData: Text = {
-				text: this.textAreaProperty.value.text,
+				text: undefined,
 			}
-			if (this.textAreaProperty.value.align !== TextAlign.LEFT) {
-				textData.align = this.textAreaProperty.value.align
+			let hasText = false
+			if (this.textAreaProperty.value.text != undefined && this.textAreaProperty.value.text !== "") {
+				textData.text = this.textAreaProperty.value.text
+				if (this.textAreaProperty.value.align !== TextAlign.LEFT) {
+					textData.align = this.textAreaProperty.value.align
+				}
+				if (this.textAreaProperty.value.justify !== -1) {
+					textData.justify = this.textAreaProperty.value.justify
+				}
+				if (this.textFontSize.value.key !== defaultFontSize.key) {
+					textData.fontSize = this.textFontSize.value.key
+				}
+				if (this.textInnerSep.value.value !== 5) {
+					textData.innerSep = this.textInnerSep.value
+				}
+				if (this.textColor.value) {
+					textData.color = this.textColor.value.toString()
+				}
+				hasText = true
 			}
-			if (this.textAreaProperty.value.justify !== -1) {
-				textData.justify = this.textAreaProperty.value.justify
+			textData.showPlaceholderText = this.createAsText || undefined
+
+			if (hasText || this.createAsText) {
+				data.text = textData
 			}
-			if (this.textFontSize.value.key !== defaultFontSize.key) {
-				textData.fontSize = this.textFontSize.value.key
-			}
-			if (this.textInnerSep.value.value !== 5) {
-				textData.innerSep = this.textInnerSep.value
-			}
-			if (this.textColor.value) {
-				textData.color = this.textColor.value.toString()
-			}
-			data.text = textData
 		}
 
 		return data
@@ -384,10 +394,12 @@ export class RectangleComponent extends ShapeComponent {
 
 		if (saveObject.text) {
 			let text: Text = {
-				text: saveObject.text.text,
+				text: saveObject.text.text == undefined ? "" : saveObject.text.text,
 				align: saveObject.text.align ?? TextAlign.LEFT,
 				justify: saveObject.text.justify ?? -1,
+				showPlaceholderText: saveObject.text.showPlaceholderText ?? false,
 			}
+			rectComponent.createAsText = text.showPlaceholderText
 			rectComponent.textAreaProperty.value = text
 			rectComponent.textAreaProperty.updateHTML()
 			rectComponent.textFontSize.value =
@@ -419,8 +431,7 @@ export class RectangleComponent extends ShapeComponent {
 			this.strokeOpacityProperty.updateHTML()
 			this.strokeStyleProperty.value = strokeStyleChoices[0]
 			this.strokeStyleProperty.updateHTML()
-			this.textAreaProperty.value = { text: "" }
-			this.textAreaProperty.updateHTML()
+			this.update()
 		}
 	}
 
@@ -621,15 +632,15 @@ export class RectangleComponent extends ShapeComponent {
 
 	private updateText() {
 		this.textSVG?.remove()
-		if (this.textAreaProperty.value.text) {
+		if (this.textAreaProperty.value.text || this.createAsText) {
 			let textData: Text = {
-				text: this.textAreaProperty.value.text,
+				text: this.textAreaProperty.value.text || (this.createAsText ? "text component" : ""),
 			}
-			textData.align = this.textAreaProperty.value.align
-			textData.justify = this.textAreaProperty.value.justify
+			textData.align = this.textAreaProperty.value.align ?? TextAlign.LEFT
+			textData.justify = this.textAreaProperty.value.justify ?? -1
 			textData.fontSize = this.textFontSize.value.key
 
-			textData.color = this.textColor.value?.toString() ?? "var(--bs-emphasis-color)"
+			textData.color = this.textColor.value?.toString() || "var(--bs-emphasis-color)"
 
 			const innerSep = this.textInnerSep.value.convertToUnit("px").value
 			let strokeWidth = this.strokeInfo.width.convertToUnit("px").value

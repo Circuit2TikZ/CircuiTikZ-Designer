@@ -35,7 +35,7 @@ export class ColorProperty extends EditableProperty<SVG.Color | null> {
 		{
 			let labelElement = document.createElement("label") as HTMLLabelElement
 			labelElement.classList.add("input-group-text")
-			labelElement.innerHTML = this.label ?? "Choose color"
+			labelElement.innerHTML = this.label || "Choose color"
 			col.appendChild(labelElement)
 
 			if (this.nullable) {

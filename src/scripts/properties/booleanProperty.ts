@@ -28,7 +28,7 @@ export class BooleanProperty extends EditableProperty<boolean> {
 
 			let labelElementX = document.createElement("label") as HTMLLabelElement
 			labelElementX.classList.add("form-check-label")
-			labelElementX.innerHTML = this.label ?? "CheckBox"
+			labelElementX.innerHTML = this.label || "CheckBox"
 			checkBoxContainerX.appendChild(labelElementX)
 		}
 		col.appendChild(checkBoxContainerX)
