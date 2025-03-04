@@ -5,13 +5,17 @@ type LineInfo = {
 	text: string
 	width: number
 }
+const syllableRegex = /([^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?)|[^aeiouy]+$/gi
 
 export function convertForeignObjectTextToNativeSVGText(text: Text, textBox: SVG.Box) {
 	const fontSize = fontSizes.find((fs) => fs.key == text.fontSize).size.toString() + "pt"
 
 	const explicitLines = text.text.split("\n").map((line) => line.trim())
-	const lines = explicitLines.map((line) => wrapLabel(line, fontSize, textBox.w)).flat(2)
 
+	// get lines including word wrapping
+	const lines = explicitLines.map((line) => wrapLine(line, fontSize, textBox.w)).flat(2)
+
+	// convert lines to svg tspans
 	let tspans = []
 	for (let index = 0; index < lines.length; index++) {
 		const line = lines[index]
@@ -64,53 +68,83 @@ export function convertForeignObjectTextToNativeSVGText(text: Text, textBox: SVG
 	return svgText
 }
 
-function wrapLabel(label: string, fontSize: string, maxWidth: number): LineInfo[] {
-	const words = label.split(" ")
+// greedy algorithm to fully use up the text rectangle. maybe change to Knuth–Plass line breaking later on
+function wrapLine(line: string, fontSize: string, maxWidth: number): LineInfo[] {
+	const words = line.split(/\s+/)
 	const completedLines: LineInfo[] = []
 	let nextLine = ""
+
 	words.forEach((word, index) => {
-		const wordLength = getTextWidth(`${word} `, fontSize)
-		const nextLineLength = getTextWidth(nextLine, fontSize)
-		if (wordLength > maxWidth) {
-			const { hyphenatedStrings, remainingWord } = breakString(word, fontSize, maxWidth)
-			completedLines.push({ text: nextLine, width: nextLineLength }, ...hyphenatedStrings)
-			nextLine = remainingWord
-		} else if (nextLineLength + wordLength >= maxWidth) {
-			completedLines.push({ text: nextLine, width: nextLineLength })
-			nextLine = word
+		const nextLineWidth = getTextWidth(nextLine, fontSize)
+		const wordWidth = getTextWidth((nextLine == "" ? "" : " ") + word, fontSize)
+		if (nextLineWidth + wordWidth >= maxWidth) {
+			const syllables = word.match(syllableRegex)
+			// fit the overflowing word onto as many lines as needed
+			let lines = fitWord(syllables, nextLineWidth, maxWidth, fontSize)
+			// the first line is what is still possible to put on the "nextLine"
+			completedLines.push({
+				text: [nextLine, lines[0]].join(""),
+				width: nextLineWidth + getTextWidth(lines[0], fontSize),
+			})
+
+			let otherLines = lines.splice(1)
+			// all other lines exept the last are already completed lines
+			for (let index = 0; index < otherLines.length - 1; index++) {
+				const line = otherLines[index]
+				completedLines.push({
+					text: line,
+					width: getTextWidth(line, fontSize),
+				})
+			}
+			nextLine = ""
+			// the last line should be treated normally as the new next line, which could have breaking words again
+			if (otherLines.length > 0) {
+				nextLine = otherLines.at(-1)
+			}
 		} else {
-			nextLine = [nextLine, word].filter(Boolean).join(" ")
+			// if the word fits completely, just add it to the line
+			if (nextLine == "") {
+				nextLine = word
+			} else {
+				nextLine = [nextLine, word].join(" ")
+			}
 		}
-		const currentWord = index + 1
-		const isLastWord = currentWord === words.length
-		if (isLastWord) {
+
+		// if no more words are available, add the next line as the final completed line
+		if (index + 1 === words.length) {
 			completedLines.push({ text: nextLine, width: getTextWidth(nextLine, fontSize) })
 		}
 	})
 	return completedLines.filter((line) => line.text !== "")
 }
 
-function breakString(word: string, fontSize: string, maxWidth: number, hyphenCharacter = "-") {
-	const characters = word.split("")
-	const lines: LineInfo[] = []
+function fitWord(syllables: string[], currentLineWidth, maxWidth, fontSize): string[] {
+	let remainingSyllables = []
 	let currentLine = ""
-	characters.forEach((character, index) => {
-		const nextLine = `${currentLine}${character}`
-		const lineWidth = getTextWidth(nextLine, fontSize)
-		if (lineWidth >= maxWidth) {
-			const currentCharacter = index + 1
-			const isLastLine = characters.length === currentCharacter
-			const hyphenatedNextLine = `${nextLine}${hyphenCharacter}`
-			lines.push({ text: isLastLine ? nextLine : hyphenatedNextLine, width: lineWidth })
-			currentLine = ""
-		} else {
-			currentLine = nextLine
+	const min = currentLineWidth > 0 ? 0 : 1 // if an empty line is used, at least one syllable should be written in that line
+	for (let index = syllables.length; index >= min; index--) {
+		currentLine =
+			(currentLineWidth > 0 && index > 0 ? " " : "") +
+			syllables.slice(0, index).join("") +
+			(index < syllables.length && index > 0 ? "-" : "")
+		remainingSyllables = syllables.slice(index)
+
+		let leftWidth = getTextWidth(currentLine, fontSize)
+		if (currentLineWidth + leftWidth < maxWidth) {
+			break
 		}
-	})
-	return { hyphenatedStrings: lines, remainingWord: currentLine }
+	}
+	let remainingLines = []
+	if (remainingSyllables.length > 0) {
+		remainingLines = fitWord(remainingSyllables, 0, maxWidth, fontSize)
+	}
+	return [currentLine].concat(remainingLines)
 }
 
 function getTextWidth(text: string, fontSize: string): number {
+	if (text == "") {
+		return 0
+	}
 	const canvas = document.createElement("canvas")
 	const context = canvas.getContext("2d")
 	context.font = `${fontSize} "Times New Roman"`

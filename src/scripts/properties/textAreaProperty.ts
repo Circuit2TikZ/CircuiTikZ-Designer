@@ -65,7 +65,7 @@ export class TextAreaProperty extends EditableProperty<Text> {
 			this.input = document.createElement("textArea") as HTMLTextAreaElement
 			this.input.classList.add("form-control")
 			this.input.value = this.value.text ?? ""
-			this.input.placeholder = "write here..."
+			this.input.placeholder = "text component"
 			inputDiv.appendChild(this.input)
 		}
 		rowTextArea.appendChild(inputDiv)
@@ -85,7 +85,7 @@ export class TextAreaProperty extends EditableProperty<Text> {
 		})
 
 		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col-12", "my-0")
+		col.classList.add("col-12", "my-0", "mt-2")
 		let checkBoxContainerX = document.createElement("div") as HTMLDivElement
 		checkBoxContainerX.classList.add("form-check", "form-switch")
 		{
@@ -98,7 +98,7 @@ export class TextAreaProperty extends EditableProperty<Text> {
 
 			let labelElementX = document.createElement("label") as HTMLLabelElement
 			labelElementX.classList.add("form-check-label")
-			labelElementX.innerHTML = "show default text"
+			labelElementX.innerHTML = "show placeholder text"
 			checkBoxContainerX.appendChild(labelElementX)
 		}
 		col.appendChild(checkBoxContainerX)
