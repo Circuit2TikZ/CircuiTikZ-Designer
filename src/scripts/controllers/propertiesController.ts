@@ -27,13 +27,13 @@ export class PropertyController {
 		return PropertyController._instance
 	}
 
-	private gridProperties: HTMLDivElement
+	private viewProperties: HTMLDivElement
 	private propertiesEntries: HTMLDivElement
 	private propertiesTitle: HTMLElement
 
 	private constructor() {
 		this.propertiesTitle = document.getElementById("propertiesTitle") as HTMLElement
-		this.gridProperties = document.getElementById("grid-properties") as HTMLDivElement
+		this.viewProperties = document.getElementById("view-properties") as HTMLDivElement
 		this.propertiesEntries = document.getElementById("propertiesEntries") as HTMLDivElement
 	}
 
@@ -46,7 +46,7 @@ export class PropertyController {
 		} else if (components.length === 1) {
 			this.setForm(components[0])
 		} else {
-			this.setFormGrid()
+			this.setFormView()
 		}
 
 		MainController.instance.updateTooltips()
@@ -185,9 +185,12 @@ export class PropertyController {
 		this.propertiesEntries.append(...component.propertiesHTMLRows)
 	}
 
-	private setFormGrid() {
-		this.gridProperties.classList.remove("d-none")
-		this.propertiesTitle.innerText = "Grid settings"
+	private setFormView() {
+		this.viewProperties.classList.remove("d-none")
+		this.propertiesTitle.innerText = "View settings"
+		;(document.getElementById("resetViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.resetView()
+		})
 
 		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
 		minorSlider.value = CanvasController.instance.majorGridSubdivisions.toString()
@@ -204,8 +207,6 @@ export class PropertyController {
 		})
 
 		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
-
-		//TODO add reset viewport button but save the viewport in localstorage
 	}
 
 	private changeGrid(majorSizecm: number, majorSubdivisions: number) {
@@ -224,7 +225,7 @@ export class PropertyController {
 
 	private clearForm() {
 		this.propertiesTitle.innerText = "Properties"
-		this.gridProperties.classList.add("d-none")
+		this.viewProperties.classList.add("d-none")
 		this.propertiesEntries.classList.add("d-none")
 		this.propertiesEntries.innerText = ""
 

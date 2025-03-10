@@ -115,8 +115,19 @@ export class CanvasController {
 			}
 		})
 
-		// init viewBox
-		this.onResizeCanvas()
+		let viewStorage = localStorage.getItem("circuit2tikz-designer-view")
+		if (viewStorage) {
+			let viewSettings = JSON.parse(viewStorage)
+			if (viewSettings) {
+				if (viewSettings.viewBox) {
+					this.onResizeCanvas()
+					this.canvas.viewbox(viewSettings.viewBox)
+				}
+			}
+		} else {
+			this.onResizeCanvas()
+			this.resetView()
+		}
 
 		// observe page size change
 		new ResizeObserver(this.onResizeCanvas.bind(this)).observe(this.canvas.node)
@@ -150,21 +161,11 @@ export class CanvasController {
 			return oldZoomFunction.apply(this.canvas, args)
 		}
 
-		// shift whole canvas down such that the origin is in the bottom left corner
-		let box = this.canvas.viewbox()
-		box.y -= box.h
-		// shift canvas up right to see the axes with the default view
-		let moveAmount = Math.max(0.05 * Math.min(box.w, box.h), 10)
-		box.x -= moveAmount
-		box.y += moveAmount
-		this.canvas.viewbox(box)
-		this.canvas.zoom(this.zoomCurrent, new SVG.Point())
-
 		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
 
-		let storage = localStorage.getItem("circuit2tikz-designer-grid")
-		if (storage) {
-			let gridSettings = JSON.parse(storage)
+		let gridStorage = localStorage.getItem("circuit2tikz-designer-grid")
+		if (gridStorage) {
+			let gridSettings = JSON.parse(gridStorage)
 			if (gridSettings) {
 				if (gridSettings.majorGridSizecm && gridSettings.majorGridSubdivisions) {
 					this.changeGrid(gridSettings.majorGridSizecm, gridSettings.majorGridSubdivisions)
@@ -175,14 +176,7 @@ export class CanvasController {
 				}
 			}
 		} else {
-			localStorage.setItem(
-				"circuit2tikz-designer-grid",
-				JSON.stringify({
-					majorGridSizecm: this.majorGridSizecm,
-					majorGridSubdivisions: this.majorGridSubdivisions,
-					gridVisible: this.gridVisible,
-				})
-			)
+			this.saveGridSettings()
 		}
 		gridVisibleToggle.checked = this.gridVisible
 
@@ -195,17 +189,44 @@ export class CanvasController {
 			} else {
 				this.paper.addClass("d-none")
 			}
-			this.saveSettings()
+			this.saveGridSettings()
 		})
 	}
 
-	private saveSettings() {
+	public resetView() {
+		// shift whole canvas down such that the origin is in the bottom left corner
+		let box = this.canvas.viewbox()
+		box.x = 0
+		box.y = 0
+
+		box.y -= box.h
+		// shift canvas up right to see the axes with the default view
+		let moveAmount = Math.max(0.05 * Math.min(box.w, box.h), 10)
+		box.x -= moveAmount
+		box.y += moveAmount
+		this.canvas.viewbox(box)
+		this.canvas.zoom(2, new SVG.Point())
+		this.onResizeCanvas()
+	}
+
+	private saveGridSettings() {
 		localStorage.setItem(
 			"circuit2tikz-designer-grid",
 			JSON.stringify({
 				majorGridSizecm: this.majorGridSizecm,
 				majorGridSubdivisions: this.majorGridSubdivisions,
 				gridVisible: this.gridVisible,
+			})
+		)
+	}
+
+	private saveViewSettings() {
+		localStorage.removeItem("circuit2tikz-designer-view")
+
+		localStorage.setItem(
+			"circuit2tikz-designer-view",
+			JSON.stringify({
+				viewBox: this.canvas.viewbox(),
 			})
 		)
 	}
@@ -416,7 +437,7 @@ export class CanvasController {
 		majorGrid.children[0]?.setAttribute("height", majorDistanceNum)
 		majorGrid.children[1]?.setAttribute("d", `M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`)
 
-		this.saveSettings()
+		this.saveGridSettings()
 	}
 
 	/**
@@ -472,5 +493,7 @@ export class CanvasController {
 		this.paper.move(box.x, box.y)
 		this.xAxis.attr({ x1: box.x, x2: box.x2 })
 		this.yAxis.attr({ y1: box.y, y2: box.y2 })
+
+		this.saveViewSettings()
 	}
 }
