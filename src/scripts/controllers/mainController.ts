@@ -785,7 +785,7 @@ export class MainController {
 			addButton.classList.add("libComponent")
 			addButton.setAttribute("searchData", "straight arrow")
 			addButton.ariaRoleDescription = "button"
-			addButton.title = "Straight arrow"
+			addButton.title = "Arrow"
 
 			const listener = (ev: MouseEvent) => {
 				ev.preventDefault()
@@ -810,6 +810,7 @@ export class MainController {
 					[9.1, 0],
 				])
 				.stroke({ color: defaultStroke, width: 0.5 })
+				.fill("none")
 			svgIcon
 				.polygon([
 					[9, -1],
