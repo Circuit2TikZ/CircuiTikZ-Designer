@@ -27,6 +27,7 @@ export type Text = {
 	innerSep?: SVG.Number
 	color?: string | "default"
 	showPlaceholderText?: boolean
+	useHyphenation?: boolean
 }
 
 export enum TextAlign {
@@ -39,7 +40,8 @@ export enum TextAlign {
 export class TextAreaProperty extends EditableProperty<Text> {
 	private input: HTMLTextAreaElement
 
-	private checkBox: HTMLInputElement
+	private placeholderCheckBox: HTMLInputElement
+	private hyphenationCheckBox: HTMLInputElement
 
 	private alignLeft: HTMLInputElement
 	private alignCenter: HTMLInputElement
@@ -84,28 +86,58 @@ export class TextAreaProperty extends EditableProperty<Text> {
 			}
 		})
 
-		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col-12", "my-0", "mt-2")
-		let checkBoxContainerX = document.createElement("div") as HTMLDivElement
-		checkBoxContainerX.classList.add("form-check", "form-switch")
+		let placeholderDiv = document.createElement("div") as HTMLDivElement
+		placeholderDiv.classList.add("col-12", "my-0", "mt-2")
+		let placeholderCheckBoxContainer = document.createElement("div") as HTMLDivElement
+		placeholderCheckBoxContainer.classList.add("form-check", "form-switch")
 		{
-			this.checkBox = document.createElement("input") as HTMLInputElement
-			this.checkBox.classList.add("form-check-input")
-			this.checkBox.setAttribute("type", "checkbox")
-			this.checkBox.setAttribute("role", "switch")
-			this.checkBox.checked = this.value.showPlaceholderText
-			checkBoxContainerX.appendChild(this.checkBox)
+			this.placeholderCheckBox = document.createElement("input") as HTMLInputElement
+			this.placeholderCheckBox.classList.add("form-check-input")
+			this.placeholderCheckBox.setAttribute("type", "checkbox")
+			this.placeholderCheckBox.setAttribute("role", "switch")
+			this.placeholderCheckBox.checked = this.value.showPlaceholderText
+			placeholderCheckBoxContainer.appendChild(this.placeholderCheckBox)
 
-			let labelElementX = document.createElement("label") as HTMLLabelElement
-			labelElementX.classList.add("form-check-label")
-			labelElementX.innerHTML = "show placeholder text"
-			checkBoxContainerX.appendChild(labelElementX)
+			let labelElement = document.createElement("label") as HTMLLabelElement
+			labelElement.classList.add("form-check-label")
+			labelElement.innerHTML = "show placeholder text"
+			placeholderCheckBoxContainer.appendChild(labelElement)
 		}
-		col.appendChild(checkBoxContainerX)
-		this.checkBox.addEventListener("change", (ev) => {
+		placeholderDiv.appendChild(placeholderCheckBoxContainer)
+		this.placeholderCheckBox.addEventListener("change", (ev) => {
 			this.update()
 		})
-		rowTextArea.appendChild(col)
+		rowTextArea.appendChild(placeholderDiv)
+
+		let hyphenationDiv = document.createElement("div") as HTMLDivElement
+		hyphenationDiv.classList.add("col-12", "my-0", "mt-2")
+		let hyphenationCheckBoxContainer = document.createElement("div") as HTMLDivElement
+		hyphenationCheckBoxContainer.classList.add("form-check", "form-switch")
+		{
+			this.hyphenationCheckBox = document.createElement("input") as HTMLInputElement
+			this.hyphenationCheckBox.classList.add("form-check-input")
+			this.hyphenationCheckBox.setAttribute("type", "checkbox")
+			this.hyphenationCheckBox.setAttribute("role", "switch")
+			this.hyphenationCheckBox.checked = this.value.useHyphenation
+			hyphenationCheckBoxContainer.appendChild(this.hyphenationCheckBox)
+
+			let labelElement = document.createElement("label") as HTMLLabelElement
+			labelElement.classList.add("form-check-label")
+			labelElement.innerHTML = "hyphenate"
+			labelElement.setAttribute("data-bs-toggle", "tooltip")
+			labelElement.setAttribute(
+				"data-bs-title",
+				"break up words with hyphens at line breaks (CAUTION! generated LaTeX code will not produce the same result!)"
+			)
+			labelElement.setAttribute("data-bs-delay", '{"show":500,"hide":250}')
+
+			hyphenationCheckBoxContainer.appendChild(labelElement)
+		}
+		hyphenationDiv.appendChild(hyphenationCheckBoxContainer)
+		this.hyphenationCheckBox.addEventListener("change", (ev) => {
+			this.update()
+		})
+		rowTextArea.appendChild(hyphenationDiv)
 
 		const btnLabelClasses = [
 			"btn",
@@ -286,7 +318,8 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				this.justifyStart.checked ? -1
 				: this.justifyCenter.checked ? 0
 				: 1,
-			showPlaceholderText: this.checkBox.checked,
+			showPlaceholderText: this.placeholderCheckBox.checked,
+			useHyphenation: this.hyphenationCheckBox.checked,
 		}
 		this.updateValue(data)
 	}
@@ -323,7 +356,8 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				default:
 					break
 			}
-			this.checkBox.checked = this.value.showPlaceholderText ?? false
+			this.placeholderCheckBox.checked = this.value.showPlaceholderText ?? false
+			this.hyphenationCheckBox.checked = this.value.useHyphenation ?? false
 		}
 	}
 
@@ -332,7 +366,8 @@ export class TextAreaProperty extends EditableProperty<Text> {
 			first.text == second.text &&
 			first.align == second.align &&
 			first.justify == second.justify &&
-			first.showPlaceholderText == second.showPlaceholderText
+			first.showPlaceholderText == second.showPlaceholderText &&
+			first.useHyphenation == second.useHyphenation
 		)
 	}
 }

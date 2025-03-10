@@ -7,13 +7,13 @@ type LineInfo = {
 }
 const syllableRegex = /([^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?)|[^aeiouy]+$/gi
 
-export function convertForeignObjectTextToNativeSVGText(text: Text, textBox: SVG.Box) {
+export function convertForeignObjectTextToNativeSVGText(text: Text, textBox: SVG.Box, useHyphenation = false) {
 	const fontSize = fontSizes.find((fs) => fs.key == text.fontSize).size.toString() + "pt"
 
 	const explicitLines = text.text.split("\n").map((line) => line.trim())
 
 	// get lines including word wrapping
-	const lines = explicitLines.map((line) => wrapLine(line, fontSize, textBox.w)).flat(2)
+	const lines = explicitLines.map((line) => wrapLine(line, fontSize, textBox.w, useHyphenation)).flat(2)
 
 	// convert lines to svg tspans
 	let tspans = []
@@ -69,7 +69,7 @@ export function convertForeignObjectTextToNativeSVGText(text: Text, textBox: SVG
 }
 
 // greedy algorithm to fully use up the text rectangle. maybe change to Knuth–Plass line breaking later on
-function wrapLine(line: string, fontSize: string, maxWidth: number): LineInfo[] {
+function wrapLine(line: string, fontSize: string, maxWidth: number, useHyphenation: boolean): LineInfo[] {
 	const words = line.split(/\s+/)
 	const completedLines: LineInfo[] = []
 	let nextLine = ""
@@ -78,28 +78,33 @@ function wrapLine(line: string, fontSize: string, maxWidth: number): LineInfo[] 
 		const nextLineWidth = getTextWidth(nextLine, fontSize)
 		const wordWidth = getTextWidth((nextLine == "" ? "" : " ") + word, fontSize)
 		if (nextLineWidth + wordWidth >= maxWidth) {
-			const syllables = word.match(syllableRegex)
-			// fit the overflowing word onto as many lines as needed
-			let lines = fitWord(syllables, nextLineWidth, maxWidth, fontSize)
-			// the first line is what is still possible to put on the "nextLine"
-			completedLines.push({
-				text: [nextLine, lines[0]].join(""),
-				width: nextLineWidth + getTextWidth(lines[0], fontSize),
-			})
-
-			let otherLines = lines.splice(1)
-			// all other lines exept the last are already completed lines
-			for (let index = 0; index < otherLines.length - 1; index++) {
-				const line = otherLines[index]
+			if (useHyphenation) {
+				const syllables = word.match(syllableRegex)
+				// fit the overflowing word onto as many lines as needed
+				let lines = fitWord(syllables, nextLineWidth, maxWidth, fontSize)
+				// the first line is what is still possible to put on the "nextLine"
 				completedLines.push({
-					text: line,
-					width: getTextWidth(line, fontSize),
+					text: [nextLine, lines[0]].join(""),
+					width: nextLineWidth + getTextWidth(lines[0], fontSize),
 				})
-			}
-			nextLine = ""
-			// the last line should be treated normally as the new next line, which could have breaking words again
-			if (otherLines.length > 0) {
-				nextLine = otherLines.at(-1)
+
+				let otherLines = lines.splice(1)
+				// all other lines exept the last are already completed lines
+				for (let index = 0; index < otherLines.length - 1; index++) {
+					const line = otherLines[index]
+					completedLines.push({
+						text: line,
+						width: getTextWidth(line, fontSize),
+					})
+				}
+				nextLine = ""
+				// the last line should be treated normally as the new next line, which could have breaking words again
+				if (otherLines.length > 0) {
+					nextLine = otherLines.at(-1)
+				}
+			} else {
+				completedLines.push({ text: nextLine, width: getTextWidth(nextLine, fontSize) })
+				nextLine = word
 			}
 		} else {
 			// if the word fits completely, just add it to the line

@@ -118,28 +118,7 @@ export class MainController {
 
 		this.initModeButtons()
 
-		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches
-
-		//enable tooltips globally
-		const tooltipTriggerList = document.querySelectorAll(
-			'[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]'
-		)
-		if (isMobile) {
-			const tooltipList = [...tooltipTriggerList].map(
-				(tooltipTriggerEl) =>
-					new Tooltip(tooltipTriggerEl, {
-						fallbackPlacements: [], //always show them exactly where defined
-						trigger: "manual",
-					})
-			)
-		} else {
-			const tooltipList = [...tooltipTriggerList].map(
-				(tooltipTriggerEl) =>
-					new Tooltip(tooltipTriggerEl, {
-						fallbackPlacements: [], //always show them exactly where defined
-					})
-			)
-		}
+		this.updateTooltips()
 
 		// init exporting
 		ExportController.instance
@@ -217,6 +196,30 @@ export class MainController {
 			PropertyController.instance.update()
 			this.isInitDone = true
 		})
+	}
+
+	public updateTooltips() {
+		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches
+		//enable tooltips globally
+		const tooltipTriggerList = document.querySelectorAll(
+			'[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]'
+		)
+		if (isMobile) {
+			;[...tooltipTriggerList].map(
+				(tooltipTriggerEl) =>
+					new Tooltip(tooltipTriggerEl, {
+						fallbackPlacements: [], //always show them exactly where defined
+						trigger: "manual",
+					})
+			)
+		} else {
+			;[...tooltipTriggerList].map(
+				(tooltipTriggerEl) =>
+					new Tooltip(tooltipTriggerEl, {
+						fallbackPlacements: [], //always show them exactly where defined
+					})
+			)
+		}
 	}
 
 	private async loadMathJax() {

@@ -49,10 +49,12 @@ export class RectangleComponent extends ShapeComponent {
 	private textSVG: SVG.Text
 
 	private createAsText: boolean
+	private useHyphenation: boolean
 
 	public constructor(createAsText: boolean = false) {
 		super()
 		this.createAsText = createAsText
+		this.useHyphenation = false
 		this.displayName = "Rectangle"
 
 		this.shapeVisualization = CanvasController.instance.canvas.rect(0, 0)
@@ -74,12 +76,14 @@ export class RectangleComponent extends ShapeComponent {
 			align: TextAlign.LEFT,
 			justify: -1,
 			showPlaceholderText: this.createAsText,
+			useHyphenation: this.useHyphenation,
 		})
 		if (createAsText) {
 			this.strokeStyleProperty.value = strokeStyleChoices[1]
 		}
 		this.textAreaProperty.addChangeListener((ev) => {
 			this.createAsText = ev.value.showPlaceholderText
+			this.useHyphenation = ev.value.useHyphenation
 			this.update()
 		})
 		this.propertiesHTMLRows.push(this.textAreaProperty.buildHTML())
@@ -316,6 +320,7 @@ export class RectangleComponent extends ShapeComponent {
 				hasText = true
 			}
 			textData.showPlaceholderText = this.createAsText || undefined
+			textData.useHyphenation = this.useHyphenation || undefined
 
 			if (hasText || this.createAsText) {
 				data.text = textData
@@ -398,8 +403,10 @@ export class RectangleComponent extends ShapeComponent {
 				align: saveObject.text.align ?? TextAlign.LEFT,
 				justify: saveObject.text.justify ?? -1,
 				showPlaceholderText: saveObject.text.showPlaceholderText ?? false,
+				useHyphenation: saveObject.text.useHyphenation ?? false,
 			}
 			rectComponent.createAsText = text.showPlaceholderText
+			rectComponent.useHyphenation = text.useHyphenation
 			rectComponent.textAreaProperty.value = text
 			rectComponent.textAreaProperty.updateHTML()
 			rectComponent.textFontSize.value =
@@ -632,6 +639,7 @@ export class RectangleComponent extends ShapeComponent {
 
 	private updateText() {
 		this.textSVG?.remove()
+
 		if (this.textAreaProperty.value.text || this.createAsText) {
 			let textData: Text = {
 				text: this.textAreaProperty.value.text || (this.createAsText ? "text component" : ""),
@@ -648,7 +656,7 @@ export class RectangleComponent extends ShapeComponent {
 			let h = this.size.y - strokeWidth * 2 - 2 * innerSep
 			const textPos = this.position.sub(new SVG.Point(w > 0 ? w : 0, h > 0 ? h : 0).div(2))
 			const textBox = new SVG.Box(textPos.x, textPos.y, w > 0 ? w : 0, h > 0 ? h : 0)
-			this.textSVG = convertForeignObjectTextToNativeSVGText(textData, textBox)
+			this.textSVG = convertForeignObjectTextToNativeSVGText(textData, textBox, this.useHyphenation)
 
 			let transformMatrix = new SVG.Matrix({
 				rotate: -this.rotationDeg,

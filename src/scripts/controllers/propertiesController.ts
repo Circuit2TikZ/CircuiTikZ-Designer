@@ -5,6 +5,7 @@ import {
 	CircuitComponent,
 	DistributionMode,
 	GroupComponent,
+	MainController,
 	SectionHeaderProperty,
 	SelectionController,
 	Undo,
@@ -47,6 +48,8 @@ export class PropertyController {
 		} else {
 			this.setFormGrid()
 		}
+
+		MainController.instance.updateTooltips()
 	}
 
 	private setMultiForm(components: CircuitComponent[]) {
