@@ -15,6 +15,7 @@ import {
 	TextProperty,
 	GroupComponent,
 	Undo,
+	renderMathJax,
 } from "../internal"
 import { rectRectIntersection, referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
 
@@ -488,104 +489,29 @@ export abstract class CircuitComponent {
 	 * @param label the data for which to generate the label visualization
 	 * @returns a Promise<void>
 	 */
-	protected async generateLabelRender(): Promise<void> {
-		// @ts-ignore
-		window.MathJax.texReset()
-		// @ts-ignore
-		return window.MathJax.tex2svgPromise(this.mathJaxLabel.value, {}).then((node: Element) => {
-			// mathjax renders the text via an svg container. That container also contains definitions and SVG.Use elements. get that container
-			let svgElement = new SVG.Svg(node.querySelector("svg"))
-
-			// if a previous label was rendered, remove everything concerning that rendering
-			if (this.labelRendering) {
-				let removeIDs = new Set<string>()
-				for (const element of this.labelRendering.find("use")) {
-					removeIDs.add(element.node.getAttribute("xlink:href"))
-				}
-
-				for (const id of removeIDs) {
-					CanvasController.instance.canvas.find(id)[0]?.remove()
-				}
+	protected generateLabelRender() {
+		// if a previous label was rendered, remove everything concerning that rendering
+		if (this.labelRendering) {
+			let removeIDs = new Set<string>()
+			for (const element of this.labelRendering.find("use")) {
+				removeIDs.add(element.node.getAttribute("xlink:href"))
 			}
 
-			// move the label definitions to the overall definitions of the canvas
-			let backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
-			let defs = svgElement.findOne("defs") as SVG.Defs
-			for (const def of defs.children()) {
-				backgroundDefs.put(def)
+			for (const id of removeIDs) {
+				CanvasController.instance.canvas.find(id)[0]?.remove()
 			}
-			defs.remove()
-
-			//1.545 magic number (how large 1em, i.e. font size, is in terms of ex) for the font used in MathJax.
-			//6.5 = normal font size for tikz??? This should be 10pt for the normalsize in latex? If measuring via 2 lines 1 cm apart(28.34pt), you need 6.5pt to match up with the tikz rendering!?
-			let expt = (1 / 1.545) * 6.5
-			//convert width and height from ex to pt via expt and then to px
-			let widthStr = svgElement.node.getAttribute("width")
-			let width = new SVG.Number(new SVG.Number(widthStr).value * expt, "pt").convertToUnit("px")
-			let heightStr = svgElement.node.getAttribute("height")
-			let height = new SVG.Number(new SVG.Number(heightStr).value * expt, "pt").convertToUnit("px")
-			let size = new SVG.Point(width.value, height.value)
-
-			// remove unnecessary data
-			for (const elementGroup of svgElement.find("use")) {
-				elementGroup.node.removeAttribute("data-c")
-			}
-			let groupElements = svgElement.find("g") as SVG.List<SVG.G>
-			for (const elementGroup of groupElements) {
-				elementGroup.node.removeAttribute("data-mml-node")
-			}
-			// remove unnecessary svg groups
-			for (const elementGroup of groupElements) {
-				let children = elementGroup.children()
-				if (children.length == 1 && !elementGroup.node.hasAttributes()) {
-					elementGroup.parent().put(children[0])
-					elementGroup.remove()
-				} else {
-					if (elementGroup.fill() == "currentColor") {
-						elementGroup.fill("inherit")
-					}
-				}
-			}
-
-			//remove background of mathjax error message
-			for (const elementGroup of svgElement.find("rect")) {
-				if (elementGroup.node.hasAttribute("data-background")) {
-					elementGroup.remove()
-				}
-			}
-
-			// the current rendering svg viewbox
-			let svgViewBox = svgElement.viewbox()
-
-			// scale such that px size is actually correct for rendering
-			let scale = size.div(new SVG.Point(svgViewBox.w, svgViewBox.h))
-			//move the rendering to local 0,0
-			let translate = new SVG.Point(-svgViewBox.x, -svgViewBox.y).mul(scale)
-			let m = new SVG.Matrix({
-				scaleX: scale.x,
-				scaleY: scale.y,
-				translateX: translate.x,
-				translateY: translate.y,
-			})
-			// add all symbol components to a group
-			let transformGroup = new SVG.G()
-			for (const child of svgElement.children()) {
-				transformGroup.add(child)
-			}
-			// apply the transformation --> the symbol is now at the origin with the correct size and no rotation
-			transformGroup.transform(m)
-
-			// remove the current label and substitute with a new group element
-			this.labelRendering?.remove()
-			let rendering = new SVG.G()
-			rendering.addClass("pointerNone")
-			rendering.add(transformGroup)
-			// add the label rendering to the visualization element
-			this.visualization.add(rendering)
-			this.labelRendering = rendering
-			this.update()
-			this.updateTheme()
-		})
+		}
+		const transformGroup = renderMathJax(this.mathJaxLabel.value)
+		// remove the current label and substitute with a new group element
+		this.labelRendering?.remove()
+		let rendering = new SVG.G()
+		rendering.addClass("pointerNone")
+		rendering.add(transformGroup.element)
+		// add the label rendering to the visualization element
+		this.visualization.add(rendering)
+		this.labelRendering = rendering
+		this.update()
+		this.updateTheme()
 	}
 
 	/**

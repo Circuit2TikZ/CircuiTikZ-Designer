@@ -6,7 +6,7 @@ import {
 	ChoiceProperty,
 	CircuitComponent,
 	ColorProperty,
-	convertForeignObjectTextToNativeSVGText,
+	convertTextToNativeSVGText,
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
@@ -46,7 +46,7 @@ export class RectangleComponent extends ShapeComponent {
 	private textInnerSep: SliderProperty
 	private textFontSize: ChoiceProperty<FontSize>
 	private textColor: ColorProperty
-	private textSVG: SVG.Text
+	private textSVG: SVG.G
 
 	private createAsText: boolean
 	private useHyphenation: boolean
@@ -656,7 +656,18 @@ export class RectangleComponent extends ShapeComponent {
 			let h = this.size.y - strokeWidth * 2 - 2 * innerSep
 			const textPos = this.position.sub(new SVG.Point(w > 0 ? w : 0, h > 0 ? h : 0).div(2))
 			const textBox = new SVG.Box(textPos.x, textPos.y, w > 0 ? w : 0, h > 0 ? h : 0)
-			this.textSVG = convertForeignObjectTextToNativeSVGText(textData, textBox, this.useHyphenation)
+
+			if (this.textSVG) {
+				let removeIDs = new Set<string>()
+				for (const element of this.textSVG.find("use")) {
+					removeIDs.add(element.node.getAttribute("xlink:href"))
+				}
+
+				for (const id of removeIDs) {
+					CanvasController.instance.canvas.find(id)[0]?.remove()
+				}
+			}
+			this.textSVG = convertTextToNativeSVGText(textData, textBox, this.useHyphenation)
 
 			let transformMatrix = new SVG.Matrix({
 				rotate: -this.rotationDeg,
