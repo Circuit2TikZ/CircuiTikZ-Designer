@@ -356,6 +356,8 @@ export class PathComponent extends CircuitikzComponent {
 		return data
 	}
 	public toTikzString(): string {
+		const optionsString = this.referenceSymbol.serializeTikzOptions()
+		
 		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
 		let shouldDist = this.labelDistance.value && distStr != "0.0cm"
 
@@ -372,6 +374,7 @@ export class PathComponent extends CircuitikzComponent {
 			this.posStart.toTikzString() +
 			" to[" +
 			this.referenceSymbol.tikzName +
+			(optionsString ? ", " + optionsString : "") +
 			(this.name.value === "" ? "" : ", name=" + this.name.value) +
 			(this.mathJaxLabel.value !== "" ?
 				", l" +
