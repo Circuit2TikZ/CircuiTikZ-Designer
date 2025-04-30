@@ -43,7 +43,7 @@ export function convertTextToNativeSVGText(text: Text, textBox: SVG.Box, useHyph
 		const renderedSections: (string | MathJaxRenderInfo)[] = []
 		for (const section of textSections) {
 			if (section.type == "inline") {
-				const rendered = renderMathJax(section.text)
+				const rendered = renderMathJax(section.text, fontSizept)
 				renderedSections.push(rendered)
 			} else {
 				section.text.split(/\s+/).forEach((word) => {
@@ -65,6 +65,7 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 	const fontSizepx = (fontSizept * 4) / 3
 	const fontSize = fontSizept.toString() + "pt"
 	const spaceWidth = getTextMetrics(" ", fontSize).width
+	const lineSpacing = 0.414 // the standard line spacing in em
 
 	const group = new SVG.G()
 	const renderedElements = new SVG.G()
@@ -111,7 +112,7 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 
 		tspans.push(lineTspans.join(""))
 		lineTspans = []
-		currentBaselineYPos += line.descent + (index < lines.length - 1 ? fontSizepx * 0.2 : 0)
+		currentBaselineYPos += line.descent + (index < lines.length - 1 ? fontSizepx * lineSpacing : 0)
 	}
 
 	const ypos = textBox.y + ((text.justify + 1) / 2) * (textBox.h - currentBaselineYPos)
@@ -121,7 +122,7 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 	svgText.transform({ translateX: textPos.x, translateY: textPos.y })
 	svgText.fill(text.color == "default" ? "black" : text.color)
 	svgText.node.innerHTML = tspans.join("\n")
-	svgText.attr("font-family", "Times New Roman")
+	svgText.attr("font-family", "CMU Serif")
 	svgText.stroke("none")
 	svgText.attr("font-size", fontSize)
 	group.add(svgText)
@@ -156,8 +157,8 @@ function wrapLine(
 			// if the element is a string
 			let textMetrics = getTextMetrics(element, fontSize)
 			elementWidth = textMetrics.width
-			elementAscent = textMetrics.fontBoundingBoxAscent
-			elementDescent = textMetrics.fontBoundingBoxDescent
+			elementAscent = textMetrics.actualBoundingBoxAscent
+			elementDescent = textMetrics.actualBoundingBoxDescent
 
 			if (currentLineWidth + startSpace + elementWidth > maxWidth) {
 				if (useHyphenation) {
@@ -170,8 +171,8 @@ function wrapLine(
 						for (let i = 0; i < fittedSyllables.length; i++) {
 							let textMetrics = getTextMetrics(fittedSyllables[i], fontSize)
 							elementWidth = textMetrics.width
-							elementAscent = textMetrics.fontBoundingBoxAscent
-							elementDescent = textMetrics.fontBoundingBoxDescent
+							elementAscent = textMetrics.actualBoundingBoxAscent
+							elementDescent = textMetrics.actualBoundingBoxDescent
 
 							if (elementWidth > 0) {
 								// Add the fitted syllable to the current line
@@ -310,7 +311,7 @@ function fitWord(syllables: string[], currentLineWidth: number, maxWidth: number
 function getTextMetrics(text: string, fontSize: string): TextMetrics {
 	const canvas = document.createElement("canvas")
 	const context = canvas.getContext("2d")
-	context.font = `${fontSize} "Times New Roman"`
+	context.font = `${fontSize} "CMU Serif"`
 	return context.measureText(text)
 }
 export type MathJaxRenderInfo = {
@@ -323,7 +324,7 @@ export type MathJaxRenderInfo = {
 	// the height of the rendered mathjax element
 	height: number
 }
-export function renderMathJax(text: string): MathJaxRenderInfo {
+export function renderMathJax(text: string, fontSize = 10): MathJaxRenderInfo {
 	// @ts-ignore
 	window.MathJax.texReset()
 	// @ts-ignore
@@ -339,14 +340,14 @@ export function renderMathJax(text: string): MathJaxRenderInfo {
 	}
 	defs.remove()
 
-	//1.545 magic number (how large 1em, i.e. font size, is in terms of ex) for the font used in MathJax.
-	//6.5 = normal font size for tikz??? This should be 10pt for the normalsize in latex? If measuring via 2 lines 1 cm apart(28.34pt), you need 6.5pt to match up with the tikz rendering!?
-	let expt = (1 / 1.545) * 6.5
+	// 1.971 magic number (how large 1em, i.e. font size, is in terms of ex) for the font used in MathJax.
+	// 1.137 is a correction factor to make the normal text ex align with the mathjax ex (looks better). this is a bit of a hack
+	let exem = 1 / (1.971 * 1.137)
 	//convert width and height from ex to pt via expt and then to px
 	let widthStr = svgElement.node.getAttribute("width")
-	let width = new SVG.Number(new SVG.Number(widthStr).value * expt, "pt").convertToUnit("px")
+	let width = new SVG.Number(new SVG.Number(widthStr).value * exem * fontSize, "pt").convertToUnit("px")
 	let heightStr = svgElement.node.getAttribute("height")
-	let height = new SVG.Number(new SVG.Number(heightStr).value * expt, "pt").convertToUnit("px")
+	let height = new SVG.Number(new SVG.Number(heightStr).value * exem * fontSize, "pt").convertToUnit("px")
 	let size = new SVG.Point(width.value, height.value)
 
 	// remove unnecessary data
