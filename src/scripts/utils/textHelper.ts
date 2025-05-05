@@ -73,10 +73,17 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 	let tspans = []
 	let lineTspans = []
 
+	const defaultTextMetrics = getTextMetrics("pH", fontSize)
+	const defaultAscent = defaultTextMetrics.actualBoundingBoxAscent
+	const defaultDescent = defaultTextMetrics.actualBoundingBoxDescent
+
 	let currentBaselineYPos = 0
 
 	for (let index = 0; index < lines.length; index++) {
 		const line = lines[index]
+		line.ascent = index > 0 ? Math.max(line.ascent, defaultAscent) : line.ascent
+		line.descent = index < lines.length - 1 ? Math.max(line.descent, defaultDescent) : line.descent
+
 		currentBaselineYPos += line.ascent
 
 		const remainingLineSpace = textBox.w - line.totalWidth
