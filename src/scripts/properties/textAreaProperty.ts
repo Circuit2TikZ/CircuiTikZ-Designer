@@ -303,12 +303,8 @@ export class TextAreaProperty extends EditableProperty<Text> {
 	}
 
 	private update() {
-		let sanitizedText = sanitizeHtml(this.input.value, {
-			allowedTags: [],
-			allowedAttributes: {},
-		})
 		let data: Text = {
-			text: sanitizedText,
+			text: this.input.value,
 			align:
 				this.alignLeft.checked ? TextAlign.LEFT
 				: this.alignCenter.checked ? TextAlign.CENTER
