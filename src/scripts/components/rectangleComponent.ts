@@ -18,6 +18,7 @@ import {
 	FontSize,
 	fontSizes,
 	getClosestPointerFromDirection,
+	MathjaxParser,
 	PositionedLabel,
 	SectionHeaderProperty,
 	ShapeComponent,
@@ -530,7 +531,34 @@ export class RectangleComponent extends ShapeComponent {
 				: "justify"
 			}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}${this.rotationDeg != 0 ? ", rotate=" + this.rotationDeg : ""}]`
 
-			let latexStr = `${fontStr}${this.textAreaProperty.value.text.replaceAll("\n", "\\\\")}`
+			//escape special characters
+			const replaceDict = {
+				"#": "\\#",
+				$: "\\$",
+				"%": "\\%",
+				"&": "\\&",
+				_: "\\_",
+				"{": "\\{",
+				"}": "\\}",
+				"~": "\\textasciitilde",
+				"^": "\\textasciicircum",
+				"\\": "\\textbackslash",
+				"\n": "\\\\",
+			}
+			const mathjaxParser = new MathjaxParser()
+			const sections: string[] = []
+			const textSections = mathjaxParser.parse(this.textAreaProperty.value.text)
+			for (const section of textSections) {
+				if (section.type == "text") {
+					sections.push(section.text.replaceAll(/[\#\%\$\&\_\{\}\~\^\\\n]/g, (match) => replaceDict[match]))
+				} else {
+					sections.push("$" + section.text + "$")
+				}
+			}
+			let escapedText = sections.join(" ")
+			console.log(escapedText)
+
+			let latexStr = `${fontStr}${escapedText}`
 			latexStr =
 				this.textColor.value ?
 					"\\textcolor" + this.textColor.value.toTikzString() + "{" + latexStr + "}"

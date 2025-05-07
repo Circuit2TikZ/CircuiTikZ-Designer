@@ -108,6 +108,7 @@ export class MainController {
 		let mathJaxPromise = this.loadMathJax()
 		let canvasPromise = this.initCanvas()
 		let symbolsDBPromise = this.initSymbolDB()
+		let fontPromise = document.fonts.load("1em CMU Serif")
 
 		MainController.appVersion = version
 		document.addEventListener("DOMContentLoaded", () => {
@@ -156,7 +157,7 @@ export class MainController {
 			PropertyController.instance
 			ComponentPlacer.instance
 		})
-		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
+		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise, fontPromise]).then(() => {
 			document.getElementById("loadingSpinner")?.classList.add("d-none")
 			SnapCursorController.instance
 			this.initAddComponentOffcanvas()

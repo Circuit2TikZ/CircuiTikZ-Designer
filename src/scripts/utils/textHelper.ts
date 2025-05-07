@@ -110,7 +110,7 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 				containerGroup.add(renderedElement)
 				containerGroup.transform({
 					translateX: xoffset + currentXPos,
-					translateY: currentBaselineYPos - element.ascent,
+					translateY: currentBaselineYPos,
 				})
 				renderedElements.add(containerGroup)
 			}
@@ -335,7 +335,7 @@ export function renderMathJax(text: string, fontSize = 10): MathJaxRenderInfo {
 	// @ts-ignore
 	window.MathJax.texReset()
 	// @ts-ignore
-	const node = window.MathJax.tex2svg(text, {})
+	const node = window.MathJax.tex2svg(text, { display: false })
 	// mathjax renders the text via an svg container. That container also contains definitions and SVG.Use elements. get that container
 	let svgElement = new SVG.Svg(node.querySelector("svg"))
 
@@ -390,37 +390,31 @@ export function renderMathJax(text: string, fontSize = 10): MathJaxRenderInfo {
 
 	// scale such that px size is actually correct for rendering
 	let scale = size.div(new SVG.Point(svgViewBox.w, svgViewBox.h))
-	//move the rendering to local 0,0
-	let translate = new SVG.Point(-svgViewBox.x, -svgViewBox.y).mul(scale)
 	let m = new SVG.Matrix({
 		scaleX: scale.x,
 		scaleY: scale.y,
-		translateX: translate.x,
-		translateY: translate.y,
 	})
 	// add all symbol components to a group
 	let transformGroup = new SVG.G()
 	for (const child of svgElement.children()) {
 		transformGroup.add(child)
 	}
-	// apply the transformation --> the symbol is now at the origin with the correct size and no rotation
+	// apply the transformation --> the symbol now has the correct size and no rotation
 	transformGroup.transform(m)
-
-	const bbox = transformGroup.bbox().transform(m)
 
 	let renderInfo: MathJaxRenderInfo = {
 		element: transformGroup,
 		baselineAlignmentRatio:
 			new SVG.Number(svgElement.node.style.verticalAlign).value /
 			svgElement.node.height.baseVal.valueInSpecifiedUnits,
-		width: bbox.width,
-		height: bbox.height,
+		width: size.x,
+		height: size.y,
 	}
 
 	return renderInfo
 }
 
-class MathjaxParser {
+export class MathjaxParser {
 	// adjusted from https://github.com/bersling/mathjax-parser
 
 	private config: MathjaxParserConfig
@@ -444,7 +438,9 @@ class MathjaxParser {
 			const delimiterSet = state.matchedDelimiterSets[index]
 
 			if (delimiterSet.start.index > startIdx) {
-				result.push({ text: inputText.slice(startIdx, delimiterSet.start.index).trim(), type: "text" })
+				// after finding the delimiter pairs, we need to replace the escaped dollar signs with a single dollar sign in order to show only the dollar sign in the ui
+				const adjustedText = inputText.slice(startIdx, delimiterSet.start.index).replace(/\\\$/g, "$")
+				result.push({ text: adjustedText.trim(), type: "text" })
 			}
 			let innerStart = delimiterSet.start.index + delimiterSet.start.delimiterGroup.group[0].length
 			let outerEnd = delimiterSet.end.index + delimiterSet.end.delimiterGroup.group[1].length
@@ -458,7 +454,9 @@ class MathjaxParser {
 		}
 
 		if (startIdx < inputText.length) {
-			result.push({ text: inputText.slice(startIdx).trim(), type: "text" })
+			// after finding the delimiter pairs, we need to replace the escaped dollar signs with a single dollar sign in order to show only the dollar sign in the ui
+			const adjustedText = inputText.slice(startIdx).replace(/\\\$/g, "$")
+			result.push({ text: adjustedText.trim(), type: "text" })
 		}
 
 		return result
