@@ -556,7 +556,6 @@ export class RectangleComponent extends ShapeComponent {
 				}
 			}
 			let escapedText = sections.join(" ")
-			console.log(escapedText)
 
 			let latexStr = `${fontStr}${escapedText}`
 			latexStr =

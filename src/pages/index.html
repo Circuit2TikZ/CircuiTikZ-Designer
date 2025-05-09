@@ -156,6 +156,19 @@
 						</li>
 						<li class="nav-item col-12 col-md-auto">
 							<button type="button" class="dropdown-item" data-bs-toggle="modal"
+								data-bs-target="#settingsModal">
+								<span class="toolbarButton material-symbols-outlined">settings</span>
+								<span class="d-md-none fs-4">
+									Settings
+								</span>
+							</button>
+						</li>
+						<li class="nav-item py-2 py-md-1 col-12 col-md-auto">
+							<div class="vr d-none d-md-flex h-100 mx-md-2"></div>
+							<hr class="d-md-none my-2">
+						</li>
+						<li class="nav-item col-12 col-md-auto">
+							<button type="button" class="dropdown-item" data-bs-toggle="modal"
 								data-bs-target="#aboutModal">
 								<span class="toolbarButton material-symbols-outlined">info</span>
 								<span class="d-md-none fs-4">
@@ -408,6 +421,36 @@
 							SymbolConvert
 						</a>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal (settings) -->
+	<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true"
+		role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-3" id="aboutModalLabel">Settings</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<h1 class="fs-4">Manage tab storage</h1>
+					<p>Total storage used by CircuiTi<i>k</i>Z Designer: <span id="storageUsed"></span></p>
+					<table class="table table-striped align-middle">
+						<thead>
+							<tr>
+								<th scope="col">Tab</th>
+								<th scope="col"># components</th>
+								<th scope="col">Storage size</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody id="settingsTableBody" class="table-group-divider">
+
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

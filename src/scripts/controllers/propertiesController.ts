@@ -209,6 +209,14 @@ export class PropertyController {
 		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
 	}
 
+	public setSliderValues(majorSizecm: number, majorSubdivisions: number) {
+		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
+		minorSlider.value = majorSubdivisions.toString()
+		let majorSlider = document.getElementById("majorSliderInput") as HTMLInputElement
+		majorSlider.value = majorSizecm.toString()
+		this.changeGrid(majorSizecm, majorSubdivisions)
+	}
+
 	private changeGrid(majorSizecm: number, majorSubdivisions: number) {
 		CanvasController.instance.changeGrid(majorSizecm, majorSubdivisions)
 

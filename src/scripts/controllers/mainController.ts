@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap"
+import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip, Modal } from "bootstrap"
 import "../utils/impSVGNumber"
 import { waitForElementLoaded } from "../utils/domWatcher"
 import hotkeys from "hotkeys-js"
@@ -28,12 +28,28 @@ import {
 	defaultStroke,
 	defaultFill,
 	PolygonComponent,
-	TextAlign,
+	GroupSaveObject,
+	memorySizeOf,
 } from "../internal"
 
 type SaveState = {
-	currentIndices: number[]
 	currentData: ComponentSaveObject[][]
+	currentIndices: number[]
+}
+
+type TabState = {
+	id: number
+	open: string
+	data: ComponentSaveObject[]
+	settings: CanvasSettings
+}
+
+export type CanvasSettings = {
+	gridVisible?: boolean
+	majorGridSizecm?: number
+	majorGridSubdivisions?: number
+	viewBox?: SVG.Box
+	viewZoom?: number
 }
 
 export enum Modes {
@@ -86,14 +102,15 @@ export class MainController {
 	isMac = false
 	selectionController: SelectionController
 
+	broadcastChannel: BroadcastChannel
+
 	/**
 	 * Init the app.
 	 */
 	private constructor() {
 		MainController._instance = this
 		this.isMac = window.navigator.userAgent.toUpperCase().indexOf("MAC") >= 0
-
-		this.addSaveStateManagement()
+		this.broadcastChannel = new BroadcastChannel("circuitikz-designer")
 
 		// dark mode init
 		const htmlElement = document.documentElement
@@ -168,13 +185,7 @@ export class MainController {
 				.getElementById("canvas")
 				.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false })
 
-			let currentProgress: SaveState = JSON.parse(localStorage.getItem("circuitikz-designer-saveState"))
-
-			if (Object.keys(currentProgress.currentData[this.tabID]).length > 0) {
-				SaveController.instance.loadFromJSON(currentProgress.currentData[this.tabID])
-			} else {
-				Undo.addState()
-			}
+			this.addSaveStateManagement()
 
 			// prepare symbolDB for colorTheme
 			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
@@ -248,71 +259,202 @@ export class MainController {
 	}
 
 	/**
-	 * make it possible to open multiple tabs and all with different save States.
+	 * handle tabs and save state management
 	 */
 	private addSaveStateManagement() {
-		const objname = "circuitikz-designer-saveState"
-		const tabname = "circuitikz-designer-tabID"
+		const defaultSettings: CanvasSettings = {}
 
-		let defaultProgress: SaveState = {
-			currentIndices: [],
-			currentData: [],
+		let db: IDBDatabase
+		const IDBrequest = indexedDB.open("circuitikz-designer-db", 1)
+		IDBrequest.onerror = function (event) {
+			console.error("IndexedDB error")
+			console.error(event)
 		}
-
-		// TODO check if multithreading of tabs can mess with localStorage due to a race condition???
-
-		// load localStorage or default if it doesn't exist
-		let storageString = localStorage.getItem(objname)
-		let current: SaveState = storageString ? JSON.parse(storageString) : defaultProgress
-
-		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
-		let sessionTabID = sessionStorage.getItem(tabname)
-		if (sessionTabID) {
-			this.tabID = Number.parseInt(sessionTabID)
-			current.currentIndices.push(this.tabID)
-		}
-
-		// this is a new tab --> assign tab ID
-		if (this.tabID < 0) {
-			// populate first available slot
-			let index = 0
-			while (current.currentIndices.includes(index)) {
-				index++
+		IDBrequest.onupgradeneeded = function (event) {
+			db = (event.target as IDBOpenDBRequest).result
+			if (!db.objectStoreNames.contains("tabs")) {
+				const objectStore = db.createObjectStore("tabs", { keyPath: "id" })
+				objectStore.createIndex("open", "open", { unique: false })
 			}
-			this.tabID = index
-			current.currentIndices.push(this.tabID)
 		}
+		IDBrequest.onsuccess = function (event) {
+			db = (event.target as IDBOpenDBRequest).result
+			let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
 
-		// save the assigned tab ID
-		sessionStorage.setItem(tabname, this.tabID.toString())
+			//load in localStorage data if available for backwards compatibility with localstorage
+			const storageString = localStorage.getItem("circuitikz-designer-saveState")
+			if (storageString) {
+				const lastSaveState: SaveState = JSON.parse(storageString)
+				let id = 0
+				lastSaveState.currentData.forEach((data) => {
+					if (data.length == 0) return
+					const newEntry: TabState = {
+						id: id,
+						open: "false",
+						data: data,
+						settings: defaultSettings,
+					}
+					tabsObjectStore.add(newEntry)
+					id++
+				})
+				localStorage.removeItem("circuitikz-designer-saveState")
+			}
 
-		// adjust the saveData object to accomodate new data if necessary
-		if (current.currentData.length <= this.tabID) {
-			current.currentData.push([])
+			// check if a closed tab is available
+			tabsObjectStore.index("open").getAll("false").onsuccess = function (event) {
+				let closedTabs = (event.target as IDBRequest).result
+				if (closedTabs.length > 0) {
+					const closedTab: TabState = closedTabs[0]
+
+					// use the first closed tab
+					MainController.instance.tabID = closedTab.id
+
+					// set the tab to open
+					closedTab.open = "true"
+					tabsObjectStore.put(closedTab)
+
+					CanvasController.instance.setSettings(closedTab.settings)
+
+					//load in the saved data
+					SaveController.instance.loadFromJSON(closedTab.data)
+				} else {
+					//no closed tabs found --> create a new db entry
+					// get the next available ID
+					tabsObjectStore.getAllKeys().onsuccess = function (event) {
+						let keys = (event.target as IDBRequest).result
+
+						let nextID = 0
+						while (keys.includes(nextID)) {
+							nextID++
+						}
+						const newEntry: TabState = { id: nextID, open: "true", data: [], settings: defaultSettings }
+						MainController.instance.tabID = nextID
+						tabsObjectStore.add(newEntry)
+					}
+					Undo.addState()
+				}
+			}
 		}
+		this.broadcastChannel.postMessage("update")
 
-		// save the current state of tabs
-		localStorage.setItem(objname, JSON.stringify(current))
-
-		//TODO get rid of unload events: will be removed from chrome in the future and is currently ignored by many browsers
-		// prepare saveState for unloading
 		window.addEventListener("beforeunload", (ev) => {
-			Undo.addState()
-			let currentProgress: SaveState = JSON.parse(localStorage.getItem(objname))
-
-			currentProgress.currentIndices.splice(
-				currentProgress.currentIndices.findIndex((value) => value == MainController.instance.tabID),
-				1
-			)
-			currentProgress.currentData[this.tabID] = Undo.getCurrentState()
-			localStorage.setItem(objname, JSON.stringify(currentProgress))
-
-			//use this here if the localStorage is fucked in development
-			// localStorage.removeItem(objname)
-			// localStorage.removeItem(tabname)
-
-			//TODO add manual way to clear the localStorage
+			this.saveCurrentState(db)
 		})
+
+		//settings modal
+		const settingsModalEl = document.getElementById("settingsModal") as HTMLDivElement
+		const settingsTableBody = document.getElementById("settingsTableBody") as HTMLTableSectionElement
+
+		settingsModalEl.addEventListener("show.bs.modal", (event) => {
+			settingsTableBody.innerHTML = ""
+
+			let tabsObjectStoreRead = db.transaction("tabs").objectStore("tabs")
+
+			tabsObjectStoreRead.getAll().onsuccess = function (event) {
+				const currentData = (event.target as IDBRequest).result as TabState[]
+
+				let totalSize = 0
+
+				for (let i = 0; i < currentData.length; i++) {
+					const tabData = currentData[i]
+					let row = settingsTableBody.appendChild(document.createElement("tr"))
+					row.classList.add("text-end")
+					let cell1 = row.appendChild(document.createElement("td"))
+					cell1.innerText = "" + i
+					let cell2 = row.appendChild(document.createElement("td"))
+					cell2.innerText = countComponents(tabData.data) + ""
+					let cell3 = row.appendChild(document.createElement("td"))
+					let size = memorySizeOf(tabData.data)
+					totalSize += size
+					cell3.innerText = sizeString(size)
+					let cell4 = row.appendChild(document.createElement("td"))
+					if (tabData.open == "false") {
+						let deleteButton = cell4.appendChild(document.createElement("button"))
+						deleteButton.classList.add("btn", "btn-danger")
+						deleteButton.innerText = "Delete"
+						deleteButton.addEventListener("click", () => {
+							let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+							tabsObjectStore.delete(tabData.id).onsuccess = function () {
+								settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+								MainController.instance.broadcastChannel.postMessage("update")
+							}
+						})
+					} else {
+						if (tabData.id == MainController.instance.tabID) {
+							let infoButton = cell4.appendChild(document.createElement("button"))
+							infoButton.classList.add("btn")
+							infoButton.innerText = "This tab"
+							infoButton.disabled = true
+							let _ = [cell1, cell2, cell3, cell4].forEach((cell) => {
+								cell.classList.add("bg-primary")
+							})
+						} else {
+							let infoButton = cell4.appendChild(document.createElement("button"))
+							infoButton.classList.add("btn")
+							infoButton.innerText = "Tab currently open"
+							infoButton.disabled = true
+						}
+					}
+				}
+				document.getElementById("storageUsed").innerHTML = sizeString(totalSize)
+			}
+		})
+
+		this.broadcastChannel.onmessage = (event) => {
+			if (settingsModalEl.classList.contains("show")) {
+				settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+			}
+		}
+
+		function sizeString(size: number) {
+			if (size < 1024) {
+				return size + " B"
+			} else if (size < 1024 * 1024) {
+				return (size / 1024).toFixed(2) + " KB"
+			} else if (size < 1024 * 1024 * 1024) {
+				return (size / (1024 * 1024)).toFixed(2) + " MB"
+			} else {
+				return (size / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+			}
+		}
+
+		function countComponents(data: ComponentSaveObject[]) {
+			let count = 0
+			for (const component of data) {
+				if (component.type == "group") {
+					count += countComponents((component as GroupSaveObject).components)
+				}
+				count++
+			}
+			return count
+		}
+	}
+
+	private saveCurrentState(db: IDBDatabase, closeTab = true) {
+		Undo.addState()
+		let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+		tabsObjectStore.get(this.tabID).onsuccess = function (event) {
+			const data = (event.target as IDBRequest).result as TabState
+			data.open = "false"
+			data.data = Undo.getCurrentState()
+			if (data.data.length > 0) {
+				data.settings.gridVisible = CanvasController.instance.gridVisible
+				data.settings.majorGridSizecm = CanvasController.instance.majorGridSizecm
+				data.settings.majorGridSubdivisions = CanvasController.instance.majorGridSubdivisions
+				data.settings.viewBox = CanvasController.instance.canvas.viewbox()
+				data.settings.viewZoom = CanvasController.instance.currentZoom
+				tabsObjectStore.put(data).onsuccess = function () {
+					MainController.instance.broadcastChannel.postMessage("update")
+				}
+			} else {
+				if (closeTab) {
+					// if no data is present, delete the entry (keeps the db clean)
+					tabsObjectStore.delete(MainController.instance.tabID).onsuccess = function () {
+						MainController.instance.broadcastChannel.postMessage("update")
+					}
+				}
+			}
+		}
 	}
 
 	/**
