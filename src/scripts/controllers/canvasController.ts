@@ -183,7 +183,7 @@ export class CanvasController {
 		PropertyController.instance.setSliderValues(this.majorGridSizecm, this.majorGridSubdivisions)
 		this.gridVisible = settings.gridVisible || this.gridVisible
 		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
-		gridVisibleToggle.checked
+		gridVisibleToggle.checked = this.gridVisible
 		if (!this.gridVisible) {
 			this.paper.addClass("d-none")
 		}

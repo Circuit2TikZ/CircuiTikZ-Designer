@@ -262,6 +262,11 @@ export class MainController {
 	 * handle tabs and save state management
 	 */
 	private addSaveStateManagement() {
+		// remove old localStorage data
+		localStorage.removeItem("currentProgress")
+		localStorage.removeItem("circuit2tikz-designer-grid")
+		sessionStorage.removeItem("circuitikz-designer-tabID")
+
 		const defaultSettings: CanvasSettings = {}
 
 		let db: IDBDatabase
@@ -304,7 +309,23 @@ export class MainController {
 			tabsObjectStore.index("open").getAll("false").onsuccess = function (event) {
 				let closedTabs = (event.target as IDBRequest).result
 				if (closedTabs.length > 0) {
-					const closedTab: TabState = closedTabs[0]
+					// You can get url_string from window.location.href if you want to work with
+					// the URL of the current page
+					var url = new URL(window.location.href)
+					let closedTab: TabState
+					var requestedID = url.searchParams.get("tabID")
+					if (requestedID != null) {
+						for (let index = 0; index < closedTabs.length; index++) {
+							const tab = closedTabs[index]
+							if (tab.id == parseInt(requestedID)) {
+								closedTab = tab
+								break
+							}
+						}
+						MainController.instance.broadcastChannel.postMessage("update")
+					} else {
+						closedTab = closedTabs[0]
+					}
 
 					// use the first closed tab
 					MainController.instance.tabID = closedTab.id
@@ -369,9 +390,17 @@ export class MainController {
 					cell3.innerText = sizeString(size)
 					let cell4 = row.appendChild(document.createElement("td"))
 					if (tabData.open == "false") {
+						let openButton = cell4.appendChild(document.createElement("button"))
+						openButton.classList.add("btn", "btn-primary", "me-2")
+						openButton.innerText = "Open"
+						openButton.addEventListener("click", () => {
+							// set the data in the object store to open
+							window.open(".?tabID=" + tabData.id, "_blank")
+						})
+
 						let deleteButton = cell4.appendChild(document.createElement("button"))
-						deleteButton.classList.add("btn", "btn-danger")
-						deleteButton.innerText = "Delete"
+						deleteButton.classList.add("btn", "btn-danger", "material-symbols-outlined")
+						deleteButton.innerText = "delete"
 						deleteButton.addEventListener("click", () => {
 							let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
 							tabsObjectStore.delete(tabData.id).onsuccess = function () {
