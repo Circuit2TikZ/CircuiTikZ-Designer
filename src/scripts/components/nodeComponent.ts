@@ -178,7 +178,7 @@ export class NodeComponent extends CircuitikzComponent {
 				value: this.mathJaxLabel.value,
 				anchor: this.anchorChoice.value.key,
 				position: this.positionChoice.value.key,
-				distance: this.labelDistance.value ?? undefined,
+				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
 				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 			}
 			data.label = labelWithoutRender
@@ -323,7 +323,9 @@ export class NodeComponent extends CircuitikzComponent {
 		if (saveObject.label) {
 			if (Object.hasOwn(saveObject.label, "value")) {
 				nodeComponent.labelDistance.value =
-					saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0)
+					saveObject.label.distance ?
+						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+					:	new SVG.Number(0, "cm")
 				nodeComponent.labelDistance.updateHTML()
 				nodeComponent.anchorChoice.value =
 					saveObject.label.anchor ?
@@ -402,7 +404,12 @@ export class NodeComponent extends CircuitikzComponent {
 			labelRef = this.labelPos.direction
 		}
 
-		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w, labelBBox.h)).add(labelRef.mul(labelDist))
+		let ref = labelRef
+			.add(1)
+			.div(2)
+			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
+			.add(new SVG.Point(labelBBox.x, labelBBox.y))
+			.add(labelRef.mul(labelDist))
 
 		// acutally move the label
 		let movePos = textPos.sub(ref)

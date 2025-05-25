@@ -342,11 +342,15 @@ export class PathComponent extends CircuitikzComponent {
 		if (this.name.value) {
 			data.name = this.name.value
 		}
-		data.label = {
-			value: this.mathJaxLabel.value ?? undefined,
-			otherSide: this.labelSide.value ? true : undefined,
-			distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
-			color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
+
+		if (this.mathJaxLabel.value) {
+			let label: PathLabel = {
+				value: this.mathJaxLabel.value,
+				otherSide: this.labelSide.value ? true : undefined,
+				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
+				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
+			}
+			data.label = label
 		}
 
 		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
@@ -357,7 +361,7 @@ export class PathComponent extends CircuitikzComponent {
 	}
 	public toTikzString(): string {
 		const optionsString = this.referenceSymbol.serializeTikzOptions()
-		
+
 		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
 		let shouldDist = this.labelDistance.value && distStr != "0.0cm"
 
@@ -537,16 +541,23 @@ export class PathComponent extends CircuitikzComponent {
 		}
 
 		if (saveObject.label) {
-			pathComponent.labelSide.value = saveObject.label.otherSide ?? false
-			pathComponent.labelSide.updateHTML()
-			pathComponent.labelDistance.value =
-				saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0, "cm")
-			pathComponent.labelDistance.updateHTML()
-			pathComponent.mathJaxLabel.value = saveObject.label.value
-			pathComponent.mathJaxLabel.updateHTML()
-			pathComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			pathComponent.labelColor.updateHTML()
-			pathComponent.generateLabelRender()
+			if (Object.hasOwn(saveObject.label, "value")) {
+				pathComponent.labelSide.value = saveObject.label.otherSide ?? false
+				pathComponent.labelSide.updateHTML()
+				pathComponent.labelDistance.value =
+					saveObject.label.distance ?
+						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+					:	new SVG.Number(0, "cm")
+				pathComponent.labelDistance.updateHTML()
+				pathComponent.mathJaxLabel.value = saveObject.label.value
+				pathComponent.mathJaxLabel.updateHTML()
+				pathComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
+				pathComponent.labelColor.updateHTML()
+				pathComponent.generateLabelRender()
+			} else {
+				//@ts-ignore
+				pathComponent.mathJaxLabel.value = saveObject.label
+			}
 		}
 		pathComponent.placeFinish()
 		pathComponent.visualization.show()
@@ -570,19 +581,19 @@ export class PathComponent extends CircuitikzComponent {
 		let symbolBBox = this.symbolUse.bbox()
 
 		// the nominal reference point of the label (bottom center)
-		let labelRef = new SVG.Point(labelBBox.w / 2, labelBBox.h)
+		let labelRef = new SVG.Point(labelBBox.cx, labelBBox.y2)
 		// the rotation angle of the label (not always identical to the path rotation angle)
 		let rotAngle = this.rotationDeg
 		if (rotAngle > 90) {
 			// upper left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
 			rotAngle -= 180
 			// the label reference point should now be the top center
-			labelRef.y = 0
+			labelRef.y = labelBBox.y
 		} else if (rotAngle < -90) {
 			// lower left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
 			rotAngle += 180
 			// the label reference point should now be the top center
-			labelRef.y = 0
+			labelRef.y = labelBBox.y
 		}
 
 		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
@@ -595,7 +606,7 @@ export class PathComponent extends CircuitikzComponent {
 		let otherSide = this.labelSide.value
 		let other = otherSide ? -1 : 1
 		if (otherSide) {
-			labelRef.y = labelBBox.h - labelRef.y
+			labelRef.y = labelBBox.y - labelRef.y
 			referenceoffsetY += symbolBBox.h
 		}
 
