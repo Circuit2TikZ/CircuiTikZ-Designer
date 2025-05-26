@@ -144,8 +144,8 @@ export class WireComponent extends CircuitComponent {
 		this.wire.fill("none")
 		this.draggableWire = CanvasController.instance.canvas.polyline()
 		this.draggableWire.attr({
-			fill: "none",
-			stroke: "transparent",
+			"fill": "none",
+			"stroke": "transparent",
 			"stroke-width": selectionSize,
 		})
 
@@ -947,7 +947,8 @@ export class WireComponent extends CircuitComponent {
 		wireComponent.placingPoints.push(new SVG.Point(saveObject.start))
 		if (Object.hasOwn(saveObject, "segments")) {
 			for (const segment of saveObject.segments) {
-				wireComponent.placingPoints.push(new SVG.Point(segment.endPoint))
+				// @ts-ignore: backwards compatibility (segment.position)
+				wireComponent.placingPoints.push(new SVG.Point(segment.endPoint || segment.position))
 				wireComponent.wireDirections.push(segment.direction)
 			}
 		} else {
