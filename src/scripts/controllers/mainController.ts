@@ -305,58 +305,54 @@ export class MainController {
 				localStorage.removeItem("circuitikz-designer-saveState")
 			}
 
-			// check if a closed tab is available
-			tabsObjectStore.index("open").getAll("false").onsuccess = function (event) {
-				let closedTabs = (event.target as IDBRequest).result
-				if (closedTabs.length > 0) {
-					// You can get url_string from window.location.href if you want to work with
-					// the URL of the current page
-					var url = new URL(window.location.href)
-					let closedTab: TabState
-					var requestedID = url.searchParams.get("tabID")
-					if (requestedID != null) {
-						for (let index = 0; index < closedTabs.length; index++) {
-							const tab = closedTabs[index]
-							if (tab.id == parseInt(requestedID)) {
-								closedTab = tab
-								break
-							}
+			// the URL of the current page
+			var url = new URL(window.location.href)
+			// check if a tabID is requested in the URL, otherwise use the first closed tab
+			var requestedID = parseInt(url.searchParams.get("tabID"))
+
+			tabsObjectStore.getAll().onsuccess = function (event) {
+				let allTabs: TabState[] = (event.target as IDBRequest).result
+
+				if (Number.isNaN(requestedID)) {
+					// no tabID is requested in the URL, so we need to find the first closed tab
+					requestedID = allTabs.findIndex((tab) => tab.open == "false")
+
+					if (requestedID < 0) {
+						// no closed tab found, use the next available ID
+						requestedID = 0
+						while (allTabs.find((tab) => tab.id == requestedID)) {
+							requestedID++
 						}
+					}
+				}
+
+				let requestedTab = allTabs.find((tab) => tab.id == requestedID)
+				if (requestedTab) {
+					// if the requested tab is closed, open it
+					requestedTab.open = "true"
+					MainController.instance.tabID = requestedTab.id
+					CanvasController.instance.setSettings(requestedTab.settings)
+					SaveController.instance.loadFromJSON(requestedTab.data)
+					tabsObjectStore.put(requestedTab).onsuccess = (event) => {
 						MainController.instance.broadcastChannel.postMessage("update")
-					} else {
-						closedTab = closedTabs[0]
 					}
-
-					// use the first closed tab
-					MainController.instance.tabID = closedTab.id
-
-					// set the tab to open
-					closedTab.open = "true"
-					tabsObjectStore.put(closedTab)
-
-					CanvasController.instance.setSettings(closedTab.settings)
-
-					//load in the saved data
-					SaveController.instance.loadFromJSON(closedTab.data)
 				} else {
-					//no closed tabs found --> create a new db entry
-					// get the next available ID
-					tabsObjectStore.getAllKeys().onsuccess = function (event) {
-						let keys = (event.target as IDBRequest).result
-
-						let nextID = 0
-						while (keys.includes(nextID)) {
-							nextID++
-						}
-						const newEntry: TabState = { id: nextID, open: "true", data: [], settings: defaultSettings }
-						MainController.instance.tabID = nextID
-						tabsObjectStore.add(newEntry)
+					// requested tab not found, so we create a new one
+					const newEntry: TabState = { id: requestedID, open: "true", data: [], settings: defaultSettings }
+					MainController.instance.tabID = requestedID
+					tabsObjectStore.add(newEntry).onsuccess = (event) => {
+						// as soon as the tab is created and saved in the db, we can notify the other tabs
+						MainController.instance.broadcastChannel.postMessage("update")
 					}
-					Undo.addState()
 				}
 			}
 		}
-		this.broadcastChannel.postMessage("update")
+
+		window.addEventListener("visibilitychange", (ev) => {
+			if (document.visibilityState == "hidden") {
+				this.saveCurrentState(db, false)
+			}
+		})
 
 		window.addEventListener("beforeunload", (ev) => {
 			this.saveCurrentState(db)
@@ -418,20 +414,54 @@ export class MainController {
 								cell.classList.add("bg-primary")
 							})
 						} else {
-							let infoButton = cell4.appendChild(document.createElement("button"))
-							infoButton.classList.add("btn")
-							infoButton.innerText = "Tab currently open"
-							infoButton.disabled = true
+							let closeButton = cell4.appendChild(document.createElement("button"))
+							closeButton.classList.add("btn", "btn-danger")
+							closeButton.innerText = "Close tab"
+							closeButton.addEventListener("click", () => {
+								// also set the open state to false in the db
+								let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+								const adjustedData = tabData
+								adjustedData.open = "false"
+								tabsObjectStore.put(adjustedData)
+								// send a message to the broadcast channel to close the tab
+								MainController.instance.broadcastChannel.postMessage("close=" + tabData.id)
+							})
 						}
 					}
 				}
+				let row = settingsTableBody.appendChild(document.createElement("tr"))
+				let cell1 = row.appendChild(document.createElement("td"))
+				cell1.colSpan = 4
+				cell1.classList.add("text-center")
+				let newTabButton = cell1.appendChild(document.createElement("button"))
+				newTabButton.classList.add("btn", "btn-primary")
+				newTabButton.innerText = "New tab"
+				newTabButton.addEventListener("click", () => {
+					// set the data in the object store to open
+					let requestedID = 0
+					while (currentData.find((tab) => tab.id == requestedID)) {
+						requestedID++
+					}
+					window.open(".?tabID=" + requestedID, "_blank")
+				})
+
 				document.getElementById("storageUsed").innerHTML = sizeString(totalSize)
 			}
 		})
 
 		this.broadcastChannel.onmessage = (event) => {
-			if (settingsModalEl.classList.contains("show")) {
-				settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+			const msg = String(event.data)
+
+			if (msg.startsWith("close")) {
+				const tabID = parseInt(msg.split("=")[1]) // get the tabID
+				if (tabID == MainController.instance.tabID) {
+					// close the tab
+					window.close()
+				}
+			} else if (msg == "update") {
+				if (settingsModalEl.classList.contains("show")) {
+					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+				}
 			}
 		}
 
@@ -464,7 +494,9 @@ export class MainController {
 		let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
 		tabsObjectStore.get(this.tabID).onsuccess = function (event) {
 			const data = (event.target as IDBRequest).result as TabState
-			data.open = "false"
+			if (closeTab) {
+				data.open = "false"
+			}
 			data.data = Undo.getCurrentState()
 			if (data.data.length > 0) {
 				data.settings.gridVisible = CanvasController.instance.gridVisible
