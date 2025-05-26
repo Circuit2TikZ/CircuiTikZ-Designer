@@ -6,6 +6,7 @@
 	"trailingComma": "es5",
 	"useTabs": true,
 	"semi": false,
+	"quoteProps": "consistent",
 	"experimentalTernaries": true,
 	"xmlQuoteAttributes": "double",
 	"xmlSelfClosingSpace": true,
