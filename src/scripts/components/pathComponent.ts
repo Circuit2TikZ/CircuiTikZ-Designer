@@ -439,10 +439,10 @@ export class PathComponent extends CircuitikzComponent {
 			AdjustDragHandler.snapDrag(this, this.endSVG, false)
 			this.endSVG.remove()
 		}
-		this.selectionElement?.remove()
 		this.resizable(false)
 		this.visualization.remove()
 		this.viewSelected(false)
+		this.selectionElement?.remove()
 		this.labelRendering?.remove()
 	}
 
@@ -540,8 +540,9 @@ export class PathComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: PathSaveObject): PathComponent {
-		let symbol = MainController.instance.symbols.find((value, index, symbols) =>
-			saveObject.id.startsWith(value.node.id)
+		let symbol = MainController.instance.symbols.find(
+			(value, index, symbols) =>
+				CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
 		)
 		let pathComponent: PathComponent = new PathComponent(symbol)
 		pathComponent.posStart = new SVG.Point(saveObject.start)

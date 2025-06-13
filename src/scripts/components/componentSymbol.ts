@@ -239,12 +239,16 @@ export class ComponentSymbol extends SVG.Symbol {
 		const result: SymbolOption[] = []
 
 		for (const option of options) {
-			let foundOption = this.possibleOptions.find((value) => value.name.replaceAll(" ", "-") == option)
+			let foundOption = this.possibleOptions.find(
+				(value) => (value.displayName ?? value.name).replaceAll(" ", "-") == option
+			)
 			if (foundOption) {
 				result.push(foundOption)
 			} else {
 				for (const enumOption of this.possibleEnumOptions) {
-					foundOption = enumOption.options.find((value) => value.name == option)
+					foundOption = enumOption.options.find(
+						(value) => (value.displayName ?? value.name).replaceAll(" ", "-") == option
+					)
 					if (foundOption) {
 						result.push(foundOption)
 						break

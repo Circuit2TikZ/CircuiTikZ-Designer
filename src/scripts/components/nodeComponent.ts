@@ -268,9 +268,9 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 	public remove(): void {
 		SnapDragHandler.snapDrag(this, false)
-		this.selectionElement?.remove()
 		this.visualization.remove()
 		this.viewSelected(false)
+		this.selectionElement?.remove()
 		this.labelRendering?.remove()
 	}
 
@@ -311,8 +311,9 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: NodeSaveObject): NodeComponent {
-		let symbol = MainController.instance.symbols.find((value, index, symbols) =>
-			saveObject.id.startsWith(value.node.id)
+		let symbol = MainController.instance.symbols.find(
+			(value, index, symbols) =>
+				CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
 		)
 
 		let nodeComponent: NodeComponent = new NodeComponent(symbol)

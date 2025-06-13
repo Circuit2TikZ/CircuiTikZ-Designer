@@ -189,4 +189,8 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		}
 		return copiedSVG
 	}
+
+	protected static idNoOptions(id: string): string {
+		return id.split("_").slice(0, 2).join("_")
+	}
 }
