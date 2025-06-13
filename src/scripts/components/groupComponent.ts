@@ -160,7 +160,7 @@ export class GroupComponent extends CircuitComponent {
 		for (const component of this.groupedComponents) {
 			outStr.push(component.toTikzString())
 		}
-		return outStr.join("\n")
+		return outStr.join("\n\t")
 	}
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
 		let group = new SVG.G()

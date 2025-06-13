@@ -46,6 +46,7 @@ export function getNamedTags(
 	namespaceURI: string,
 	additionalFilter: (arg0: Element) => boolean = null
 ): Element[] {
+	tagName = tagName.toLowerCase()
 	return Array.prototype.filter.call(
 		/** @type {HTMLCollection} */ root.children,
 		(/** @type {Element} */ node: Element) =>

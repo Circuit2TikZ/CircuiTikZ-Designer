@@ -10,6 +10,10 @@ export class ChoiceProperty<T extends ChoiceEntry> extends EditableProperty<T> {
 	private selectElement: HTMLSelectElement
 	private choiceOptions: T[]
 
+	public get entries(): T[] {
+		return this.choiceOptions
+	}
+
 	public constructor(label: string, choiceOptions: T[], initialValue?: T) {
 		super(initialValue)
 		this.label = label

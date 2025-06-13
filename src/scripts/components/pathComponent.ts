@@ -72,11 +72,11 @@ export class PathComponent extends CircuitikzComponent {
 		super(symbol)
 		SnapCursorController.instance.visible = true
 
-		let startPinIndex = symbol._pins.findIndex((value) => value.name === "START")
-		let endPinIndex = symbol._pins.findIndex((value) => value.name === "END")
+		let startPinIndex = this.componentVariant.pins.findIndex((value) => value.name === "START")
+		let endPinIndex = this.componentVariant.pins.findIndex((value) => value.name === "END")
 
-		this.relSymbolStart = symbol._pins.at(startPinIndex).point
-		this.relSymbolEnd = symbol._pins.at(endPinIndex).point
+		this.relSymbolStart = this.componentVariant.pins.at(startPinIndex).point
+		this.relSymbolEnd = this.componentVariant.pins.at(endPinIndex).point
 
 		this.startLine = CanvasController.instance.canvas
 			.line()
@@ -142,9 +142,9 @@ export class PathComponent extends CircuitikzComponent {
 		this.snappingPoints = [
 			new SnapPoint(this, null, new SVG.Point(0, 0)),
 			new SnapPoint(this, null, new SVG.Point(0, 0)),
-			...this.referenceSymbol._pins
+			...this.componentVariant.pins
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
-				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))),
+				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))),
 		]
 	}
 
@@ -192,6 +192,20 @@ export class PathComponent extends CircuitikzComponent {
 		super.recalculateSnappingPoints()
 	}
 
+	protected updateOptions(): void {
+		super.updateOptions()
+		let startPinIndex = this.componentVariant.pins.findIndex((value) => value.name === "START")
+		let endPinIndex = this.componentVariant.pins.findIndex((value) => value.name === "END")
+		this.snappingPoints = [
+			new SnapPoint(this, null, new SVG.Point(0, 0)),
+			new SnapPoint(this, null, new SVG.Point(0, 0)),
+			...this.componentVariant.pins
+				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
+				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))),
+		]
+		this.update()
+	}
+
 	public getSnappingInfo(): SnappingInfo {
 		if (this.finishedPlacing) {
 			return {
@@ -215,8 +229,8 @@ export class PathComponent extends CircuitikzComponent {
 		let m = this.getTransformMatrix()
 		this.symbolUse.transform(m)
 
-		let startEnd = this.relSymbolStart.add(this.referenceSymbol.relMid).transform(m)
-		let endStart = this.relSymbolEnd.add(this.referenceSymbol.relMid).transform(m)
+		let startEnd = this.relSymbolStart.add(this.componentVariant.mid).transform(m)
+		let endStart = this.relSymbolEnd.add(this.componentVariant.mid).transform(m)
 
 		if (this.invert.value) {
 			let switchPos = startEnd
@@ -262,7 +276,7 @@ export class PathComponent extends CircuitikzComponent {
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
-		const symbolRel = this.referenceSymbol.relMid
+		const symbolRel = this.componentVariant.mid
 		return new SVG.Matrix({
 			scaleX: this.scaleState.x,
 			scaleY: this.scaleState.y,
@@ -334,7 +348,7 @@ export class PathComponent extends CircuitikzComponent {
 	public toJson(): PathSaveObject {
 		let data: PathSaveObject = {
 			type: "path",
-			id: this.referenceSymbol.node.id,
+			id: this.componentVariant.symbol.id(),
 			start: this.posStart.simplifyForJson(),
 			end: this.posEnd.simplifyForJson(),
 		}
@@ -360,7 +374,7 @@ export class PathComponent extends CircuitikzComponent {
 		return data
 	}
 	public toTikzString(): string {
-		const optionsString = this.referenceSymbol.serializeTikzOptions()
+		const optionsString = this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()).join(", ")
 
 		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
 		let shouldDist = this.labelDistance.value && distStr != "0.0cm"
@@ -518,11 +532,14 @@ export class PathComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: PathSaveObject): PathComponent {
-		let symbol = MainController.instance.symbols.find((value, index, symbols) => value.node.id == saveObject.id)
+		let symbol = MainController.instance.symbols.find((value, index, symbols) =>
+			saveObject.id.startsWith(value.node.id)
+		)
 		let pathComponent: PathComponent = new PathComponent(symbol)
 		pathComponent.posStart = new SVG.Point(saveObject.start)
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced = 2
+		pathComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
 
 		if (saveObject.scale) {
 			pathComponent.scaleState = new SVG.Point(saveObject.scale)
@@ -596,7 +613,7 @@ export class PathComponent extends CircuitikzComponent {
 
 		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
 		let referenceoffsetY =
-			this.scaleState.y < 0 ? this.referenceSymbol.relMid.y - symbolBBox.h : -this.referenceSymbol.relMid.y
+			this.scaleState.y < 0 ? this.componentVariant.mid.y - symbolBBox.h : -this.componentVariant.mid.y
 
 		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
 		let referenceOffsetX = 0

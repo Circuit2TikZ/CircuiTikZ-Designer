@@ -34,7 +34,7 @@ export class NodeComponent extends CircuitikzComponent {
 	constructor(symbol: ComponentSymbol) {
 		super(symbol)
 		this.position = new SVG.Point()
-		this.relPosition = symbol.relMid
+		this.relPosition = this.componentVariant.mid
 		this.visualization.add(this.symbolUse)
 
 		this.rotationDeg = 0
@@ -69,13 +69,13 @@ export class NodeComponent extends CircuitikzComponent {
 		this.addName()
 		this.addInfo()
 
-		this.snappingPoints = symbol._pins.map(
-			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.referenceSymbol.relMid))
+		this.snappingPoints = this.componentVariant.pins.map(
+			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))
 		)
 	}
 
 	public getTransformMatrix(): SVG.Matrix {
-		const symbolRel = this.referenceSymbol.relMid
+		const symbolRel = this.componentVariant.mid
 		return new SVG.Matrix({
 			scaleX: this.scaleState.x,
 			scaleY: this.scaleState.y,
@@ -96,8 +96,16 @@ export class NodeComponent extends CircuitikzComponent {
 	public getSnappingInfo(): SnappingInfo {
 		return {
 			trackedSnappingPoints: this.snappingPoints,
-			additionalSnappingPoints: [new SnapPoint(this, "center", this.referenceSymbol.relMid)],
+			additionalSnappingPoints: [new SnapPoint(this, "center", this.componentVariant.mid)],
 		}
+	}
+
+	protected updateOptions(): void {
+		super.updateOptions()
+		this.snappingPoints = this.componentVariant.pins.map(
+			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))
+		)
+		this.update()
 	}
 
 	protected update() {
@@ -117,7 +125,7 @@ export class NodeComponent extends CircuitikzComponent {
 		if (this.selectionElement.visible()) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.symbolBBox
-			let maxStroke = this.referenceSymbol.maxStroke
+			let maxStroke = this.componentVariant.maxStroke
 
 			this.selectionElement
 				.size(bbox.w + maxStroke + selectedBoxWidth, bbox.h + maxStroke + selectedBoxWidth)
@@ -161,7 +169,7 @@ export class NodeComponent extends CircuitikzComponent {
 	public toJson(): NodeSaveObject {
 		let data: NodeSaveObject = {
 			type: "node",
-			id: this.referenceSymbol.node.id,
+			id: this.componentVariant.symbol.id(),
 			position: this.position.simplifyForJson(),
 		}
 		if (this.rotationDeg !== 0) {
@@ -188,7 +196,7 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	public toTikzString(): string {
-		const optionsString = this.referenceSymbol.serializeTikzOptions()
+		const optionsString = this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()).join(", ")
 
 		let id = this.name.value
 		if (!id && this.mathJaxLabel.value) {
@@ -303,8 +311,12 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: NodeSaveObject): NodeComponent {
-		let symbol = MainController.instance.symbols.find((value, index, symbols) => value.node.id == saveObject.id)
+		let symbol = MainController.instance.symbols.find((value, index, symbols) =>
+			saveObject.id.startsWith(value.node.id)
+		)
+
 		let nodeComponent: NodeComponent = new NodeComponent(symbol)
+		nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
 		nodeComponent.moveTo(new SVG.Point(saveObject.position))
 
 		if (saveObject.rotation) {
@@ -367,7 +379,7 @@ export class NodeComponent extends CircuitikzComponent {
 		// get relevant positions and bounding boxes
 		let textPosNoTrans: SVG.Point
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPosNoTrans = this.referenceSymbol._textPosition.point.add(this.referenceSymbol.relMid)
+			textPosNoTrans = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
 		} else {
 			let bboxHalfSize = new SVG.Point(this.symbolBBox.w / 2, this.symbolBBox.h / 2)
 			textPosNoTrans = bboxHalfSize.add(bboxHalfSize.mul(this.positionChoice.value.direction))

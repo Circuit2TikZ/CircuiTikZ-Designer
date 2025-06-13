@@ -15,27 +15,30 @@ export class BooleanProperty extends EditableProperty<boolean> {
 	public buildHTML(): HTMLElement {
 		let row = this.getRow()
 		let col = document.createElement("div") as HTMLDivElement
-		col.classList.add("col-12", "my-0")
-		let checkBoxContainerX = document.createElement("div") as HTMLDivElement
-		checkBoxContainerX.classList.add("form-check", "form-switch")
+		col.classList.add("col-12", "input-group", "my-0")
 		{
-			this.checkBox = document.createElement("input") as HTMLInputElement
-			this.checkBox.classList.add("form-check-input")
-			this.checkBox.setAttribute("type", "checkbox")
-			this.checkBox.setAttribute("role", "switch")
-			this.checkBox.checked = this.value
-			checkBoxContainerX.appendChild(this.checkBox)
+			let labelElement = document.createElement("label") as HTMLLabelElement
+			labelElement.classList.add("input-group-text", "flex-grow-1")
+			labelElement.innerHTML = this.label || "CheckBox"
+			col.appendChild(labelElement)
 
-			let labelElementX = document.createElement("label") as HTMLLabelElement
-			labelElementX.classList.add("form-check-label")
-			labelElementX.innerHTML = this.label || "CheckBox"
-			checkBoxContainerX.appendChild(labelElementX)
+			let checkBoxContainer = document.createElement("div") as HTMLDivElement
+			checkBoxContainer.classList.add("input-group-text", "form-switch")
+			{
+				this.checkBox = document.createElement("input") as HTMLInputElement
+				this.checkBox.classList.add("form-check-input", "m-0")
+				this.checkBox.setAttribute("type", "checkbox")
+				this.checkBox.setAttribute("role", "switch")
+				this.checkBox.checked = this.value
+
+				this.checkBox.addEventListener("change", (ev) => {
+					this.updateValue(this.checkBox.checked)
+					Undo.addState()
+				})
+				checkBoxContainer.appendChild(this.checkBox)
+			}
+			col.appendChild(checkBoxContainer)
 		}
-		col.appendChild(checkBoxContainerX)
-		this.checkBox.addEventListener("change", (ev) => {
-			this.updateValue(this.checkBox.checked)
-			Undo.addState()
-		})
 		row.appendChild(col)
 		return row
 	}

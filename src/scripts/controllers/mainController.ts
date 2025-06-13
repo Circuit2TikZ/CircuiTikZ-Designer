@@ -716,23 +716,10 @@ export class MainController {
 
 		// Extract symbols
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement)
-		const defs: SVG.Defs = this.symbolsSVG.defs()
-		const symbols: SVGSymbolElement[] = Array.prototype.filter.call(
-			defs.node.children,
-			(def) => def instanceof SVGSymbolElement
-		)
-		// let symbols = defs.children().filter((/** @type {SVG.Element} */def) => def instanceof SVG.Symbol);
-		this.symbols = symbols.flatMap((symbol) => {
-			const baseInfo = ComponentSymbol.getBaseInformation(symbol)
-			if (baseInfo.isNode === baseInfo.isPath) return [] // type not correctly set
-			try {
-				// if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
-				// else return new PathComponentSymbol(symbol, baseInfo);
-				return new ComponentSymbol(symbol, baseInfo)
-			} catch (e) {
-				console.log(e)
-				return []
-			}
+		const componentsMetadata = Array.from(this.symbolsSVG.node.getElementsByTagName("ci:component"))
+
+		this.symbols = componentsMetadata.flatMap((componentMetadata) => {
+			return new ComponentSymbol(componentMetadata)
 		})
 	}
 
@@ -1102,7 +1089,17 @@ export class MainController {
 				addButton.classList.add("libComponent")
 				addButton.setAttribute(
 					"searchData",
-					[symbol.tikzName].concat(Array.from(symbol._tikzOptions.keys())).join(" ")
+					[symbol.tikzName]
+						.concat(
+							symbol.possibleOptions
+								.map((option) => option.displayName ?? option.displayName)
+								.concat(
+									symbol.possibleEnumOptions.flatMap((enumOption) =>
+										enumOption.options.map((option) => option.displayName ?? option.name)
+									)
+								)
+						)
+						.join(" ")
 				)
 				addButton.ariaRoleDescription = "button"
 				addButton.title = symbol.displayName || symbol.tikzName
@@ -1139,7 +1136,8 @@ export class MainController {
 
 					svgIcon.viewbox(viewBox).width(viewBox.width).height(viewBox.height)
 				}
-				svgIcon.use(symbol.id()).stroke(defaultStroke).fill(defaultFill).node.style.color = defaultStroke
+				svgIcon.use(symbol.symbolElement.id()).stroke(defaultStroke).fill(defaultFill).node.style.color =
+					defaultStroke
 			}
 		}
 	}
