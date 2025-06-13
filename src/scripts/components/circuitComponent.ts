@@ -162,6 +162,8 @@ export abstract class CircuitComponent {
 	protected labelDistance: SliderProperty
 	protected labelColor: ColorProperty
 
+	private isHovered = false
+
 	/**
 	 * The default constructor giving basic functionality. Never call this directly (only via super() in the constructor of the derived class).
 	 */
@@ -172,8 +174,18 @@ export abstract class CircuitComponent {
 		MainController.instance.addComponent(this)
 		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 		this.selectionElement.node.classList.add("selectionElement")
+		this.selectionElement.node.style.pointerEvents = "none"
 
 		this.visualization = CanvasController.instance.canvas.group()
+
+		this.visualization.mouseenter((ev) => {
+			this.isHovered = true
+			this.showSeletedOrHovered()
+		})
+		this.visualization.mouseleave((ev) => {
+			this.isHovered = false
+			this.showSeletedOrHovered()
+		})
 
 		this.displayName = "Circuit Component"
 		this.addPositioning()
@@ -338,18 +350,32 @@ export abstract class CircuitComponent {
 		}
 	}
 
+	private viewAsSelected = false
 	/**
 	 * Show or hide the selection visualization of the component. This has to be distinct from the actual selection state due to how the selection controller works
 	 * @param show if the component should appear selected or not
 	 */
 	public viewSelected(show: boolean): void {
-		if (show) {
+		this.viewAsSelected = show
+		this.showSeletedOrHovered()
+	}
+
+	private showSeletedOrHovered() {
+		if (this.viewAsSelected || this.isHovered) {
 			CanvasController.instance.canvas.put(this.selectionElement)
 			this.selectionElement.show()
+			const color =
+				this.isSelectionReference ?
+					this.isHovered ?
+						"var(--bs-yellow)"
+					:	referenceColor
+				: this.isHovered ? "var(--bs-yellow)"
+				: selectionColor
+
 			this.selectionElement
 				.stroke({
 					width: selectedBoxWidth,
-					color: this.isSelectionReference ? referenceColor : selectionColor,
+					color: color,
 					dasharray: "4, 2",
 				})
 				.fill("none")

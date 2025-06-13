@@ -53,6 +53,9 @@ export class PathComponent extends CircuitikzComponent {
 
 	private startLine: SVG.Line
 	private endLine: SVG.Line
+	private startLineSelection: SVG.Line
+	private endLineSelection: SVG.Line
+	private selectionRect: SVG.Rect
 	private dragStartLine: SVG.Line
 	private dragEndLine: SVG.Line
 	private relSymbolStart: SVG.Point
@@ -89,6 +92,17 @@ export class PathComponent extends CircuitikzComponent {
 			.fill("none")
 			.stroke({ width: selectionSize, color: "transparent" })
 		this.dragEndLine = this.dragStartLine.clone(true)
+
+		this.selectionElement.remove()
+		this.selectionElement = CanvasController.instance.canvas.group()
+		this.startLineSelection = CanvasController.instance.canvas.line().fill("none")
+		this.endLineSelection = CanvasController.instance.canvas.line().fill("none")
+		this.selectionRect = CanvasController.instance.canvas.rect(0, 0).fill("none")
+		this.selectionElement.add(this.selectionRect)
+		this.selectionElement.add(this.startLineSelection)
+		this.selectionElement.add(this.endLineSelection)
+
+		this.selectionElement.hide()
 
 		this.visualization.add(this.symbolUse)
 		this.visualization.add(this.startLine)
@@ -241,6 +255,8 @@ export class PathComponent extends CircuitikzComponent {
 		this.recalculateResizePoints()
 		this.startLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.endLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
+		this.startLineSelection.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
+		this.endLineSelection.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
 		this.dragStartLine.plot(this.posStart.x, this.posStart.y, startEnd.x, startEnd.y)
 		this.dragEndLine.plot(this.posEnd.x, this.posEnd.y, endStart.x, endStart.y)
 
@@ -256,7 +272,7 @@ export class PathComponent extends CircuitikzComponent {
 		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.symbolBBox
-			this.selectionElement
+			this.selectionRect
 				.size(bbox.w + selectedBoxWidth, bbox.h + selectedBoxWidth)
 				.transform(this.getTransformMatrix())
 		}
@@ -264,14 +280,6 @@ export class PathComponent extends CircuitikzComponent {
 
 	public viewSelected(show: boolean): void {
 		super.viewSelected(show)
-		if (show) {
-			// also paint the lines leading to the symbol
-			this.startLine.stroke(this.isSelectionReference ? referenceColor : selectionColor)
-			this.endLine.stroke(this.isSelectionReference ? referenceColor : selectionColor)
-		} else {
-			this.startLine.stroke(defaultStroke)
-			this.endLine.stroke(defaultStroke)
-		}
 		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
 	}
 
