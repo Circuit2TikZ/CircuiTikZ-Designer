@@ -336,7 +336,12 @@ export class NodeComponent extends CircuitikzComponent {
 		if (saveObject.label) {
 			if (Object.hasOwn(saveObject.label, "value")) {
 				nodeComponent.labelDistance.value =
-					saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0, "cm")
+					saveObject.label.distance ?
+						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+					:	new SVG.Number(0, "cm")
+				if (nodeComponent.labelDistance.value.unit == "") {
+					nodeComponent.labelDistance.value.unit = "cm"
+				}
 				nodeComponent.labelDistance.updateHTML()
 				nodeComponent.anchorChoice.value =
 					saveObject.label.anchor ?

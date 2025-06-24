@@ -364,12 +364,10 @@ export abstract class CircuitComponent {
 		if (this.viewAsSelected || this.isHovered) {
 			CanvasController.instance.canvas.put(this.selectionElement)
 			this.selectionElement.show()
+
 			const color =
-				this.isSelectionReference ?
-					this.isHovered ?
-						"var(--bs-yellow)"
-					:	referenceColor
-				: this.isHovered ? "var(--bs-yellow)"
+				this.isHovered ? "var(--bs-yellow)"
+				: this.isSelectionReference ? referenceColor
 				: selectionColor
 
 			this.selectionElement

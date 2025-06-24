@@ -296,7 +296,12 @@ export class PolygonComponent extends ShapeComponent {
 
 		if (saveObject.label) {
 			polygonComponent.labelDistance.value =
-				saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0)
+				saveObject.label.distance ?
+					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+				:	new SVG.Number(0, "cm")
+			if (polygonComponent.labelDistance.value.unit == "") {
+				polygonComponent.labelDistance.value.unit = "cm"
+			}
 			polygonComponent.labelDistance.updateHTML()
 			polygonComponent.anchorChoice.value =
 				saveObject.label.anchor ?

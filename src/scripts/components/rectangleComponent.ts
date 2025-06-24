@@ -379,7 +379,12 @@ export class RectangleComponent extends ShapeComponent {
 
 		if (saveObject.label) {
 			rectComponent.labelDistance.value =
-				saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0)
+				saveObject.label.distance ?
+					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+				:	new SVG.Number(0, "cm")
+			if (rectComponent.labelDistance.value.unit == "") {
+				rectComponent.labelDistance.value.unit = "cm"
+			}
 			rectComponent.labelDistance.updateHTML()
 			rectComponent.anchorChoice.value =
 				saveObject.label.anchor ?
@@ -534,10 +539,10 @@ export class RectangleComponent extends ShapeComponent {
 			//escape special characters
 			const replaceDict = {
 				"#": "\\#",
-				$: "\\$",
+				"$": "\\$",
 				"%": "\\%",
 				"&": "\\&",
-				_: "\\_",
+				"_": "\\_",
 				"{": "\\{",
 				"}": "\\}",
 				"~": "\\textasciitilde",

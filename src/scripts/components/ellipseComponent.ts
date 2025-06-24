@@ -275,7 +275,12 @@ export class EllipseComponent extends ShapeComponent {
 
 		if (saveObject.label) {
 			ellipseComponent.labelDistance.value =
-				saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0)
+				saveObject.label.distance ?
+					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+				:	new SVG.Number(0, "cm")
+			if (ellipseComponent.labelDistance.value.unit == "") {
+				ellipseComponent.labelDistance.value.unit = "cm"
+			}
 			ellipseComponent.labelDistance.updateHTML()
 			ellipseComponent.anchorChoice.value =
 				saveObject.label.anchor ?

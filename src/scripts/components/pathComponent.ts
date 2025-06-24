@@ -571,7 +571,12 @@ export class PathComponent extends CircuitikzComponent {
 				pathComponent.labelSide.value = saveObject.label.otherSide ?? false
 				pathComponent.labelSide.updateHTML()
 				pathComponent.labelDistance.value =
-					saveObject.label.distance ? new SVG.Number(saveObject.label.distance) : new SVG.Number(0, "cm")
+					saveObject.label.distance ?
+						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+					:	new SVG.Number(0, "cm")
+				if (pathComponent.labelDistance.value.unit == "") {
+					pathComponent.labelDistance.value.unit = "cm"
+				}
 				pathComponent.labelDistance.updateHTML()
 				pathComponent.mathJaxLabel.value = saveObject.label.value
 				pathComponent.mathJaxLabel.updateHTML()
