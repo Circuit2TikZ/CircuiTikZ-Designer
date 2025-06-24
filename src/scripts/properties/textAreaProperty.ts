@@ -87,42 +87,35 @@ export class TextAreaProperty extends EditableProperty<Text> {
 		})
 
 		let placeholderDiv = document.createElement("div") as HTMLDivElement
-		placeholderDiv.classList.add("col-12", "my-0", "mt-2")
-		let placeholderCheckBoxContainer = document.createElement("div") as HTMLDivElement
-		placeholderCheckBoxContainer.classList.add("form-check", "form-switch")
+		placeholderDiv.classList.add("col-12", "input-group", "my-0", "mt-2")
 		{
-			this.placeholderCheckBox = document.createElement("input") as HTMLInputElement
-			this.placeholderCheckBox.classList.add("form-check-input")
-			this.placeholderCheckBox.setAttribute("type", "checkbox")
-			this.placeholderCheckBox.setAttribute("role", "switch")
-			this.placeholderCheckBox.checked = this.value.showPlaceholderText
-			placeholderCheckBoxContainer.appendChild(this.placeholderCheckBox)
-
 			let labelElement = document.createElement("label") as HTMLLabelElement
-			labelElement.classList.add("form-check-label")
+			labelElement.classList.add("input-group-text", "flex-grow-1")
 			labelElement.innerHTML = "show placeholder text"
-			placeholderCheckBoxContainer.appendChild(labelElement)
+			placeholderDiv.appendChild(labelElement)
+
+			let placeholderCheckBoxContainer = document.createElement("div") as HTMLDivElement
+			placeholderCheckBoxContainer.classList.add("input-group-text", "form-switch")
+			{
+				this.placeholderCheckBox = document.createElement("input") as HTMLInputElement
+				this.placeholderCheckBox.classList.add("form-check-input", "m-0")
+				this.placeholderCheckBox.setAttribute("type", "checkbox")
+				this.placeholderCheckBox.setAttribute("role", "switch")
+				this.placeholderCheckBox.checked = this.value.showPlaceholderText
+				this.placeholderCheckBox.addEventListener("change", (ev) => {
+					this.update()
+				})
+				placeholderCheckBoxContainer.appendChild(this.placeholderCheckBox)
+			}
+			placeholderDiv.appendChild(placeholderCheckBoxContainer)
 		}
-		placeholderDiv.appendChild(placeholderCheckBoxContainer)
-		this.placeholderCheckBox.addEventListener("change", (ev) => {
-			this.update()
-		})
 		rowTextArea.appendChild(placeholderDiv)
 
 		let hyphenationDiv = document.createElement("div") as HTMLDivElement
-		hyphenationDiv.classList.add("col-12", "my-0", "mt-2")
-		let hyphenationCheckBoxContainer = document.createElement("div") as HTMLDivElement
-		hyphenationCheckBoxContainer.classList.add("form-check", "form-switch")
+		hyphenationDiv.classList.add("col-12", "input-group", "my-0", "mt-2")
 		{
-			this.hyphenationCheckBox = document.createElement("input") as HTMLInputElement
-			this.hyphenationCheckBox.classList.add("form-check-input")
-			this.hyphenationCheckBox.setAttribute("type", "checkbox")
-			this.hyphenationCheckBox.setAttribute("role", "switch")
-			this.hyphenationCheckBox.checked = this.value.useHyphenation
-			hyphenationCheckBoxContainer.appendChild(this.hyphenationCheckBox)
-
 			let labelElement = document.createElement("label") as HTMLLabelElement
-			labelElement.classList.add("form-check-label")
+			labelElement.classList.add("input-group-text", "flex-grow-1")
 			labelElement.innerHTML = "hyphenate"
 			labelElement.setAttribute("data-bs-toggle", "tooltip")
 			labelElement.setAttribute(
@@ -130,13 +123,23 @@ export class TextAreaProperty extends EditableProperty<Text> {
 				"break up words with hyphens at line breaks (CAUTION! generated LaTeX code will not produce the same result!)"
 			)
 			labelElement.setAttribute("data-bs-delay", '{"show":500,"hide":250}')
+			hyphenationDiv.appendChild(labelElement)
 
-			hyphenationCheckBoxContainer.appendChild(labelElement)
+			let hyphenationCheckBoxContainer = document.createElement("div") as HTMLDivElement
+			hyphenationCheckBoxContainer.classList.add("input-group-text", "form-switch")
+			{
+				this.hyphenationCheckBox = document.createElement("input") as HTMLInputElement
+				this.hyphenationCheckBox.classList.add("form-check-input", "m-0")
+				this.hyphenationCheckBox.setAttribute("type", "checkbox")
+				this.hyphenationCheckBox.setAttribute("role", "switch")
+				this.hyphenationCheckBox.checked = this.value.useHyphenation
+				this.hyphenationCheckBox.addEventListener("change", (ev) => {
+					this.update()
+				})
+				hyphenationCheckBoxContainer.appendChild(this.hyphenationCheckBox)
+			}
+			hyphenationDiv.appendChild(hyphenationCheckBoxContainer)
 		}
-		hyphenationDiv.appendChild(hyphenationCheckBoxContainer)
-		this.hyphenationCheckBox.addEventListener("change", (ev) => {
-			this.update()
-		})
 		rowTextArea.appendChild(hyphenationDiv)
 
 		const btnLabelClasses = [
