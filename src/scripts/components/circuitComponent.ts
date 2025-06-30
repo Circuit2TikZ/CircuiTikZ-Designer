@@ -17,7 +17,13 @@ import {
 	Undo,
 	renderMathJax,
 } from "../internal"
-import { rectRectIntersection, referenceColor, selectedBoxWidth, selectionColor } from "../utils/selectionHelper"
+import {
+	hoverColor,
+	rectRectIntersection,
+	referenceColor,
+	selectedBoxWidth,
+	selectionColor,
+} from "../utils/selectionHelper"
 
 /**
  * names cannot contain punctuation, parentheses and some other symbols
@@ -366,7 +372,7 @@ export abstract class CircuitComponent {
 			this.selectionElement.show()
 
 			const color =
-				this.isHovered ? "var(--bs-yellow)"
+				this.isHovered ? hoverColor
 				: this.isSelectionReference ? referenceColor
 				: selectionColor
 

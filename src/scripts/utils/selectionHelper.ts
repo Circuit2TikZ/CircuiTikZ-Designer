@@ -1,9 +1,10 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { CanvasController } from "../internal"
 
-export const selectedBoxWidth = 0.5
+export const selectedBoxWidth = 1
 export const selectionColor = "var(--bs-red)"
-export const referenceColor = "var(--bs-teal)"
+export const referenceColor = "var(--bs-cyan)"
+export const hoverColor = "#FF00FF" // magenta
 
 export const selectionSize = 16
 export function pathPointSVG() {
