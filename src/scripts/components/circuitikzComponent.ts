@@ -55,6 +55,17 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		this.displayName = symbol.displayName
 		this.referenceSymbol = symbol
 
+		this.scaleState = new SVG.Point(1, 1)
+		this.scaleProperty = new SliderProperty("Scale", 0.1, 10, 0.01, new SVG.Number(1), true)
+		this.scaleProperty.addChangeListener((ev) => {
+			this.scaleState = new SVG.Point(
+				Math.sign(this.scaleState.x) * ev.value.value,
+				Math.sign(this.scaleState.y) * ev.value.value
+			)
+			this.update()
+		})
+		this.propertiesHTMLRows.push(this.scaleProperty.buildHTML())
+
 		this.optionProperties = new Map()
 		this.optionEnumProperties = new Map()
 
@@ -73,7 +84,7 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 				enumOption.options.forEach((option) =>
 					choices.push({ key: option.name, name: option.displayName ?? option.name })
 				)
-				const property = new ChoiceProperty("Choose:", choices, choices[0])
+				const property = new ChoiceProperty(enumOption.displayName, choices, choices[0])
 
 				property.addChangeListener((ev) => {
 					this.updateOptions()
@@ -90,17 +101,6 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		this.symbolUse.stroke(defaultStroke)
 		this.symbolUse.node.style.color = defaultStroke
 		this.symbolBBox = this.componentVariant.viewBox
-
-		this.scaleState = new SVG.Point(1, 1)
-		this.scaleProperty = new SliderProperty("Scale", 0.1, 10, 0.01, new SVG.Number(1), true)
-		this.scaleProperty.addChangeListener((ev) => {
-			this.scaleState = new SVG.Point(
-				Math.sign(this.scaleState.x) * ev.value.value,
-				Math.sign(this.scaleState.y) * ev.value.value
-			)
-			this.update()
-		})
-		this.propertiesHTMLRows.push(this.scaleProperty.buildHTML())
 	}
 
 	protected optionsFromProperties(): SymbolOption[] {

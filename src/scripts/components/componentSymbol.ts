@@ -26,6 +26,7 @@ export type SymbolOption = {
 export type EnumOption = {
 	options: SymbolOption[]
 	selectNone: boolean
+	displayName: string
 }
 
 export type Variant = {
@@ -94,6 +95,7 @@ export class ComponentSymbol extends SVG.Symbol {
 							enumOption.hasAttribute("selectNone") ?
 								enumOption.getAttribute("selectNone") == "true"
 							:	true,
+						displayName: enumOption.getAttribute("displayName") ?? "Choose an option",
 					}
 				}
 			)
