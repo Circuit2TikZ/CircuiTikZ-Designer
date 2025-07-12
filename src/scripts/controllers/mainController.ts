@@ -1092,7 +1092,7 @@ export class MainController {
 					[symbol.tikzName]
 						.concat(
 							symbol.possibleOptions
-								.map((option) => option.displayName ?? option.displayName)
+								.map((option) => option.displayName ?? option.name)
 								.concat(
 									symbol.possibleEnumOptions.flatMap((enumOption) =>
 										enumOption.options.map((option) => option.displayName ?? option.name)

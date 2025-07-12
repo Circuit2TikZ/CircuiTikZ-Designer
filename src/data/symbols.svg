@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ci="urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 	<defs>
 		<symbol id="node_ground">
 			<g fill="none" stroke="#000" stroke-miterlimit="10" stroke-width=".4">
@@ -27714,6 +27714,7 @@
 				<pin name="B1" y="-29.10236"/>
 				<pin name="G" x="-37.03902" y="-10.18600"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<textpos x="2.64580" y="0.00000"/>
 			</variant>
 			<variant x="37.30472" y="29.63372" viewBox="0 0 52.91636 59.26741" for="node_pujt_bodydiode">
@@ -27721,6 +27722,7 @@
 				<pin name="B1" y="-29.10236"/>
 				<pin name="G" x="-37.03902" y="-10.18600"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<pin name="body C out" x="11.11181" y="17.46160"/>
 				<pin name="body E out" x="11.11181" y="-17.46159"/>
 				<textpos x="2.64580" y="0.00000"/>
@@ -27730,6 +27732,7 @@
 				<option key="nogate"/>
 				<pin name="B1" y="-29.10236"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<pin name="body C out" x="11.11181" y="17.46160"/>
 				<pin name="body E out" x="11.11181" y="-17.46159"/>
 				<textpos x="2.64580" y="0.00000"/>
@@ -27740,6 +27743,7 @@
 				<option key="tr circle"/>
 				<pin name="B1" y="-29.10236"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37224" y="-10.18600"/>
 				<pin name="body C out" x="11.11181" y="17.46160"/>
 				<pin name="body E out" x="11.11181" y="-17.46159"/>
 				<textpos x="2.64580" y="0.00000"/>
@@ -27750,6 +27754,7 @@
 				<pin name="B1" y="-29.10236"/>
 				<pin name="G" x="-37.03902" y="-10.18600"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<pin name="body C out" x="11.11181" y="17.46160"/>
 				<pin name="body E out" x="11.11181" y="-17.46159"/>
 				<textpos x="2.64580" y="0.00000"/>
@@ -27758,6 +27763,7 @@
 				<option key="nogate"/>
 				<pin name="B1" y="-29.10236"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<textpos x="2.64580" y="0.00000"/>
 			</variant>
 			<variant x="33.86624" y="29.63372" viewBox="0 0 43.54435 59.26741" for="node_pujt_nogate_tr-circle">
@@ -27765,6 +27771,7 @@
 				<option key="tr circle"/>
 				<pin name="B1" y="-29.10236"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37224" y="-10.18600"/>
 				<textpos x="2.64580" y="0.00000"/>
 			</variant>
 			<variant x="37.30472" y="29.63372" viewBox="0 0 46.98283 59.26741" for="node_pujt_tr-circle">
@@ -27772,6 +27779,7 @@
 				<pin name="B1" y="-29.10236"/>
 				<pin name="G" x="-37.03902" y="-10.18600"/>
 				<pin name="B2" y="29.10238"/>
+				<pin name="kink" x="-30.37225" y="-10.18600"/>
 				<textpos x="2.64580" y="0.00000"/>
 			</variant>
 		</component>
