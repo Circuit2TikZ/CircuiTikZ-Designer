@@ -1,9 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { ensureInPx } from "../utils/impSVGNumber"
-import { getNamedTag, getNamedTags } from "../utils/xmlHelper"
 import { CanvasController } from "../internal"
-
-const METADATA_NAMESPACE_URI = "urn:uuid:c93d8327-175d-40b7-bdf7-03205e4f8fc3"
 
 /**
  * a point where one can snap to relative to the component position
@@ -74,34 +71,35 @@ export class ComponentSymbol extends SVG.Symbol {
 	maxStroke: number = 0
 
 	constructor(componentMetadata: Element) {
-		const variants = getNamedTags(componentMetadata, "variant", METADATA_NAMESPACE_URI)
+		const variants = componentMetadata.getElementsByTagName("variant")
+
 		const firstSymbol = componentMetadata.ownerDocument.getElementById(variants[0].getAttribute("for"))
 		super(firstSymbol)
 		this.isNodeSymbol = componentMetadata.getAttribute("type") == "node"
 
-		this.tikzName = componentMetadata?.getAttribute("tikzName") ?? null
-		this.displayName = componentMetadata?.getAttribute("displayName") ?? this.tikzName
-		this.groupName = componentMetadata?.getAttribute("groupName") ?? null
+		this.tikzName = componentMetadata?.getAttribute("tikz") ?? null
+		this.displayName = componentMetadata?.getAttribute("display") ?? this.tikzName
+		this.groupName = componentMetadata?.getAttribute("group") ?? null
 
-		const tikzOptions = getNamedTag(componentMetadata, "tikzOptions", METADATA_NAMESPACE_URI)
+		const tikzOptions = componentMetadata.getElementsByTagName("options")[0]
 		if (tikzOptions) {
-			this.possibleEnumOptions = getNamedTags(tikzOptions, "enumOption", METADATA_NAMESPACE_URI).map<EnumOption>(
+			this.possibleEnumOptions = Array.from(tikzOptions.getElementsByTagName("enumopt")).map<EnumOption>(
 				(enumOption) => {
 					return {
-						options: getNamedTags(enumOption, "option", METADATA_NAMESPACE_URI).map(
+						options: Array.from(enumOption.getElementsByTagName("option")).map(
 							this.optionMetadataToSymbolOption
 						),
 						selectNone:
 							enumOption.hasAttribute("selectNone") ?
 								enumOption.getAttribute("selectNone") == "true"
 							:	true,
-						displayName: enumOption.getAttribute("displayName") ?? "Choose an option",
+						displayName: enumOption.getAttribute("display") ?? "Choose an option",
 					}
 				}
 			)
-			this.possibleOptions = getNamedTags(tikzOptions, "option", METADATA_NAMESPACE_URI)
+			this.possibleOptions = Array.from(tikzOptions.getElementsByTagName("option"))
 				.filter((option) => {
-					return option.parentElement.tagName == "ci:tikzOptions"
+					return option.parentElement.tagName == "options"
 				})
 				.map<SymbolOption>((option) => this.optionMetadataToSymbolOption(option))
 		} else {
@@ -112,11 +110,9 @@ export class ComponentSymbol extends SVG.Symbol {
 		this._mapping = new Map<string, Variant>()
 		for (const variant of variants) {
 			// get options
-			var symbolOptions: SymbolOption[] = getNamedTags(
-				variant,
-				"option",
-				METADATA_NAMESPACE_URI
-			).map<SymbolOption>((option) => this.optionMetadataToSymbolOption(option))
+			var symbolOptions: SymbolOption[] = Array.from(variant.getElementsByTagName("option")).map<SymbolOption>(
+				(option) => this.optionMetadataToSymbolOption(option)
+			)
 
 			const symbolID = variant.getAttribute("for")
 			const symbol = new SVG.Symbol(componentMetadata.ownerDocument.getElementById(symbolID))
@@ -139,7 +135,7 @@ export class ComponentSymbol extends SVG.Symbol {
 				variant.setAttribute("viewBox", box.toString())
 			}
 
-			let pinArray = getNamedTags(variant, "pin", METADATA_NAMESPACE_URI) ?? []
+			let pinArray = Array.from(variant.getElementsByTagName("pin")) ?? []
 			const pins = pinArray.map(this.parseAnchor, this)
 			const defaultAnchor = pins.find((pin) => pin.isDefault) || {
 				name: "center",
@@ -149,17 +145,24 @@ export class ComponentSymbol extends SVG.Symbol {
 				point: new SVG.Point(0, 0),
 			}
 
-			const textPositionElement = getNamedTag(variant, "textPosition", METADATA_NAMESPACE_URI)
+			const textPositionElement = variant.getElementsByTagName("textpos")[0]
+			let textAnchor: TikZAnchor
+			if (textPositionElement) {
+				textAnchor = this.parseAnchor(textPositionElement)
+				textAnchor.name = "text"
+			} else {
+				textAnchor = defaultAnchor
+			}
 
 			var variantObject: Variant = {
 				mid: new SVG.Point(
-					ensureInPx(variant.getAttribute("refX") || 0),
-					ensureInPx(variant.getAttribute("refY") || 0)
+					ensureInPx(variant.getAttribute("x") ?? 0),
+					ensureInPx(variant.getAttribute("y") ?? 0)
 				),
 				viewBox: new SVG.Box(variant.getAttribute("viewBox")),
 				symbol: new SVG.Symbol(componentMetadata.ownerDocument.getElementById(symbolID)),
 				pins: pins,
-				textPosition: textPositionElement ? this.parseAnchor(textPositionElement) : defaultAnchor,
+				textPosition: textAnchor,
 				defaultAnchor: defaultAnchor,
 				options: symbolOptions,
 				maxStroke: maxStroke,
@@ -182,7 +185,7 @@ export class ComponentSymbol extends SVG.Symbol {
 	private optionMetadataToSymbolOption(option: Element) {
 		return {
 			name: option.getAttribute("key"),
-			displayName: option.getAttribute("displayName") ?? undefined,
+			displayName: option.getAttribute("display") ?? undefined,
 			value: option.getAttribute("value") ?? undefined,
 		}
 	}
@@ -215,9 +218,9 @@ export class ComponentSymbol extends SVG.Symbol {
 	private parseAnchor(anchorElement: Element): TikZAnchor {
 		const numberRegEx = /^(\d*\.)?\d+$/ // "1", ".1", "1.1"; but not "1."
 		let anchor: TikZAnchor = {
-			name: anchorElement.getAttribute("anchorName") || anchorElement.getAttribute("anchorname") || undefined,
-			x: new SVG.Number(anchorElement.getAttribute("x")),
-			y: new SVG.Number(anchorElement.getAttribute("y")),
+			name: anchorElement.getAttribute("name") || anchorElement.getAttribute("anchorname") || undefined,
+			x: new SVG.Number(anchorElement.getAttribute("x") ?? "0"),
+			y: new SVG.Number(anchorElement.getAttribute("y") ?? "0"),
 			isDefault:
 				Boolean(anchorElement.getAttribute("isDefault")) ||
 				Boolean(anchorElement.getAttribute("isdefault")) ||

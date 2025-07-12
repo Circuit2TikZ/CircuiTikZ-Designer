@@ -716,7 +716,7 @@ export class MainController {
 
 		// Extract symbols
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement)
-		const componentsMetadata = Array.from(this.symbolsSVG.node.getElementsByTagName("ci:component"))
+		const componentsMetadata = Array.from(this.symbolsSVG.node.getElementsByTagName("component"))
 
 		this.symbols = componentsMetadata.flatMap((componentMetadata) => {
 			return new ComponentSymbol(componentMetadata)
