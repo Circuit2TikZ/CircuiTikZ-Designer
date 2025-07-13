@@ -22,6 +22,7 @@ import {
  */
 export type CircuitikzSaveObject = ComponentSaveObject & {
 	id: string
+	options?: string[]
 	name?: string
 	scale?: SVG.Point
 }
@@ -81,9 +82,9 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 			}
 			for (const enumOption of symbol.possibleEnumOptions) {
 				let choices: ChoiceEntry[] = enumOption.selectNone ? [{ key: "-", name: "--default--" }] : []
-				enumOption.options.forEach((option) =>
+				enumOption.options.forEach((option) => {
 					choices.push({ key: option.name, name: option.displayName ?? option.name })
-				)
+				})
 				const property = new ChoiceProperty(enumOption.displayName, choices, choices[0])
 
 				property.addChangeListener((ev) => {
@@ -112,7 +113,11 @@ export abstract class CircuitikzComponent extends CircuitComponent {
 		})
 		this.optionEnumProperties.forEach((option, property) => {
 			if (property.value.key != "-") {
-				selectedOptions.push(option.options.find((o) => o.name == property.value.key))
+				selectedOptions.push(
+					option.options.find((o) => {
+						return o.name == property.value.key
+					})
+				)
 			}
 		})
 		return selectedOptions

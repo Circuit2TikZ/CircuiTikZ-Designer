@@ -356,9 +356,12 @@ export class PathComponent extends CircuitikzComponent {
 	public toJson(): PathSaveObject {
 		let data: PathSaveObject = {
 			type: "path",
-			id: this.componentVariant.symbol.id(),
+			id: this.referenceSymbol.tikzName,
 			start: this.posStart.simplifyForJson(),
 			end: this.posEnd.simplifyForJson(),
+		}
+		if (this.componentVariant.options.length > 0) {
+			data.options = this.componentVariant.options.map((option) => option.displayName ?? option.name)
 		}
 
 		if (this.name.value) {
@@ -540,15 +543,14 @@ export class PathComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: PathSaveObject): PathComponent {
-		let symbol = MainController.instance.symbols.find(
-			(value, index, symbols) =>
-				CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
-		)
+		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
 		let pathComponent: PathComponent = new PathComponent(symbol)
 		pathComponent.posStart = new SVG.Point(saveObject.start)
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced = 2
-		pathComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
+
+		let options = saveObject.options ?? []
+		pathComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
 
 		if (saveObject.scale) {
 			pathComponent.scaleState = new SVG.Point(saveObject.scale)

@@ -16,7 +16,6 @@ export type TikZAnchor = {
 export type SymbolOption = {
 	name: string
 	displayName?: string
-	value?: string
 	selected?: boolean
 }
 
@@ -93,7 +92,7 @@ export class ComponentSymbol extends SVG.Symbol {
 							enumOption.hasAttribute("selectNone") ?
 								enumOption.getAttribute("selectNone") == "true"
 							:	true,
-						displayName: enumOption.getAttribute("display") ?? "Choose an option",
+						displayName: enumOption.getAttribute("name") ?? "Choose an option",
 					}
 				}
 			)
@@ -110,8 +109,8 @@ export class ComponentSymbol extends SVG.Symbol {
 		this._mapping = new Map<string, Variant>()
 		for (const variant of variants) {
 			// get options
-			var symbolOptions: SymbolOption[] = Array.from(variant.getElementsByTagName("option")).map<SymbolOption>(
-				(option) => this.optionMetadataToSymbolOption(option)
+			var symbolOptions = this.getOptionsFromOptionNames(
+				Array.from(variant.getElementsByTagName("option")).map((option) => option.getAttribute("name"))
 			)
 
 			const symbolID = variant.getAttribute("for")
@@ -182,11 +181,10 @@ export class ComponentSymbol extends SVG.Symbol {
 		this.maxStroke = first.maxStroke
 	}
 
-	private optionMetadataToSymbolOption(option: Element) {
+	private optionMetadataToSymbolOption(option: Element): SymbolOption {
 		return {
-			name: option.getAttribute("key"),
+			name: option.getAttribute("name"),
 			displayName: option.getAttribute("display") ?? undefined,
-			value: option.getAttribute("value") ?? undefined,
 		}
 	}
 
@@ -201,7 +199,7 @@ export class ComponentSymbol extends SVG.Symbol {
 				return 0
 			})
 			.map((option) => {
-				return option.name + (option.value ? "=" + option.value : "")
+				return option.name
 			})
 	}
 
@@ -235,25 +233,24 @@ export class ComponentSymbol extends SVG.Symbol {
 		return anchor
 	}
 
-	public getOptionsFromSymbolID(id: string): SymbolOption[] {
-		const idSplit = id.split(this.tikzName.replaceAll(" ", "-"))[1]
-		if (idSplit == "") {
-			return []
-		}
-		const options: string[] = idSplit.split("_").slice(1)
+	public getOptionsFromOptionNames(options: string[]): SymbolOption[] {
 		const result: SymbolOption[] = []
 
-		for (const option of options) {
-			let foundOption = this.possibleOptions.find(
-				(value) => (value.displayName ?? value.name).replaceAll(" ", "-") == option
+		function optionsEqual(opt1: SymbolOption, opt2: string): boolean {
+			const optionReplaced = opt2.replaceAll(" ", "-")
+			return (
+				(opt1.displayName ? opt1.displayName.replaceAll(" ", "-") == optionReplaced : false) ||
+				opt1.name.replaceAll(" ", "-") == optionReplaced
 			)
+		}
+
+		for (const option of options) {
+			let foundOption = this.possibleOptions.find((value) => optionsEqual(value, option))
 			if (foundOption) {
 				result.push(foundOption)
 			} else {
 				for (const enumOption of this.possibleEnumOptions) {
-					foundOption = enumOption.options.find(
-						(value) => (value.displayName ?? value.name).replaceAll(" ", "-") == option
-					)
+					foundOption = enumOption.options.find((value) => optionsEqual(value, option))
 					if (foundOption) {
 						result.push(foundOption)
 						break

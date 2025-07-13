@@ -169,8 +169,11 @@ export class NodeComponent extends CircuitikzComponent {
 	public toJson(): NodeSaveObject {
 		let data: NodeSaveObject = {
 			type: "node",
-			id: this.componentVariant.symbol.id(),
+			id: this.referenceSymbol.tikzName,
 			position: this.position.simplifyForJson(),
+		}
+		if (this.componentVariant.options.length > 0) {
+			data.options = this.componentVariant.options.map((option) => option.displayName ?? option.name)
 		}
 		if (this.rotationDeg !== 0) {
 			data.rotation = this.rotationDeg
@@ -311,13 +314,11 @@ export class NodeComponent extends CircuitikzComponent {
 	}
 
 	public static fromJson(saveObject: NodeSaveObject): NodeComponent {
-		let symbol = MainController.instance.symbols.find(
-			(value, index, symbols) =>
-				CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
-		)
+		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
 
 		let nodeComponent: NodeComponent = new NodeComponent(symbol)
-		nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
+		let options = saveObject.options ?? []
+		nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
 		nodeComponent.moveTo(new SVG.Point(saveObject.position))
 
 		if (saveObject.rotation) {
