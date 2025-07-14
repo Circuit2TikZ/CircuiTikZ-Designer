@@ -261,4 +261,12 @@ export class ComponentSymbol extends SVG.Symbol {
 
 		return result
 	}
+	public getOptionsFromSymbolID(id: string): SymbolOption[] {
+		const idSplit = id.split(this.tikzName.replaceAll(" ", "-"))[1]
+		if (idSplit == "") {
+			return []
+		}
+		const options: string[] = idSplit.split("_").slice(1)
+		return this.getOptionsFromOptionNames(options)
+	}
 }

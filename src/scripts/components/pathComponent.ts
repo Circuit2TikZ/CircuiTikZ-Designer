@@ -544,13 +544,29 @@ export class PathComponent extends CircuitikzComponent {
 
 	public static fromJson(saveObject: PathSaveObject): PathComponent {
 		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
+
+		let backwards = false
+		if (!symbol) {
+			// only for backwards compatibility
+			symbol = MainController.instance.symbols.find(
+				(value, index, symbols) =>
+					CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
+			)
+			backwards = true
+		}
+
 		let pathComponent: PathComponent = new PathComponent(symbol)
 		pathComponent.posStart = new SVG.Point(saveObject.start)
 		pathComponent.posEnd = new SVG.Point(saveObject.end)
 		pathComponent.pointsPlaced = 2
 
-		let options = saveObject.options ?? []
-		pathComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
+		if (backwards) {
+			// not working for all options (if key value pair is used)
+			pathComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
+		} else {
+			let options = saveObject.options ?? []
+			pathComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
+		}
 
 		if (saveObject.scale) {
 			pathComponent.scaleState = new SVG.Point(saveObject.scale)

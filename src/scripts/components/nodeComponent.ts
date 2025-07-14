@@ -316,9 +316,24 @@ export class NodeComponent extends CircuitikzComponent {
 	public static fromJson(saveObject: NodeSaveObject): NodeComponent {
 		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
 
+		let backwards = false
+		if (!symbol) {
+			// only for backwards compatibility
+			symbol = MainController.instance.symbols.find(
+				(value, index, symbols) =>
+					CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
+			)
+			backwards = true
+		}
+
 		let nodeComponent: NodeComponent = new NodeComponent(symbol)
-		let options = saveObject.options ?? []
-		nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
+		if (backwards) {
+			// not working for all options (if key value pair is used)
+			nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
+		} else {
+			let options = saveObject.options ?? []
+			nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
+		}
 		nodeComponent.moveTo(new SVG.Point(saveObject.position))
 
 		if (saveObject.rotation) {
