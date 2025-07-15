@@ -7,6 +7,9 @@
 	},
 	"prettier.documentSelectors": ["**/*.{svg,xsd,xml}", ".parcelrc", ".posthtmlrc"],
 	"prettier.prettierPath": "./node_modules/prettier/index.cjs",
+	"prettier.requireConfig": true,
+	"prettier.configPath": ".prettierrc",
+	"prettier.resolveGlobalModules": true,
 	"terminal.integrated.env.linux": {
 		"PATH": "${env:PATH}:${workspaceFolder}/node_modules/.bin"
 	},

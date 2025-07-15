@@ -1,6 +1,8 @@
 {
 	"endOfLine": "lf",
 	"plugins": ["@prettier/plugin-xml"],
+	"bracketSameLine": true,
+	"singleAttributePerLine": false,
 	"printWidth": 120,
 	"tabWidth": 4,
 	"trailingComma": "es5",

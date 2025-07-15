@@ -191,6 +191,9 @@ export class PropertyController {
 		;(document.getElementById("resetViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
 			CanvasController.instance.resetView()
 		})
+		;(document.getElementById("fitViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.fitView()
+		})
 
 		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
 		minorSlider.value = CanvasController.instance.majorGridSubdivisions.toString()

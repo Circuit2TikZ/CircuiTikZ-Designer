@@ -212,6 +212,31 @@ export class CanvasController {
 		this.onResizeCanvas()
 	}
 
+	public fitView() {
+		let bbox: SVG.Box = null
+		for (const component of MainController.instance.circuitComponents) {
+			let compBBox = component.visualization.bbox()
+			if (bbox) {
+				bbox = bbox.merge(compBBox)
+			} else {
+				bbox = compBBox
+			}
+		}
+
+		if (bbox) {
+			let canvasBox = this.canvas.viewbox()
+			let zoomFactor = Math.min(canvasBox.w / bbox.w, canvasBox.h / bbox.h) * 0.98 // sligtly more zoomed out
+			let newSize = new SVG.Point(canvasBox.w, canvasBox.h).mul(zoomFactor)
+			canvasBox = new SVG.Box(bbox.cx - newSize.x / 2, bbox.cy - newSize.y / 2, newSize.x, newSize.y)
+			this.canvas.viewbox(canvasBox)
+			this.zoomCurrent *= zoomFactor
+			this.canvas.zoom(this.zoomCurrent, new SVG.Point(bbox.cx, bbox.cy))
+			this.onResizeCanvas()
+		} else {
+			this.resetView()
+		}
+	}
+
 	public moveComponentsForward(components: CircuitComponent[]) {
 		if (MainController.instance.circuitComponents.length < 2 || components.length == 0) {
 			return
