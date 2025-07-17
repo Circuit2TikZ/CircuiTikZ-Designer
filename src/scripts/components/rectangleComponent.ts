@@ -662,7 +662,12 @@ export class RectangleComponent extends ShapeComponent {
 			labelRef = this.labelPos.direction
 		}
 
-		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w, labelBBox.h)).add(labelRef.mul(labelDist))
+		let ref = labelRef
+			.add(1)
+			.div(2)
+			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
+			.add(new SVG.Point(labelBBox.x, labelBBox.y))
+			.add(labelRef.mul(labelDist))
 
 		// actually move the label
 		let movePos = textPos.sub(ref)

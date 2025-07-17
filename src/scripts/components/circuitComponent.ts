@@ -16,6 +16,7 @@ import {
 	GroupComponent,
 	Undo,
 	renderMathJax,
+	ChoiceProperty,
 } from "../internal"
 import {
 	hoverColor,
@@ -56,6 +57,7 @@ export type Label = {
 export type PositionedLabel = Label & {
 	anchor?: string
 	position?: string
+	relativeToComponent?: boolean
 }
 
 export const basicDirections: DirectionInfo[] = [
@@ -164,6 +166,11 @@ export abstract class CircuitComponent {
 	public snappingPoints: SnapPoint[]
 
 	protected mathJaxLabel: MathJaxProperty
+	protected labelReferenceChoices: ChoiceEntry[] = [
+		{ key: "canvas", name: "Canvas" },
+		{ key: "component", name: "Component" },
+	]
+	protected labelReferenceProperty: ChoiceProperty<ChoiceEntry>
 	protected labelRendering: SVG.Element
 	protected labelDistance: SliderProperty
 	protected labelColor: ColorProperty

@@ -43,3 +43,4 @@ export * from "./snapDrag/snapCursor"
 export * from "./snapDrag/snapPoint"
 // other
 export * from "./utils/textHelper"
+export * from "./utils/utils"

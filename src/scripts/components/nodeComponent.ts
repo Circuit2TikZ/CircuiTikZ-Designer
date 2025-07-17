@@ -2,9 +2,11 @@ import * as SVG from "@svgdotjs/svg.js"
 import {
 	basicDirections,
 	CanvasController,
+	ChoiceEntry,
 	ChoiceProperty,
 	CircuitikzComponent,
 	CircuitikzSaveObject,
+	clamp,
 	ColorProperty,
 	ComponentSymbol,
 	defaultBasicDirection,
@@ -14,6 +16,7 @@ import {
 	MathJaxProperty,
 	PositionedLabel,
 	SectionHeaderProperty,
+	simpifyRotationAndScale,
 	SliderProperty,
 	SnapDragHandler,
 	SnappingInfo,
@@ -46,6 +49,16 @@ export class NodeComponent extends CircuitikzComponent {
 			this.mathJaxLabel = new MathJaxProperty()
 			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
 			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+
+			this.labelReferenceProperty = new ChoiceProperty(
+				"Relative to",
+				this.labelReferenceChoices,
+				this.labelReferenceChoices[0]
+			)
+			this.labelReferenceProperty.addChangeListener((ev) => {
+				this.updateLabelPosition()
+			})
+			this.propertiesHTMLRows.push(this.labelReferenceProperty.buildHTML())
 
 			this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
 			this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
@@ -189,6 +202,7 @@ export class NodeComponent extends CircuitikzComponent {
 				value: this.mathJaxLabel.value,
 				anchor: this.anchorChoice.value.key,
 				position: this.positionChoice.value.key,
+				relativeToComponent: this.labelReferenceProperty.value.key == "component",
 				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
 				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 			}
@@ -208,15 +222,15 @@ export class NodeComponent extends CircuitikzComponent {
 
 		let labelNodeStr = ""
 		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.labelPos.name
+			let labelStr = "anchor=" + this.anchorPos.name
 
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 
-			if (!isNaN(this.labelPos.direction.absSquared())) {
+			if (!isNaN(this.anchorPos.direction.absSquared())) {
 				labelDist = labelDist.minus(0.12)
 			}
 
-			let labelShift = this.labelPos.direction.mul(-labelDist.value)
+			let labelShift = this.anchorPos.direction.mul(-labelDist.value)
 			let posShift = ""
 			if (labelShift.x !== 0) {
 				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
@@ -227,22 +241,10 @@ export class NodeComponent extends CircuitikzComponent {
 			}
 			posShift = posShift == "" ? "" : "[" + posShift + "]"
 
-			let pos = defaultBasicDirection.name
-			if (this.positionChoice.value.key != "default") {
-				let newdir = this.positionChoice.value.direction.transform(
-					new SVG.Matrix({
-						rotate: this.rotationDeg,
-						scaleX: this.scaleState.x,
-						scaleY: this.scaleState.y,
-					})
-				)
-
-				newdir = new SVG.Point(Math.round(newdir.x), Math.round(newdir.y))
-
-				pos = basicDirections.find((item) => item.direction.eq(newdir)).name
-			}
-
-			let posStr = this.positionChoice.value.key == defaultBasicDirection.key ? id + ".text" : id + "." + pos
+			let posStr =
+				this.positionChoice.value.key == defaultBasicDirection.key ?
+					id + ".text"
+				:	id + "." + this.labelPos.name
 			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
 			latexStr =
 				latexStr && this.labelColor.value ?
@@ -253,13 +255,15 @@ export class NodeComponent extends CircuitikzComponent {
 		}
 
 		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same
+		let [rotation, scale] = simpifyRotationAndScale(this.rotationDeg, this.scaleState)
+
 		return (
-			"\\draw node[" +
+			"\\node[" +
 			this.referenceSymbol.tikzName +
 			(optionsString ? ", " + optionsString : "") +
-			(this.rotationDeg !== 0 ? `, rotate=${this.rotationDeg}` : "") +
-			(this.scaleState.x != 1 ? `, xscale=${this.scaleState.x}` : "") +
-			(this.scaleState.y != 1 ? `, yscale=${this.scaleState.y}` : "") +
+			(rotation !== 0 ? `, rotate=${rotation}` : "") +
+			(scale.x != 1 ? `, xscale=${scale.x}` : "") +
+			(scale.y != 1 ? `, yscale=${scale.y}` : "") +
 			"] " +
 			(id ? "(" + id + ") " : "") +
 			"at " +
@@ -369,6 +373,11 @@ export class NodeComponent extends CircuitikzComponent {
 						basicDirections.find((item) => item.key == saveObject.label.position)
 					:	defaultBasicDirection
 				nodeComponent.positionChoice.updateHTML()
+				nodeComponent.labelReferenceProperty.value =
+					saveObject.label.relativeToComponent ?
+						nodeComponent.labelReferenceChoices[1]
+					:	nodeComponent.labelReferenceChoices[0]
+				nodeComponent.labelReferenceProperty.updateHTML()
 				nodeComponent.mathJaxLabel.value = saveObject.label.value
 				nodeComponent.mathJaxLabel.updateHTML()
 				nodeComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
@@ -391,6 +400,7 @@ export class NodeComponent extends CircuitikzComponent {
 		return newComponent
 	}
 
+	private anchorPos: DirectionInfo
 	private labelPos: DirectionInfo
 	public updateLabelPosition(): void {
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
@@ -398,45 +408,70 @@ export class NodeComponent extends CircuitikzComponent {
 		}
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
+		let textPos: SVG.Point
+		let ref: SVG.Point
+
 		// get relevant positions and bounding boxes
-		let textPosNoTrans: SVG.Point
+		let bboxHalfSize = new SVG.Point(this.symbolBBox.w / 2, this.symbolBBox.h / 2)
+		let textDir: SVG.Point // normalized direction to bbox size
+		let textPosNoTransform: SVG.Point // relative to the upper left corner in local coordinates
+		// get the position of the label
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPosNoTrans = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
+			textPosNoTransform = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
+			textDir = textPosNoTransform.sub(bboxHalfSize).div(bboxHalfSize)
 		} else {
-			let bboxHalfSize = new SVG.Point(this.symbolBBox.w / 2, this.symbolBBox.h / 2)
-			textPosNoTrans = bboxHalfSize.add(bboxHalfSize.mul(this.positionChoice.value.direction))
+			if (this.labelReferenceProperty.value.key == "canvas") {
+				// the component should be placed absolute to the canvas
+				//reverse local transform effect
+				textDir = this.positionChoice.value.direction.transform(
+					new SVG.Matrix({
+						rotate: -this.rotationDeg,
+						scaleX: this.scaleState.x,
+						scaleY: this.scaleState.y,
+					}).inverse()
+				)
+				// check which label direction should be used to get the final correct direction
+				textDir = textDir.div(textDir.abs())
+				textDir.x = Math.round(textDir.x)
+				textDir.y = Math.round(textDir.y)
+			} else {
+				// just use whatever is selected
+				textDir = this.positionChoice.value.direction
+			}
+
+			textPosNoTransform = bboxHalfSize.add(bboxHalfSize.mul(textDir))
 		}
-		let textPos = textPosNoTrans.transform(transformMatrix)
+		this.labelPos = basicDirections.find((item) => item.direction.eq(textDir))
+		textPos = textPosNoTransform.transform(transformMatrix)
 		let labelBBox = labelSVG.bbox()
 
 		// calculate where on the label the anchor point should be
 		let labelRef: SVG.Point
 		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
 		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
-			let clamp = function (value: number, min: number, max: number) {
-				if (value < min) {
-					return min
-				} else if (value > max) {
-					return max
-				} else {
-					return value
-				}
-			}
-			let useBBox = this.symbolUse.bbox()
-			let horizontalTextPosition = clamp(Math.round((2 * (useBBox.cx - textPosNoTrans.x)) / useBBox.w), -1, 1)
-			let verticalTextPosition = clamp(Math.round((2 * (useBBox.cy - textPosNoTrans.y)) / useBBox.h), -1, 1)
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition).rotate(this.rotationDeg)
+			labelRef = textDir.mul(-1)
+			//transform anchor direction back to global coordinates
+			labelRef = labelRef.transform(
+				new SVG.Matrix({
+					rotate: -this.rotationDeg,
+					scaleX: this.scaleState.x,
+					scaleY: this.scaleState.y,
+				})
+			)
+
+			// check which direction should be used to get the final correct direction
+			labelRef = labelRef.div(labelRef.abs())
 			labelRef.x = Math.round(labelRef.x)
 			labelRef.y = Math.round(labelRef.y)
 
-			//reset to center before actually checking where it should go
-			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))
+			this.anchorPos = basicDirections.find((item) => item.direction.eq(labelRef))
 		} else {
-			this.labelPos = this.anchorChoice.value
-			labelRef = this.labelPos.direction
+			// an explicit anchor was selected
+			this.anchorPos = this.anchorChoice.value
+			labelRef = this.anchorPos.direction
 		}
 
-		let ref = labelRef
+		ref = labelRef
 			.add(1)
 			.div(2)
 			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
