@@ -16,9 +16,8 @@ import {
 	PropertyController,
 	CircuitComponent,
 	ComponentPlacer,
-	NodeComponent,
-	CircuitikzComponent,
-	PathComponent,
+	NodeSymbolComponent,
+	PathSymbolComponent,
 	WireComponent,
 	ComponentSymbol,
 	ComponentSaveObject,
@@ -30,17 +29,14 @@ import {
 	PolygonComponent,
 	GroupSaveObject,
 	memorySizeOf,
+	SaveFileFormat,
+	emtpySaveState,
 } from "../internal"
-
-type SaveState = {
-	currentData: ComponentSaveObject[][]
-	currentIndices: number[]
-}
 
 type TabState = {
 	id: number
 	open: string
-	data: ComponentSaveObject[]
+	data: SaveFileFormat
 	settings: CanvasSettings
 }
 
@@ -286,25 +282,6 @@ export class MainController {
 			db = (event.target as IDBOpenDBRequest).result
 			let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
 
-			//load in localStorage data if available for backwards compatibility with localstorage
-			const storageString = localStorage.getItem("circuitikz-designer-saveState")
-			if (storageString) {
-				const lastSaveState: SaveState = JSON.parse(storageString)
-				let id = 0
-				lastSaveState.currentData.forEach((data) => {
-					if (data.length == 0) return
-					const newEntry: TabState = {
-						id: id,
-						open: "false",
-						data: data,
-						settings: defaultSettings,
-					}
-					tabsObjectStore.add(newEntry)
-					id++
-				})
-				localStorage.removeItem("circuitikz-designer-saveState")
-			}
-
 			// the URL of the current page
 			var url = new URL(window.location.href)
 			// check if a tabID is requested in the URL, otherwise use the first closed tab
@@ -338,7 +315,12 @@ export class MainController {
 					}
 				} else {
 					// requested tab not found, so we create a new one
-					const newEntry: TabState = { id: requestedID, open: "true", data: [], settings: defaultSettings }
+					const newEntry: TabState = {
+						id: requestedID,
+						open: "true",
+						data: emtpySaveState,
+						settings: defaultSettings,
+					}
 					MainController.instance.tabID = requestedID
 					tabsObjectStore.add(newEntry).onsuccess = (event) => {
 						// as soon as the tab is created and saved in the db, we can notify the other tabs
@@ -379,7 +361,7 @@ export class MainController {
 					let cell1 = row.appendChild(document.createElement("td"))
 					cell1.innerText = "" + i
 					let cell2 = row.appendChild(document.createElement("td"))
-					cell2.innerText = countComponents(tabData.data) + ""
+					cell2.innerText = countComponents(tabData.data.components) + ""
 					let cell3 = row.appendChild(document.createElement("td"))
 					let size = memorySizeOf(tabData.data)
 					totalSize += size
@@ -497,8 +479,8 @@ export class MainController {
 			if (closeTab) {
 				data.open = "false"
 			}
-			data.data = Undo.getCurrentState()
-			if (data.data.length > 0) {
+			data.data.components = Undo.getCurrentState()
+			if (data.data.components.length > 0) {
 				data.settings.gridVisible = CanvasController.instance.gridVisible
 				data.settings.majorGridSizecm = CanvasController.instance.majorGridSizecm
 				data.settings.majorGridSubdivisions = CanvasController.instance.majorGridSubdivisions
@@ -1112,11 +1094,11 @@ export class MainController {
 						ComponentPlacer.instance.placeCancel()
 					}
 
-					let newComponent: CircuitikzComponent
+					let newComponent: CircuitComponent
 					if (symbol.isNodeSymbol) {
-						newComponent = new NodeComponent(symbol)
+						newComponent = new NodeSymbolComponent(symbol)
 					} else {
-						newComponent = new PathComponent(symbol)
+						newComponent = new PathSymbolComponent(symbol)
 					}
 					ComponentPlacer.instance.placeComponent(newComponent)
 

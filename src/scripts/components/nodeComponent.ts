@@ -1,301 +1,161 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
-	basicDirections,
-	CanvasController,
 	ChoiceEntry,
 	ChoiceProperty,
-	CircuitikzComponent,
-	CircuitikzSaveObject,
 	clamp,
 	ColorProperty,
-	ComponentSymbol,
-	defaultBasicDirection,
-	DirectionInfo,
-	ExportController,
-	MainController,
 	MathJaxProperty,
-	PositionedLabel,
-	SectionHeaderProperty,
-	simpifyRotationAndScale,
 	SliderProperty,
-	SnapDragHandler,
+	ComponentSaveObject,
+	defaultStroke,
+	CanvasController,
+	renderMathJax,
+	SectionHeaderProperty,
+	Label,
+	AdjustDragHandler,
 	SnappingInfo,
-	SnapPoint,
+	FillInfo,
+	SnapDragHandler,
 } from "../internal"
-import { roundTikz, selectedBoxWidth } from "../utils/selectionHelper"
+import { CircuitComponent, getClosestPointerFromDirection } from "./circuitComponent"
+import { resizeSVG } from "../utils/selectionHelper"
 
-export type NodeSaveObject = CircuitikzSaveObject & {
-	position: { x: number; y: number }
-	label?: PositionedLabel
-	rotation?: number
+export const basicDirections: DirectionInfo[] = [
+	{ key: "default", name: "default", direction: new SVG.Point(NaN, NaN) },
+	{ key: "center", name: "center", direction: new SVG.Point() },
+	{ key: "north", name: "north", direction: new SVG.Point(0, -1), pointer: "ns-resize" },
+	{ key: "south", name: "south", direction: new SVG.Point(0, 1), pointer: "ns-resize" },
+	{ key: "east", name: "east", direction: new SVG.Point(1, 0), pointer: "ew-resize" },
+	{ key: "west", name: "west", direction: new SVG.Point(-1, 0), pointer: "ew-resize" },
+	{ key: "northeast", name: "north east", direction: new SVG.Point(1, -1), pointer: "nesw-resize" },
+	{ key: "northwest", name: "north west", direction: new SVG.Point(-1, -1), pointer: "nwse-resize" },
+	{ key: "southeast", name: "south east", direction: new SVG.Point(1, 1), pointer: "nwse-resize" },
+	{ key: "southwest", name: "south west", direction: new SVG.Point(-1, 1), pointer: "nesw-resize" },
+]
+export const defaultBasicDirection = basicDirections[0]
+
+/**
+ * Finds the closest basic direction from a given direction.
+ * Basic directions are defined in `basicDirections` and include cardinal and intercardinal directions.
+ * @param direction the direction to find the closest basic direction for
+ * @returns
+ */
+export function getClosestBasicDirectionFromDirection(direction: SVG.Point): DirectionInfo {
+	let dir = new SVG.Point(direction)
+	dir.x = clamp(Math.round(dir.x), -1, 1)
+	dir.y = clamp(Math.round(dir.y), -1, 1)
+	return (
+		basicDirections.find((dirInfo) => dirInfo.direction.x === dir.x && dirInfo.direction.y === dir.y) ??
+		basicDirections[0]
+	)
 }
 
-export class NodeComponent extends CircuitikzComponent {
+export type DirectionInfo = ChoiceEntry & {
+	direction: SVG.Point
+	pointer?: string
+}
+
+export type PositionedLabel = Label & {
+	anchor?: string
+	position?: string
+	relativeToComponent?: boolean
+}
+
+export type NodeSaveObject = ComponentSaveObject & {
+	position: SVG.Point
+	scale?: SVG.Point
+	rotation?: number
+	label?: PositionedLabel
+	name?: string
+}
+
+/**
+ * abstract super class for all node components.
+ * This includes all components that are represented by a node, i.e. are drawn via a tikz node command at a single position.
+ *
+ * Examples are: transistors, ground, rectangles, text boxes, etc.
+ *
+ * Extend this class to create a new component which is represented by a node.
+ *
+ * NodeComponents are edited/adjusted in local coordinates. Transformations like translation (moving), rotation, scaling and flipping are done by changing the transformation Matrix
+ */
+export abstract class NodeComponent extends CircuitComponent {
+	/**
+	 * the current rotation angle in degrees
+	 */
+	public rotationDeg: number = 0
+
+	protected scaleState: SVG.Point
+	/**
+	 * the component size in local coordinates
+	 */
+	protected size: SVG.Point
+
+	protected resizeVisualizations: Map<DirectionInfo, SVG.Element>
+	protected isResizing: boolean = false
+
 	public anchorChoice: ChoiceProperty<DirectionInfo>
 	public positionChoice: ChoiceProperty<DirectionInfo>
 
-	constructor(symbol: ComponentSymbol) {
-		super(symbol)
+	protected mathJaxLabel: MathJaxProperty
+	protected labelReferenceChoices: ChoiceEntry[] = [
+		{ key: "canvas", name: "Canvas" },
+		{ key: "component", name: "Component" },
+	]
+	protected labelReferenceProperty: ChoiceProperty<ChoiceEntry>
+	protected labelRendering: SVG.Element
+	protected labelDistance: SliderProperty
+	protected labelColor: ColorProperty
+
+	protected textPosNoTransform: SVG.Point
+
+	constructor() {
+		super()
 		this.position = new SVG.Point()
-		this.relPosition = this.componentVariant.mid
-		this.visualization.add(this.symbolUse)
+		this.size = new SVG.Point()
 
 		this.rotationDeg = 0
+		this.scaleState = new SVG.Point(1, 1)
 
-		{
-			//label section
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
+		this.textPosNoTransform = new SVG.Point()
 
-			this.mathJaxLabel = new MathJaxProperty()
-			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+		//label section
+		this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
 
-			this.labelReferenceProperty = new ChoiceProperty(
-				"Relative to",
-				this.labelReferenceChoices,
-				this.labelReferenceChoices[0]
-			)
-			this.labelReferenceProperty.addChangeListener((ev) => {
-				this.updateLabelPosition()
-			})
-			this.propertiesHTMLRows.push(this.labelReferenceProperty.buildHTML())
+		this.mathJaxLabel = new MathJaxProperty()
+		this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
+		this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
 
-			this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
-			this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
-
-			this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
-			this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
-
-			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
-			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
-
-			this.labelColor = new ColorProperty("Color", null)
-			this.labelColor.addChangeListener((ev) => {
-				this.updateTheme()
-			})
-			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
-		}
-
-		this.addName()
-		this.addInfo()
-
-		this.snappingPoints = this.componentVariant.pins.map(
-			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))
+		this.labelReferenceProperty = new ChoiceProperty(
+			"Relative to",
+			this.labelReferenceChoices,
+			this.labelReferenceChoices[0]
 		)
+		this.labelReferenceProperty.addChangeListener((ev) => {
+			this.updateLabelPosition()
+		})
+		this.propertiesHTMLRows.push(this.labelReferenceProperty.buildHTML())
+
+		this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
+		this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
+		this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
+
+		this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
+		this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
+		this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
+
+		this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
+		this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
+		this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+
+		this.labelColor = new ColorProperty("Color", null)
+		this.labelColor.addChangeListener((ev) => {
+			this.updateTheme()
+		})
+		this.propertiesHTMLRows.push(this.labelColor.buildHTML())
 	}
 
-	public getTransformMatrix(): SVG.Matrix {
-		const symbolRel = this.componentVariant.mid
-		return new SVG.Matrix({
-			scaleX: this.scaleState.x,
-			scaleY: this.scaleState.y,
-			translate: [-symbolRel.x, -symbolRel.y],
-			origin: [symbolRel.x, symbolRel.y],
-		}).lmultiply(
-			new SVG.Matrix({
-				rotate: -this.rotationDeg,
-				translate: [this.position.x, this.position.y],
-			})
-		)
-	}
-
-	public recalculateSnappingPoints(): void {
-		super.recalculateSnappingPoints()
-	}
-
-	public getSnappingInfo(): SnappingInfo {
-		return {
-			trackedSnappingPoints: this.snappingPoints,
-			additionalSnappingPoints: [new SnapPoint(this, "center", this.componentVariant.mid)],
-		}
-	}
-
-	protected updateOptions(): void {
-		super.updateOptions()
-		this.snappingPoints = this.componentVariant.pins.map(
-			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))
-		)
-		this.update()
-	}
-
-	protected update() {
-		let m = this.getTransformMatrix()
-		this.symbolUse.transform(m)
-		this._bbox = this.symbolBBox.transform(m)
-
-		this.updateLabelPosition()
-
-		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
-
-		this.recalculateSelectionVisuals()
-		this.recalculateSnappingPoints()
-	}
-
-	protected recalculateSelectionVisuals(): void {
-		if (this.selectionElement.visible()) {
-			// use the saved position instead of the bounding box (bbox position fails in safari)
-			let bbox = this.symbolBBox
-			let maxStroke = this.componentVariant.maxStroke
-
-			this.selectionElement
-				.size(bbox.w + maxStroke + selectedBoxWidth, bbox.h + maxStroke + selectedBoxWidth)
-				.transform(
-					this.getTransformMatrix().multiply(
-						new SVG.Matrix({
-							translate: [
-								bbox.x - (selectedBoxWidth + maxStroke) / 2,
-								bbox.y - (selectedBoxWidth + maxStroke) / 2,
-							],
-						})
-					)
-				)
-		}
-	}
-
-	public moveTo(position: SVG.Point) {
-		this.position = position.clone()
-		this.update()
-	}
-
-	public rotate(angleDeg: number): void {
-		this.rotationDeg += angleDeg
-		this.simplifyRotationAngle()
-
-		this.update()
-	}
-
-	public flip(horizontal: boolean): void {
-		if (horizontal) {
-			this.scaleState.y *= -1
-			this.rotationDeg *= -1
-		} else {
-			this.scaleState.y *= -1
-			this.rotationDeg = 180 - this.rotationDeg
-		}
-		this.simplifyRotationAngle()
-		this.update()
-	}
-
-	public toJson(): NodeSaveObject {
-		let data: NodeSaveObject = {
-			type: "node",
-			id: this.referenceSymbol.tikzName,
-			position: this.position.simplifyForJson(),
-		}
-		if (this.componentVariant.options.length > 0) {
-			data.options = this.componentVariant.options.map((option) => option.displayName ?? option.name)
-		}
-		if (this.rotationDeg !== 0) {
-			data.rotation = this.rotationDeg
-		}
-		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
-			data.scale = this.scaleState
-		}
-		if (this.name.value) {
-			data.name = this.name.value
-		}
-		if (this.mathJaxLabel.value) {
-			let labelWithoutRender: PositionedLabel = {
-				value: this.mathJaxLabel.value,
-				anchor: this.anchorChoice.value.key,
-				position: this.positionChoice.value.key,
-				relativeToComponent: this.labelReferenceProperty.value.key == "component",
-				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
-				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
-			}
-			data.label = labelWithoutRender
-		}
-
-		return data
-	}
-
-	public toTikzString(): string {
-		const optionsString = this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()).join(", ")
-
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("N")
-		}
-
-		let labelNodeStr = ""
-		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.anchorPos.name
-
-			let labelDist = this.labelDistance.value.convertToUnit("cm")
-
-			if (!isNaN(this.anchorPos.direction.absSquared())) {
-				labelDist = labelDist.minus(0.12)
-			}
-
-			let labelShift = this.anchorPos.direction.mul(-labelDist.value)
-			let posShift = ""
-			if (labelShift.x !== 0) {
-				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
-			}
-			if (labelShift.y !== 0) {
-				posShift += posShift == "" ? "" : ", "
-				posShift += "yshift=" + roundTikz(-labelShift.y) + "cm"
-			}
-			posShift = posShift == "" ? "" : "[" + posShift + "]"
-
-			let posStr =
-				this.positionChoice.value.key == defaultBasicDirection.key ?
-					id + ".text"
-				:	id + "." + this.labelPos.name
-			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-			latexStr =
-				latexStr && this.labelColor.value ?
-					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-				:	latexStr
-
-			labelNodeStr = " node[" + labelStr + "] at (" + posShift + posStr + "){" + latexStr + "}"
-		}
-
-		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same
-		let [rotation, scale] = simpifyRotationAndScale(this.rotationDeg, this.scaleState)
-
-		return (
-			"\\node[" +
-			this.referenceSymbol.tikzName +
-			(optionsString ? ", " + optionsString : "") +
-			(rotation !== 0 ? `, rotate=${rotation}` : "") +
-			(scale.x != 1 ? `, xscale=${scale.x}` : "") +
-			(scale.y != 1 ? `, yscale=${scale.y}` : "") +
-			"] " +
-			(id ? "(" + id + ") " : "") +
-			"at " +
-			this.position.toTikzString() +
-			" {}" +
-			labelNodeStr +
-			";"
-		)
-	}
-	public remove(): void {
-		SnapDragHandler.snapDrag(this, false)
-		this.visualization.remove()
-		this.viewSelected(false)
-		this.selectionElement?.remove()
-		this.labelRendering?.remove()
-	}
-
-	public draggable(drag: boolean): void {
-		if (drag) {
-			this.visualization.node.classList.add("draggable")
-		} else {
-			this.visualization.node.classList.remove("draggable")
-		}
-		SnapDragHandler.snapDrag(this, drag, this.symbolUse)
-	}
-
-	public resizable(resize: boolean): void {
-		throw new Error("Method not implemented.")
-	}
-	protected recalculateResizePoints(): void {
-		throw new Error("Method not implemented.")
-	}
+	public abstract resizable(resize: boolean): void
 
 	public placeMove(pos: SVG.Point): void {
 		this.moveTo(pos)
@@ -317,91 +177,168 @@ export class NodeComponent extends CircuitikzComponent {
 		this.finishedPlacing = true
 	}
 
-	public static fromJson(saveObject: NodeSaveObject): NodeComponent {
-		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
+	public remove(): void {
+		super.remove()
+		this.labelRendering?.remove()
+	}
 
-		let backwards = false
-		if (!symbol) {
-			// only for backwards compatibility
-			symbol = MainController.instance.symbols.find(
-				(value, index, symbols) =>
-					CircuitikzComponent.idNoOptions(saveObject.id) == CircuitikzComponent.idNoOptions(value.node.id)
-			)
-			backwards = true
+	public moveRel(delta: SVG.Point): void {
+		this.moveTo(this.position.add(delta))
+	}
+
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix({
+			scaleX: this.scaleState.x,
+			scaleY: this.scaleState.y,
+			translate: [-this.referencePosition.x, -this.referencePosition.y],
+			origin: [this.referencePosition.x, this.referencePosition.y],
+		}).lmultiply(
+			new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				translate: [this.position.x, this.position.y],
+			})
+		)
+	}
+
+	public updateTheme() {
+		let labelColor = defaultStroke
+		if (this.labelColor && this.labelColor.value) {
+			labelColor = this.labelColor.value.toString()
 		}
+		this.labelRendering?.fill(labelColor)
+	}
 
-		let nodeComponent: NodeComponent = new NodeComponent(symbol)
-		if (backwards) {
-			// not working for all options (if key value pair is used)
-			nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromSymbolID(saveObject.id))
+	/**
+	 * Generate a label visualization via mathjax
+	 */
+	protected generateLabelRender() {
+		// if a previous label was rendered, remove everything concerning that rendering
+		if (this.labelRendering) {
+			let removeIDs = new Set<string>()
+			for (const element of this.labelRendering.find("use")) {
+				removeIDs.add(element.node.getAttribute("xlink:href"))
+			}
+
+			for (const id of removeIDs) {
+				CanvasController.instance.canvas.find(id)[0]?.remove()
+			}
+		}
+		const transformGroup = renderMathJax(this.mathJaxLabel.value)
+		// remove the current label and substitute with a new group element
+		this.labelRendering?.remove()
+		this.labelRendering = new SVG.G()
+		this.labelRendering.addClass("pointerNone")
+		this.labelRendering.add(transformGroup.element)
+		// add the label rendering to the visualization element
+		this.visualization.add(this.labelRendering)
+		this.update()
+		this.updateTheme()
+	}
+
+	protected recalculateResizePoints(): void {}
+
+	public moveTo(position: SVG.Point) {
+		this.position = position.clone()
+		this.update()
+	}
+
+	public rotate(angleDeg: number): void {
+		this.rotationDeg += angleDeg
+		this.simplifyRotationAngle()
+
+		this.update()
+	}
+
+	/**
+	 * helper method to always be between -180 and 180 degrees.
+	 */
+	public simplifyRotationAngle() {
+		// modulo with extra steps since js modulo is weird for negative numbers
+		this.rotationDeg = ((((this.rotationDeg + 180) % 360) + 360) % 360) - 180
+	}
+
+	public flip(horizontal: boolean): void {
+		if (horizontal) {
+			this.scaleState.y *= -1
+			this.rotationDeg *= -1
 		} else {
-			let options = saveObject.options ?? []
-			nodeComponent.setPropertiesFromOptions(symbol.getOptionsFromOptionNames(options))
+			this.scaleState.y *= -1
+			this.rotationDeg = 180 - this.rotationDeg
 		}
-		nodeComponent.moveTo(new SVG.Point(saveObject.position))
+		this.simplifyRotationAngle()
+		this.update()
+	}
 
+	public toJson(): NodeSaveObject {
+		const data = super.toJson() as NodeSaveObject
+		data.position = this.position.simplifyForJson()
+
+		if (this.rotationDeg !== 0) {
+			data.rotation = this.rotationDeg
+		}
+		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
+			data.scale = this.scaleState
+		}
+
+		if (this.mathJaxLabel.value) {
+			let labelWithoutRender: PositionedLabel = {
+				value: this.mathJaxLabel.value,
+				anchor: this.anchorChoice.value.key,
+				position: this.positionChoice.value.key,
+				relativeToComponent: this.labelReferenceProperty.value.key == "component",
+				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
+				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
+			}
+			data.label = labelWithoutRender
+		}
+
+		if (this.name.value && this.name.value != "") {
+			data.name = this.name.value
+		}
+		return data
+	}
+
+	protected applyJson(saveObject: NodeSaveObject): void {
+		super.applyJson(saveObject)
+		this.position = new SVG.Point(saveObject.position)
 		if (saveObject.rotation) {
-			nodeComponent.rotationDeg = saveObject.rotation
+			this.rotationDeg = saveObject.rotation
 		}
 
 		if (saveObject.scale) {
-			nodeComponent.scaleState = new SVG.Point(saveObject.scale)
-			nodeComponent.scaleProperty.updateValue(new SVG.Number(Math.abs(saveObject.scale.x)), true)
+			this.scaleState = new SVG.Point(saveObject.scale)
 		}
 
 		if (saveObject.name) {
-			nodeComponent.name.updateValue(saveObject.name, true)
+			this.name.updateValue(saveObject.name, true)
 		}
 
 		if (saveObject.label) {
-			if (Object.hasOwn(saveObject.label, "value")) {
-				nodeComponent.labelDistance.value =
-					saveObject.label.distance ?
-						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-					:	new SVG.Number(0, "cm")
-				if (nodeComponent.labelDistance.value.unit == "") {
-					nodeComponent.labelDistance.value.unit = "cm"
-				}
-				nodeComponent.labelDistance.updateHTML()
-				nodeComponent.anchorChoice.value =
-					saveObject.label.anchor ?
-						basicDirections.find((item) => item.key == saveObject.label.anchor)
-					:	defaultBasicDirection
-				nodeComponent.anchorChoice.updateHTML()
-				nodeComponent.positionChoice.value =
-					saveObject.label.position ?
-						basicDirections.find((item) => item.key == saveObject.label.position)
-					:	defaultBasicDirection
-				nodeComponent.positionChoice.updateHTML()
-				nodeComponent.labelReferenceProperty.value =
-					saveObject.label.relativeToComponent ?
-						nodeComponent.labelReferenceChoices[1]
-					:	nodeComponent.labelReferenceChoices[0]
-				nodeComponent.labelReferenceProperty.updateHTML()
-				nodeComponent.mathJaxLabel.value = saveObject.label.value
-				nodeComponent.mathJaxLabel.updateHTML()
-				nodeComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-				nodeComponent.labelColor.updateHTML()
-				nodeComponent.generateLabelRender()
-			} else {
-				//@ts-ignore
-				nodeComponent.mathJaxLabel.value = saveObject.label
+			this.labelDistance.value =
+				saveObject.label.distance ?
+					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
+				:	new SVG.Number(0, "cm")
+			if (this.labelDistance.value.unit == "") {
+				this.labelDistance.value.unit = "cm"
 			}
+			this.anchorChoice.value =
+				saveObject.label.anchor ?
+					basicDirections.find((item) => item.key == saveObject.label.anchor)
+				:	defaultBasicDirection
+			this.positionChoice.value =
+				saveObject.label.position ?
+					basicDirections.find((item) => item.key == saveObject.label.position)
+				:	defaultBasicDirection
+			this.labelReferenceProperty.value =
+				saveObject.label.relativeToComponent ? this.labelReferenceChoices[1] : this.labelReferenceChoices[0]
+			this.mathJaxLabel.value = saveObject.label.value
+			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
+			this.generateLabelRender()
 		}
-		nodeComponent.placeFinish()
-
-		return nodeComponent
 	}
 
-	public copyForPlacement(): NodeComponent {
-		let newComponent = new NodeComponent(this.referenceSymbol)
-		newComponent.rotationDeg = this.rotationDeg
-		newComponent.scaleState = new SVG.Point(this.scaleState)
-		return newComponent
-	}
-
-	private anchorPos: DirectionInfo
-	private labelPos: DirectionInfo
+	protected anchorPos: DirectionInfo
+	protected labelPos: DirectionInfo
 	public updateLabelPosition(): void {
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
 			return
@@ -412,12 +349,12 @@ export class NodeComponent extends CircuitikzComponent {
 		let ref: SVG.Point
 
 		// get relevant positions and bounding boxes
-		let bboxHalfSize = new SVG.Point(this.symbolBBox.w / 2, this.symbolBBox.h / 2)
+		let bboxHalfSize = new SVG.Point(this.size.x / 2, this.size.y / 2)
 		let textDir: SVG.Point // normalized direction to bbox size
 		let textPosNoTransform: SVG.Point // relative to the upper left corner in local coordinates
 		// get the position of the label
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPosNoTransform = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
+			textPosNoTransform = this.textPosNoTransform
 			textDir = textPosNoTransform.sub(bboxHalfSize).div(bboxHalfSize)
 		} else {
 			if (this.labelReferenceProperty.value.key == "canvas") {

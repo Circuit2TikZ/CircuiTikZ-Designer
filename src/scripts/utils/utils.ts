@@ -1,6 +1,11 @@
 import * as SVG from "@svgdotjs/svg.js"
 
-// Utility functions for Circuitikz components
+// utility values
+
+export const defaultStroke = "var(--bs-emphasis-color)"
+export const defaultFill = "var(--bs-body-bg)"
+
+// Utility functions for components
 
 /**
  * Simplifies the rotation and scale of a component for better consistency and human readability.

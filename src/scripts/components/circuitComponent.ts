@@ -6,17 +6,14 @@ import {
 	SnappingInfo,
 	ButtonGridProperty,
 	CanvasController,
-	MathJaxProperty,
 	SelectionController,
-	ColorProperty,
-	SliderProperty,
-	ChoiceEntry,
 	SectionHeaderProperty,
 	TextProperty,
 	GroupComponent,
 	Undo,
-	renderMathJax,
-	ChoiceProperty,
+	EditableProperty,
+	basicDirections,
+	SnapDragHandler,
 } from "../internal"
 import {
 	hoverColor,
@@ -31,17 +28,14 @@ import {
  */
 export const invalidNameRegEx = /[\t\r\n\v.,:;()-]/
 
+type Constructor<T = {}> = new (...args: any[]) => T
+
 /**
  * the root object for saving components as json. Extend this for custom components
  */
 export type ComponentSaveObject = {
 	type: string
 	selected?: boolean
-}
-
-export type DirectionInfo = ChoiceEntry & {
-	direction: SVG.Point
-	pointer?: string
 }
 
 /**
@@ -53,26 +47,6 @@ export type Label = {
 	distance?: SVG.Number
 	color?: string | "default"
 }
-
-export type PositionedLabel = Label & {
-	anchor?: string
-	position?: string
-	relativeToComponent?: boolean
-}
-
-export const basicDirections: DirectionInfo[] = [
-	{ key: "default", name: "default", direction: new SVG.Point(NaN, NaN) },
-	{ key: "center", name: "center", direction: new SVG.Point() },
-	{ key: "north", name: "north", direction: new SVG.Point(0, -1), pointer: "ns-resize" },
-	{ key: "south", name: "south", direction: new SVG.Point(0, 1), pointer: "ns-resize" },
-	{ key: "east", name: "east", direction: new SVG.Point(1, 0), pointer: "ew-resize" },
-	{ key: "west", name: "west", direction: new SVG.Point(-1, 0), pointer: "ew-resize" },
-	{ key: "northeast", name: "north east", direction: new SVG.Point(1, -1), pointer: "nesw-resize" },
-	{ key: "northwest", name: "north west", direction: new SVG.Point(-1, -1), pointer: "nwse-resize" },
-	{ key: "southeast", name: "south east", direction: new SVG.Point(1, 1), pointer: "nwse-resize" },
-	{ key: "southwest", name: "south west", direction: new SVG.Point(-1, 1), pointer: "nesw-resize" },
-]
-export const defaultBasicDirection = basicDirections[0]
 
 export function getClosestPointerFromDirection(direction: SVG.Point): string {
 	let minValue = Infinity
@@ -87,25 +61,19 @@ export function getClosestPointerFromDirection(direction: SVG.Point): string {
 	return minPointer
 }
 
-export const defaultStroke = "var(--bs-emphasis-color)"
-export const defaultFill = "var(--bs-body-bg)"
-
 /**
  * Every component in the circuit should be deriving from this class.
  */
 export abstract class CircuitComponent {
 	/**
-	 * the position of the circuit component
+	 * the position of the component reference point in world coordinates
 	 */
 	public position: SVG.Point
+
 	/**
-	 * The vector from the upper left corner of the component visualization to the reference position of the component
+	 * The vector from (0,0) to the reference position of the component (in local coordinates, i.e. without rotation, translation and scaling)
 	 */
-	public relPosition: SVG.Point
-	/**
-	 * the current rotation angle in degrees
-	 */
-	public rotationDeg: number = 0
+	public referencePosition: SVG.Point
 
 	/**
 	 * all properties, which should be able to be edited in the properties window have to be included here
@@ -123,6 +91,9 @@ export abstract class CircuitComponent {
 	 */
 	public name: TextProperty
 
+	/**
+	 * For keeping track of the parent group of this component if one exists.
+	 */
 	public parentGroup: GroupComponent = null
 
 	/**
@@ -134,16 +105,16 @@ export abstract class CircuitComponent {
 	}
 	public set isSelected(value: boolean) {
 		if (!value) {
+			if (this.isSelectionReference) {
+				SelectionController.instance.referenceComponent = null
+			}
 			this.isSelectionReference = false
-			SelectionController.instance.referenceComponent = null
 		}
 		this._isSelected = value
 	}
 
-	protected isResizing: boolean = false
-
 	/**
-	 * the cached bounding box of the component. Useful for example for the selection controller
+	 * the cached bounding box of the component in world coordinates. Useful for example for the selection controller
 	 */
 	protected _bbox: SVG.Box
 	/**
@@ -154,26 +125,34 @@ export abstract class CircuitComponent {
 	}
 
 	/**
-	 * the SVG.js Element which represents the visualization/graphics of the component on the canvas. Should probably always be a group containing more svg components
+	 * the SVG.js Element which represents the visualization/graphics of the component on the canvas. This includes the actual component as well the label, the element used for dragging and other parts. Should probably always be a group containing more svg components
 	 */
 	public visualization: SVG.Element
 
+	/**
+	 * The SVG.js Element which is used to visualize the selection of the component. Should probably always be a rectangle
+	 */
 	public selectionElement: SVG.Element = null
+
+	/**
+	 * The SVG.js Element which is used to visualize the component. This has to be added to the visualization element as a child @see CircuitComponent.visualization
+	 */
+	public componentVisualization: SVG.Element
+
+	/**
+	 * the element which can be grabbed and dragged. Mostly the whole visualization, but for some components it might be a sub-element
+	 */
+	protected dragElement: SVG.Element
 
 	/**
 	 * A List of all the Snapping points of this component
 	 */
 	public snappingPoints: SnapPoint[]
 
-	protected mathJaxLabel: MathJaxProperty
-	protected labelReferenceChoices: ChoiceEntry[] = [
-		{ key: "canvas", name: "Canvas" },
-		{ key: "component", name: "Component" },
-	]
-	protected labelReferenceProperty: ChoiceProperty<ChoiceEntry>
-	protected labelRendering: SVG.Element
-	protected labelDistance: SliderProperty
-	protected labelColor: ColorProperty
+	/**
+	 * A map of all the properties which are used by this component. The key is the ID of the property, which can be used to filter for multi-component editing
+	 */
+	public componentProperties: Map<string, EditableProperty<any>> = new Map()
 
 	private isHovered = false
 
@@ -182,7 +161,7 @@ export abstract class CircuitComponent {
 	 */
 	public constructor() {
 		this.position = new SVG.Point()
-		this.relPosition = new SVG.Point()
+		this.referencePosition = new SVG.Point()
 		//every time a component is initialized, it should be added to the component list for housekeeping
 		MainController.instance.addComponent(this)
 		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
@@ -199,6 +178,7 @@ export abstract class CircuitComponent {
 			this.isHovered = false
 			this.showSeletedOrHovered()
 		})
+		this.dragElement = this.visualization
 
 		this.displayName = "Circuit Component"
 		this.addPositioning()
@@ -314,13 +294,15 @@ export abstract class CircuitComponent {
 	 * Set this component draggable or not
 	 * @param drag if dragging should be enabled
 	 */
-	public abstract draggable(drag: boolean): void
+	public draggable(drag: boolean): void {
+		if (drag) {
+			this.visualization.node.classList.add("draggable")
+		} else {
+			this.visualization.node.classList.remove("draggable")
+		}
+		SnapDragHandler.snapDrag(this, drag, this.dragElement)
+	}
 
-	/**
-	 * Set this component resizable or not
-	 * @param resize if resizing should be enabled
-	 */
-	public abstract resizable(resize: boolean): void
 	protected abstract recalculateResizePoints(): void
 
 	/**
@@ -332,19 +314,17 @@ export abstract class CircuitComponent {
 	 * Move the component by the specified delta, i.e. the new position = old position + delta
 	 * @param delta by how much the component should be moved
 	 */
-	public moveRel(delta: SVG.Point): void {
-		this.moveTo(this.position.add(delta))
-	}
+	public abstract moveRel(delta: SVG.Point): void
 	/**
-	 * Rotate the component by the specified angle
+	 * Rotate the component by the specified angle. (This should not set the rotation of the component, but rotate the component further along by the specified angle)
 	 * @param angleDeg angle in degrees
 	 */
 	public abstract rotate(angleDeg: number): void
 	/**
 	 * Flip the component along the horizontal or vertical axis
-	 * @param horizontal if the component should be flipped at the horizontal or vertical axis
+	 * @param horizontalAxis if the component should be flipped around the horizontal or vertical axis
 	 */
-	public abstract flip(horizontal: boolean): void
+	public abstract flip(horizontalAxis: boolean): void
 
 	/**
 	 * Update the component, it's visualization, snapping points, selection visuals and transform matrix/position
@@ -359,7 +339,7 @@ export abstract class CircuitComponent {
 			let box = this.visualization.bbox().transform(this.getTransformMatrix())
 
 			this.selectionElement.size(box.w, box.h)
-			this.selectionElement.center(this.position.x, this.position.y)
+			this.selectionElement.center(box.cx, box.cy)
 		}
 	}
 
@@ -419,26 +399,18 @@ export abstract class CircuitComponent {
 	/**
 	 * update the visuals to comply with dark/light mode
 	 */
-	public updateTheme() {
-		let labelColor = defaultStroke
-		if (this.labelColor && this.labelColor.value) {
-			labelColor = this.labelColor.value.toString()
-		}
-		this.labelRendering?.fill(labelColor)
-	}
-
-	/**
-	 * helper method to always be between -180 and 180 degrees.
-	 */
-	public simplifyRotationAngle() {
-		// modulo with extra steps since js modulo is weird for negative numbers
-		this.rotationDeg = ((((this.rotationDeg + 180) % 360) + 360) % 360) - 180
-	}
+	public abstract updateTheme()
 
 	/**
 	 * Converts the Component into a ComponentSaveObject or a derived type therof. This should encompass all information necessary to reproduce this component via {@link fromJson}
+	 * Override this in your subclass and call the super() method to ensure that the base class properties are also included.
 	 */
-	public abstract toJson(): ComponentSaveObject
+	public toJson(): ComponentSaveObject {
+		let saveObject: ComponentSaveObject = {
+			type: "component",
+		}
+		return saveObject
+	}
 	/**
 	 * convert this component into a draw command for CircuiTikz
 	 */
@@ -450,19 +422,40 @@ export abstract class CircuitComponent {
 	 */
 	public abstract toSVG(defs: Map<string, SVG.Element>): SVG.Element
 	/**
-	 * Convert a ComponentSaveObject to a component. Calling CircuitComponent.fromJson(A.{@link toJson}()) should essentially produce an exact copy of the component "A". Override this in your subclass!
-	 * @param saveObject An object of a derived type of ComponentSaveOject, which encompasses all information necessary to initalize this component type
+	 * Convert a ComponentSaveObject to a component. This requires 2 steps:
+	 * 1) Define a public static fromJson method which returns an instance of the component. This should only handle proper initialization and no parameter setting. See NodeSymbolComponent
+	 * 2) Override the applyJson method which should contain a super.applyJson call. This method should only handle parameters not already handled by the respective super class(es)
 	 */
+	protected applyJson(saveObject: ComponentSaveObject): void {
+		// highest level doesn't do anything (essentially only the type but this is not used here)
+	}
+
+	static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()
 	public static fromJson(saveObject: ComponentSaveObject): CircuitComponent {
-		throw new Error("fromJson not implemented on " + typeof this + ". Implement in derived class")
+		const ComponentConstructor = CircuitComponent.jsonSaveMap.get(saveObject.type)
+		if (ComponentConstructor == undefined) {
+			throw new Error(
+				'There is no component of type "' +
+					saveObject.type +
+					'" defined. Every non-abstract class deriving from CircuitComponent (or one of its subclasses) should have a static block, which registers it by setting the type as the key and the class itself as the value of the jsonSaveMap static variable (see NodeSymbolComponent as a reference)'
+			)
+		}
+		// @ts-ignore
+		const component: CircuitComponent = ComponentConstructor.fromJson(saveObject)
+		component.applyJson(saveObject)
+		return component
 	}
 
 	/**
-	 * Obtain the transformation matrix which transforms an object from the component reference to the world reference
+	 * Obtain the transformation matrix which transforms an object from the local coordinates to the world coordiantes.
+	 * Default implementation returns the identity matrix, i.e. local coordinates = world coordinates.
+	 *
+	 * Override this!
+	 *
 	 * @returns the transformation matrix
 	 */
 	public getTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix(this.visualization.transform())
+		return new SVG.Matrix()
 	}
 
 	/**
@@ -481,9 +474,14 @@ export abstract class CircuitComponent {
 	public abstract copyForPlacement(): CircuitComponent
 
 	/**
-	 * remove the component from the program
+	 * remove the component from the canvas
 	 */
-	public abstract remove(): void
+	public remove(): void {
+		SnapDragHandler.snapDrag(this, false)
+		this.visualization.remove()
+		this.viewSelected(false)
+		this.selectionElement?.remove()
+	}
 
 	// component placement code
 	/**
@@ -522,40 +520,16 @@ export abstract class CircuitComponent {
 	public abstract placeFinish(): void // call this to force the placement to finish
 
 	/**
-	 * Generate a label visualization via mathjax
-	 * @param label the data for which to generate the label visualization
-	 * @returns a Promise<void>
-	 */
-	protected generateLabelRender() {
-		// if a previous label was rendered, remove everything concerning that rendering
-		if (this.labelRendering) {
-			let removeIDs = new Set<string>()
-			for (const element of this.labelRendering.find("use")) {
-				removeIDs.add(element.node.getAttribute("xlink:href"))
-			}
-
-			for (const id of removeIDs) {
-				CanvasController.instance.canvas.find(id)[0]?.remove()
-			}
-		}
-		const transformGroup = renderMathJax(this.mathJaxLabel.value)
-		// remove the current label and substitute with a new group element
-		this.labelRendering?.remove()
-		let rendering = new SVG.G()
-		rendering.addClass("pointerNone")
-		rendering.add(transformGroup.element)
-		// add the label rendering to the visualization element
-		this.visualization.add(rendering)
-		this.labelRendering = rendering
-		this.update()
-		this.updateTheme()
-	}
-
-	/**
 	 * Updates the position of the label when moving/rotating... Override this!
 	 */
 	public abstract updateLabelPosition(): void
 
+	/**
+	 * Returns the list of TikZ libraries which are required for this component to work. This is used to automatically include the libraries in the generated code.
+	 *
+	 * Override this to add libraries
+	 * @returns a list of tikz library names (strings)
+	 */
 	public requiredTikzLibraries(): string[] {
 		return []
 	}

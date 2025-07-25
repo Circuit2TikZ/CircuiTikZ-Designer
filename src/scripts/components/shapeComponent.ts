@@ -1,15 +1,11 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
 	ChoiceProperty,
-	CircuitComponent,
 	ColorProperty,
-	ComponentSaveObject,
 	DirectionInfo,
-	PositionedLabel,
 	SliderProperty,
 	CanvasController,
 	SectionHeaderProperty,
-	MathJaxProperty,
 	basicDirections,
 	defaultBasicDirection,
 	SnappingInfo,
@@ -19,15 +15,16 @@ import {
 	AdjustDragHandler,
 	defaultStroke,
 	SelectionController,
+	NodeComponent,
+	NodeSaveObject,
+	getClosestPointerFromDirection,
 } from "../internal"
-import { selectedBoxWidth } from "../utils/selectionHelper"
+import { resizeSVG, selectedBoxWidth } from "../utils/selectionHelper"
 
-export type ShapeSaveObject = ComponentSaveObject & {
-	rotationDeg?: number
+export type ShapeSaveObject = NodeSaveObject & {
 	fill?: FillInfo
 	stroke?: StrokeInfo
-	label?: PositionedLabel
-	name?: string
+	size: SVG.Point
 }
 
 export type StrokeInfo = {
@@ -74,15 +71,9 @@ export const dashArrayToPattern = (linewidth: SVG.Number, dasharray: number[]): 
 	return "dash pattern={" + pattern.join(" ") + "}"
 }
 
-export abstract class ShapeComponent extends CircuitComponent {
+export abstract class ShapeComponent extends NodeComponent {
 	protected strokeInfo: StrokeInfo
 	protected fillInfo: FillInfo
-
-	protected shapeVisualization: SVG.Element
-	protected size: SVG.Point
-
-	protected dragElement: SVG.Element
-	protected resizeVisualizations: Map<DirectionInfo, SVG.Element>
 
 	protected fillColorProperty: ColorProperty
 	protected fillOpacityProperty: SliderProperty
@@ -90,9 +81,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 	protected strokeOpacityProperty: SliderProperty
 	protected strokeWidthProperty: SliderProperty
 	protected strokeStyleProperty: ChoiceProperty<StrokeStyle>
-
-	protected anchorChoice: ChoiceProperty<DirectionInfo>
-	protected positionChoice: ChoiceProperty<DirectionInfo>
 
 	protected placePoint: SVG.Point
 
@@ -185,42 +173,9 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
 
-		{
-			//label section
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
-
-			this.mathJaxLabel = new MathJaxProperty()
-			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
-
-			this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
-			this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
-
-			this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
-			this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
-
-			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
-			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
-
-			this.labelColor = new ColorProperty("Color", null)
-			this.labelColor.addChangeListener((ev) => {
-				this.updateTheme()
-			})
-			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
-		}
 		SnapCursorController.instance.visible = true
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)
-	}
-
-	public getTransformMatrix(): SVG.Matrix {
-		return new SVG.Matrix({
-			rotate: -this.rotationDeg,
-			origin: [this.position.x, this.position.y],
-		})
 	}
 
 	public moveTo(position: SVG.Point): void {
@@ -240,24 +195,74 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.update()
 	}
 
+	protected recalculateResizePoints() {
+		const halfsize = this.size.div(2)
+		const transformMatrix = this.getTransformMatrix()
+		for (const [dir, viz] of this.resizeVisualizations) {
+			let pos = halfsize.add(halfsize.mul(dir.direction)).transform(transformMatrix)
+			viz.center(pos.x, pos.y)
+		}
+	}
+
+	public toJson(): ShapeSaveObject {
+		const data = super.toJson() as ShapeSaveObject
+		data.size = this.size
+
+		let fill: FillInfo = {}
+		let shouldFill = false
+		if (this.fillInfo.color != "default") {
+			fill.color = this.fillInfo.color
+			shouldFill = true
+		}
+		if (this.fillInfo.opacity != 1) {
+			fill.opacity = this.fillInfo.opacity
+			shouldFill = true
+		}
+		if (shouldFill) {
+			data.fill = fill
+		}
+
+		let stroke: StrokeInfo = {}
+		let shouldStroke = false
+		if (this.strokeInfo.color != "default") {
+			stroke.color = this.strokeInfo.color
+			shouldStroke = true
+		}
+		if (this.strokeInfo.opacity != 1) {
+			stroke.opacity = this.strokeInfo.opacity
+			shouldStroke = true
+		}
+
+		if (!this.strokeInfo.width.eq(new SVG.Number("1pt"))) {
+			stroke.width = this.strokeInfo.width
+			shouldStroke = true
+		}
+		if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
+			stroke.style = this.strokeInfo.style
+			shouldStroke = true
+		}
+		if (shouldStroke) {
+			data.stroke = stroke
+		}
+		return data
+	}
+
 	protected update(): void {
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
 		let transformMatrix = this.getTransformMatrix()
 
-		this.dragElement.size(this.size.x, this.size.y).center(this.position.x, this.position.y)
+		this.dragElement.size(this.size.x, this.size.y)
 		this.dragElement.transform(transformMatrix)
 
-		this.shapeVisualization.size(
+		this.componentVisualization.size(
 			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
 			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
 		)
-		this.shapeVisualization.center(this.position.x, this.position.y)
-		this.shapeVisualization.transform(transformMatrix)
+		this.componentVisualization.transform(transformMatrix)
 
 		this._bbox = this.dragElement.bbox().transform(transformMatrix)
 
-		this.relPosition = this.position.sub(new SVG.Point(this.bbox.x, this.bbox.y))
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
@@ -270,7 +275,6 @@ export abstract class ShapeComponent extends CircuitComponent {
 
 			this.selectionElement
 				.size(this.size.x + lineWidth, this.size.y + lineWidth)
-				.center(this.position.x, this.position.y)
 				.transform(this.getTransformMatrix())
 		}
 	}
@@ -281,12 +285,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 			strokeColor = defaultStroke
 		}
 
-		let fillColor = this.fillInfo.color
-		if (fillColor == "default") {
-			fillColor = "none"
-		}
-
-		this.shapeVisualization?.stroke({
+		this.componentVisualization?.stroke({
 			color: strokeColor,
 			opacity: this.strokeInfo.opacity,
 			width: this.strokeInfo.opacity == 0 ? 0 : this.strokeInfo.width.convertToUnit("px").value,
@@ -294,7 +293,12 @@ export abstract class ShapeComponent extends CircuitComponent {
 				.map((factor) => this.strokeInfo.width.times(factor).toString())
 				.join(" "),
 		})
-		this.shapeVisualization?.fill({
+
+		let fillColor = this.fillInfo.color
+		if (fillColor == "default") {
+			fillColor = "none"
+		}
+		this.componentVisualization?.fill({
 			color: fillColor,
 			opacity: this.fillInfo.opacity,
 		})
@@ -330,6 +334,89 @@ export abstract class ShapeComponent extends CircuitComponent {
 	public viewSelected(show: boolean): void {
 		super.viewSelected(show)
 		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
+	}
+
+	public resizable(resize: boolean): void {
+		// general method: work with positions in non rotated reference frame (rotation of rotated positions has to be compensated --> inverse transform Matrix). Rotation is done in update via the transformMatrix
+		if (resize == this.isResizing) {
+			return
+		}
+		this.isResizing = resize
+		if (resize) {
+			let originalPos: SVG.Point
+			let originalSize: SVG.Point
+			let transformMatrixInv: SVG.Matrix
+			const getInitialDim = () => {
+				originalPos = this.position.clone()
+				originalSize = this.size.clone()
+				transformMatrixInv = this.getTransformMatrix().inverse()
+			}
+
+			for (const direction of basicDirections) {
+				if (direction.key == defaultBasicDirection.key || direction.key == "center") {
+					continue
+				}
+
+				const directionTransformed = direction.direction.rotate(this.rotationDeg)
+
+				let viz = resizeSVG()
+				viz.node.style.cursor = getClosestPointerFromDirection(directionTransformed)
+				this.resizeVisualizations.set(direction, viz)
+
+				let startPoint: SVG.Point
+				let oppositePoint: SVG.Point
+				AdjustDragHandler.snapDrag(this, viz, true, {
+					dragStart: (pos) => {
+						getInitialDim()
+						let positionLocal = originalPos.transform(transformMatrixInv)
+						startPoint = positionLocal.add(direction.direction.mul(originalSize).div(2))
+						oppositePoint = positionLocal.add(direction.direction.mul(originalSize).div(-2))
+					},
+					dragMove: (pos, ev) => {
+						pos = pos.transform(transformMatrixInv)
+						if (
+							ev &&
+							(ev as MouseEvent | TouchEvent).ctrlKey &&
+							direction.direction.x * direction.direction.y != 0
+						) {
+							// get closest point on one of the two diagonals
+							let diff = pos.sub(oppositePoint)
+							if (diff.x * diff.y < 0) {
+								pos = new SVG.Point(pos.x - pos.y, pos.y - pos.x)
+									.add(oppositePoint.x + oppositePoint.y)
+									.div(2)
+							} else {
+								pos = new SVG.Point(
+									oppositePoint.x - oppositePoint.y,
+									oppositePoint.y - oppositePoint.x
+								)
+									.add(pos.x + pos.y)
+									.div(2)
+							}
+						}
+						let dirAbs = new SVG.Point(Math.abs(direction.direction.x), Math.abs(direction.direction.y))
+						let delta = pos.sub(startPoint)
+
+						this.size.x = direction.direction.x ? Math.abs(pos.x - oppositePoint.x) : originalSize.x
+						this.size.y = direction.direction.y ? Math.abs(pos.y - oppositePoint.y) : originalSize.y
+						this.referencePosition = this.size.div(2)
+
+						this.position = originalPos.add(delta.mul(dirAbs.div(2)).rotate(this.rotationDeg))
+						this.update()
+					},
+					dragEnd: () => {
+						return true
+					},
+				})
+			}
+			this.update()
+		} else {
+			for (const [dir, viz] of this.resizeVisualizations) {
+				AdjustDragHandler.snapDrag(this, viz, false)
+				viz.remove()
+			}
+			this.resizeVisualizations.clear()
+		}
 	}
 
 	public draggable(drag: boolean): void {
@@ -370,6 +457,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 				Math.abs(secondPoint.x - this.placePoint.x),
 				Math.abs(secondPoint.y - this.placePoint.y)
 			)
+			this.referencePosition = this.size.div(2)
 			this.update()
 		}
 	}
@@ -382,7 +470,8 @@ export abstract class ShapeComponent extends CircuitComponent {
 			this.placePoint = pos
 			this.position = pos
 			this.size = new SVG.Point()
-			this.shapeVisualization.show()
+			this.referencePosition = this.size.div(2)
+			this.componentVisualization.show()
 			this.updateTheme()
 			SnapCursorController.instance.visible = false
 			return false
@@ -403,7 +492,7 @@ export abstract class ShapeComponent extends CircuitComponent {
 		this.finishedPlacing = true
 		this.update()
 		this.draggable(true)
-		this.shapeVisualization.show()
+		this.componentVisualization.show()
 		this.updateTheme()
 		SnapCursorController.instance.visible = false
 	}

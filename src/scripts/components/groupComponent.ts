@@ -4,7 +4,6 @@ import {
 	CircuitComponent,
 	ComponentSaveObject,
 	MainController,
-	SaveController,
 	SectionHeaderProperty,
 	SelectionController,
 	SelectionMode,
@@ -18,6 +17,11 @@ export type GroupSaveObject = ComponentSaveObject & {
 }
 
 export class GroupComponent extends CircuitComponent {
+	private static jsonID = "group"
+	static {
+		CircuitComponent.jsonSaveMap.set(GroupComponent.jsonID, GroupComponent)
+	}
+
 	public groupedComponents: CircuitComponent[] = []
 
 	constructor(components: CircuitComponent[]) {
@@ -83,9 +87,7 @@ export class GroupComponent extends CircuitComponent {
 		}
 	}
 	public resizable(resize: boolean): void {
-		for (const element of this.groupedComponents) {
-			element.resizable(resize)
-		}
+		// Not all components are resizable, so this is not implemented here
 	}
 	protected recalculateResizePoints(): void {
 		//No resizing for now
@@ -125,7 +127,7 @@ export class GroupComponent extends CircuitComponent {
 		}
 		this.position = new SVG.Point(this._bbox.cx, this._bbox.cy)
 
-		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
+		this.referencePosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
 		this.recalculateSelectionVisuals()
 	}
 	protected recalculateSelectionVisuals(): void {
@@ -142,16 +144,16 @@ export class GroupComponent extends CircuitComponent {
 			componentSaveObjects.push(component.toJson())
 		}
 		let saveObject: GroupSaveObject = {
-			type: "group",
+			type: GroupComponent.jsonID,
 			components: componentSaveObjects,
 		}
 
 		return saveObject
 	}
-	public static fromJson(saveObject: GroupSaveObject): GroupComponent {
+	public applyJson(saveObject: GroupSaveObject): GroupComponent {
 		let components: CircuitComponent[] = []
 		for (const saveObj of saveObject.components) {
-			components.push(SaveController.fromJson(saveObj))
+			components.push(CircuitComponent.fromJson(saveObj))
 		}
 		return new GroupComponent(components)
 	}
@@ -196,5 +198,16 @@ export class GroupComponent extends CircuitComponent {
 	public updateLabelPosition(): void {
 		//not needed
 		return
+	}
+
+	public moveRel(delta: SVG.Point): void {
+		for (const component of this.groupedComponents) {
+			component.moveRel(delta)
+		}
+		this.update()
+	}
+
+	public updateTheme() {
+		// not needed
 	}
 }

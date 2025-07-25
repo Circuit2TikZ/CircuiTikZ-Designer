@@ -1,6 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
-	AdjustDragHandler,
 	basicDirections,
 	CanvasController,
 	ChoiceProperty,
@@ -10,37 +9,34 @@ import {
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
-	defaultStroke,
 	defaultStrokeStyleChoice,
-	DirectionInfo,
 	ExportController,
-	FillInfo,
 	FontSize,
 	fontSizes,
-	getClosestPointerFromDirection,
 	MathjaxParser,
-	PositionedLabel,
 	SectionHeaderProperty,
 	ShapeComponent,
 	ShapeSaveObject,
 	SliderProperty,
 	SnapPoint,
-	StrokeInfo,
 	strokeStyleChoices,
 	Text,
 	TextAlign,
 	TextAreaProperty,
 } from "../internal"
-import { rectRectIntersection, resizeSVG, roundTikz } from "../utils/selectionHelper"
+import { rectRectIntersection, roundTikz } from "../utils/selectionHelper"
 
 export type RectangleSaveObject = ShapeSaveObject & {
-	position: SVG.Point
 	size: SVG.Point
 	text?: Text
 }
 
 export class RectangleComponent extends ShapeComponent {
-	protected declare shapeVisualization: SVG.Rect
+	private static jsonID = "rect"
+	static {
+		CircuitComponent.jsonSaveMap.set(RectangleComponent.jsonID, RectangleComponent)
+	}
+
 	protected declare dragElement: SVG.Rect
 
 	private textAreaProperty: TextAreaProperty
@@ -58,8 +54,8 @@ export class RectangleComponent extends ShapeComponent {
 		this.useHyphenation = false
 		this.displayName = "Rectangle"
 
-		this.shapeVisualization = CanvasController.instance.canvas.rect(0, 0)
-		this.shapeVisualization.hide()
+		this.componentVisualization = CanvasController.instance.canvas.rect(0, 0)
+		this.componentVisualization.hide()
 
 		this.dragElement = CanvasController.instance.canvas.rect(0, 0)
 		this.dragElement.attr({
@@ -67,7 +63,7 @@ export class RectangleComponent extends ShapeComponent {
 			stroke: "none",
 		})
 
-		this.visualization.add(this.shapeVisualization)
+		this.visualization.add(this.componentVisualization)
 
 		this.visualization.add(this.dragElement)
 
@@ -123,13 +119,13 @@ export class RectangleComponent extends ShapeComponent {
 		}
 		if (!this.snappingPoints || this.snappingPoints.length == 0) {
 			for (const element of relPositions) {
-				this.snappingPoints.push(new SnapPoint(this, element.anchorname, element.relPos.add(this.position)))
+				this.snappingPoints.push(new SnapPoint(this, element.anchorname, element.relPos.add(halfSize)))
 			}
 		} else {
 			for (let index = 0; index < relPositions.length; index++) {
 				const relPos = relPositions[index].relPos
 				const snappingPoint = this.snappingPoints[index]
-				snappingPoint.updateRelPosition(relPos.add(this.position))
+				snappingPoint.updateRelPosition(relPos.add(halfSize))
 				snappingPoint.recalculate()
 			}
 		}
@@ -145,156 +141,15 @@ export class RectangleComponent extends ShapeComponent {
 		return rectRectIntersection(rect, selectionRectangle, this.rotationDeg)
 	}
 
-	protected recalculateResizePoints() {
-		let halfsize = this.size.div(2)
-		for (const [dir, viz] of this.resizeVisualizations) {
-			let pos = this.position.add(halfsize.mul(dir.direction).rotate(this.rotationDeg))
-			viz.center(pos.x, pos.y)
-		}
-	}
-	public resizable(resize: boolean): void {
-		// general method: work with positions in non rotated reference frame (rotation of rotated positions has to be compensated --> inverse transform Matrix). Rotation is done in update via the transformMatrix
-		if (resize == this.isResizing) {
-			return
-		}
-		this.isResizing = resize
-		if (resize) {
-			let originalPos: SVG.Point
-			let originalSize: SVG.Point
-			let transformMatrixInv: SVG.Matrix
-			const getInitialDim = () => {
-				originalPos = this.position.clone()
-				originalSize = this.size.clone()
-				transformMatrixInv = this.getTransformMatrix().inverse()
-			}
-
-			for (const direction of basicDirections) {
-				if (direction.key == defaultBasicDirection.key || direction.key == "center") {
-					continue
-				}
-
-				const directionTransformed = direction.direction.rotate(this.rotationDeg)
-
-				let viz = resizeSVG()
-				viz.node.style.cursor = getClosestPointerFromDirection(directionTransformed)
-				this.resizeVisualizations.set(direction, viz)
-
-				let startPoint: SVG.Point
-				let oppositePoint: SVG.Point
-				AdjustDragHandler.snapDrag(this, viz, true, {
-					dragStart: (pos) => {
-						getInitialDim()
-						startPoint = originalPos.add(direction.direction.mul(originalSize).div(2))
-						oppositePoint = originalPos.add(direction.direction.mul(originalSize).div(-2))
-					},
-					dragMove: (pos, ev) => {
-						pos = pos.transform(transformMatrixInv)
-						if (
-							ev &&
-							(ev as MouseEvent | TouchEvent).ctrlKey &&
-							direction.direction.x * direction.direction.y != 0
-						) {
-							// get closest point on one of the two diagonals
-							let diff = pos.sub(oppositePoint)
-							if (diff.x * diff.y < 0) {
-								pos = new SVG.Point(pos.x - pos.y, pos.y - pos.x)
-									.add(oppositePoint.x + oppositePoint.y)
-									.div(2)
-							} else {
-								pos = new SVG.Point(
-									oppositePoint.x - oppositePoint.y,
-									oppositePoint.y - oppositePoint.x
-								)
-									.add(pos.x + pos.y)
-									.div(2)
-							}
-						}
-						let dirAbs = new SVG.Point(Math.abs(direction.direction.x), Math.abs(direction.direction.y))
-						let delta = pos.sub(startPoint)
-
-						this.size.x = direction.direction.x ? Math.abs(pos.x - oppositePoint.x) : originalSize.x
-						this.size.y = direction.direction.y ? Math.abs(pos.y - oppositePoint.y) : originalSize.y
-
-						this.position = originalPos.add(delta.mul(dirAbs.div(2)).rotate(this.rotationDeg))
-						this.update()
-					},
-					dragEnd: () => {
-						return true
-					},
-				})
-			}
-			this.update()
-		} else {
-			for (const [dir, viz] of this.resizeVisualizations) {
-				AdjustDragHandler.snapDrag(this, viz, false)
-				viz.remove()
-			}
-			this.resizeVisualizations.clear()
-		}
-	}
-
 	protected update(): void {
 		super.update()
 		this.updateText()
 	}
 
 	public toJson(): RectangleSaveObject {
-		let data: RectangleSaveObject = {
-			type: "rect",
-			position: this.position.simplifyForJson(),
-			size: this.size.simplifyForJson(),
-		}
-		if (this.rotationDeg) {
-			data.rotationDeg = this.rotationDeg
-		}
-
-		let fill: FillInfo = {}
-		let shouldFill = false
-		if (this.fillInfo.color != "default") {
-			fill.color = this.fillInfo.color
-			shouldFill = true
-		}
-		if (this.fillInfo.opacity != 1) {
-			fill.opacity = this.fillInfo.opacity
-			shouldFill = true
-		}
-		if (shouldFill) {
-			data.fill = fill
-		}
-
-		let stroke: StrokeInfo = {}
-		let shouldStroke = false
-		if (this.strokeInfo.color != "default") {
-			stroke.color = this.strokeInfo.color
-			shouldStroke = true
-		}
-		if (this.strokeInfo.opacity != 1) {
-			stroke.opacity = this.strokeInfo.opacity
-			shouldStroke = true
-		}
-
-		if (!this.strokeInfo.width.eq(new SVG.Number("1pt"))) {
-			stroke.width = this.strokeInfo.width
-			shouldStroke = true
-		}
-		if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-			stroke.style = this.strokeInfo.style
-			shouldStroke = true
-		}
-		if (shouldStroke) {
-			data.stroke = stroke
-		}
-
-		if (this.mathJaxLabel.value) {
-			let labelWithoutRender: PositionedLabel = {
-				value: this.mathJaxLabel.value,
-				anchor: this.anchorChoice.value.key,
-				position: this.positionChoice.value.key,
-				distance: this.labelDistance.value ?? undefined,
-				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
-			}
-			data.label = labelWithoutRender
-		}
+		const data = super.toJson() as RectangleSaveObject
+		data.type = RectangleComponent.jsonID
+		data.size = this.size.simplifyForJson()
 
 		if (this.textAreaProperty.value) {
 			let textData: Text = {
@@ -336,19 +191,18 @@ export class RectangleComponent extends ShapeComponent {
 		rectComponent.position = new SVG.Point(saveObject.position)
 		rectComponent.placePoint = rectComponent.position
 		rectComponent.size = new SVG.Point(saveObject.size)
+		rectComponent.referencePosition = rectComponent.size.div(2)
 
-		rectComponent.rotationDeg = saveObject.rotationDeg ?? 0
+		rectComponent.rotationDeg = saveObject.rotation ?? 0
 
 		if (saveObject.fill) {
 			if (saveObject.fill.color) {
 				rectComponent.fillInfo.color = saveObject.fill.color
 				rectComponent.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
-				rectComponent.fillColorProperty.updateHTML()
 			}
 			if (saveObject.fill.opacity != undefined) {
 				rectComponent.fillInfo.opacity = saveObject.fill.opacity
 				rectComponent.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity * 100, "%")
-				rectComponent.fillOpacityProperty.updateHTML()
 			}
 		}
 
@@ -356,24 +210,20 @@ export class RectangleComponent extends ShapeComponent {
 			if (saveObject.stroke.color) {
 				rectComponent.strokeInfo.color = saveObject.stroke.color
 				rectComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-				rectComponent.strokeColorProperty.updateHTML()
 			}
 			if (saveObject.stroke.opacity != undefined) {
 				rectComponent.strokeInfo.opacity = saveObject.stroke.opacity
 				rectComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
-				rectComponent.strokeOpacityProperty.updateHTML()
 			}
 			if (saveObject.stroke.width) {
 				rectComponent.strokeInfo.width = new SVG.Number(saveObject.stroke.width)
 				rectComponent.strokeWidthProperty.value = rectComponent.strokeInfo.width
-				rectComponent.strokeWidthProperty.updateHTML()
 			}
 			if (saveObject.stroke.style) {
 				rectComponent.strokeInfo.style = saveObject.stroke.style
 				rectComponent.strokeStyleProperty.value = strokeStyleChoices.find(
 					(item) => item.key == saveObject.stroke.style
 				)
-				rectComponent.strokeStyleProperty.updateHTML()
 			}
 		}
 
@@ -385,21 +235,21 @@ export class RectangleComponent extends ShapeComponent {
 			if (rectComponent.labelDistance.value.unit == "") {
 				rectComponent.labelDistance.value.unit = "cm"
 			}
-			rectComponent.labelDistance.updateHTML()
+
 			rectComponent.anchorChoice.value =
 				saveObject.label.anchor ?
 					basicDirections.find((item) => item.key == saveObject.label.anchor)
 				:	defaultBasicDirection
-			rectComponent.anchorChoice.updateHTML()
+
 			rectComponent.positionChoice.value =
 				saveObject.label.position ?
 					basicDirections.find((item) => item.key == saveObject.label.position)
 				:	defaultBasicDirection
-			rectComponent.positionChoice.updateHTML()
+
 			rectComponent.mathJaxLabel.value = saveObject.label.value
-			rectComponent.mathJaxLabel.updateHTML()
+
 			rectComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			rectComponent.labelColor.updateHTML()
+
 			rectComponent.generateLabelRender()
 		}
 
@@ -414,17 +264,16 @@ export class RectangleComponent extends ShapeComponent {
 			rectComponent.createAsText = text.showPlaceholderText
 			rectComponent.useHyphenation = text.useHyphenation
 			rectComponent.textAreaProperty.value = text
-			rectComponent.textAreaProperty.updateHTML()
+
 			rectComponent.textFontSize.value =
 				saveObject.text.fontSize ?
 					fontSizes.find((item) => item.key == saveObject.text.fontSize)
 				:	defaultFontSize
-			rectComponent.textFontSize.updateHTML()
+
 			rectComponent.textInnerSep.value =
 				saveObject.text.innerSep ? new SVG.Number(saveObject.text.innerSep) : new SVG.Number("5pt")
-			rectComponent.textInnerSep.updateHTML()
+
 			rectComponent.textColor.value = saveObject.text.color ? new SVG.Color(saveObject.text.color) : null
-			rectComponent.textColor.updateHTML()
 		}
 
 		rectComponent.placeFinish()
@@ -441,9 +290,9 @@ export class RectangleComponent extends ShapeComponent {
 			this.strokeOpacityProperty.value = new SVG.Number(0, "%")
 			this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
 			this.updateTheme()
-			this.strokeOpacityProperty.updateHTML()
+
 			this.strokeStyleProperty.value = strokeStyleChoices[0]
-			this.strokeStyleProperty.updateHTML()
+
 			this.update()
 		}
 	}
@@ -612,66 +461,6 @@ export class RectangleComponent extends ShapeComponent {
 
 	public copyForPlacement(): CircuitComponent {
 		return new RectangleComponent(this.createAsText)
-	}
-
-	private labelPos: DirectionInfo
-	public updateLabelPosition(): void {
-		if (!this.mathJaxLabel.value || !this.labelRendering) {
-			return
-		}
-		let labelSVG = this.labelRendering
-		let transformMatrix = this.getTransformMatrix()
-		let bbox = new SVG.Box(
-			this.position.x - this.size.x / 2,
-			this.position.y - this.size.y / 2,
-			this.size.x,
-			this.size.y
-		)
-		// get relevant positions and bounding boxes
-		let textPos = this.position
-		let textPosNoTrans = this.position
-		if (this.positionChoice.value.key != defaultBasicDirection.key) {
-			let bboxHalfSize = this.size.div(2)
-			textPosNoTrans = this.position.add(bboxHalfSize.mul(this.positionChoice.value.direction))
-			textPos = textPosNoTrans.transform(transformMatrix)
-		}
-		let labelBBox = labelSVG.bbox()
-
-		// calculate where on the label the anchor point should be
-		let labelRef: SVG.Point
-		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
-		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
-			let clamp = function (value: number, min: number, max: number) {
-				if (value < min) {
-					return min
-				} else if (value > max) {
-					return max
-				} else {
-					return value
-				}
-			}
-
-			let horizontalTextPosition = clamp(Math.round((2 * (bbox.cx - textPosNoTrans.x)) / bbox.w), -1, 1)
-			let verticalTextPosition = clamp(Math.round((2 * (bbox.cy - textPosNoTrans.y)) / bbox.h), -1, 1)
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition).rotate(this.rotationDeg)
-			labelRef.x = Math.round(labelRef.x)
-			labelRef.y = Math.round(labelRef.y)
-			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))
-		} else {
-			this.labelPos = this.anchorChoice.value
-			labelRef = this.labelPos.direction
-		}
-
-		let ref = labelRef
-			.add(1)
-			.div(2)
-			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
-			.add(new SVG.Point(labelBBox.x, labelBBox.y))
-			.add(labelRef.mul(labelDist))
-
-		// actually move the label
-		let movePos = textPos.sub(ref)
-		labelSVG.transform(new SVG.Matrix({ translate: [movePos.x, movePos.y] }))
 	}
 
 	private updateText() {
