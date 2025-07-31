@@ -1,0 +1,3 @@
+[submodule "ext/CircuiTikZ-convert"]
+	path = ext/CircuiTikZ-convert
+	url = git@github.com:pierpaolopalazzo/CircuiTikZ-convert.git
