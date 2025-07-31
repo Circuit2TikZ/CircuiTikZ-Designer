@@ -20,8 +20,6 @@ import {
 	renderMathJax,
 	SectionHeaderProperty,
 	SliderProperty,
-	SnapCursorController,
-	SnapDragHandler,
 	SnappingInfo,
 	SnapPoint,
 	StrokeInfo,
@@ -647,10 +645,8 @@ export class PolygonComponent extends PathComponent {
 	}
 
 	public placeMove(pos: SVG.Point, ev?: Event): void {
-		SnapCursorController.instance.visible = true
 		if (this.referencePoints.length < 1) {
 			// not started placing
-			SnapCursorController.instance.moveTo(pos)
 		} else {
 			let placePoint = this.referencePoints.at(-2)
 			let secondPoint: SVG.Point
@@ -682,7 +678,6 @@ export class PolygonComponent extends PathComponent {
 			this.referencePoints.push(pos.clone())
 			this.componentVisualization.show()
 			this.updateTheme()
-			SnapCursorController.instance.visible = false
 		} else {
 			if (this.referencePoints.at(-2).eq(pos)) {
 				return true
@@ -717,7 +712,6 @@ export class PolygonComponent extends PathComponent {
 		this.draggable(true)
 		this.componentVisualization.show()
 		this.updateTheme()
-		SnapCursorController.instance.visible = false
 		this.update()
 	}
 

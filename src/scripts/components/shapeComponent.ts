@@ -11,7 +11,6 @@ import {
 	SnappingInfo,
 	SnapDragHandler,
 	ChoiceEntry,
-	SnapCursorController,
 	AdjustDragHandler,
 	defaultStroke,
 	SelectionController,
@@ -173,7 +172,6 @@ export abstract class ShapeComponent extends NodeComponent {
 		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
 		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
 
-		SnapCursorController.instance.visible = true
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)
 	}
@@ -259,6 +257,7 @@ export abstract class ShapeComponent extends NodeComponent {
 			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
 			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
 		)
+		this.defaultTextPosition = this.size.div(2)
 		this.componentVisualization.transform(transformMatrix)
 
 		this._bbox = this.dragElement.bbox().transform(transformMatrix)
@@ -431,7 +430,6 @@ export abstract class ShapeComponent extends NodeComponent {
 	public placeMove(pos: SVG.Point, ev?: Event): void {
 		if (!this.placePoint) {
 			// not started placing
-			SnapCursorController.instance.moveTo(pos)
 		} else {
 			let secondPoint: SVG.Point
 			if (ev && (ev as MouseEvent | TouchEvent).ctrlKey) {
@@ -473,7 +471,6 @@ export abstract class ShapeComponent extends NodeComponent {
 			this.referencePosition = this.size.div(2)
 			this.componentVisualization.show()
 			this.updateTheme()
-			SnapCursorController.instance.visible = false
 			return false
 		}
 
@@ -494,7 +491,6 @@ export abstract class ShapeComponent extends NodeComponent {
 		this.draggable(true)
 		this.componentVisualization.show()
 		this.updateTheme()
-		SnapCursorController.instance.visible = false
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {

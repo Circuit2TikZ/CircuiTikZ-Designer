@@ -136,7 +136,6 @@ export class SaveController {
 		for (const component of saveFile.components) {
 			let c = SaveController.fromJson(component)
 			components.push(c)
-			c.updateTheme()
 		}
 
 		if (selectComponents) {

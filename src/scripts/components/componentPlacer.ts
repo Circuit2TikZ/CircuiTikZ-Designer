@@ -8,6 +8,7 @@ import {
 	SelectionController,
 	SelectionMode,
 	SnapController,
+	SnapCursorController,
 	Undo,
 } from "../internal"
 import hotkeys from "hotkeys-js"
@@ -73,6 +74,7 @@ export class ComponentPlacer {
 		let pt = ComponentPlacer.pointFromEvent(ev)
 		this.component.placeMove(pt, ev)
 		SnapController.instance.recalculateAdditionalSnapPoints()
+		SnapCursorController.instance.moveTo(pt)
 	}
 
 	/**
@@ -131,6 +133,7 @@ export class ComponentPlacer {
 		}
 		this.previousComponent = null
 		this.cleanUp()
+		SnapCursorController.instance.visible = false
 		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}
 

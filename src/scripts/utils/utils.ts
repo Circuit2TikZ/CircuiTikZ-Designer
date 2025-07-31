@@ -1,4 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
+import { basicDirections, DirectionInfo } from "../internal"
 
 // utility values
 
@@ -31,6 +32,23 @@ export function simpifyRotationAndScale(rotation: number, scale: SVG.Point): [nu
 	return [rotation, s]
 }
 
+export function closestBasicDirection(direction: SVG.Point): DirectionInfo {
+	return basicDirections
+		.map((val) => {
+			return { dirInfo: val, distsq: val.direction.distanceSquared(direction) }
+		})
+		.reduce(
+			(prev, current) => {
+				if (current.distsq < prev.distsq) {
+					return current
+				} else {
+					return prev
+				}
+			},
+			{ dirInfo: { key: "", name: "", direction: new SVG.Point() }, distsq: Number.MAX_VALUE }
+		).dirInfo
+}
+
 /**
  * Clamps a value between a minimum and maximum value.
  * @param value The value to clamp
@@ -39,4 +57,35 @@ export function simpifyRotationAndScale(rotation: number, scale: SVG.Point): [nu
  */
 export function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value))
+}
+
+export function memorySizeOf(obj) {
+	var bytes = 0
+
+	function sizeOf(obj) {
+		if (obj !== null && obj !== undefined) {
+			switch (typeof obj) {
+				case "number":
+					bytes += 8
+					break
+				case "string":
+					bytes += obj.length * 2
+					break
+				case "boolean":
+					bytes += 4
+					break
+				case "object":
+					var objClass = Object.prototype.toString.call(obj).slice(8, -1)
+					if (objClass === "Object" || objClass === "Array") {
+						for (var key in obj) {
+							if (!obj.hasOwnProperty(key)) continue
+							sizeOf(obj[key])
+						}
+					} else bytes += obj.toString().length * 2
+					break
+			}
+		}
+		return bytes
+	}
+	return sizeOf(obj)
 }

@@ -14,6 +14,7 @@ import {
 	EditableProperty,
 	basicDirections,
 	SnapDragHandler,
+	SnapCursorController,
 } from "../internal"
 import {
 	hoverColor,
@@ -161,6 +162,7 @@ export abstract class CircuitComponent {
 	 */
 	public constructor() {
 		this.position = new SVG.Point()
+		this.finishedPlacing = false
 		this.referencePosition = new SVG.Point()
 		//every time a component is initialized, it should be added to the component list for housekeeping
 		MainController.instance.addComponent(this)
@@ -428,6 +430,8 @@ export abstract class CircuitComponent {
 	 */
 	protected applyJson(saveObject: ComponentSaveObject): void {
 		// highest level doesn't do anything (essentially only the type but this is not used here)
+		SnapCursorController.instance.visible = false
+		this.finishedPlacing = true
 	}
 
 	static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()

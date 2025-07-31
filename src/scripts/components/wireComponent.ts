@@ -14,7 +14,6 @@ import {
 	SectionHeaderProperty,
 	SelectionController,
 	SliderProperty,
-	SnapCursorController,
 	SnappingInfo,
 	SnapPoint,
 	StrokeInfo,
@@ -126,7 +125,6 @@ export class WireComponent extends PathComponent {
 		this.referencePoints = []
 		this.pointLimit = -1
 		this.wireDirections = []
-		SnapCursorController.instance.visible = true
 		this.displayName = "Wire"
 
 		this.strokeInfo = {
@@ -652,6 +650,10 @@ export class WireComponent extends PathComponent {
 		return data
 	}
 
+	public static fromJson(saveObject: WireSaveObject): WireComponent {
+		return new WireComponent()
+	}
+
 	public toTikzString(): string {
 		let drawOptions: string[] = []
 		if (this.arrowStartChoice.value.key !== defaultArrowTip.key) {
@@ -750,7 +752,6 @@ export class WireComponent extends PathComponent {
 
 	public placeMove(pos: SVG.Point, ev?: MouseEvent): void {
 		//only move the last corner point in the array
-		SnapCursorController.instance.moveTo(pos)
 		if (this.referencePoints.length > 1) {
 			let previousPoint = this.referencePoints.at(-2)
 			let relToPreviousPoint = pos.sub(previousPoint)
@@ -807,7 +808,6 @@ export class WireComponent extends PathComponent {
 		} else {
 			this.referencePoints.push(pos.clone())
 			this.updateTheme()
-			SnapCursorController.instance.visible = false
 		}
 
 		this.referencePoints.push(pos)
@@ -826,8 +826,6 @@ export class WireComponent extends PathComponent {
 			//was already called
 			return
 		}
-
-		SnapCursorController.instance.visible = false
 
 		if (this.referencePoints.length == 0) {
 			this.placeStep(new SVG.Point())
@@ -859,6 +857,9 @@ export class WireComponent extends PathComponent {
 	public applyJson(saveObject: WireSaveObject): void {
 		super.applyJson(saveObject)
 		this.wireDirections = saveObject.directions ?? []
+		while (this.wireDirections.length < this.referencePoints.length - 1) {
+			this.wireDirections.push(WireDirection.Straight)
+		}
 
 		if (saveObject.stroke) {
 			if (saveObject.stroke.color) {

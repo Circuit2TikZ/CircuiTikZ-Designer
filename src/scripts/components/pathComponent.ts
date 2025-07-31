@@ -1,14 +1,15 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
 	AdjustDragHandler,
-	ChoiceEntry,
-	ChoiceProperty,
 	CircuitComponent,
 	ColorProperty,
 	ComponentSaveObject,
 	Label,
+	MainController,
 	MathJaxProperty,
 	SliderProperty,
+	SnapController,
+	SnapCursorController,
 } from "../internal"
 import { resizeSVG } from "../utils/selectionHelper"
 
@@ -63,6 +64,7 @@ export abstract class PathComponent extends CircuitComponent {
 		super()
 		this.referencePoints = []
 		this.resizableSVGs = []
+		SnapCursorController.instance.visible = true
 	}
 
 	public moveRel(delta: SVG.Point): void {
@@ -149,4 +151,57 @@ export abstract class PathComponent extends CircuitComponent {
 		this.update()
 	}
 	public flip(horizontalAxis: boolean): void {}
+
+	public placeMove(pos: SVG.Point, ev?: Event): void {
+		if (this.referencePoints.length > 0) {
+			this.movePointTo(this.referencePoints.length - 1, pos)
+		}
+	}
+
+	public placeStep(pos: SVG.Point, ev?: Event): boolean {
+		if (this.finishedPlacing) {
+			return true
+		}
+
+		if (this.referencePoints.length == 0) {
+			this.referencePoints.push(pos.clone())
+			this.visualization.show()
+			this.updateTheme()
+		} else {
+			if (this.referencePoints.at(-2).eq(pos)) {
+				return true
+			}
+		}
+		if (this.pointLimit > 0 && this.referencePoints.length >= this.pointLimit) {
+			this.placeMove(pos, ev)
+			this.referencePoints.push(new SVG.Point())
+			return true
+		}
+
+		this.referencePoints.push(pos)
+		this.placeMove(pos, ev)
+		return false
+	}
+
+	public placeFinish(): void {
+		if (this.finishedPlacing) {
+			return
+		}
+		if (this.referencePoints.length == 0) {
+			this.placeStep(new SVG.Point())
+		}
+		this.referencePoints.pop()
+		if (this.referencePoints.length >= 2 && this.referencePoints.at(-1).eq(this.referencePoints.at(-2))) {
+			this.referencePoints.pop()
+		}
+		if (this.referencePoints.length < 2) {
+			// if not even 2 corner points -> no polygon, delete
+			MainController.instance.removeComponent(this)
+			return
+		}
+		this.finishedPlacing = true
+		SnapController.instance.hideSnapPoints()
+		this.update()
+		this.draggable(true)
+	}
 }

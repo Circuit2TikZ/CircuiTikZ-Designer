@@ -16,6 +16,7 @@ import {
 	SnappingInfo,
 	FillInfo,
 	SnapDragHandler,
+	closestBasicDirection,
 } from "../internal"
 import { CircuitComponent, getClosestPointerFromDirection } from "./circuitComponent"
 import { resizeSVG } from "../utils/selectionHelper"
@@ -107,7 +108,8 @@ export abstract class NodeComponent extends CircuitComponent {
 	protected labelDistance: SliderProperty
 	protected labelColor: ColorProperty
 
-	protected textPosNoTransform: SVG.Point
+	// where the text should go by default in local coordinates
+	protected defaultTextPosition: SVG.Point
 
 	constructor() {
 		super()
@@ -117,7 +119,7 @@ export abstract class NodeComponent extends CircuitComponent {
 		this.rotationDeg = 0
 		this.scaleState = new SVG.Point(1, 1)
 
-		this.textPosNoTransform = new SVG.Point()
+		this.defaultTextPosition = new SVG.Point()
 
 		//label section
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
@@ -345,21 +347,19 @@ export abstract class NodeComponent extends CircuitComponent {
 		}
 		let labelSVG = this.labelRendering
 		let transformMatrix = this.getTransformMatrix()
-		let textPos: SVG.Point
-		let ref: SVG.Point
+		let textPos: SVG.Point // in local coords
+		let textDir: SVG.Point // normalized direction to size (length not normalized) in local coords
+		let halfSize = this.size.div(2)
 
-		// get relevant positions and bounding boxes
-		let bboxHalfSize = new SVG.Point(this.size.x / 2, this.size.y / 2)
-		let textDir: SVG.Point // normalized direction to bbox size
-		let textPosNoTransform: SVG.Point // relative to the upper left corner in local coordinates
-		// get the position of the label
+		// calculate the text position in world space
 		if (this.positionChoice.value.key == defaultBasicDirection.key) {
-			textPosNoTransform = this.textPosNoTransform
-			textDir = textPosNoTransform.sub(bboxHalfSize).div(bboxHalfSize)
+			textPos = this.defaultTextPosition.transform(transformMatrix)
+			this.labelPos = undefined
+			textDir = closestBasicDirection(this.defaultTextPosition.sub(halfSize).div(halfSize)).direction
 		} else {
 			if (this.labelReferenceProperty.value.key == "canvas") {
 				// the component should be placed absolute to the canvas
-				//reverse local transform effect
+				// bring desired direction into local coordinates
 				textDir = this.positionChoice.value.direction.transform(
 					new SVG.Matrix({
 						rotate: -this.rotationDeg,
@@ -368,27 +368,22 @@ export abstract class NodeComponent extends CircuitComponent {
 					}).inverse()
 				)
 				// check which label direction should be used to get the final correct direction
-				textDir = textDir.div(textDir.abs())
-				textDir.x = Math.round(textDir.x)
-				textDir.y = Math.round(textDir.y)
+				this.labelPos = closestBasicDirection(textDir)
 			} else {
 				// just use whatever is selected
-				textDir = this.positionChoice.value.direction
+				this.labelPos = this.positionChoice.value
 			}
-
-			textPosNoTransform = bboxHalfSize.add(bboxHalfSize.mul(textDir))
+			textDir = this.labelPos.direction
+			textPos = halfSize.add(textDir.mul(halfSize)).transform(transformMatrix)
 		}
-		this.labelPos = basicDirections.find((item) => item.direction.eq(textDir))
-		textPos = textPosNoTransform.transform(transformMatrix)
+
 		let labelBBox = labelSVG.bbox()
 
 		// calculate where on the label the anchor point should be
-		let labelRef: SVG.Point
 		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
 		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
-			labelRef = textDir.mul(-1)
 			//transform anchor direction back to global coordinates
-			labelRef = labelRef.transform(
+			let labelRefDir = textDir.mul(-1).transform(
 				new SVG.Matrix({
 					rotate: -this.rotationDeg,
 					scaleX: this.scaleState.x,
@@ -397,26 +392,20 @@ export abstract class NodeComponent extends CircuitComponent {
 			)
 
 			// check which direction should be used to get the final correct direction
-			labelRef = labelRef.div(labelRef.abs())
-			labelRef.x = Math.round(labelRef.x)
-			labelRef.y = Math.round(labelRef.y)
-
-			this.anchorPos = basicDirections.find((item) => item.direction.eq(labelRef))
+			this.anchorPos = closestBasicDirection(labelRefDir)
 		} else {
 			// an explicit anchor was selected
 			this.anchorPos = this.anchorChoice.value
-			labelRef = this.anchorPos.direction
 		}
+		let labelRef = this.anchorPos.direction
 
-		ref = labelRef
+		let ref = labelRef
 			.add(1)
 			.div(2)
 			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
 			.add(new SVG.Point(labelBBox.x, labelBBox.y))
 			.add(labelRef.mul(labelDist))
 
-		// acutally move the label
-		let movePos = textPos.sub(ref)
-		labelSVG.transform(new SVG.Matrix({ translate: [movePos.x, movePos.y] }))
+		labelSVG.transform({ translate: textPos.sub(ref) })
 	}
 }

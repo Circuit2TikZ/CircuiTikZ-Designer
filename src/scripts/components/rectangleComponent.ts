@@ -422,7 +422,7 @@ export class RectangleComponent extends ShapeComponent {
 
 		let labelNodeStr = ""
 		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.labelPos.name
+			let labelStr = "anchor=" + this.anchorPos.name
 
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 

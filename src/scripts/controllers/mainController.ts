@@ -172,7 +172,6 @@ export class MainController {
 		})
 		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise, fontPromise]).then(() => {
 			document.getElementById("loadingSpinner")?.classList.add("d-none")
-			SnapCursorController.instance
 			this.initAddComponentOffcanvas()
 			this.initShortcuts()
 

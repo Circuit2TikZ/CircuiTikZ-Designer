@@ -3,8 +3,6 @@ import {
 	CanvasController,
 	ComponentSymbol,
 	MainController,
-	SnapController,
-	SnapCursorController,
 	SnapPoint,
 	SnapDragHandler,
 	SnappingInfo,
@@ -27,7 +25,6 @@ import {
 	renderMathJax,
 	InfoProperty,
 	CircuitComponent,
-	ComponentSaveObject,
 } from "../internal"
 import {
 	lineRectIntersection,
@@ -67,8 +64,6 @@ export class PathSymbolComponent extends PathComponent {
 	 * the vector in local coordinates from componentVariant.mid to the point where the second half of the path line should start
 	 */
 	private relSymbolEnd: SVG.Point
-
-	private pointsPlaced: 0 | 1 | 2 = 0
 
 	private mirror: BooleanProperty
 	private invert: BooleanProperty
@@ -356,7 +351,8 @@ export class PathSymbolComponent extends PathComponent {
 		} else {
 			return {
 				trackedSnappingPoints: [],
-				additionalSnappingPoints: this.pointsPlaced > 0 ? [new SnapPoint(this, "", new SVG.Point())] : [],
+				additionalSnappingPoints:
+					this.referencePoints.length > 0 ? [new SnapPoint(this, "", new SVG.Point())] : [],
 			}
 		}
 	}
@@ -623,32 +619,6 @@ export class PathSymbolComponent extends PathComponent {
 		this.visualization.remove()
 		this.selectionElement?.remove()
 		this.labelRendering?.remove()
-	}
-
-	public placeMove(pos: SVG.Point): void {
-		SnapCursorController.instance.moveTo(pos)
-		if (this.pointsPlaced == 1) {
-			this.moveEndTo(pos)
-		}
-	}
-	public placeStep(pos: SVG.Point): boolean {
-		if (this.pointsPlaced == 0) {
-			this.visualization.show()
-			this.referencePoints[0] = pos
-		}
-		this.pointsPlaced += 1
-		this.placeMove(pos)
-		return this.pointsPlaced > 1
-	}
-	public placeFinish(): void {
-		while (!this.finishedPlacing) {
-			this.finishedPlacing = this.placeStep(CanvasController.instance.lastCanvasPoint)
-		}
-		this.finishedPlacing = true
-		SnapCursorController.instance.visible = false
-		SnapController.instance.hideSnapPoints()
-		this.update()
-		this.draggable(true)
 	}
 
 	public copyForPlacement(): PathSymbolComponent {

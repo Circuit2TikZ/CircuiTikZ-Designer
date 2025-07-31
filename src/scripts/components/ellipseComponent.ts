@@ -7,12 +7,9 @@ import {
 	defaultBasicDirection,
 	defaultStrokeStyleChoice,
 	ExportController,
-	FillInfo,
-	PositionedLabel,
 	ShapeComponent,
 	ShapeSaveObject,
 	SnapPoint,
-	StrokeInfo,
 	strokeStyleChoices,
 } from "../internal"
 import { pointInsideRect, roundTikz } from "../utils/selectionHelper"
@@ -160,6 +157,10 @@ export class EllipseComponent extends ShapeComponent {
 		return ellipseComponent
 	}
 
+	public static fromJson(saveObject: EllipseSaveObject): EllipseComponent {
+		return new EllipseComponent()
+	}
+
 	public toTikzString(): string {
 		let optionsArray: string[] = []
 
@@ -233,13 +234,14 @@ export class EllipseComponent extends ShapeComponent {
 
 		let labelNodeStr = ""
 		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.labelPos.name
+			let labelStr = "anchor=" + this.anchorPos.name
 
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 
-			let norm = this.labelPos.direction.abs()
-			norm = norm == 0 ? 1 : norm
-			let labelShift = this.labelPos.direction.mul(-labelDist.value / norm)
+			let labelShift: SVG.Point = new SVG.Point()
+			if (this.positionChoice.value.key != defaultBasicDirection.key) {
+				labelShift = this.labelPos.direction.mul(-labelDist.value / this.labelPos.direction.abs())
+			}
 			let posShift = ""
 			if (labelShift.x !== 0) {
 				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"

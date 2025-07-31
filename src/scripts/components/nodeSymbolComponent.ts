@@ -88,7 +88,7 @@ export class NodeSymbolComponent extends NodeComponent {
 
 		this.componentVariant = symbol.getVariant(this.optionsFromProperties())
 		this.size = new SVG.Point(this.componentVariant.viewBox.w, this.componentVariant.viewBox.h)
-		this.textPosNoTransform = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
+		this.defaultTextPosition = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
 
 		this.symbolUse = CanvasController.instance.canvas.use(this.componentVariant.symbol)
 		this.symbolUse.fill(defaultFill)
@@ -187,8 +187,8 @@ export class NodeSymbolComponent extends NodeComponent {
 	protected updateOptions() {
 		this.componentVariant = this.referenceSymbol.getVariant(this.optionsFromProperties())
 		this.symbolUse.node.setAttribute("href", "#" + this.componentVariant.symbol.id())
-		this.size = new SVG.Point(this.componentVariant.viewBox.x, this.componentVariant.viewBox.y)
-		this.textPosNoTransform = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
+		this.size = new SVG.Point(this.componentVariant.viewBox.w, this.componentVariant.viewBox.h)
+		this.defaultTextPosition = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
 
 		this.snappingPoints = this.componentVariant.pins.map(
 			(pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))
