@@ -4,8 +4,8 @@ export class BooleanProperty extends EditableProperty<boolean> {
 	private checkBox: HTMLInputElement
 	private label: string
 
-	public constructor(label: string, initialValue?: boolean) {
-		super(initialValue)
+	public constructor(label: string, initialValue?: boolean, tooltip = "") {
+		super(initialValue, tooltip)
 		this.label = label
 	}
 	public eq(first: boolean, second: boolean): boolean {

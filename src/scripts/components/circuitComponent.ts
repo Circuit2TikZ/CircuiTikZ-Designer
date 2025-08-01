@@ -206,6 +206,13 @@ export abstract class CircuitComponent {
 				(ev) => CanvasController.instance.componentsToBackground([this]),
 				(ev) => CanvasController.instance.moveComponentsForward([this]),
 				(ev) => CanvasController.instance.moveComponentsBackward([this]),
+			],
+			false,
+			[
+				"Bring the component to the foreground",
+				"Move the component to the background",
+				"Move the component one step towards the foreground",
+				"Move the component one step towards the background",
 			]
 		)
 		this.propertiesHTMLRows.push(new SectionHeaderProperty("Ordering").buildHTML())
@@ -251,6 +258,15 @@ export abstract class CircuitComponent {
 					this.flip(false)
 					Undo.addState()
 				},
+			],
+			false,
+			[
+				"Rotate the component 90 degrees clockwise",
+				"Rotate the component 90 degrees counter clockwise",
+				"Rotate the component 45 degrees clockwise",
+				"Rotate the component 45 degrees counter clockwise",
+				"Flip the component around its x-axis",
+				"Flip the component around its y-axis",
 			]
 		)
 		this.propertiesHTMLRows.push(positioning.buildHTML())
@@ -437,7 +453,7 @@ export abstract class CircuitComponent {
 		this.draggable(true)
 	}
 
-	static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()
+	protected static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()
 	public static fromJson(saveObject: ComponentSaveObject): CircuitComponent {
 		const ComponentConstructor = CircuitComponent.jsonSaveMap.get(saveObject.type)
 		if (ComponentConstructor == undefined) {
@@ -445,6 +461,12 @@ export abstract class CircuitComponent {
 				'There is no component of type "' +
 					saveObject.type +
 					'" defined. Every non-abstract class deriving from CircuitComponent (or one of its subclasses) should have a static block, which registers it by setting the type as the key and the class itself as the value of the jsonSaveMap static variable (see NodeSymbolComponent as a reference)'
+			)
+		}
+		if (!Object.hasOwn(ComponentConstructor, "fromJson")) {
+			throw new Error(
+				ComponentConstructor.name +
+					" does not implement a fromJson method! See CircuitComponent.applyJson for more info."
 			)
 		}
 		// @ts-ignore

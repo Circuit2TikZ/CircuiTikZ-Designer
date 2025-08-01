@@ -100,6 +100,15 @@ export class PropertyController {
 					SelectionController.instance.flipSelection(false)
 					Undo.addState()
 				},
+			],
+			false,
+			[
+				"Rotate the components 90 degrees clockwise",
+				"Rotate the components 90 degrees counter clockwise",
+				"Rotate the components 45 degrees clockwise",
+				"Rotate the components 45 degrees counter clockwise",
+				"Flip the components around its x-axis",
+				"Flip the components around its y-axis",
 			]
 		)
 		rows.push(positioning.buildHTML())
@@ -130,6 +139,13 @@ export class PropertyController {
 					CanvasController.instance.moveComponentsBackward(
 						SelectionController.instance.currentlySelectedComponents
 					),
+			],
+			false,
+			[
+				"Bring the components to the foreground",
+				"Move the components to the background",
+				"Move the components one step towards the foreground",
+				"Move the components one step towards the background",
 			]
 		)
 		rows.push(ordering.buildHTML())

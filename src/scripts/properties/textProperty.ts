@@ -6,8 +6,8 @@ export class TextProperty extends EditableProperty<string> {
 
 	private label: string
 
-	public constructor(label: string, initalValue?: string) {
-		super(initalValue)
+	public constructor(label: string, initalValue?: string, tooltip = "") {
+		super(initalValue, tooltip)
 		this.label = label
 	}
 

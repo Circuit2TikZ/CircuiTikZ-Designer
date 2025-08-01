@@ -51,8 +51,8 @@ export class TextAreaProperty extends EditableProperty<Text> {
 	private justifyCenter: HTMLInputElement
 	private justifyEnd: HTMLInputElement
 
-	public constructor(initalValue?: Text) {
-		super(initalValue)
+	public constructor(initalValue?: Text, tooltip = "") {
+		super(initalValue, tooltip)
 	}
 
 	public buildHTML(): HTMLElement {

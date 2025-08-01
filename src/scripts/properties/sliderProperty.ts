@@ -25,9 +25,10 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 		max: number,
 		step: number,
 		initalValue?: SVG.Number,
-		restrictToRange: boolean = false
+		restrictToRange: boolean = false,
+		tooltip = ""
 	) {
-		super(initalValue)
+		super(initalValue, tooltip)
 		this.label = label
 		this.min = min
 		this.max = max

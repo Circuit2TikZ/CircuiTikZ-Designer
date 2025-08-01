@@ -205,14 +205,18 @@ export class MainController {
 		})
 	}
 
+	private allTooltips: Tooltip[] = []
 	public updateTooltips() {
 		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches
 		//enable tooltips globally
 		const tooltipTriggerList = document.querySelectorAll(
 			'[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]'
 		)
+		for (const tooltip of this.allTooltips) {
+			tooltip.dispose()
+		}
 		if (isMobile) {
-			;[...tooltipTriggerList].map(
+			this.allTooltips = [...tooltipTriggerList].map(
 				(tooltipTriggerEl) =>
 					new Tooltip(tooltipTriggerEl, {
 						fallbackPlacements: [], //always show them exactly where defined
@@ -220,10 +224,11 @@ export class MainController {
 					})
 			)
 		} else {
-			;[...tooltipTriggerList].map(
+			this.allTooltips = [...tooltipTriggerList].map(
 				(tooltipTriggerEl) =>
 					new Tooltip(tooltipTriggerEl, {
 						fallbackPlacements: [], //always show them exactly where defined
+						delay: { show: 1000, hide: 0 },
 					})
 			)
 		}
