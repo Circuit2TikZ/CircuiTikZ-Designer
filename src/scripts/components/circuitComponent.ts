@@ -172,14 +172,6 @@ export abstract class CircuitComponent {
 
 		this.visualization = CanvasController.instance.canvas.group()
 
-		this.visualization.mouseenter((ev) => {
-			this.isHovered = true
-			this.showSeletedOrHovered()
-		})
-		this.visualization.mouseleave((ev) => {
-			this.isHovered = false
-			this.showSeletedOrHovered()
-		})
 		this.dragElement = this.visualization
 
 		this.displayName = "Circuit Component"
@@ -398,6 +390,25 @@ export abstract class CircuitComponent {
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
 		return rectRectIntersection(this.bbox, selectionRectangle)
 	}
+
+	public selectable(enable = true) {
+		if (enable) {
+			this.visualization.on("mouseenter", (ev) => {
+				this.isHovered = true
+				this.showSeletedOrHovered()
+			})
+			this.visualization.on("mouseleave", (ev) => {
+				this.isHovered = false
+				this.showSeletedOrHovered()
+			})
+		} else {
+			this.isHovered = false
+			this.showSeletedOrHovered()
+			this.visualization.off("mouseenter")
+			this.visualization.off("mouseleave")
+		}
+	}
+
 	/**
 	 * update the visuals to comply with dark/light mode
 	 */
@@ -432,6 +443,7 @@ export abstract class CircuitComponent {
 		// highest level doesn't do anything (essentially only the type but this is not used here)
 		SnapCursorController.instance.visible = false
 		this.finishedPlacing = true
+		this.selectable()
 	}
 
 	static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()

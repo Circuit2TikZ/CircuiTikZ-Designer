@@ -104,6 +104,7 @@ export class ComponentPlacer {
 	public placeFinish(ev: Event) {
 		if (this.component) {
 			this.component.placeFinish()
+			this.component.selectable()
 			this.cleanUp()
 			Undo.addState()
 
