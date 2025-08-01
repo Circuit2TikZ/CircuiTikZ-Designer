@@ -202,7 +202,7 @@ export class SelectionController {
 	public activateSelection() {
 		this.selectionEnabled = true
 		for (const component of MainController.instance.circuitComponents) {
-			component.selectable()
+			component.draggable(true)
 		}
 	}
 
@@ -214,7 +214,7 @@ export class SelectionController {
 		for (const component of MainController.instance.circuitComponents) {
 			component.isSelected = false
 			component.viewSelected(false)
-			component.selectable(false)
+			component.draggable(false)
 		}
 	}
 

@@ -34,6 +34,16 @@ type DragMoveEventDetail = {
 
 type DragEvent = CustomEvent<DragMoveEventDetail>
 
+function getHighestParentGroup(component: CircuitComponent) {
+	let parent: CircuitComponent = component
+	while (parent.parentGroup) {
+		parent = parent.parentGroup
+	}
+	return parent
+}
+
+let currentlyDragging: CircuitComponent = null
+
 export class SnapDragHandler {
 	private componentReference: CircuitComponent
 	private element: SVG.Element
@@ -50,6 +60,13 @@ export class SnapDragHandler {
 		this.element.on("dragstart", this.dragStart, this, { passive: true })
 		this.element.on("dragmove.namespace", this.dragMove, this)
 		this.element.on("dragend", this.dragEnd, this, { passive: true })
+		this.element.on("mouseenter", (ev) => {
+			getHighestParentGroup(this.componentReference).isHovered =
+				currentlyDragging ? this.componentReference == currentlyDragging : true
+		})
+		this.element.on("mouseleave", (ev) => {
+			getHighestParentGroup(this.componentReference).isHovered = this.didDrag
+		})
 	}
 
 	static snapDrag(
@@ -75,6 +92,8 @@ export class SnapDragHandler {
 		this.element.off("dragstart", this.dragStart)
 		this.element.off("dragmove.namespace", this.dragMove)
 		this.element.off("dragend", this.dragEnd)
+		this.element.off("mouseenter")
+		this.element.off("mouseleave")
 		this.element.draggable(false)
 		this.element.forget("_snapDragHandler")
 		this.element.forget("_draggable")
@@ -83,15 +102,12 @@ export class SnapDragHandler {
 	private dragOffset: SVG.Point
 	private dragStart(ev: DragEvent) {
 		this.startedDragging = true
+		currentlyDragging = this.componentReference
 		this.element.node.classList.add("dragging")
 		this.element.parent().node.classList.add("dragging")
 		this.dragOffset = this.componentReference.position.sub(CanvasController.eventToPoint(ev.detail.event, false))
 
-		let parent: CircuitComponent = this.componentReference
-		while (parent.parentGroup) {
-			parent = parent.parentGroup
-		}
-		SnapController.instance.updateSnapPoints(parent, false)
+		SnapController.instance.updateSnapPoints(getHighestParentGroup(this.componentReference), false)
 	}
 	private dragMove(ev: DragEvent) {
 		this.didDrag = true
@@ -106,10 +122,7 @@ export class SnapDragHandler {
 
 		SnapController.instance.showSnapPoints(!shiftKey)
 
-		let parent: CircuitComponent = this.componentReference
-		while (parent.parentGroup) {
-			parent = parent.parentGroup
-		}
+		let parent: CircuitComponent = getHighestParentGroup(this.componentReference)
 
 		if (parent.isSelected) {
 			//move the whole selection to the destination
@@ -123,11 +136,10 @@ export class SnapDragHandler {
 		if (!this.startedDragging) {
 			return
 		}
+		currentlyDragging = null
 
-		let parent: CircuitComponent = this.componentReference
-		while (parent.parentGroup) {
-			parent = parent.parentGroup
-		}
+		let parent: CircuitComponent = getHighestParentGroup(this.componentReference)
+
 		if (!this.didDrag) {
 			// didn't move at all -> essentially clicked the component --> select the component instead; no Undo state
 			let ctrlCommand = ev.detail.event.ctrlKey || (MainController.instance.isMac && ev.detail.event.metaKey)
@@ -197,6 +209,12 @@ export class AdjustDragHandler {
 		this.element.on("dragstart", this.dragStart, this, { passive: true })
 		this.element.on("dragmove.namespace", this.dragMove, this)
 		this.element.on("dragend", this.dragEnd, this, { passive: true })
+		this.element.on("mouseenter", (ev) => {
+			this.componentReference.isHovered = currentlyDragging ? this.componentReference == currentlyDragging : true
+		})
+		this.element.on("mouseleave", (ev) => {
+			this.componentReference.isHovered = this.didDrag
+		})
 	}
 
 	static snapDrag(
@@ -227,6 +245,8 @@ export class AdjustDragHandler {
 		this.element.off("dragstart", this.dragStart)
 		this.element.off("dragmove.namespace", this.dragMove)
 		this.element.off("dragend", this.dragEnd)
+		this.element.off("mouseenter")
+		this.element.off("mouseleave")
 		this.element.draggable(false)
 		this.element.forget("_adjustDragHandler")
 		this.element.forget("_draggable")
@@ -240,6 +260,7 @@ export class AdjustDragHandler {
 	 */
 	dragStart(event: DragEvent) {
 		this.startedDragging = true
+		currentlyDragging = this.componentReference
 		this.element.node.classList.add("dragging")
 		this.element.parent().node.classList.add("dragging")
 		SnapController.instance.updateSnapPoints(this.componentReference, true)
@@ -292,6 +313,7 @@ export class AdjustDragHandler {
 		if (!this.startedDragging) {
 			return
 		}
+		currentlyDragging = null
 
 		if (!this.didDrag) {
 			// didn't move at all -> essentially clicked the component --> select the component instead

@@ -155,7 +155,16 @@ export abstract class CircuitComponent {
 	 */
 	public componentProperties: Map<string, EditableProperty<any>> = new Map()
 
-	private isHovered = false
+	private _isHovered = false
+
+	public get isHovered(): boolean {
+		return this._isHovered
+	}
+
+	public set isHovered(value: boolean) {
+		this._isHovered = value
+		this.showSeletedOrHovered()
+	}
 
 	/**
 	 * The default constructor giving basic functionality. Never call this directly (only via super() in the constructor of the derived class).
@@ -361,7 +370,7 @@ export abstract class CircuitComponent {
 				.stroke({
 					width: selectedBoxWidth,
 					color: color,
-					dasharray: "4, 2",
+					dasharray: this.isSelectionReference ? "1, 1" : "4, 2",
 				})
 				.fill("none")
 			this.recalculateSelectionVisuals()
@@ -389,24 +398,6 @@ export abstract class CircuitComponent {
 	 */
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
 		return rectRectIntersection(this.bbox, selectionRectangle)
-	}
-
-	public selectable(enable = true) {
-		if (enable) {
-			this.visualization.on("mouseenter", (ev) => {
-				this.isHovered = true
-				this.showSeletedOrHovered()
-			})
-			this.visualization.on("mouseleave", (ev) => {
-				this.isHovered = false
-				this.showSeletedOrHovered()
-			})
-		} else {
-			this.isHovered = false
-			this.showSeletedOrHovered()
-			this.visualization.off("mouseenter")
-			this.visualization.off("mouseleave")
-		}
 	}
 
 	/**
@@ -443,7 +434,7 @@ export abstract class CircuitComponent {
 		// highest level doesn't do anything (essentially only the type but this is not used here)
 		SnapCursorController.instance.visible = false
 		this.finishedPlacing = true
-		this.selectable()
+		this.draggable(true)
 	}
 
 	static jsonSaveMap: Map<string, Constructor<CircuitComponent>> = new Map()

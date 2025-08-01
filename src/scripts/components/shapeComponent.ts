@@ -418,15 +418,6 @@ export abstract class ShapeComponent extends NodeComponent {
 		}
 	}
 
-	public draggable(drag: boolean): void {
-		if (drag) {
-			this.dragElement.node.classList.add("draggable")
-		} else {
-			this.dragElement.node.classList.remove("draggable")
-		}
-		SnapDragHandler.snapDrag(this, drag, this.dragElement)
-	}
-
 	public placeMove(pos: SVG.Point, ev?: Event): void {
 		if (!this.placePoint) {
 			// not started placing
@@ -488,7 +479,6 @@ export abstract class ShapeComponent extends NodeComponent {
 
 		this.finishedPlacing = true
 		this.update()
-		this.draggable(true)
 		this.componentVisualization.show()
 		this.updateTheme()
 	}

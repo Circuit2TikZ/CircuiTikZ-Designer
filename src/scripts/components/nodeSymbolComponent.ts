@@ -97,7 +97,6 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.referencePosition = this.componentVariant.mid
 		this.visualization.add(this.symbolUse)
 		this.dragElement = this.symbolUse
-		this.draggable(true)
 
 		this.addName()
 		this.addInfo()
@@ -215,7 +214,7 @@ export class NodeSymbolComponent extends NodeComponent {
 	}
 
 	protected recalculateSelectionVisuals(): void {
-		if (this.selectionElement.visible()) {
+		if (this.selectionElement) {
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.componentVariant.viewBox
 			let maxStroke = this.componentVariant.maxStroke

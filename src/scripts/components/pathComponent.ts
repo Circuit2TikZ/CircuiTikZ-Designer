@@ -200,6 +200,5 @@ export abstract class PathComponent extends CircuitComponent {
 		}
 		this.finishedPlacing = true
 		this.update()
-		this.draggable(true)
 	}
 }

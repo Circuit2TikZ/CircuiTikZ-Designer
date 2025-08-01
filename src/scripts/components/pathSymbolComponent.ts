@@ -660,7 +660,6 @@ export class PathSymbolComponent extends PathComponent {
 			this.generateLabelRender()
 		}
 		this.update()
-		this.draggable(true)
 		this.visualization.show()
 	}
 

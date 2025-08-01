@@ -846,7 +846,6 @@ export class WireComponent extends PathComponent {
 			return
 		}
 
-		this.draggable(true)
 		this.updateArrowTypesAndColors()
 		this.update()
 		this.updateTheme()
@@ -888,7 +887,6 @@ export class WireComponent extends PathComponent {
 		}
 		this.updateArrowTypesAndColors()
 
-		this.draggable(true)
 		this.update()
 		this.updateTheme()
 

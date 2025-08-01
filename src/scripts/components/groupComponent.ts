@@ -150,7 +150,7 @@ export class GroupComponent extends CircuitComponent {
 
 		return saveObject
 	}
-	public applyJson(saveObject: GroupSaveObject): GroupComponent {
+	public static fromJson(saveObject: GroupSaveObject): GroupComponent {
 		let components: CircuitComponent[] = []
 		for (const saveObj of saveObject.components) {
 			components.push(CircuitComponent.fromJson(saveObj))

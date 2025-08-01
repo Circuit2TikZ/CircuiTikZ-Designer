@@ -1195,9 +1195,6 @@ export class MainController {
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected")
 				CanvasController.instance.deactivatePanning()
 				SelectionController.instance.deactivateSelection()
-				for (const instance of this.circuitComponents) {
-					instance.draggable(false)
-				}
 				break
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected")
@@ -1218,9 +1215,6 @@ export class MainController {
 				this.modeSwitchButtons.modeDragPan.classList.add("selected")
 				CanvasController.instance.activatePanning()
 				SelectionController.instance.activateSelection()
-				for (const instance of this.circuitComponents) {
-					instance.draggable(true)
-				}
 				break
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected")

@@ -174,9 +174,8 @@ export abstract class NodeComponent extends CircuitComponent {
 	}
 	public placeFinish(): void {
 		// make draggable
-		this.draggable(true)
-		this.update()
 		this.finishedPlacing = true
+		this.update()
 	}
 
 	public remove(): void {

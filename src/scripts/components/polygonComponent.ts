@@ -469,7 +469,6 @@ export class PolygonComponent extends PathComponent {
 		}
 
 		this.updateTheme()
-		this.draggable(true)
 		this.update()
 	}
 
@@ -709,7 +708,6 @@ export class PolygonComponent extends PathComponent {
 
 		this.finishedPlacing = true
 		this.update()
-		this.draggable(true)
 		this.componentVisualization.show()
 		this.updateTheme()
 		this.update()
