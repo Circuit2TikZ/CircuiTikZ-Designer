@@ -73,6 +73,7 @@ export class ComponentPlacer {
 	public placeMove(ev: MouseEvent | TouchEvent) {
 		let pt = ComponentPlacer.pointFromEvent(ev)
 		this.component.placeMove(pt, ev)
+		SnapController.instance.showSnapPoints(!ev.shiftKey)
 		SnapController.instance.recalculateAdditionalSnapPoints()
 		SnapCursorController.instance.moveTo(pt)
 	}
@@ -141,7 +142,7 @@ export class ComponentPlacer {
 	 * Get rid of now not needed event listeners
 	 */
 	private cleanUp() {
-		SnapController.instance.hideSnapPoints()
+		SnapController.instance.showSnapPoints(false)
 		//remove event listeners
 		let canvas = CanvasController.instance.canvas
 		canvas.off("mousemove", this.placeMove)
@@ -169,7 +170,6 @@ export class ComponentPlacer {
 		canvas.on("touchmove", this.placeMove)
 		canvas.on("mouseup", this.placeStep)
 		canvas.on("touchend", this.placeStep)
-		// canvas.on("dblclick",this.placeFinish)
 		hotkeys("enter", { keyup: false, keydown: true }, this.placeFinish)
 
 		// move once to actually place the component at the mouse position

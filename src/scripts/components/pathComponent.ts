@@ -8,7 +8,6 @@ import {
 	MainController,
 	MathJaxProperty,
 	SliderProperty,
-	SnapController,
 	SnapCursorController,
 } from "../internal"
 import { resizeSVG } from "../utils/selectionHelper"
@@ -200,7 +199,6 @@ export abstract class PathComponent extends CircuitComponent {
 			return
 		}
 		this.finishedPlacing = true
-		SnapController.instance.hideSnapPoints()
 		this.update()
 		this.draggable(true)
 	}

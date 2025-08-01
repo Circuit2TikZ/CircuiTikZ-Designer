@@ -94,11 +94,6 @@ export class SnapDragHandler {
 		SnapController.instance.updateSnapPoints(parent, false)
 	}
 	private dragMove(ev: DragEvent) {
-		if (!this.didDrag) {
-			// only show snapping points if actually moving
-			SnapController.instance.showSnapPoints()
-		}
-
 		this.didDrag = true
 		ev.preventDefault()
 
@@ -108,6 +103,8 @@ export class SnapDragHandler {
 		let shiftKey = ev.detail.event.shiftKey
 		let destination =
 			shiftKey ? draggedPoint : SnapController.instance.snapPoint(draggedPoint, this.componentReference)
+
+		SnapController.instance.showSnapPoints(!shiftKey)
 
 		let parent: CircuitComponent = this.componentReference
 		while (parent.parentGroup) {
@@ -156,7 +153,7 @@ export class SnapDragHandler {
 		this.startedDragging = false
 		this.element.node.classList.remove("dragging")
 		this.element.parent().node.classList.remove("dragging")
-		SnapController.instance.hideSnapPoints()
+		SnapController.instance.showSnapPoints(false)
 
 		if (window.TouchEvent && ev.detail?.event instanceof TouchEvent) {
 			const clientXY = ev.detail.event.touches?.[0] ?? ev.detail.event.changedTouches?.[0]
@@ -271,10 +268,6 @@ export class AdjustDragHandler {
 			return
 		}
 
-		if (!this.didDrag) {
-			// only show snapping points if actually moving
-			SnapController.instance.showSnapPoints()
-		}
 		this.didDrag = true
 
 		const draggedPoint = new SVG.Point(event.detail.box.cx, event.detail.box.cy)
@@ -282,6 +275,8 @@ export class AdjustDragHandler {
 		let shiftKey = event.detail.event.shiftKey
 		let destination =
 			shiftKey ? draggedPoint : SnapController.instance.snapPoint(draggedPoint, this.componentReference)
+
+		SnapController.instance.showSnapPoints(!shiftKey)
 
 		if (this.dragCallbacks && this.dragCallbacks.dragMove) {
 			this.dragCallbacks.dragMove(destination, event.detail.event)
@@ -324,7 +319,7 @@ export class AdjustDragHandler {
 		this.element.node.classList.remove("dragging")
 		this.element.parent().node.classList.remove("dragging")
 
-		SnapController.instance.hideSnapPoints()
+		SnapController.instance.showSnapPoints(false)
 
 		let shouldUndo = false
 		if (this.dragCallbacks && this.dragCallbacks.dragEnd) {

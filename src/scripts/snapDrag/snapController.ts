@@ -82,45 +82,47 @@ export class SnapController {
 			}
 		}
 
-		if (this.whereSnap.length > 0) {
-			this.showSnapPoints()
+		this.showSnapPoints(this.whereSnap.length > 0)
+	}
+
+	/**
+	 * show or hide the snap points on the canvas (doesn't show grid points)
+	 */
+	public showSnapPoints(show = true) {
+		if (show == this._snapPointsShown) {
+			return
+		}
+
+		if (show) {
+			this.fixedSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(true, false)
+			})
+			this.movingSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(true, true)
+			})
+			this.additionalSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(true, true)
+			})
 		} else {
-			this.hideSnapPoints()
+			this.fixedSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(false)
+			})
+			this.movingSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(false)
+			})
+			this.additionalSnapPoints.forEach((snapPoint) => {
+				snapPoint.show(false)
+			})
+			while (this.whereSnap.length > 0) {
+				this.whereSnap.pop().remove()
+			}
 		}
+		this._snapPointsShown = show
 	}
 
-	/**
-	 * show the snap points on the canvas (doesn't show grid points)
-	 */
-	public showSnapPoints() {
-		this.fixedSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(true, false)
-		})
-		this.movingSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(true, true)
-		})
-		this.additionalSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(true, true)
-		})
-	}
-
-	/**
-	 * hide the snap points again
-	 */
-	public hideSnapPoints() {
-		// remove all the snap point visualizations from the svg canvas
-		this.fixedSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(false)
-		})
-		this.movingSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(false)
-		})
-		this.additionalSnapPoints.forEach((snapPoint) => {
-			snapPoint.show(false)
-		})
-		while (this.whereSnap.length > 0) {
-			this.whereSnap.pop().remove()
-		}
+	private _snapPointsShown = false
+	public get snapPointsShown(): boolean {
+		return this._snapPointsShown
 	}
 
 	/**
