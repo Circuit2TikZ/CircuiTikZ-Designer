@@ -35,6 +35,12 @@ export class PropertyController {
 		this.propertiesTitle = document.getElementById("propertiesTitle") as HTMLElement
 		this.viewProperties = document.getElementById("view-properties") as HTMLDivElement
 		this.propertiesEntries = document.getElementById("propertiesEntries") as HTMLDivElement
+		;(document.getElementById("resetViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.resetView()
+		})
+		;(document.getElementById("fitViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.fitView()
+		})
 	}
 
 	update() {
@@ -188,12 +194,6 @@ export class PropertyController {
 	private setFormView() {
 		this.viewProperties.classList.remove("d-none")
 		this.propertiesTitle.innerText = "View settings"
-		;(document.getElementById("resetViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
-			CanvasController.instance.resetView()
-		})
-		;(document.getElementById("fitViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
-			CanvasController.instance.fitView()
-		})
 
 		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
 		minorSlider.value = CanvasController.instance.majorGridSubdivisions.toString()

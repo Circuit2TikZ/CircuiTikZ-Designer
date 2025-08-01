@@ -226,6 +226,11 @@ export class CanvasController {
 		if (bbox) {
 			let canvasBox = this.canvas.viewbox()
 			let zoomFactor = Math.min(canvasBox.w / bbox.w, canvasBox.h / bbox.h) * 0.98 // sligtly more zoomed out
+			if (zoomFactor * this.zoomCurrent > this.zoomMax) {
+				zoomFactor = this.zoomMax / this.zoomCurrent
+			} else if (zoomFactor * this.zoomCurrent < this.zoomMin) {
+				zoomFactor = this.zoomMin / this.zoomCurrent
+			}
 			let newSize = new SVG.Point(canvasBox.w, canvasBox.h).mul(zoomFactor)
 			canvasBox = new SVG.Box(bbox.cx - newSize.x / 2, bbox.cy - newSize.y / 2, newSize.x, newSize.y)
 			this.canvas.viewbox(canvasBox)
