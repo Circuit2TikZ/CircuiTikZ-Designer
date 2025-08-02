@@ -4,6 +4,7 @@ import {
 	CircuitComponent,
 	ComponentSaveObject,
 	MainController,
+	PropertyCategories,
 	SectionHeaderProperty,
 	SelectionController,
 	SelectionMode,
@@ -44,9 +45,9 @@ export class GroupComponent extends CircuitComponent {
 
 		MainController.instance.circuitComponents.splice(firstIndex, 0, this) // added here
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Grouping").buildHTML())
+		this.properties.add(PropertyCategories.ordering, new SectionHeaderProperty("Grouping"))
 		let grouping = new ButtonGridProperty(1, [["Ungroup", ""]], [(ev) => this.ungroup()])
-		this.propertiesHTMLRows.push(grouping.buildHTML())
+		this.properties.add(PropertyCategories.ordering, grouping)
 
 		this.update()
 		SelectionController.instance.selectComponents([this], SelectionMode.RESET)

@@ -15,6 +15,8 @@ import {
 	basicDirections,
 	SnapDragHandler,
 	SnapCursorController,
+	PropertiesCollection,
+	PropertyCategories,
 } from "../internal"
 import {
 	hoverColor,
@@ -79,7 +81,7 @@ export abstract class CircuitComponent {
 	/**
 	 * all properties, which should be able to be edited in the properties window have to be included here
 	 */
-	public propertiesHTMLRows: HTMLElement[] = []
+	public properties: PropertiesCollection
 
 	/**
 	 * the name of the component (e.g. "Resistor", "Wire" or "Transformer")
@@ -184,8 +186,10 @@ export abstract class CircuitComponent {
 		this.dragElement = this.visualization
 
 		this.displayName = "Circuit Component"
+		this.properties = new PropertiesCollection()
 		this.addPositioning()
 		this.addZOrdering()
+		this.addName()
 	}
 
 	/**
@@ -215,8 +219,8 @@ export abstract class CircuitComponent {
 				"Move the component one step towards the background",
 			]
 		)
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Ordering").buildHTML())
-		this.propertiesHTMLRows.push(ordering.buildHTML())
+		this.properties.add(PropertyCategories.ordering, new SectionHeaderProperty("Ordering"))
+		this.properties.add(PropertyCategories.ordering, ordering)
 	}
 
 	/**
@@ -269,7 +273,7 @@ export abstract class CircuitComponent {
 				"Flip the component around its y-axis",
 			]
 		)
-		this.propertiesHTMLRows.push(positioning.buildHTML())
+		this.properties.add(PropertyCategories.manipulation, positioning)
 	}
 
 	/**
@@ -300,8 +304,8 @@ export abstract class CircuitComponent {
 			}
 			this.name.changeInvalidStatus("")
 		})
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("TikZ name").buildHTML())
-		this.propertiesHTMLRows.push(this.name.buildHTML())
+		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("TikZ name"))
+		this.properties.add(PropertyCategories.info, this.name)
 	}
 
 	/**

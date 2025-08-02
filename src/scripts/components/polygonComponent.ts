@@ -17,6 +17,7 @@ import {
 	PathComponent,
 	PathSaveObject,
 	PositionedLabel,
+	PropertyCategories,
 	renderMathJax,
 	SectionHeaderProperty,
 	SliderProperty,
@@ -72,7 +73,7 @@ export class PolygonComponent extends PathComponent {
 		}
 
 		//add color property
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Fill").buildHTML())
+		this.properties.add(PropertyCategories.fill, new SectionHeaderProperty("Fill"))
 
 		this.fillOpacityProperty = new SliderProperty(
 			"Opacity",
@@ -98,10 +99,10 @@ export class PolygonComponent extends PathComponent {
 			this.updateTheme()
 		})
 
-		this.propertiesHTMLRows.push(this.fillColorProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.fillOpacityProperty.buildHTML())
+		this.properties.add(PropertyCategories.fill, this.fillColorProperty)
+		this.properties.add(PropertyCategories.fill, this.fillOpacityProperty)
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Stroke").buildHTML())
+		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
 		this.strokeOpacityProperty = new SliderProperty(
 			"Opacity",
 			0,
@@ -140,36 +141,36 @@ export class PolygonComponent extends PathComponent {
 			this.strokeInfo.style = ev.value.key
 			this.updateTheme()
 		})
-		this.propertiesHTMLRows.push(this.strokeColorProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeOpacityProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
+		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
 
 		{
 			//label section
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
+			this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Label"))
 
 			this.mathJaxLabel = new MathJaxProperty()
 			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+			this.properties.add(PropertyCategories.stroke, this.mathJaxLabel)
 
 			this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
 			this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
+			this.properties.add(PropertyCategories.stroke, this.anchorChoice)
 
 			this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
 			this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
+			this.properties.add(PropertyCategories.stroke, this.positionChoice)
 
 			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
 			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+			this.properties.add(PropertyCategories.stroke, this.labelDistance)
 
 			this.labelColor = new ColorProperty("Color", null)
 			this.labelColor.addChangeListener((ev) => {
 				this.updateTheme()
 			})
-			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
+			this.properties.add(PropertyCategories.stroke, this.labelColor)
 		}
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)

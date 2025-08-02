@@ -4,6 +4,7 @@ import {
 	CanvasController,
 	CircuitComponent,
 	DistributionMode,
+	EditableProperty,
 	GroupComponent,
 	MainController,
 	SectionHeaderProperty,
@@ -16,6 +17,44 @@ export type FormEntry = {
 	propertyName: string
 	inputType: string
 	currentValue: any
+}
+
+export enum PropertyCategories {
+	manipulation,
+	ordering,
+	options,
+	fill,
+	stroke,
+	label,
+	text,
+	info,
+}
+
+export class PropertiesCollection extends Map<PropertyCategories, EditableProperty<any>[]> {
+	public add(category: PropertyCategories, property: EditableProperty<any>) {
+		if (this.has(category)) {
+			this.get(category).push(property)
+		} else {
+			this.set(category, [property])
+		}
+	}
+
+	public sorted(): EditableProperty<any>[] {
+		let properties: EditableProperty<any>[] = []
+
+		let key = Object.keys(PropertyCategories)[0]
+		PropertyCategories[key]
+		for (const element in PropertyCategories) {
+			if (isNaN(Number(element))) {
+				//@ts-ignore
+				let category: PropertyCategories = PropertyCategories[element]
+				if (this.has(category)) {
+					properties.push(...this.get(category))
+				}
+			}
+		}
+		return properties
+	}
 }
 
 export class PropertyController {
@@ -204,7 +243,7 @@ export class PropertyController {
 	private setForm(component: CircuitComponent) {
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = component.displayName
-		this.propertiesEntries.append(...component.propertiesHTMLRows)
+		this.propertiesEntries.append(...component.properties.sorted().map((property) => property.getHTMLElement()))
 	}
 
 	private setFormView() {

@@ -17,6 +17,7 @@ import {
 	NodeComponent,
 	NodeSaveObject,
 	getClosestPointerFromDirection,
+	PropertyCategories,
 } from "../internal"
 import { resizeSVG, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -99,7 +100,7 @@ export abstract class ShapeComponent extends NodeComponent {
 		}
 
 		//add color property
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Fill").buildHTML())
+		this.properties.add(PropertyCategories.fill, new SectionHeaderProperty("Fill"))
 
 		this.fillOpacityProperty = new SliderProperty(
 			"Opacity",
@@ -125,10 +126,10 @@ export abstract class ShapeComponent extends NodeComponent {
 			this.updateTheme()
 		})
 
-		this.propertiesHTMLRows.push(this.fillColorProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.fillOpacityProperty.buildHTML())
+		this.properties.add(PropertyCategories.fill, this.fillColorProperty)
+		this.properties.add(PropertyCategories.fill, this.fillOpacityProperty)
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Stroke").buildHTML())
+		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
 		this.strokeOpacityProperty = new SliderProperty(
 			"Opacity",
 			0,
@@ -167,10 +168,10 @@ export abstract class ShapeComponent extends NodeComponent {
 			this.strokeInfo.style = ev.value.key
 			this.updateTheme()
 		})
-		this.propertiesHTMLRows.push(this.strokeColorProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeOpacityProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
+		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
 
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)

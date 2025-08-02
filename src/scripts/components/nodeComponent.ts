@@ -17,6 +17,7 @@ import {
 	FillInfo,
 	SnapDragHandler,
 	closestBasicDirection,
+	PropertyCategories,
 } from "../internal"
 import { CircuitComponent, getClosestPointerFromDirection } from "./circuitComponent"
 import { resizeSVG } from "../utils/selectionHelper"
@@ -122,11 +123,11 @@ export abstract class NodeComponent extends CircuitComponent {
 		this.defaultTextPosition = new SVG.Point()
 
 		//label section
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
+		this.properties.add(PropertyCategories.label, new SectionHeaderProperty("Label"))
 
 		this.mathJaxLabel = new MathJaxProperty()
 		this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-		this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+		this.properties.add(PropertyCategories.label, this.mathJaxLabel)
 
 		this.labelReferenceProperty = new ChoiceProperty(
 			"Relative to",
@@ -136,25 +137,25 @@ export abstract class NodeComponent extends CircuitComponent {
 		this.labelReferenceProperty.addChangeListener((ev) => {
 			this.updateLabelPosition()
 		})
-		this.propertiesHTMLRows.push(this.labelReferenceProperty.buildHTML())
+		this.properties.add(PropertyCategories.label, this.labelReferenceProperty)
 
 		this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
 		this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-		this.propertiesHTMLRows.push(this.anchorChoice.buildHTML())
+		this.properties.add(PropertyCategories.label, this.anchorChoice)
 
 		this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
 		this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-		this.propertiesHTMLRows.push(this.positionChoice.buildHTML())
+		this.properties.add(PropertyCategories.label, this.positionChoice)
 
 		this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
 		this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-		this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+		this.properties.add(PropertyCategories.label, this.labelDistance)
 
 		this.labelColor = new ColorProperty("Color", null)
 		this.labelColor.addChangeListener((ev) => {
 			this.updateTheme()
 		})
-		this.propertiesHTMLRows.push(this.labelColor.buildHTML())
+		this.properties.add(PropertyCategories.label, this.labelColor)
 	}
 
 	public abstract resizable(resize: boolean): void

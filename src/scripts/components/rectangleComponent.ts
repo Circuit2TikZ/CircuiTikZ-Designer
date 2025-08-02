@@ -14,6 +14,7 @@ import {
 	FontSize,
 	fontSizes,
 	MathjaxParser,
+	PropertyCategories,
 	SectionHeaderProperty,
 	ShapeComponent,
 	ShapeSaveObject,
@@ -67,7 +68,7 @@ export class RectangleComponent extends ShapeComponent {
 
 		this.visualization.add(this.dragElement)
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Text").buildHTML())
+		this.properties.add(PropertyCategories.text, new SectionHeaderProperty("Text"))
 		this.textAreaProperty = new TextAreaProperty({
 			text: "",
 			align: TextAlign.LEFT,
@@ -83,25 +84,25 @@ export class RectangleComponent extends ShapeComponent {
 			this.useHyphenation = ev.value.useHyphenation
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.textAreaProperty.buildHTML())
+		this.properties.add(PropertyCategories.text, this.textAreaProperty)
 
 		this.textFontSize = new ChoiceProperty("Fontsize", fontSizes, defaultFontSize)
 		this.textFontSize.addChangeListener((ev) => {
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.textFontSize.buildHTML())
+		this.properties.add(PropertyCategories.text, this.textFontSize)
 
 		this.textInnerSep = new SliderProperty("Inner sep", 0, 10, 0.1, new SVG.Number(5, "pt"))
 		this.textInnerSep.addChangeListener((ev) => {
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.textInnerSep.buildHTML())
+		this.properties.add(PropertyCategories.text, this.textInnerSep)
 
 		this.textColor = new ColorProperty("Color", null)
 		this.textColor.addChangeListener((ev) => {
 			this.updateText()
 		})
-		this.propertiesHTMLRows.push(this.textColor.buildHTML())
+		this.properties.add(PropertyCategories.text, this.textColor)
 
 		this.addName()
 

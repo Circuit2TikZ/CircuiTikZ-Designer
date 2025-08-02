@@ -17,8 +17,10 @@ import {
 	MainController,
 	NodeComponent,
 	NodeSaveObject,
+	PropertyCategories,
 	SectionHeaderProperty,
 	simpifyRotationAndScale,
+	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
 	SymbolOption,
@@ -52,6 +54,8 @@ export class NodeSymbolComponent extends NodeComponent {
 	protected optionEnumProperties: Map<ChoiceProperty<ChoiceEntry>, EnumOption>
 	protected componentVariant: Variant
 
+	protected scaleProperty: SliderProperty
+
 	constructor(symbol: ComponentSymbol) {
 		super()
 		this.displayName = symbol.displayName
@@ -60,16 +64,27 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.optionProperties = new Map()
 		this.optionEnumProperties = new Map()
 
+		this.scaleState = new SVG.Point(1, 1)
+		this.scaleProperty = new SliderProperty("Scale", 0.1, 10, 0.01, new SVG.Number(1), true)
+		this.scaleProperty.addChangeListener((ev) => {
+			this.scaleState = new SVG.Point(
+				Math.sign(this.scaleState.x) * ev.value.value,
+				Math.sign(this.scaleState.y) * ev.value.value
+			)
+			this.update()
+		})
+		this.properties.add(PropertyCategories.manipulation, this.scaleProperty)
+
 		// initialize UI for options handling
 		if (symbol.possibleOptions.length > 0 || symbol.possibleEnumOptions.length > 0) {
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Options").getHTMLElement())
+			this.properties.add(PropertyCategories.options, new SectionHeaderProperty("Options"))
 			for (const option of symbol.possibleOptions) {
 				const property = new BooleanProperty(option.displayName ?? option.name, false)
 				property.addChangeListener((ev) => {
 					this.updateOptions()
 				})
 				this.optionProperties.set(property, option)
-				this.propertiesHTMLRows.push(property.getHTMLElement())
+				this.properties.add(PropertyCategories.options, property)
 			}
 			for (const enumOption of symbol.possibleEnumOptions) {
 				let choices: ChoiceEntry[] = enumOption.selectNone ? [{ key: "-", name: "--default--" }] : []
@@ -82,7 +97,7 @@ export class NodeSymbolComponent extends NodeComponent {
 					this.updateOptions()
 				})
 				this.optionEnumProperties.set(property, enumOption)
-				this.propertiesHTMLRows.push(property.getHTMLElement())
+				this.properties.add(PropertyCategories.options, property)
 			}
 		}
 
@@ -98,7 +113,6 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.visualization.add(this.symbolUse)
 		this.dragElement = this.symbolUse
 
-		this.addName()
 		this.addInfo()
 
 		this.snappingPoints = this.componentVariant.pins.map(
@@ -128,9 +142,9 @@ export class NodeSymbolComponent extends NodeComponent {
 	}
 
 	protected addInfo() {
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Info").getHTMLElement())
+		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("Info"))
 		// the tikz id of the component. e.g. "nmos" in "\node[nmos] at (0,0){};"
-		this.propertiesHTMLRows.push(new InfoProperty("ID", this.referenceSymbol.tikzName).getHTMLElement())
+		this.properties.add(PropertyCategories.info, new InfoProperty("ID", this.referenceSymbol.tikzName))
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {

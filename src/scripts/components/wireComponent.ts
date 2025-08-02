@@ -11,6 +11,7 @@ import {
 	MainController,
 	PathComponent,
 	PathSaveObject,
+	PropertyCategories,
 	SectionHeaderProperty,
 	SelectionController,
 	SliderProperty,
@@ -147,13 +148,13 @@ export class WireComponent extends PathComponent {
 		this.visualization.add(this.dragElement)
 		this.snappingPoints = []
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Arrows").buildHTML())
+		this.properties.add(PropertyCategories.options, new SectionHeaderProperty("Arrows"))
 		this.arrowStartChoice = new ChoiceProperty("Start", arrowTips, defaultArrowTip)
 		this.arrowStartChoice.addChangeListener((ev) => {
 			this.updateArrowTypesAndColors()
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.arrowStartChoice.buildHTML())
+		this.properties.add(PropertyCategories.options, this.arrowStartChoice)
 
 		this.arrowEndChoice = new ChoiceProperty(
 			"End",
@@ -164,9 +165,9 @@ export class WireComponent extends PathComponent {
 			this.updateArrowTypesAndColors()
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.arrowEndChoice.buildHTML())
+		this.properties.add(PropertyCategories.options, this.arrowEndChoice)
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Stroke").buildHTML())
+		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
 		this.strokeOpacityProperty = new SliderProperty(
 			"Opacity",
 			0,
@@ -209,10 +210,10 @@ export class WireComponent extends PathComponent {
 			this.strokeInfo.style = ev.value.key
 			this.updateTheme()
 		})
-		this.propertiesHTMLRows.push(this.strokeColorProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeOpacityProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeWidthProperty.buildHTML())
-		this.propertiesHTMLRows.push(this.strokeStyleProperty.buildHTML())
+		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
+		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
 
 		this.updateTheme()
 

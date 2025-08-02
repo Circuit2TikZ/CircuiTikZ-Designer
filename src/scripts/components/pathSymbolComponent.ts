@@ -25,6 +25,7 @@ import {
 	renderMathJax,
 	InfoProperty,
 	CircuitComponent,
+	PropertyCategories,
 } from "../internal"
 import {
 	lineRectIntersection,
@@ -95,20 +96,20 @@ export class PathSymbolComponent extends PathComponent {
 			)
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.scaleProperty.buildHTML())
+		this.properties.add(PropertyCategories.manipulation, this.scaleProperty)
 
 		this.optionProperties = new Map()
 		this.optionEnumProperties = new Map()
 
 		if (symbol.possibleOptions.length > 0 || symbol.possibleEnumOptions.length > 0) {
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Options").buildHTML())
+			this.properties.add(PropertyCategories.options, new SectionHeaderProperty("Options"))
 			for (const option of symbol.possibleOptions) {
 				const property = new BooleanProperty(option.displayName ?? option.name, false)
 				property.addChangeListener((ev) => {
 					this.updateOptions()
 				})
 				this.optionProperties.set(property, option)
-				this.propertiesHTMLRows.push(property.buildHTML())
+				this.properties.add(PropertyCategories.options, property)
 			}
 			for (const enumOption of symbol.possibleEnumOptions) {
 				let choices: ChoiceEntry[] = enumOption.selectNone ? [{ key: "-", name: "--default--" }] : []
@@ -121,7 +122,7 @@ export class PathSymbolComponent extends PathComponent {
 					this.updateOptions()
 				})
 				this.optionEnumProperties.set(property, enumOption)
-				this.propertiesHTMLRows.push(property.buildHTML())
+				this.properties.add(PropertyCategories.options, property)
 			}
 		}
 
@@ -174,42 +175,42 @@ export class PathSymbolComponent extends PathComponent {
 
 		{
 			//label section
-			this.propertiesHTMLRows.push(new SectionHeaderProperty("Label").buildHTML())
+			this.properties.add(PropertyCategories.label, new SectionHeaderProperty("Label"))
 
 			this.mathJaxLabel = new MathJaxProperty()
 			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.propertiesHTMLRows.push(this.mathJaxLabel.buildHTML())
+			this.properties.add(PropertyCategories.label, this.mathJaxLabel)
 
 			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
 			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.labelDistance.buildHTML())
+			this.properties.add(PropertyCategories.label, this.labelDistance)
 
 			this.labelColor = new ColorProperty("Color", null)
 			this.labelColor.addChangeListener((ev) => {
 				this.updateTheme()
 			})
-			this.propertiesHTMLRows.push(this.labelColor.buildHTML())
+			this.properties.add(PropertyCategories.label, this.labelColor)
 
 			this.labelSide = new BooleanProperty("Switch side")
 			this.labelSide.addChangeListener((ev) => this.updateLabelPosition())
-			this.propertiesHTMLRows.push(this.labelSide.buildHTML())
+			this.properties.add(PropertyCategories.label, this.labelSide)
 		}
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Symbol Orientation").buildHTML())
+		this.properties.add(PropertyCategories.manipulation, new SectionHeaderProperty("Symbol Orientation"))
 
 		this.mirror = new BooleanProperty("Mirror", false)
 		this.mirror.addChangeListener((ev) => {
 			this.scaleState.y *= -1
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.mirror.buildHTML())
+		this.properties.add(PropertyCategories.manipulation, this.mirror)
 
 		this.invert = new BooleanProperty("Invert", false)
 		this.invert.addChangeListener((ev) => {
 			this.scaleState.x *= -1
 			this.update()
 		})
-		this.propertiesHTMLRows.push(this.invert.buildHTML())
+		this.properties.add(PropertyCategories.manipulation, this.invert)
 
 		this.addName()
 		this.addInfo()
@@ -224,8 +225,8 @@ export class PathSymbolComponent extends PathComponent {
 	}
 
 	protected addInfo() {
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Info").buildHTML())
-		this.propertiesHTMLRows.push(new InfoProperty("ID", this.referenceSymbol.tikzName).buildHTML())
+		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("Info"))
+		this.properties.add(PropertyCategories.info, new InfoProperty("ID", this.referenceSymbol.tikzName))
 	}
 
 	protected generateLabelRender(): void {
