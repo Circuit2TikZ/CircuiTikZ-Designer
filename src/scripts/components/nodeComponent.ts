@@ -12,14 +12,13 @@ import {
 	renderMathJax,
 	SectionHeaderProperty,
 	Label,
-	AdjustDragHandler,
-	SnappingInfo,
-	FillInfo,
-	SnapDragHandler,
 	closestBasicDirection,
 	PropertyCategories,
+	PositionLabelable,
+	Nameable,
+	PositionedLabel,
 } from "../internal"
-import { CircuitComponent, getClosestPointerFromDirection } from "./circuitComponent"
+import { CircuitComponent } from "./circuitComponent"
 import { resizeSVG } from "../utils/selectionHelper"
 
 export const basicDirections: DirectionInfo[] = [
@@ -36,31 +35,9 @@ export const basicDirections: DirectionInfo[] = [
 ]
 export const defaultBasicDirection = basicDirections[0]
 
-/**
- * Finds the closest basic direction from a given direction.
- * Basic directions are defined in `basicDirections` and include cardinal and intercardinal directions.
- * @param direction the direction to find the closest basic direction for
- * @returns
- */
-export function getClosestBasicDirectionFromDirection(direction: SVG.Point): DirectionInfo {
-	let dir = new SVG.Point(direction)
-	dir.x = clamp(Math.round(dir.x), -1, 1)
-	dir.y = clamp(Math.round(dir.y), -1, 1)
-	return (
-		basicDirections.find((dirInfo) => dirInfo.direction.x === dir.x && dirInfo.direction.y === dir.y) ??
-		basicDirections[0]
-	)
-}
-
 export type DirectionInfo = ChoiceEntry & {
 	direction: SVG.Point
 	pointer?: string
-}
-
-export type PositionedLabel = Label & {
-	anchor?: string
-	position?: string
-	relativeToComponent?: boolean
 }
 
 export type NodeSaveObject = ComponentSaveObject & {
@@ -81,7 +58,7 @@ export type NodeSaveObject = ComponentSaveObject & {
  *
  * NodeComponents are edited/adjusted in local coordinates. Transformations like translation (moving), rotation, scaling and flipping are done by changing the transformation Matrix
  */
-export abstract class NodeComponent extends CircuitComponent {
+export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitComponent)) {
 	/**
 	 * the current rotation angle in degrees
 	 */
@@ -96,19 +73,6 @@ export abstract class NodeComponent extends CircuitComponent {
 	protected resizeVisualizations: Map<DirectionInfo, SVG.Element>
 	protected isResizing: boolean = false
 
-	public anchorChoice: ChoiceProperty<DirectionInfo>
-	public positionChoice: ChoiceProperty<DirectionInfo>
-
-	protected mathJaxLabel: MathJaxProperty
-	protected labelReferenceChoices: ChoiceEntry[] = [
-		{ key: "canvas", name: "Canvas" },
-		{ key: "component", name: "Component" },
-	]
-	protected labelReferenceProperty: ChoiceProperty<ChoiceEntry>
-	protected labelRendering: SVG.Element
-	protected labelDistance: SliderProperty
-	protected labelColor: ColorProperty
-
 	// where the text should go by default in local coordinates
 	protected defaultTextPosition: SVG.Point
 
@@ -121,41 +85,6 @@ export abstract class NodeComponent extends CircuitComponent {
 		this.scaleState = new SVG.Point(1, 1)
 
 		this.defaultTextPosition = new SVG.Point()
-
-		//label section
-		this.properties.add(PropertyCategories.label, new SectionHeaderProperty("Label"))
-
-		this.mathJaxLabel = new MathJaxProperty()
-		this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-		this.properties.add(PropertyCategories.label, this.mathJaxLabel)
-
-		this.labelReferenceProperty = new ChoiceProperty(
-			"Relative to",
-			this.labelReferenceChoices,
-			this.labelReferenceChoices[0]
-		)
-		this.labelReferenceProperty.addChangeListener((ev) => {
-			this.updateLabelPosition()
-		})
-		this.properties.add(PropertyCategories.label, this.labelReferenceProperty)
-
-		this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
-		this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-		this.properties.add(PropertyCategories.label, this.anchorChoice)
-
-		this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
-		this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-		this.properties.add(PropertyCategories.label, this.positionChoice)
-
-		this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
-		this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-		this.properties.add(PropertyCategories.label, this.labelDistance)
-
-		this.labelColor = new ColorProperty("Color", null)
-		this.labelColor.addChangeListener((ev) => {
-			this.updateTheme()
-		})
-		this.properties.add(PropertyCategories.label, this.labelColor)
 	}
 
 	public abstract resizable(resize: boolean): void
@@ -210,33 +139,6 @@ export abstract class NodeComponent extends CircuitComponent {
 		this.labelRendering?.fill(labelColor)
 	}
 
-	/**
-	 * Generate a label visualization via mathjax
-	 */
-	protected generateLabelRender() {
-		// if a previous label was rendered, remove everything concerning that rendering
-		if (this.labelRendering) {
-			let removeIDs = new Set<string>()
-			for (const element of this.labelRendering.find("use")) {
-				removeIDs.add(element.node.getAttribute("xlink:href"))
-			}
-
-			for (const id of removeIDs) {
-				CanvasController.instance.canvas.find(id)[0]?.remove()
-			}
-		}
-		const transformGroup = renderMathJax(this.mathJaxLabel.value)
-		// remove the current label and substitute with a new group element
-		this.labelRendering?.remove()
-		this.labelRendering = new SVG.G()
-		this.labelRendering.addClass("pointerNone")
-		this.labelRendering.add(transformGroup.element)
-		// add the label rendering to the visualization element
-		this.visualization.add(this.labelRendering)
-		this.update()
-		this.updateTheme()
-	}
-
 	protected recalculateResizePoints(): void {}
 
 	public moveTo(position: SVG.Point) {
@@ -282,21 +184,6 @@ export abstract class NodeComponent extends CircuitComponent {
 			data.scale = this.scaleState
 		}
 
-		if (this.mathJaxLabel.value) {
-			let labelWithoutRender: PositionedLabel = {
-				value: this.mathJaxLabel.value,
-				anchor: this.anchorChoice.value.key,
-				position: this.positionChoice.value.key,
-				relativeToComponent: this.labelReferenceProperty.value.key == "component",
-				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
-				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
-			}
-			data.label = labelWithoutRender
-		}
-
-		if (this.name.value && this.name.value != "") {
-			data.name = this.name.value
-		}
 		return data
 	}
 
@@ -310,38 +197,9 @@ export abstract class NodeComponent extends CircuitComponent {
 		if (saveObject.scale) {
 			this.scaleState = new SVG.Point(saveObject.scale)
 		}
-
-		if (saveObject.name) {
-			this.name.updateValue(saveObject.name, true)
-		}
-
-		if (saveObject.label) {
-			this.labelDistance.value =
-				saveObject.label.distance ?
-					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-				:	new SVG.Number(0, "cm")
-			if (this.labelDistance.value.unit == "") {
-				this.labelDistance.value.unit = "cm"
-			}
-			this.anchorChoice.value =
-				saveObject.label.anchor ?
-					basicDirections.find((item) => item.key == saveObject.label.anchor)
-				:	defaultBasicDirection
-			this.positionChoice.value =
-				saveObject.label.position ?
-					basicDirections.find((item) => item.key == saveObject.label.position)
-				:	defaultBasicDirection
-			this.labelReferenceProperty.value =
-				saveObject.label.relativeToComponent ? this.labelReferenceChoices[1] : this.labelReferenceChoices[0]
-			this.mathJaxLabel.value = saveObject.label.value
-			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			this.generateLabelRender()
-		}
 	}
 
-	protected anchorPos: DirectionInfo
-	protected labelPos: DirectionInfo
-	public updateLabelPosition(): void {
+	public updatePositionedLabel(): void {
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
 			return
 		}

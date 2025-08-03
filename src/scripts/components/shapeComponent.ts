@@ -10,7 +10,6 @@ import {
 	defaultBasicDirection,
 	SnappingInfo,
 	SnapDragHandler,
-	ChoiceEntry,
 	AdjustDragHandler,
 	defaultStroke,
 	SelectionController,
@@ -18,6 +17,11 @@ import {
 	NodeSaveObject,
 	getClosestPointerFromDirection,
 	PropertyCategories,
+	FillInfo,
+	Fillable,
+	StrokeInfo,
+	Strokable,
+	ComponentSaveObject,
 } from "../internal"
 import { resizeSVG, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -26,39 +30,6 @@ export type ShapeSaveObject = NodeSaveObject & {
 	stroke?: StrokeInfo
 	size: SVG.Point
 }
-
-export type StrokeInfo = {
-	width?: SVG.Number
-	color?: string | "default"
-	opacity?: number
-	style?: string
-}
-
-export type FillInfo = {
-	color?: string | "default"
-	opacity?: number
-}
-
-export type StrokeStyle = ChoiceEntry & {
-	dasharray: number[]
-}
-
-export const strokeStyleChoices: StrokeStyle[] = [
-	{ key: "solid", name: "solid", dasharray: [1, 0] },
-	{ key: "dotted", name: "dotted", dasharray: [1, 4] },
-	{ key: "denselydotted", name: "densely dotted", dasharray: [1, 2] },
-	{ key: "looselydotted", name: "loosely dotted", dasharray: [1, 8] },
-	{ key: "dashed", name: "dashed", dasharray: [4, 4] },
-	{ key: "denselydashed", name: "densely dashed", dasharray: [4, 2] },
-	{ key: "looselydashed", name: "loosely dashed", dasharray: [4, 8] },
-	{ key: "dashdot", name: "dash dot", dasharray: [4, 2, 1, 2] },
-	{ key: "denselydashdot", name: "densely dash dot", dasharray: [4, 1, 1, 1] },
-	{ key: "looselydashdot", name: "loosely dash dot", dasharray: [4, 4, 1, 4] },
-	{ key: "dashdotdot", name: "dash dot dot", dasharray: [4, 2, 1, 2, 1, 2] },
-	{ key: "denselydashdotdot", name: "densely dash dot dot", dasharray: [4, 1, 1, 1, 1, 1] },
-	{ key: "looselydashdotdot", name: "loosely dash dot dot", dasharray: [4, 4, 1, 4, 1, 4] },
-]
-export const defaultStrokeStyleChoice = strokeStyleChoices[0]
 
 export const dashArrayToPattern = (linewidth: SVG.Number, dasharray: number[]): string => {
 	let pattern = []
@@ -71,107 +42,12 @@ export const dashArrayToPattern = (linewidth: SVG.Number, dasharray: number[]): 
 	return "dash pattern={" + pattern.join(" ") + "}"
 }
 
-export abstract class ShapeComponent extends NodeComponent {
-	protected strokeInfo: StrokeInfo
-	protected fillInfo: FillInfo
-
-	protected fillColorProperty: ColorProperty
-	protected fillOpacityProperty: SliderProperty
-	protected strokeColorProperty: ColorProperty
-	protected strokeOpacityProperty: SliderProperty
-	protected strokeWidthProperty: SliderProperty
-	protected strokeStyleProperty: ChoiceProperty<StrokeStyle>
-
+export abstract class ShapeComponent extends Strokable(Fillable(NodeComponent)) {
 	protected placePoint: SVG.Point
 
 	public constructor() {
 		super()
 		this.resizeVisualizations = new Map<DirectionInfo, SVG.Element>()
-
-		this.fillInfo = {
-			color: "default",
-			opacity: 1,
-		}
-		this.strokeInfo = {
-			color: "default",
-			opacity: 1,
-			width: new SVG.Number("1pt"),
-			style: defaultStrokeStyleChoice.key,
-		}
-
-		//add color property
-		this.properties.add(PropertyCategories.fill, new SectionHeaderProperty("Fill"))
-
-		this.fillOpacityProperty = new SliderProperty(
-			"Opacity",
-			0,
-			100,
-			1,
-			new SVG.Number(this.fillInfo.opacity * 100, "%")
-		)
-		this.fillOpacityProperty.addChangeListener((ev) => {
-			this.fillInfo.opacity = ev.value.value / 100
-			this.updateTheme()
-		})
-
-		this.fillColorProperty = new ColorProperty("Color", null)
-		this.fillColorProperty.addChangeListener((ev) => {
-			if (ev.value == null) {
-				this.fillInfo.color = "default"
-				this.fillInfo.opacity = 1
-			} else {
-				this.fillInfo.color = ev.value.toRgb()
-				this.fillInfo.opacity = this.fillOpacityProperty.value.value / 100
-			}
-			this.updateTheme()
-		})
-
-		this.properties.add(PropertyCategories.fill, this.fillColorProperty)
-		this.properties.add(PropertyCategories.fill, this.fillOpacityProperty)
-
-		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
-		this.strokeOpacityProperty = new SliderProperty(
-			"Opacity",
-			0,
-			100,
-			1,
-			new SVG.Number(this.strokeInfo.opacity * 100, "%")
-		)
-		this.strokeOpacityProperty.addChangeListener((ev) => {
-			this.strokeInfo.opacity = ev.value.value / 100
-			this.updateTheme()
-		})
-
-		this.strokeColorProperty = new ColorProperty("Color", null)
-		this.strokeColorProperty.addChangeListener((ev) => {
-			if (ev.value == null) {
-				this.strokeInfo.color = "default"
-				this.strokeInfo.opacity = 1
-			} else {
-				this.strokeInfo.color = ev.value.toRgb()
-				this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
-			}
-			this.updateTheme()
-		})
-		this.strokeWidthProperty = new SliderProperty("Width", 0, 10, 0.1, this.strokeInfo.width)
-		this.strokeWidthProperty.addChangeListener((ev) => {
-			this.strokeInfo.width = ev.value
-			this.update()
-			this.updateTheme()
-		})
-		this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>(
-			"Style",
-			strokeStyleChoices,
-			defaultStrokeStyleChoice
-		)
-		this.strokeStyleProperty.addChangeListener((ev) => {
-			this.strokeInfo.style = ev.value.key
-			this.updateTheme()
-		})
-		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
 
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)
@@ -203,53 +79,38 @@ export abstract class ShapeComponent extends NodeComponent {
 		}
 	}
 
+	protected applyJson(saveObject: ShapeSaveObject): void {
+		super.applyJson(saveObject)
+		this.placePoint = this.position
+		this.size = new SVG.Point(saveObject.size)
+		this.referencePosition = this.size.div(2)
+	}
+
 	public toJson(): ShapeSaveObject {
 		const data = super.toJson() as ShapeSaveObject
 		data.size = this.size
-
-		let fill: FillInfo = {}
-		let shouldFill = false
-		if (this.fillInfo.color != "default") {
-			fill.color = this.fillInfo.color
-			shouldFill = true
-		}
-		if (this.fillInfo.opacity != 1) {
-			fill.opacity = this.fillInfo.opacity
-			shouldFill = true
-		}
-		if (shouldFill) {
-			data.fill = fill
-		}
-
-		let stroke: StrokeInfo = {}
-		let shouldStroke = false
-		if (this.strokeInfo.color != "default") {
-			stroke.color = this.strokeInfo.color
-			shouldStroke = true
-		}
-		if (this.strokeInfo.opacity != 1) {
-			stroke.opacity = this.strokeInfo.opacity
-			shouldStroke = true
-		}
-
-		if (!this.strokeInfo.width.eq(new SVG.Number("1pt"))) {
-			stroke.width = this.strokeInfo.width
-			shouldStroke = true
-		}
-		if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-			stroke.style = this.strokeInfo.style
-			shouldStroke = true
-		}
-		if (shouldStroke) {
-			data.stroke = stroke
-		}
 		return data
+	}
+
+	public getTransformMatrix(): SVG.Matrix {
+		return new SVG.Matrix({
+			scaleX: this.scaleState.x,
+			scaleY: this.scaleState.y,
+			translate: [-this.referencePosition.x, -this.referencePosition.y],
+			origin: [this.referencePosition.x, this.referencePosition.y],
+		}).lmultiply(
+			new SVG.Matrix({
+				rotate: -this.rotationDeg,
+				translate: [this.position.x, this.position.y],
+			})
+		)
 	}
 
 	protected update(): void {
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
 		let transformMatrix = this.getTransformMatrix()
+		const halfSize = this.size.div(2)
 
 		this.dragElement.size(this.size.x, this.size.y)
 		this.dragElement.transform(transformMatrix)
@@ -258,23 +119,23 @@ export abstract class ShapeComponent extends NodeComponent {
 			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
 			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
 		)
-		this.defaultTextPosition = this.size.div(2)
+		this.componentVisualization.center(halfSize.x, halfSize.y)
 		this.componentVisualization.transform(transformMatrix)
 
+		this.defaultTextPosition = halfSize
 		this._bbox = this.dragElement.bbox().transform(transformMatrix)
 
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
-		this.updateLabelPosition()
+		this.updatePositionedLabel()
 	}
 
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
-			let lineWidth = selectedBoxWidth
-
 			this.selectionElement
-				.size(this.size.x + lineWidth, this.size.y + lineWidth)
+				.size(this.size.x + selectedBoxWidth, this.size.y + selectedBoxWidth)
+				.center(this.size.x / 2, this.size.y / 2)
 				.transform(this.getTransformMatrix())
 		}
 	}

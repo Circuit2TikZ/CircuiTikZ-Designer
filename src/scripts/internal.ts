@@ -20,6 +20,11 @@ export * from "./properties/mathjaxProperty"
 export * from "./properties/sliderProperty"
 export * from "./properties/sectionHeaderProperty"
 export * from "./properties/colorProperty"
+//mixins
+export * from "./mixins/fillable"
+export * from "./mixins/strokable"
+export * from "./mixins/nameable"
+export * from "./mixins/labelable"
 // components
 export * from "./components/circuitComponent"
 export * from "./components/pathComponent"

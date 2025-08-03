@@ -15,6 +15,9 @@ export abstract class EditableProperty<T> {
 	}
 	public set value(newVal: T) {
 		this._value = newVal
+		if (!this.element) {
+			this.element = this.buildHTML()
+		}
 		this.updateHTML()
 	}
 
@@ -100,6 +103,9 @@ export abstract class EditableProperty<T> {
 			value: this._value,
 		}
 		if (updateHTML) {
+			if (!this.element) {
+				this.element = this.buildHTML()
+			}
 			this.updateHTML()
 		}
 		if (notifyEventListeners) {

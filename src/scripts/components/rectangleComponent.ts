@@ -5,15 +5,18 @@ import {
 	ChoiceProperty,
 	CircuitComponent,
 	ColorProperty,
+	ComponentSaveObject,
 	convertTextToNativeSVGText,
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
 	defaultStrokeStyleChoice,
 	ExportController,
+	FillInfo,
 	FontSize,
 	fontSizes,
 	MathjaxParser,
+	NodeSaveObject,
 	PropertyCategories,
 	SectionHeaderProperty,
 	ShapeComponent,
@@ -28,7 +31,6 @@ import {
 import { rectRectIntersection, roundTikz } from "../utils/selectionHelper"
 
 export type RectangleSaveObject = ShapeSaveObject & {
-	size: SVG.Point
 	text?: Text
 }
 
@@ -38,7 +40,7 @@ export class RectangleComponent extends ShapeComponent {
 		CircuitComponent.jsonSaveMap.set(RectangleComponent.jsonID, RectangleComponent)
 	}
 
-	protected declare dragElement: SVG.Rect
+	declare protected dragElement: SVG.Rect
 
 	private textAreaProperty: TextAreaProperty
 	private textInnerSep: SliderProperty
@@ -103,8 +105,6 @@ export class RectangleComponent extends ShapeComponent {
 			this.updateText()
 		})
 		this.properties.add(PropertyCategories.text, this.textColor)
-
-		this.addName()
 
 		this.selectionElement = CanvasController.instance.canvas.rect(0, 0).hide()
 	}
@@ -187,72 +187,8 @@ export class RectangleComponent extends ShapeComponent {
 		return data
 	}
 
-	static fromJson(saveObject: RectangleSaveObject): RectangleComponent {
-		let rectComponent = new RectangleComponent()
-		rectComponent.position = new SVG.Point(saveObject.position)
-		rectComponent.placePoint = rectComponent.position
-		rectComponent.size = new SVG.Point(saveObject.size)
-		rectComponent.referencePosition = rectComponent.size.div(2)
-
-		rectComponent.rotationDeg = saveObject.rotation ?? 0
-
-		if (saveObject.fill) {
-			if (saveObject.fill.color) {
-				rectComponent.fillInfo.color = saveObject.fill.color
-				rectComponent.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
-			}
-			if (saveObject.fill.opacity != undefined) {
-				rectComponent.fillInfo.opacity = saveObject.fill.opacity
-				rectComponent.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity * 100, "%")
-			}
-		}
-
-		if (saveObject.stroke) {
-			if (saveObject.stroke.color) {
-				rectComponent.strokeInfo.color = saveObject.stroke.color
-				rectComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-			}
-			if (saveObject.stroke.opacity != undefined) {
-				rectComponent.strokeInfo.opacity = saveObject.stroke.opacity
-				rectComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
-			}
-			if (saveObject.stroke.width) {
-				rectComponent.strokeInfo.width = new SVG.Number(saveObject.stroke.width)
-				rectComponent.strokeWidthProperty.value = rectComponent.strokeInfo.width
-			}
-			if (saveObject.stroke.style) {
-				rectComponent.strokeInfo.style = saveObject.stroke.style
-				rectComponent.strokeStyleProperty.value = strokeStyleChoices.find(
-					(item) => item.key == saveObject.stroke.style
-				)
-			}
-		}
-
-		if (saveObject.label) {
-			rectComponent.labelDistance.value =
-				saveObject.label.distance ?
-					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-				:	new SVG.Number(0, "cm")
-			if (rectComponent.labelDistance.value.unit == "") {
-				rectComponent.labelDistance.value.unit = "cm"
-			}
-
-			rectComponent.anchorChoice.value =
-				saveObject.label.anchor ?
-					basicDirections.find((item) => item.key == saveObject.label.anchor)
-				:	defaultBasicDirection
-
-			rectComponent.positionChoice.value =
-				saveObject.label.position ?
-					basicDirections.find((item) => item.key == saveObject.label.position)
-				:	defaultBasicDirection
-
-			rectComponent.mathJaxLabel.value = saveObject.label.value
-
-			rectComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-
-			rectComponent.generateLabelRender()
-		}
+	protected applyJson(saveObject: RectangleSaveObject): void {
+		super.applyJson(saveObject)
 
 		if (saveObject.text) {
 			let text: Text = {
@@ -262,23 +198,40 @@ export class RectangleComponent extends ShapeComponent {
 				showPlaceholderText: saveObject.text.showPlaceholderText ?? false,
 				useHyphenation: saveObject.text.useHyphenation ?? false,
 			}
-			rectComponent.createAsText = text.showPlaceholderText
-			rectComponent.useHyphenation = text.useHyphenation
-			rectComponent.textAreaProperty.value = text
+			this.createAsText = text.showPlaceholderText
+			this.useHyphenation = text.useHyphenation
+			this.textAreaProperty.value = text
 
-			rectComponent.textFontSize.value =
+			this.textFontSize.value =
 				saveObject.text.fontSize ?
 					fontSizes.find((item) => item.key == saveObject.text.fontSize)
 				:	defaultFontSize
 
-			rectComponent.textInnerSep.value =
-				saveObject.text.innerSep ? new SVG.Number(saveObject.text.innerSep) : new SVG.Number("5pt")
+			if (saveObject.text.innerSep) {
+				if (Object.hasOwn(saveObject.text.innerSep, "value")) {
+					// SVG.Number as object
+					this.textInnerSep.value = new SVG.Number(
+						saveObject.text.innerSep.value,
+						saveObject.text.innerSep.unit
+					)
+				} else {
+					// SVG.Number as string
+					this.textInnerSep.value = new SVG.Number(saveObject.text.innerSep)
+				}
+			} else {
+				this.textInnerSep.value = new SVG.Number("5pt")
+			}
 
-			rectComponent.textColor.value = saveObject.text.color ? new SVG.Color(saveObject.text.color) : null
+			this.textColor.value = saveObject.text.color ? new SVG.Color(saveObject.text.color) : null
 		}
 
-		rectComponent.placeFinish()
-		rectComponent.updateTheme()
+		this.update()
+		this.componentVisualization.show()
+		this.updateTheme()
+	}
+
+	static fromJson(saveObject: RectangleSaveObject): RectangleComponent {
+		let rectComponent = new RectangleComponent()
 		return rectComponent
 	}
 

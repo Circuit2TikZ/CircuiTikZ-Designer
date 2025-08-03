@@ -221,7 +221,7 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.symbolUse.transform(m)
 		this._bbox = this.componentVariant.viewBox.transform(m)
 
-		this.updateLabelPosition()
+		this.updatePositionedLabel()
 
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()

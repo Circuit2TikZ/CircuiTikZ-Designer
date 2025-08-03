@@ -25,7 +25,7 @@ export class EllipseComponent extends ShapeComponent {
 		CircuitComponent.jsonSaveMap.set(EllipseComponent.jsonID, EllipseComponent)
 	}
 
-	protected declare dragElement: SVG.Ellipse
+	declare protected dragElement: SVG.Ellipse
 
 	public get isCircle() {
 		return Math.abs(this.size.x - this.size.y) < 1e-5
@@ -33,7 +33,6 @@ export class EllipseComponent extends ShapeComponent {
 
 	public constructor() {
 		super()
-		this.addName()
 		this.displayName = "Ellipse"
 
 		this.componentVisualization = CanvasController.instance.canvas.ellipse(0, 0)
@@ -91,70 +90,38 @@ export class EllipseComponent extends ShapeComponent {
 		return data
 	}
 
-	public applyJson(saveObject: EllipseSaveObject): EllipseComponent {
-		let ellipseComponent = new EllipseComponent()
-		ellipseComponent.position = new SVG.Point(saveObject.position)
-		ellipseComponent.placePoint = saveObject.position
-		ellipseComponent.size = new SVG.Point(saveObject.size)
+	public applyJson(saveObject: EllipseSaveObject) {
+		super.applyJson(saveObject)
+		this.position = new SVG.Point(saveObject.position)
+		this.placePoint = saveObject.position
+		this.size = new SVG.Point(saveObject.size)
 
-		ellipseComponent.rotationDeg = saveObject.rotation ?? 0
-
-		if (saveObject.fill) {
-			if (saveObject.fill.color) {
-				ellipseComponent.fillInfo.color = saveObject.fill.color
-				ellipseComponent.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
-			}
-			if (saveObject.fill.opacity != undefined) {
-				ellipseComponent.fillInfo.opacity = saveObject.fill.opacity
-				ellipseComponent.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity * 100, "%")
-			}
-		}
-
-		if (saveObject.stroke) {
-			if (saveObject.stroke.color) {
-				ellipseComponent.strokeInfo.color = saveObject.stroke.color
-				ellipseComponent.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-			}
-			if (saveObject.stroke.opacity != undefined) {
-				ellipseComponent.strokeInfo.opacity = saveObject.stroke.opacity
-				ellipseComponent.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
-			}
-			if (saveObject.stroke.width) {
-				ellipseComponent.strokeInfo.width = new SVG.Number(saveObject.stroke.width)
-				ellipseComponent.strokeWidthProperty.value = ellipseComponent.strokeInfo.width
-			}
-			if (saveObject.stroke.style) {
-				ellipseComponent.strokeInfo.style = saveObject.stroke.style
-				ellipseComponent.strokeStyleProperty.value = strokeStyleChoices.find(
-					(item) => item.key == saveObject.stroke.style
-				)
-			}
-		}
+		this.rotationDeg = saveObject.rotation ?? 0
 
 		if (saveObject.label) {
-			ellipseComponent.labelDistance.value =
+			this.labelDistance.value =
 				saveObject.label.distance ?
 					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
 				:	new SVG.Number(0, "cm")
-			if (ellipseComponent.labelDistance.value.unit == "") {
-				ellipseComponent.labelDistance.value.unit = "cm"
+			if (this.labelDistance.value.unit == "") {
+				this.labelDistance.value.unit = "cm"
 			}
-			ellipseComponent.anchorChoice.value =
+			this.anchorChoice.value =
 				saveObject.label.anchor ?
 					basicDirections.find((item) => item.key == saveObject.label.anchor)
 				:	defaultBasicDirection
-			ellipseComponent.positionChoice.value =
+			this.positionChoice.value =
 				saveObject.label.position ?
 					basicDirections.find((item) => item.key == saveObject.label.position)
 				:	defaultBasicDirection
-			ellipseComponent.mathJaxLabel.value = saveObject.label.value
-			ellipseComponent.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			ellipseComponent.generateLabelRender()
+			this.mathJaxLabel.value = saveObject.label.value
+			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
+			this.generateLabelRender()
 		}
 
-		ellipseComponent.placeFinish()
-		ellipseComponent.updateTheme()
-		return ellipseComponent
+		this.update()
+		this.componentVisualization.show()
+		this.updateTheme()
 	}
 
 	public static fromJson(saveObject: EllipseSaveObject): EllipseComponent {

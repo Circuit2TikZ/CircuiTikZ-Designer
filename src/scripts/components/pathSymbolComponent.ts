@@ -22,10 +22,11 @@ import {
 	SymbolOption,
 	Variant,
 	defaultFill,
-	renderMathJax,
+	PathLabelable,
 	InfoProperty,
 	CircuitComponent,
 	PropertyCategories,
+	Nameable,
 } from "../internal"
 import {
 	lineRectIntersection,
@@ -43,7 +44,7 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	label?: PathLabel
 }
 
-export class PathSymbolComponent extends PathComponent {
+export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) {
 	private static jsonID = "path"
 	static {
 		CircuitComponent.jsonSaveMap.set(PathSymbolComponent.jsonID, PathSymbolComponent)
@@ -66,12 +67,10 @@ export class PathSymbolComponent extends PathComponent {
 	 */
 	private relSymbolEnd: SVG.Point
 
-	private mirror: BooleanProperty
-	private invert: BooleanProperty
-
 	private rotationDeg: number = 0
 
-	private labelSide: BooleanProperty
+	private mirror: BooleanProperty
+	private invert: BooleanProperty
 
 	protected scaleProperty: SliderProperty
 
@@ -173,29 +172,6 @@ export class PathSymbolComponent extends PathComponent {
 		this.visualization.add(this.dragEndLine)
 		this.visualization.hide()
 
-		{
-			//label section
-			this.properties.add(PropertyCategories.label, new SectionHeaderProperty("Label"))
-
-			this.mathJaxLabel = new MathJaxProperty()
-			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.properties.add(PropertyCategories.label, this.mathJaxLabel)
-
-			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
-			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.properties.add(PropertyCategories.label, this.labelDistance)
-
-			this.labelColor = new ColorProperty("Color", null)
-			this.labelColor.addChangeListener((ev) => {
-				this.updateTheme()
-			})
-			this.properties.add(PropertyCategories.label, this.labelColor)
-
-			this.labelSide = new BooleanProperty("Switch side")
-			this.labelSide.addChangeListener((ev) => this.updateLabelPosition())
-			this.properties.add(PropertyCategories.label, this.labelSide)
-		}
-
 		this.properties.add(PropertyCategories.manipulation, new SectionHeaderProperty("Symbol Orientation"))
 
 		this.mirror = new BooleanProperty("Mirror", false)
@@ -212,7 +188,6 @@ export class PathSymbolComponent extends PathComponent {
 		})
 		this.properties.add(PropertyCategories.manipulation, this.invert)
 
-		this.addName()
 		this.addInfo()
 
 		this.snappingPoints = [
@@ -227,29 +202,6 @@ export class PathSymbolComponent extends PathComponent {
 	protected addInfo() {
 		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("Info"))
 		this.properties.add(PropertyCategories.info, new InfoProperty("ID", this.referenceSymbol.tikzName))
-	}
-
-	protected generateLabelRender(): void {
-		if (this.labelRendering) {
-			let removeIDs = new Set<string>()
-			for (const element of this.labelRendering.find("use")) {
-				removeIDs.add(element.node.getAttribute("xlink:href"))
-			}
-
-			for (const id of removeIDs) {
-				CanvasController.instance.canvas.find(id)[0]?.remove()
-			}
-		}
-		const transformGroup = renderMathJax(this.mathJaxLabel.value)
-		// remove the current label and substitute with a new group element
-		this.labelRendering?.remove()
-		this.labelRendering = new SVG.G()
-		this.labelRendering.addClass("pointerNone")
-		this.labelRendering.add(transformGroup.element)
-		// add the label rendering to the visualization element
-		this.visualization.add(this.labelRendering)
-		this.update()
-		this.updateTheme()
 	}
 
 	protected optionsFromProperties(): SymbolOption[] {
@@ -417,7 +369,7 @@ export class PathSymbolComponent extends PathComponent {
 			endLineStartPoint.y
 		)
 
-		this.updateLabelPosition()
+		this.updatePathLabel()
 		this._bbox = this.visualization.bbox()
 		this.referencePosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
 
@@ -527,20 +479,6 @@ export class PathSymbolComponent extends PathComponent {
 			data.options = this.componentVariant.options.map((option) => option.displayName ?? option.name)
 		}
 
-		if (this.name.value) {
-			data.name = this.name.value
-		}
-
-		if (this.mathJaxLabel.value) {
-			let label: PathLabel = {
-				value: this.mathJaxLabel.value,
-				otherSide: this.labelSide.value ? true : undefined,
-				distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
-				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
-			}
-			data.label = label
-		}
-
 		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
 			data.scale = this.scaleState
 		}
@@ -643,23 +581,6 @@ export class PathSymbolComponent extends PathComponent {
 		this.invert.value = this.scaleState.x < 0
 		this.scaleProperty.value = new SVG.Number(Math.abs(this.scaleState.x))
 
-		if (saveObject.name) {
-			this.name.value = saveObject.name
-		}
-
-		if (saveObject.label) {
-			this.labelSide.value = saveObject.label.otherSide ?? false
-			this.labelDistance.value =
-				saveObject.label.distance ?
-					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-				:	new SVG.Number(0, "cm")
-			if (this.labelDistance.value.unit == "") {
-				this.labelDistance.value.unit = "cm"
-			}
-			this.mathJaxLabel.value = saveObject.label.value
-			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			this.generateLabelRender()
-		}
 		this.update()
 		this.visualization.show()
 	}
@@ -670,7 +591,7 @@ export class PathSymbolComponent extends PathComponent {
 		return pathComponent
 	}
 
-	public updateLabelPosition(): void {
+	public updatePathLabel(): void {
 		if (!this.mathJaxLabel || !this.labelRendering) {
 			return
 		}

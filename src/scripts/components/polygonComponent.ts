@@ -11,6 +11,7 @@ import {
 	defaultStrokeStyleChoice,
 	DirectionInfo,
 	ExportController,
+	Fillable,
 	FillInfo,
 	MainController,
 	MathJaxProperty,
@@ -23,9 +24,12 @@ import {
 	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
+	Strokable,
 	StrokeInfo,
 	StrokeStyle,
 	strokeStyleChoices,
+	Nameable,
+	PositionLabelable,
 } from "../internal"
 import { lineRectIntersection, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -36,145 +40,20 @@ export type PolygonSaveObject = PathSaveObject & {
 	label?: PositionedLabel
 }
 
-export class PolygonComponent extends PathComponent {
+export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Fillable(PathComponent)))) {
 	private static jsonID = "polygon"
 	static {
 		CircuitComponent.jsonSaveMap.set(PolygonComponent.jsonID, PolygonComponent)
 	}
 
-	public declare componentVisualization: SVG.Polygon
-	protected declare dragElement: SVG.Polygon
-
-	protected strokeInfo: StrokeInfo
-	protected fillInfo: FillInfo
-
-	protected anchorChoice: ChoiceProperty<DirectionInfo>
-	protected positionChoice: ChoiceProperty<DirectionInfo>
-
-	protected fillColorProperty: ColorProperty
-	protected fillOpacityProperty: SliderProperty
-	protected strokeColorProperty: ColorProperty
-	protected strokeOpacityProperty: SliderProperty
-	protected strokeWidthProperty: SliderProperty
-	protected strokeStyleProperty: ChoiceProperty<StrokeStyle>
+	declare public componentVisualization: SVG.Polygon
+	declare protected dragElement: SVG.Polygon
 
 	public constructor() {
 		super()
 
-		this.fillInfo = {
-			color: "default",
-			opacity: 1,
-		}
-		this.strokeInfo = {
-			color: "default",
-			opacity: 1,
-			width: new SVG.Number("1pt"),
-			style: defaultStrokeStyleChoice.key,
-		}
-
-		//add color property
-		this.properties.add(PropertyCategories.fill, new SectionHeaderProperty("Fill"))
-
-		this.fillOpacityProperty = new SliderProperty(
-			"Opacity",
-			0,
-			100,
-			1,
-			new SVG.Number(this.fillInfo.opacity * 100, "%")
-		)
-		this.fillOpacityProperty.addChangeListener((ev) => {
-			this.fillInfo.opacity = ev.value.value / 100
-			this.updateTheme()
-		})
-
-		this.fillColorProperty = new ColorProperty("Color", null)
-		this.fillColorProperty.addChangeListener((ev) => {
-			if (ev.value == null) {
-				this.fillInfo.color = "default"
-				this.fillInfo.opacity = 1
-			} else {
-				this.fillInfo.color = ev.value.toRgb()
-				this.fillInfo.opacity = this.fillOpacityProperty.value.value / 100
-			}
-			this.updateTheme()
-		})
-
-		this.properties.add(PropertyCategories.fill, this.fillColorProperty)
-		this.properties.add(PropertyCategories.fill, this.fillOpacityProperty)
-
-		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
-		this.strokeOpacityProperty = new SliderProperty(
-			"Opacity",
-			0,
-			100,
-			1,
-			new SVG.Number(this.strokeInfo.opacity * 100, "%")
-		)
-		this.strokeOpacityProperty.addChangeListener((ev) => {
-			this.strokeInfo.opacity = ev.value.value / 100
-			this.updateTheme()
-		})
-
-		this.strokeColorProperty = new ColorProperty("Color", null)
-		this.strokeColorProperty.addChangeListener((ev) => {
-			if (ev.value == null) {
-				this.strokeInfo.color = "default"
-				this.strokeInfo.opacity = 1
-			} else {
-				this.strokeInfo.color = ev.value.toRgb()
-				this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
-			}
-			this.updateTheme()
-		})
-		this.strokeWidthProperty = new SliderProperty("Width", 0, 10, 0.1, this.strokeInfo.width)
-		this.strokeWidthProperty.addChangeListener((ev) => {
-			this.strokeInfo.width = ev.value
-			this.update()
-			this.updateTheme()
-		})
-		this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>(
-			"Style",
-			strokeStyleChoices,
-			defaultStrokeStyleChoice
-		)
-		this.strokeStyleProperty.addChangeListener((ev) => {
-			this.strokeInfo.style = ev.value.key
-			this.updateTheme()
-		})
-		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
-
-		{
-			//label section
-			this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Label"))
-
-			this.mathJaxLabel = new MathJaxProperty()
-			this.mathJaxLabel.addChangeListener((ev) => this.generateLabelRender())
-			this.properties.add(PropertyCategories.stroke, this.mathJaxLabel)
-
-			this.anchorChoice = new ChoiceProperty("Anchor", basicDirections, defaultBasicDirection)
-			this.anchorChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.properties.add(PropertyCategories.stroke, this.anchorChoice)
-
-			this.positionChoice = new ChoiceProperty("Position", basicDirections, defaultBasicDirection)
-			this.positionChoice.addChangeListener((ev) => this.updateLabelPosition())
-			this.properties.add(PropertyCategories.stroke, this.positionChoice)
-
-			this.labelDistance = new SliderProperty("Gap", -0.5, 1, 0.01, new SVG.Number(0.12, "cm"))
-			this.labelDistance.addChangeListener((ev) => this.updateLabelPosition())
-			this.properties.add(PropertyCategories.stroke, this.labelDistance)
-
-			this.labelColor = new ColorProperty("Color", null)
-			this.labelColor.addChangeListener((ev) => {
-				this.updateTheme()
-			})
-			this.properties.add(PropertyCategories.stroke, this.labelColor)
-		}
 		this.snappingPoints = []
 		CanvasController.instance.canvas.add(this.visualization)
-		this.addName()
 		this.displayName = "Polygon"
 		this.position = new SVG.Point()
 
@@ -189,35 +68,6 @@ export class PolygonComponent extends PathComponent {
 		this.visualization.add(this.componentVisualization)
 
 		this.visualization.add(this.dragElement)
-	}
-
-	/**
-	 * Generate a label visualization via mathjax
-	 * @param label the data for which to generate the label visualization
-	 * @returns a Promise<void>
-	 */
-	protected generateLabelRender() {
-		// if a previous label was rendered, remove everything concerning that rendering
-		if (this.labelRendering) {
-			let removeIDs = new Set<string>()
-			for (const element of this.labelRendering.find("use")) {
-				removeIDs.add(element.node.getAttribute("xlink:href"))
-			}
-
-			for (const id of removeIDs) {
-				CanvasController.instance.canvas.find(id)[0]?.remove()
-			}
-		}
-		const transformGroup = renderMathJax(this.mathJaxLabel.value)
-		// remove the current label and substitute with a new group element
-		this.labelRendering?.remove()
-		this.labelRendering = new SVG.G()
-		this.labelRendering.addClass("pointerNone")
-		this.labelRendering.add(transformGroup.element)
-		// add the label rendering to the visualization element
-		this.visualization.add(this.labelRendering)
-		this.update()
-		this.updateTheme()
 	}
 
 	public getSnappingInfo(): SnappingInfo {
@@ -364,110 +214,11 @@ export class PolygonComponent extends PathComponent {
 		let data = super.toJson() as PolygonSaveObject
 		data.type = PolygonComponent.jsonID
 
-		let fill: FillInfo = {}
-		let shouldFill = false
-		if (this.fillInfo.color != "default") {
-			fill.color = this.fillInfo.color
-			shouldFill = true
-		}
-		if (this.fillInfo.opacity != 1) {
-			fill.opacity = this.fillInfo.opacity
-			shouldFill = true
-		}
-		if (shouldFill) {
-			data.fill = fill
-		}
-
-		let stroke: StrokeInfo = {}
-		let shouldStroke = false
-		if (this.strokeInfo.color != "default") {
-			stroke.color = this.strokeInfo.color
-			shouldStroke = true
-		}
-		if (this.strokeInfo.opacity != 1) {
-			stroke.opacity = this.strokeInfo.opacity
-			shouldStroke = true
-		}
-
-		if (!this.strokeInfo.width.eq(new SVG.Number("1pt"))) {
-			stroke.width = this.strokeInfo.width
-			shouldStroke = true
-		}
-		if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-			stroke.style = this.strokeInfo.style
-			shouldStroke = true
-		}
-		if (shouldStroke) {
-			data.stroke = stroke
-		}
-
-		if (this.mathJaxLabel.value) {
-			let labelWithoutRender: PositionedLabel = {
-				value: this.mathJaxLabel.value,
-				anchor: this.anchorChoice.value.key,
-				position: this.positionChoice.value.key,
-				distance: this.labelDistance.value ?? undefined,
-				color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
-			}
-			data.label = labelWithoutRender
-		}
-
 		return data
 	}
 
 	public applyJson(saveObject: PolygonSaveObject): void {
 		super.applyJson(saveObject)
-
-		if (saveObject.fill) {
-			if (saveObject.fill.color) {
-				this.fillInfo.color = saveObject.fill.color
-				this.fillColorProperty.value = new SVG.Color(saveObject.fill.color)
-			}
-			if (saveObject.fill.opacity != undefined) {
-				this.fillInfo.opacity = saveObject.fill.opacity
-				this.fillOpacityProperty.value = new SVG.Number(saveObject.fill.opacity * 100, "%")
-			}
-		}
-
-		if (saveObject.stroke) {
-			if (saveObject.stroke.color) {
-				this.strokeInfo.color = saveObject.stroke.color
-				this.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-			}
-			if (saveObject.stroke.opacity != undefined) {
-				this.strokeInfo.opacity = saveObject.stroke.opacity
-				this.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
-			}
-			if (saveObject.stroke.width) {
-				this.strokeInfo.width = new SVG.Number(saveObject.stroke.width)
-				this.strokeWidthProperty.value = this.strokeInfo.width
-			}
-			if (saveObject.stroke.style) {
-				this.strokeInfo.style = saveObject.stroke.style
-				this.strokeStyleProperty.value = strokeStyleChoices.find((item) => item.key == saveObject.stroke.style)
-			}
-		}
-
-		if (saveObject.label) {
-			this.labelDistance.value =
-				saveObject.label.distance ?
-					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-				:	new SVG.Number(0, "cm")
-			if (this.labelDistance.value.unit == "") {
-				this.labelDistance.value.unit = "cm"
-			}
-			this.anchorChoice.value =
-				saveObject.label.anchor ?
-					basicDirections.find((item) => item.key == saveObject.label.anchor)
-				:	defaultBasicDirection
-			this.positionChoice.value =
-				saveObject.label.position ?
-					basicDirections.find((item) => item.key == saveObject.label.position)
-				:	defaultBasicDirection
-			this.mathJaxLabel.value = saveObject.label.value
-			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			this.generateLabelRender()
-		}
 
 		this.updateTheme()
 		this.update()
@@ -631,7 +382,7 @@ export class PolygonComponent extends PathComponent {
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
-		this.updateLabelPosition()
+		this.updatePositionedLabel()
 	}
 
 	protected recalculateSelectionVisuals(): void {
@@ -718,9 +469,9 @@ export class PolygonComponent extends PathComponent {
 		return new PolygonComponent()
 	}
 
-	private labelPos: DirectionInfo
+	// private labelPos: DirectionInfo
 	private textPos: SVG.Point
-	public updateLabelPosition(): void {
+	public updatePositionedLabel(): void {
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
 			return
 		}

@@ -196,10 +196,6 @@ export class GroupComponent extends CircuitComponent {
 		//not needed
 		return
 	}
-	public updateLabelPosition(): void {
-		//not needed
-		return
-	}
 
 	public moveRel(delta: SVG.Point): void {
 		for (const component of this.groupedComponents) {

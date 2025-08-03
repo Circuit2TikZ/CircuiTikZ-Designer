@@ -1,6 +1,8 @@
 import * as SVG from "@svgdotjs/svg.js"
 import { basicDirections, DirectionInfo } from "../internal"
 
+export type AbstractConstructor<T = {}> = abstract new (...args: any[]) => T
+
 // utility values
 
 export const defaultStroke = "var(--bs-emphasis-color)"
@@ -88,4 +90,17 @@ export function memorySizeOf(obj) {
 		return bytes
 	}
 	return sizeOf(obj)
+}
+
+export function getClosestPointerFromDirection(direction: SVG.Point): string {
+	let minValue = Infinity
+	let minPointer = "move"
+	basicDirections.slice(2).forEach((item) => {
+		const diffLength = item.direction.sub(direction).absSquared()
+		if (diffLength < minValue) {
+			minValue = diffLength
+			minPointer = item.pointer
+		}
+	})
+	return minPointer
 }

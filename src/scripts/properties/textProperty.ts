@@ -6,9 +6,12 @@ export class TextProperty extends EditableProperty<string> {
 
 	private label: string
 
-	public constructor(label: string, initalValue?: string, tooltip = "") {
+	private validator = (value: string) => ""
+
+	public constructor(label: string, initalValue?: string, tooltip = "", validator = (value: string) => "") {
 		super(initalValue, tooltip)
 		this.label = label
+		this.validator = validator
 	}
 
 	public buildHTML(): HTMLElement {
@@ -39,10 +42,17 @@ export class TextProperty extends EditableProperty<string> {
 			previousState = this.value ?? ""
 		})
 		this.input.addEventListener("input", (ev) => {
-			this.updateValue(this.input.value)
+			let validationText = this.validator(this.input.value)
+			if (validationText == "") {
+				this.updateValue(this.input.value)
+			}
+			this.changeInvalidStatus(validationText)
 		})
 
 		this.input.addEventListener("focusout", (ev) => {
+			//first set what you see to the last known value, which should always be a valid value
+			this.updateHTML()
+			this.changeInvalidStatus("")
 			if (this.value && previousState !== this.value) {
 				Undo.addState()
 			}
@@ -50,7 +60,7 @@ export class TextProperty extends EditableProperty<string> {
 		return row
 	}
 
-	public changeInvalidStatus(msg: string) {
+	private changeInvalidStatus(msg: string) {
 		if (this.invalidDiv) {
 			if (msg === "") {
 				this.input.classList.remove("is-invalid")

@@ -26,11 +26,6 @@ import {
 	selectionColor,
 } from "../utils/selectionHelper"
 
-/**
- * names cannot contain punctuation, parentheses and some other symbols
- */
-export const invalidNameRegEx = /[\t\r\n\v.,:;()-]/
-
 type Constructor<T = {}> = new (...args: any[]) => T
 
 /**
@@ -39,29 +34,6 @@ type Constructor<T = {}> = new (...args: any[]) => T
 export type ComponentSaveObject = {
 	type: string
 	selected?: boolean
-}
-
-/**
- * A type encompassing all information needed for the label
- */
-export type Label = {
-	value: string
-	rendering?: SVG.Element
-	distance?: SVG.Number
-	color?: string | "default"
-}
-
-export function getClosestPointerFromDirection(direction: SVG.Point): string {
-	let minValue = Infinity
-	let minPointer = "move"
-	basicDirections.slice(2).forEach((item) => {
-		const diffLength = item.direction.sub(direction).absSquared()
-		if (diffLength < minValue) {
-			minValue = diffLength
-			minPointer = item.pointer
-		}
-	})
-	return minPointer
 }
 
 /**
@@ -87,12 +59,6 @@ export abstract class CircuitComponent {
 	 * the name of the component (e.g. "Resistor", "Wire" or "Transformer")
 	 */
 	public displayName: string
-
-	/**
-	 * What will be used as the reference name in the tikz code (e.g. "\node[] (name) at (0,0){};"").
-	 * Not used for all components, e.g. wire
-	 */
-	public name: TextProperty
 
 	/**
 	 * For keeping track of the parent group of this component if one exists.
@@ -189,13 +155,12 @@ export abstract class CircuitComponent {
 		this.properties = new PropertiesCollection()
 		this.addPositioning()
 		this.addZOrdering()
-		this.addName()
 	}
 
 	/**
 	 * Add z-index ordering to the properties window
 	 */
-	protected addZOrdering() {
+	private addZOrdering() {
 		// all components should receive the possiblity to change their draw order/z order/depth
 		let ordering = new ButtonGridProperty(
 			2,
@@ -226,7 +191,7 @@ export abstract class CircuitComponent {
 	/**
 	 * Add rotation and flipping to the properties window
 	 */
-	protected addPositioning() {
+	private addPositioning() {
 		let positioning = new ButtonGridProperty(
 			2,
 			[
@@ -274,38 +239,6 @@ export abstract class CircuitComponent {
 			]
 		)
 		this.properties.add(PropertyCategories.manipulation, positioning)
-	}
-
-	/**
-	 * Add the property for the tikz name to the properties window
-	 */
-	protected addName() {
-		this.name = new TextProperty("Name", "")
-		this.name.addChangeListener((ev) => {
-			if (ev.value === "") {
-				// no name is always valid
-				this.name.changeInvalidStatus("")
-				return
-			}
-			if (ev.value.match(invalidNameRegEx)) {
-				// check if characters are valid
-				this.name.changeInvalidStatus("Contains forbidden characters!")
-				return
-			}
-			for (const component of MainController.instance.circuitComponents) {
-				// check if another component with the same name already exists
-				if (component != this && component.name) {
-					if (ev.value !== "" && component.name.value == ev.value) {
-						this.name.updateValue(ev.previousValue, false)
-						this.name.changeInvalidStatus("Name is already taken!")
-						return
-					}
-				}
-			}
-			this.name.changeInvalidStatus("")
-		})
-		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("TikZ name"))
-		this.properties.add(PropertyCategories.info, this.name)
 	}
 
 	/**
@@ -551,11 +484,6 @@ export abstract class CircuitComponent {
 	 * Called by ComponentPlacer after {@link placeStep}==true to clean up the component placement. Also instantly finishes the placement when called
 	 */
 	public abstract placeFinish(): void // call this to force the placement to finish
-
-	/**
-	 * Updates the position of the label when moving/rotating... Override this!
-	 */
-	public abstract updateLabelPosition(): void
 
 	/**
 	 * Returns the list of TikZ libraries which are required for this component to work. This is used to automatically include the libraries in the generated code.

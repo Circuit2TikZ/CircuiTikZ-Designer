@@ -17,10 +17,6 @@ export type PathOrientation = {
 	invert: boolean
 }
 
-export type PathLabel = Label & {
-	otherSide?: boolean
-}
-
 export type PathSaveObject = ComponentSaveObject & {
 	points: SVG.Point[]
 }
@@ -53,11 +49,6 @@ export abstract class PathComponent extends CircuitComponent {
 	 * if the component is currently being adjusted, i.e. the reference points are being shown
 	 */
 	protected isResizing: boolean = false
-
-	protected mathJaxLabel: MathJaxProperty
-	protected labelRendering: SVG.Element
-	protected labelDistance: SliderProperty
-	protected labelColor: ColorProperty
 
 	constructor() {
 		super()

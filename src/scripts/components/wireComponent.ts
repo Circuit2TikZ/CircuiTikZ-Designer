@@ -17,12 +17,19 @@ import {
 	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
+	Strokable,
 	StrokeInfo,
 	StrokeStyle,
 	strokeStyleChoices,
 } from "../internal"
 import { AdjustDragHandler } from "../snapDrag/dragHandlers"
-import { lineRectIntersection, pointInsideRect, resizeSVG, selectionSize } from "../utils/selectionHelper"
+import {
+	lineRectIntersection,
+	pointInsideRect,
+	resizeSVG,
+	selectedBoxWidth,
+	selectionSize,
+} from "../utils/selectionHelper"
 
 /**
  * how the wire should be drawn. horizontal then vertical, vertical then horizontal or straight
@@ -82,19 +89,13 @@ export const defaultArrowTip = arrowTips[0]
 /**
  * The component responsible for multi segmented wires (polylines)/wires
  */
-export class WireComponent extends PathComponent {
+export class WireComponent extends Strokable(PathComponent) {
 	private static jsonID = "wire"
 	static {
 		CircuitComponent.jsonSaveMap.set(WireComponent.jsonID, WireComponent)
 	}
 
-	protected strokeInfo: StrokeInfo
-	protected strokeColorProperty: ColorProperty
-	protected strokeOpacityProperty: SliderProperty
-	protected strokeWidthProperty: SliderProperty
-	protected strokeStyleProperty: ChoiceProperty<StrokeStyle>
-
-	protected declare dragElement: SVG.Polyline
+	declare protected dragElement: SVG.Polyline
 	/**
 	 * the wire directions when drawing
 	 */
@@ -128,13 +129,6 @@ export class WireComponent extends PathComponent {
 		this.wireDirections = []
 		this.displayName = "Wire"
 
-		this.strokeInfo = {
-			color: "default",
-			opacity: 1,
-			width: new SVG.Number("0.4pt"),
-			style: defaultStrokeStyleChoice.key,
-		}
-
 		this.wire = CanvasController.instance.canvas.polyline()
 		this.wire.fill("none")
 		this.dragElement = CanvasController.instance.canvas.polyline()
@@ -143,6 +137,10 @@ export class WireComponent extends PathComponent {
 			"stroke": "transparent",
 			"stroke-width": selectionSize,
 		})
+
+		// override default value
+		this.strokeWidthProperty.value = new SVG.Number("0.4pt")
+		this.strokeInfo.width = this.strokeWidthProperty.value
 
 		this.visualization.add(this.wire)
 		this.visualization.add(this.dragElement)
@@ -166,54 +164,6 @@ export class WireComponent extends PathComponent {
 			this.update()
 		})
 		this.properties.add(PropertyCategories.options, this.arrowEndChoice)
-
-		this.properties.add(PropertyCategories.stroke, new SectionHeaderProperty("Stroke"))
-		this.strokeOpacityProperty = new SliderProperty(
-			"Opacity",
-			0,
-			100,
-			1,
-			new SVG.Number(this.strokeInfo.opacity * 100, "%")
-		)
-		this.strokeOpacityProperty.addChangeListener((ev) => {
-			this.strokeInfo.opacity = ev.value.value / 100
-			this.updateTheme()
-			this.updateArrowTypesAndColors()
-			this.update()
-		})
-
-		this.strokeColorProperty = new ColorProperty("Color", null)
-		this.strokeColorProperty.addChangeListener((ev) => {
-			if (ev.value == null) {
-				this.strokeInfo.color = "default"
-				this.strokeInfo.opacity = 1
-			} else {
-				this.strokeInfo.color = ev.value.toRgb()
-				this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
-			}
-			this.updateTheme()
-			this.updateArrowTypesAndColors()
-			this.update()
-		})
-		this.strokeWidthProperty = new SliderProperty("Width", 0, 10, 0.1, this.strokeInfo.width)
-		this.strokeWidthProperty.addChangeListener((ev) => {
-			this.strokeInfo.width = ev.value
-			this.update()
-			this.updateTheme()
-		})
-		this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>(
-			"Style",
-			strokeStyleChoices,
-			defaultStrokeStyleChoice
-		)
-		this.strokeStyleProperty.addChangeListener((ev) => {
-			this.strokeInfo.style = ev.value.key
-			this.updateTheme()
-		})
-		this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeWidthProperty)
-		this.properties.add(PropertyCategories.stroke, this.strokeStyleProperty)
 
 		this.updateTheme()
 
@@ -572,7 +522,7 @@ export class WireComponent extends PathComponent {
 				bbox = bbox.merge(endBBox)
 			}
 
-			this.selectionElement.size(bbox.width, bbox.height)
+			this.selectionElement.size(bbox.width + selectedBoxWidth, bbox.height + selectedBoxWidth)
 			this.selectionElement.center(bbox.cx, bbox.cy)
 			this.selectionElement.transform(transformMatrix)
 		}
@@ -616,29 +566,6 @@ export class WireComponent extends PathComponent {
 		let data = super.toJson() as WireSaveObject
 		data.type = WireComponent.jsonID
 		data.directions = this.wireDirections
-
-		let stroke: StrokeInfo = {}
-		let shouldStroke = false
-		if (this.strokeInfo.color != "default") {
-			stroke.color = this.strokeInfo.color
-			shouldStroke = true
-		}
-		if (this.strokeInfo.opacity != 1) {
-			stroke.opacity = this.strokeInfo.opacity
-			shouldStroke = true
-		}
-
-		if (!this.strokeInfo.width.eq(new SVG.Number("0.4pt"))) {
-			stroke.width = this.strokeInfo.width
-			shouldStroke = true
-		}
-		if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-			stroke.style = this.strokeInfo.style
-			shouldStroke = true
-		}
-		if (shouldStroke) {
-			data.stroke = stroke
-		}
 
 		if (this.arrowStartChoice.value.key !== defaultArrowTip.key) {
 			data.startArrow = this.arrowStartChoice.value.key
@@ -861,24 +788,6 @@ export class WireComponent extends PathComponent {
 			this.wireDirections.push(WireDirection.Straight)
 		}
 
-		if (saveObject.stroke) {
-			if (saveObject.stroke.color) {
-				this.strokeInfo.color = saveObject.stroke.color
-				this.strokeColorProperty.value = new SVG.Color(saveObject.stroke.color)
-			}
-			if (saveObject.stroke.opacity != undefined) {
-				this.strokeInfo.opacity = saveObject.stroke.opacity
-				this.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
-			}
-			if (saveObject.stroke.width) {
-				this.strokeInfo.width = new SVG.Number(saveObject.stroke.width)
-				this.strokeWidthProperty.value = this.strokeInfo.width
-			}
-			if (saveObject.stroke.style) {
-				this.strokeInfo.style = saveObject.stroke.style
-				this.strokeStyleProperty.value = strokeStyleChoices.find((item) => item.key == saveObject.stroke.style)
-			}
-		}
 		if (saveObject.startArrow) {
 			this.arrowStartChoice.value = arrowTips.find((item) => item.key == saveObject.startArrow)
 		}
@@ -892,8 +801,5 @@ export class WireComponent extends PathComponent {
 		this.updateTheme()
 
 		this.finishedPlacing = true
-	}
-	public updateLabelPosition(): void {
-		//not needed for wires
 	}
 }

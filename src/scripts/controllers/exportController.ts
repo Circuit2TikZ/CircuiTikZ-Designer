@@ -1,5 +1,5 @@
 import { Modal, Tooltip } from "bootstrap"
-import { SelectionController, MainController, defaultStroke, defaultFill } from "../internal"
+import { SelectionController, MainController, defaultStroke, defaultFill, TextProperty } from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
 import * as SVG from "@svgdotjs/svg.js"
@@ -49,8 +49,11 @@ export class ExportController {
 	private isIDUsed(id: string): boolean {
 		for (const component of MainController.instance.circuitComponents) {
 			// check if another component with the same name already exists
-			if (component.name?.value == id) {
-				return true
+			if ("name" in component) {
+				let name = component.name as TextProperty
+				if (name.value == id) {
+					return true
+				}
 			}
 		}
 		return false
