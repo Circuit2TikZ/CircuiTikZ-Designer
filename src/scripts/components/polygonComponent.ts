@@ -2,34 +2,27 @@ import * as SVG from "@svgdotjs/svg.js"
 import {
 	basicDirections,
 	CanvasController,
-	ChoiceProperty,
 	CircuitComponent,
-	ColorProperty,
 	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultStroke,
 	defaultStrokeStyleChoice,
-	DirectionInfo,
 	ExportController,
 	Fillable,
 	FillInfo,
 	MainController,
-	MathJaxProperty,
 	PathComponent,
 	PathSaveObject,
 	PositionedLabel,
-	PropertyCategories,
-	renderMathJax,
-	SectionHeaderProperty,
-	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
 	Strokable,
 	StrokeInfo,
-	StrokeStyle,
 	strokeStyleChoices,
 	Nameable,
 	PositionLabelable,
+	bboxFromPoints,
+	closestBasicDirection,
 } from "../internal"
 import { lineRectIntersection, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -118,20 +111,6 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		}
 	}
 
-	private static bboxFromPoints(points: SVG.Point[]): SVG.Box {
-		let minX = Number.MAX_VALUE
-		let maxX = -Number.MAX_VALUE
-		let minY = Number.MAX_VALUE
-		let maxY = -Number.MAX_VALUE
-		for (const point of points) {
-			if (point.x < minX) minX = point.x
-			if (point.y < minY) minY = point.y
-			if (point.x > maxX) maxX = point.x
-			if (point.y > maxY) maxY = point.y
-		}
-		return new SVG.Box(minX, minY, maxX - minX, maxY - minY)
-	}
-
 	// protected recalculateResizePoints() {
 	// 	if (this.resizeViz.length == this.referencePoints.length) {
 	// 		const transformMatrix = this.getTransformMatrix()
@@ -183,7 +162,7 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 	// 					pos = pos.add(posOffset)
 
 	// 					this.referencePoints[index] = pos
-	// 					const bbox = PolygonComponent.bboxFromPoints(this.referencePoints)
+	// 					const bbox = bboxFromPoints(this.referencePoints)
 	// 					const posDelta = new SVG.Point(bbox.cx, bbox.cy)
 	// 					posOffset = posOffset.sub(posDelta)
 
@@ -308,7 +287,7 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 
 		let labelNodeStr = ""
 		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.labelPos.name
+			let labelStr = "anchor=" + this.anchorPos.name
 
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 
@@ -327,9 +306,8 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 			labelNodeStr = " node[" + labelStr + "] at " + posStr + "{" + latexStr + "}"
 		}
 
-		const transformMatrix = this.getTransformMatrix()
 		let pointsStr = this.referencePoints
-			.map((point) => point.transform(transformMatrix).toTikzString())
+			.map((point) => point.toTikzString())
 			.concat(["cycle"])
 			.join(" -- ")
 
@@ -362,7 +340,7 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 
 		let pointsArray: [number, number][] = this.referencePoints.map((point) => point.toArray())
 
-		const bbox = PolygonComponent.bboxFromPoints(this.referencePoints)
+		const bbox = bboxFromPoints(this.referencePoints)
 		this._bbox = bbox
 
 		this.size = new SVG.Point(bbox.w, bbox.h)
@@ -475,51 +453,47 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		if (!this.mathJaxLabel.value || !this.labelRendering) {
 			return
 		}
+
 		let labelSVG = this.labelRendering
+		let bbox = this.bbox
+		let halfSize = this.size.div(2)
 
-		// get relevant positions and bounding boxes
-		let transformMatrix = this.getTransformMatrix()
-		let bbox = PolygonComponent.bboxFromPoints(this.referencePoints)
-
-		this.textPos = new SVG.Point(this.bbox.cx, this.bbox.cy)
+		let textDir: SVG.Point // normalized direction to size (length not normalized) in local coords
 		let textPosNoTrans = new SVG.Point()
 		if (this.positionChoice.value.key != defaultBasicDirection.key) {
-			let bboxHalfSize = new SVG.Point(bbox.w / 2, bbox.h / 2)
-
-			textPosNoTrans = bboxHalfSize.mul(this.positionChoice.value.direction)
-			this.textPos = textPosNoTrans.transform(transformMatrix)
+			textDir = this.positionChoice.value.direction
+			textPosNoTrans = halfSize.mul(this.positionChoice.value.direction)
+			this.textPos = this.position.add(textPosNoTrans)
+		} else {
+			textDir = new SVG.Point()
+			textPosNoTrans = new SVG.Point()
+			this.textPos = this.position
 		}
 		let labelBBox = labelSVG.bbox()
 
 		// calculate where on the label the anchor point should be
-		let labelRef: SVG.Point
 		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
 		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
-			let clamp = function (value: number, min: number = -1, max: number = 1) {
-				if (value < min) {
-					return min
-				} else if (value > max) {
-					return max
-				} else {
-					return value
-				}
-			}
-			let horizontalTextPosition = clamp(Math.round((2 * (bbox.cx - textPosNoTrans.x)) / bbox.w))
-			let verticalTextPosition = clamp(Math.round((2 * (bbox.cy - textPosNoTrans.y)) / bbox.h))
-			labelRef = new SVG.Point(horizontalTextPosition, verticalTextPosition)
-			labelRef.x = Math.round(labelRef.x)
-			labelRef.y = Math.round(labelRef.y)
-			this.labelPos = basicDirections.find((item) => item.direction.eq(labelRef))
-		} else {
-			this.labelPos = this.anchorChoice.value
-			labelRef = this.labelPos.direction
-		}
+			//transform anchor direction back to global coordinates
+			let labelRefDir = textDir.mul(-1)
 
-		let ref = labelRef.add(1).div(2).mul(new SVG.Point(labelBBox.w, labelBBox.h)).add(labelRef.mul(labelDist))
+			// check which direction should be used to get the final correct direction
+			this.anchorPos = closestBasicDirection(labelRefDir)
+		} else {
+			// an explicit anchor was selected
+			this.anchorPos = this.anchorChoice.value
+		}
+		let labelRef = this.anchorPos.direction
+
+		let ref = labelRef
+			.add(1)
+			.div(2)
+			.mul(new SVG.Point(labelBBox.w, labelBBox.h))
+			.add(new SVG.Point(labelBBox.x, labelBBox.y))
+			.add(labelRef.mul(labelDist))
 
 		// acutally move the label
-		let movePos = this.textPos.sub(ref)
-		labelSVG.transform(new SVG.Matrix({ translate: [movePos.x, movePos.y] }))
+		labelSVG.transform({ translate: this.textPos.sub(ref) })
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {

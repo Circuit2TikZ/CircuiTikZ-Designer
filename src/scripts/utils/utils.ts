@@ -104,3 +104,17 @@ export function getClosestPointerFromDirection(direction: SVG.Point): string {
 	})
 	return minPointer
 }
+
+export function bboxFromPoints(points: SVG.Point[]): SVG.Box {
+	let minX = Number.MAX_VALUE
+	let maxX = -Number.MAX_VALUE
+	let minY = Number.MAX_VALUE
+	let maxY = -Number.MAX_VALUE
+	for (const point of points) {
+		if (point.x < minX) minX = point.x
+		if (point.y < minY) minY = point.y
+		if (point.x > maxX) maxX = point.x
+		if (point.y > maxY) maxY = point.y
+	}
+	return new SVG.Box(minX, minY, maxX - minX, maxY - minY)
+}

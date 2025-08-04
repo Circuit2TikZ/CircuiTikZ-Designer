@@ -1,10 +1,10 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
+	bboxFromPoints,
 	CanvasController,
 	ChoiceEntry,
 	ChoiceProperty,
 	CircuitComponent,
-	ColorProperty,
 	dashArrayToPattern,
 	defaultStroke,
 	defaultStrokeStyleChoice,
@@ -14,12 +14,10 @@ import {
 	PropertyCategories,
 	SectionHeaderProperty,
 	SelectionController,
-	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
 	Strokable,
 	StrokeInfo,
-	StrokeStyle,
 	strokeStyleChoices,
 } from "../internal"
 import { AdjustDragHandler } from "../snapDrag/dragHandlers"
@@ -385,22 +383,9 @@ export class WireComponent extends Strokable(PathComponent) {
 		this.update()
 	}
 
-	private static bboxFromPoints(points: SVG.Point[]): SVG.Box {
-		let min = new SVG.Point(Infinity, Infinity)
-		let max = new SVG.Point(-Infinity, -Infinity)
-		points.forEach((point) => {
-			if (min.x > point.x) min.x = point.x
-			if (min.y > point.y) min.y = point.y
-			if (max.x < point.x) max.x = point.x
-			if (max.y < point.y) max.y = point.y
-		})
-
-		return new SVG.Box(min.x, min.y, max.x - min.x, max.y - min.y)
-	}
-
 	protected update(): void {
 		//recalculate the bounding box and position
-		this._bbox = WireComponent.bboxFromPoints(this.referencePoints)
+		this._bbox = bboxFromPoints(this.referencePoints)
 		this.position = new SVG.Point(this._bbox.cx, this._bbox.cy)
 
 		// generate all the points in the wire from the corner points and the wire directions
@@ -499,7 +484,7 @@ export class WireComponent extends Strokable(PathComponent) {
 			const transformMatrix = this.getTransformMatrix()
 			const transformMatrixInv = transformMatrix.inverse()
 
-			let bbox = WireComponent.bboxFromPoints(this.referencePoints)
+			let bbox = this.bbox
 			const strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 			bbox = new SVG.Box(
 				bbox.x - strokeWidth / 2,
