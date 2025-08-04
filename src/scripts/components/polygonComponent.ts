@@ -59,7 +59,6 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		})
 
 		this.visualization.add(this.componentVisualization)
-
 		this.visualization.add(this.dragElement)
 	}
 
@@ -336,8 +335,6 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 
 	private size: SVG.Point
 	protected update(): void {
-		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
-
 		let pointsArray: [number, number][] = this.referencePoints.map((point) => point.toArray())
 
 		const bbox = bboxFromPoints(this.referencePoints)
@@ -347,14 +344,7 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		this.position = new SVG.Point(bbox.cx, bbox.cy)
 
 		this.dragElement.plot(pointsArray)
-		// this.dragElement.size(this.size.x, this.size.y)
-
 		this.componentVisualization.plot(pointsArray)
-		this.componentVisualization.size(
-			this.size.x < strokeWidth ? 0 : this.size.x - strokeWidth,
-			this.size.y < strokeWidth ? 0 : this.size.y - strokeWidth
-		)
-
 		this.referencePosition = this.position.sub(new SVG.Point(this.bbox.x, this.bbox.y))
 
 		this.recalculateSelectionVisuals()
@@ -365,10 +355,11 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 
 	protected recalculateSelectionVisuals(): void {
 		if (this.selectionElement) {
-			let lineWidth = selectedBoxWidth
+			let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
+			let additionalWidth = selectedBoxWidth + strokeWidth + 2
 
 			this.selectionElement
-				.size(this.size.x + lineWidth, this.size.y + lineWidth)
+				.size(this.size.x + additionalWidth, this.size.y + additionalWidth)
 				.center(this.position.x, this.position.y)
 		}
 	}
