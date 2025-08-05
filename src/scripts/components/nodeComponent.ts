@@ -17,9 +17,12 @@ import {
 	PositionLabelable,
 	Nameable,
 	PositionedLabel,
+	simpifyRotationAndScale,
+	ExportController,
 } from "../internal"
 import { CircuitComponent } from "./circuitComponent"
 import { resizeSVG } from "../utils/selectionHelper"
+import { TikzNode } from "../utils/tikzBuilder"
 
 export const basicDirections: DirectionInfo[] = [
 	{ key: "default", name: "default", direction: new SVG.Point(NaN, NaN) },
@@ -196,6 +199,27 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 
 		if (saveObject.scale) {
 			this.scaleState = new SVG.Point(saveObject.scale)
+		}
+	}
+
+	protected buildTikzCommand(tikzCommand: TikzNode): void {
+		let id = this.name.value
+		if (!id && this.mathJaxLabel.value) {
+			id = ExportController.instance.createExportID("N")
+		}
+		tikzCommand.name = id
+		tikzCommand.position = this.position
+
+		let [rotation, scale] = simpifyRotationAndScale(this.rotationDeg, this.scaleState)
+
+		if (rotation !== 0) {
+			tikzCommand.options.push("rotate=" + rotation)
+		}
+		if (scale.x != 1) {
+			tikzCommand.options.push("xscale=" + scale.x)
+		}
+		if (scale.y != 1) {
+			tikzCommand.options.push("yscale=" + scale.y)
 		}
 	}
 
