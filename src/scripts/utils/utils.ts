@@ -92,19 +92,6 @@ export function memorySizeOf(obj) {
 	return sizeOf(obj)
 }
 
-export function getClosestPointerFromDirection(direction: SVG.Point): string {
-	let minValue = Infinity
-	let minPointer = "move"
-	basicDirections.slice(2).forEach((item) => {
-		const diffLength = item.direction.sub(direction).absSquared()
-		if (diffLength < minValue) {
-			minValue = diffLength
-			minPointer = item.pointer
-		}
-	})
-	return minPointer
-}
-
 export function bboxFromPoints(points: SVG.Point[]): SVG.Box {
 	let minX = Number.MAX_VALUE
 	let maxX = -Number.MAX_VALUE

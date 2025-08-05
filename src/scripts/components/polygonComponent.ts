@@ -23,6 +23,7 @@ import {
 	PositionLabelable,
 	bboxFromPoints,
 	closestBasicDirection,
+	SelectionController,
 } from "../internal"
 import { lineRectIntersection, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -110,83 +111,10 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		}
 	}
 
-	// protected recalculateResizePoints() {
-	// 	if (this.resizeViz.length == this.referencePoints.length) {
-	// 		const transformMatrix = this.getTransformMatrix()
-
-	// 		for (let index = 0; index < this.referencePoints.length; index++) {
-	// 			const point = this.referencePoints[index].transform(transformMatrix)
-	// 			const viz = this.resizeViz[index]
-
-	// 			viz.center(point.x, point.y)
-	// 		}
-	// 	}
-	// }
-
-	// private resizeViz: SVG.Element[] = []
-	// public resizable(resize: boolean): void {
-	// 	if (resize == this.isResizing) {
-	// 		return
-	// 	}
-	// 	this.isResizing = resize
-	// 	if (resize) {
-	// 		// let originalPos: SVG.Point
-	// 		// let originalSize: SVG.Point
-	// 		let transformMatrixInv: SVG.Matrix
-	// 		const getInitialDim = () => {
-	// 			// originalPos = this.position.clone()
-	// 			// originalSize = this.size.clone()
-	// 			transformMatrixInv = this.getTransformMatrix().inverse()
-	// 		}
-
-	// 		for (let index = 0; index < this.referencePoints.length; index++) {
-	// 			const point = this.referencePoints[index]
-	// 			let viz = resizeSVG()
-	// 			viz.node.style.cursor = "move"
-	// 			this.resizeViz.push(viz)
-
-	// 			let startPoint: SVG.Point
-	// 			let posOffset: SVG.Point = new SVG.Point()
-	// 			AdjustDragHandler.snapDrag(this, viz, true, {
-	// 				dragStart: (pos) => {
-	// 					getInitialDim()
-	// 					startPoint = new SVG.Point(point)
-	// 				},
-	// 				dragMove: (pos, ev) => {
-	// 					pos = pos.transform(transformMatrixInv)
-	// 					const transformMatrix = this.getTransformMatrix().lmultiply({
-	// 						translate: [-this.position.x, -this.position.y],
-	// 					})
-
-	// 					pos = pos.add(posOffset)
-
-	// 					this.referencePoints[index] = pos
-	// 					const bbox = bboxFromPoints(this.referencePoints)
-	// 					const posDelta = new SVG.Point(bbox.cx, bbox.cy)
-	// 					posOffset = posOffset.sub(posDelta)
-
-	// 					for (let index = 0; index < this.referencePoints.length; index++) {
-	// 						const point = this.referencePoints[index]
-	// 						this.referencePoints[index] = point.sub(posDelta)
-	// 					}
-	// 					this.position = this.position.add(posDelta.transform(transformMatrix))
-	// 					startPoint = pos
-	// 					this.update()
-	// 				},
-	// 				dragEnd: () => {
-	// 					return true
-	// 				},
-	// 			})
-	// 		}
-	// 		this.update()
-	// 	} else {
-	// 		for (const viz of this.resizeViz) {
-	// 			AdjustDragHandler.snapDrag(this, viz, false)
-	// 			viz.remove()
-	// 		}
-	// 		this.resizeViz = []
-	// 	}
-	// }
+	public viewSelected(show: boolean): void {
+		super.viewSelected(show)
+		this.resizable(this.isSelected && show && SelectionController.instance.currentlySelectedComponents.length == 1)
+	}
 
 	public toJson(): PolygonSaveObject {
 		let data = super.toJson() as PolygonSaveObject
@@ -428,7 +356,6 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		}
 
 		this.finishedPlacing = true
-		this.update()
 		this.componentVisualization.show()
 		this.updateTheme()
 		this.update()

@@ -1,11 +1,7 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
-	ChoiceProperty,
-	ColorProperty,
 	DirectionInfo,
-	SliderProperty,
 	CanvasController,
-	SectionHeaderProperty,
 	basicDirections,
 	defaultBasicDirection,
 	SnappingInfo,
@@ -15,13 +11,11 @@ import {
 	SelectionController,
 	NodeComponent,
 	NodeSaveObject,
-	getClosestPointerFromDirection,
-	PropertyCategories,
 	FillInfo,
 	Fillable,
 	StrokeInfo,
 	Strokable,
-	ComponentSaveObject,
+	closestBasicDirection,
 } from "../internal"
 import { resizeSVG, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -125,6 +119,20 @@ export abstract class ShapeComponent extends Strokable(Fillable(NodeComponent)) 
 		this.defaultTextPosition = halfSize
 		this._bbox = this.dragElement.bbox().transform(transformMatrix)
 
+		//update resize pointers
+		if (this.isResizing) {
+			for (const [direction, viz] of this.resizeVisualizations.entries()) {
+				const directionTransformed = direction.direction.transform(
+					new SVG.Matrix({
+						rotate: -this.rotationDeg,
+						scaleX: this.scaleState.x,
+						scaleY: this.scaleState.y,
+					})
+				)
+				viz.node.style.cursor = closestBasicDirection(directionTransformed).pointer
+			}
+		}
+
 		this.recalculateSelectionVisuals()
 		this.recalculateSnappingPoints()
 		this.recalculateResizePoints()
@@ -218,10 +226,7 @@ export abstract class ShapeComponent extends Strokable(Fillable(NodeComponent)) 
 					continue
 				}
 
-				const directionTransformed = direction.direction.rotate(this.rotationDeg)
-
 				let viz = resizeSVG()
-				viz.node.style.cursor = getClosestPointerFromDirection(directionTransformed)
 				this.resizeVisualizations.set(direction, viz)
 
 				let startPoint: SVG.Point

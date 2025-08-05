@@ -1,25 +1,14 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
 	ChoiceEntry,
-	ChoiceProperty,
-	clamp,
-	ColorProperty,
-	MathJaxProperty,
-	SliderProperty,
 	ComponentSaveObject,
 	defaultStroke,
-	CanvasController,
-	renderMathJax,
-	SectionHeaderProperty,
-	Label,
 	closestBasicDirection,
-	PropertyCategories,
 	PositionLabelable,
 	Nameable,
 	PositionedLabel,
 } from "../internal"
 import { CircuitComponent } from "./circuitComponent"
-import { resizeSVG } from "../utils/selectionHelper"
 
 export const basicDirections: DirectionInfo[] = [
 	{ key: "default", name: "default", direction: new SVG.Point(NaN, NaN) },
