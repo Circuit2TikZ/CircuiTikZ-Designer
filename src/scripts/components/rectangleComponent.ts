@@ -208,7 +208,7 @@ export class RectangleComponent extends ShapeComponent {
 				:	defaultFontSize
 
 			if (saveObject.text.innerSep) {
-				if (Object.hasOwn(saveObject.text.innerSep, "value")) {
+				if ("value" in saveObject.text.innerSep) {
 					// SVG.Number as object
 					this.textInnerSep.value = new SVG.Number(
 						saveObject.text.innerSep.value,

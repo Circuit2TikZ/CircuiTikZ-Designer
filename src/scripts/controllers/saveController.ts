@@ -120,7 +120,7 @@ export class SaveController {
 	}
 
 	loadFromJSON(saveFile: SaveFileFormat, selectComponents = false) {
-		if (!Object.hasOwn(saveFile, "version")) {
+		if (!("version" in saveFile)) {
 			alert(
 				"Save files in json format pre application version 0.7 are not compatible anymore. Please redo your circuits. Sorry :("
 			)

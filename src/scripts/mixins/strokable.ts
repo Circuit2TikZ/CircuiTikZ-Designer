@@ -153,7 +153,7 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 					this.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
 				}
 				if (saveObject.stroke.width) {
-					if (Object.hasOwn(saveObject.stroke.width, "value")) {
+					if ("value" in saveObject.stroke.width) {
 						// SVG.Number as object
 						this.strokeInfo.width = new SVG.Number(
 							saveObject.stroke.width.value,
