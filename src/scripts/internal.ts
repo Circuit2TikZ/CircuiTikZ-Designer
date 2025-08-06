@@ -47,3 +47,4 @@ export * from "./snapDrag/snapPoint"
 // other
 export * from "./utils/textHelper"
 export * from "./utils/utils"
+export * from "./utils/tikzBuilder"

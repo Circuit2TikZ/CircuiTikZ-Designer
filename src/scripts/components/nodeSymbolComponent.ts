@@ -2,6 +2,7 @@ import * as SVG from "@svgdotjs/svg.js"
 import {
 	basicDirections,
 	BooleanProperty,
+	buildTikzNodeCommand,
 	CanvasController,
 	ChoiceEntry,
 	ChoiceProperty,
@@ -24,6 +25,7 @@ import {
 	SnappingInfo,
 	SnapPoint,
 	SymbolOption,
+	TikzNode,
 	Variant,
 } from "../internal"
 import { roundTikz, selectedBoxWidth } from "../utils/selectionHelper"
@@ -264,17 +266,21 @@ export class NodeSymbolComponent extends NodeComponent {
 	}
 
 	public toTikzString(): string {
-		const optionsString = this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()).join(", ")
-
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("N")
+		let command: TikzNode = {
+			position: this.position,
+			options: [this.referenceSymbol.tikzName],
+			additionalNodes: [],
 		}
+		this.buildTikzCommand(command)
+		return buildTikzNodeCommand(command)
+	}
 
-		let labelNodeStr = ""
+	protected buildTikzCommand(tikzCommand: TikzNode): void {
+		super.buildTikzCommand(tikzCommand)
+
+		tikzCommand.options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+
 		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.anchorPos.name
-
 			let labelDist = this.labelDistance.value.convertToUnit("cm")
 
 			if (!isNaN(this.anchorPos.direction.absSquared())) {
@@ -294,35 +300,22 @@ export class NodeSymbolComponent extends NodeComponent {
 
 			let posStr =
 				this.positionChoice.value.key == defaultBasicDirection.key ?
-					id + ".text"
-				:	id + "." + this.labelPos.name
+					tikzCommand.name + ".text"
+				:	tikzCommand.name + "." + this.labelPos.name
 			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
 			latexStr =
 				latexStr && this.labelColor.value ?
 					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
 				:	latexStr
 
-			labelNodeStr = " node[" + labelStr + "] at (" + posShift + posStr + "){" + latexStr + "}"
+			let labelCommand: TikzNode = {
+				position: posShift + posStr,
+				options: ["anchor=" + this.anchorPos.name],
+				additionalNodes: [],
+				content: latexStr,
+			}
+			tikzCommand.additionalNodes.push(labelCommand)
 		}
-
-		//don't change the order of scale and rotate!!! otherwise tikz render and UI are not the same
-		let [rotation, scale] = simpifyRotationAndScale(this.rotationDeg, this.scaleState)
-
-		return (
-			"\\node[" +
-			this.referenceSymbol.tikzName +
-			(optionsString ? ", " + optionsString : "") +
-			(rotation !== 0 ? `, rotate=${rotation}` : "") +
-			(scale.x != 1 ? `, xscale=${scale.x}` : "") +
-			(scale.y != 1 ? `, yscale=${scale.y}` : "") +
-			"] " +
-			(id ? "(" + id + ") " : "") +
-			"at " +
-			this.position.toTikzString() +
-			" {}" +
-			labelNodeStr +
-			";"
-		)
 	}
 
 	protected applyJson(saveObject: NodeSymbolSaveObject): void {
