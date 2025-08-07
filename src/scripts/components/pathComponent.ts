@@ -1,14 +1,12 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
 	AdjustDragHandler,
+	buildTikzStringFromPathCommand,
 	CircuitComponent,
-	ColorProperty,
 	ComponentSaveObject,
-	Label,
 	MainController,
-	MathJaxProperty,
-	SliderProperty,
 	SnapCursorController,
+	TikzPathCommand,
 } from "../internal"
 import { resizeSVG } from "../utils/selectionHelper"
 
@@ -191,5 +189,22 @@ export abstract class PathComponent extends CircuitComponent {
 		}
 		this.finishedPlacing = true
 		this.update()
+	}
+
+	public toTikzString(): string {
+		let command: TikzPathCommand = {
+			options: [],
+			additionalNodes: [],
+			connectors: [],
+			coordinates: [],
+		}
+		this.buildTikzCommand(command)
+		return buildTikzStringFromPathCommand(command)
+	}
+
+	protected buildTikzCommand(command: TikzPathCommand): void {
+		super.buildTikzCommand(command)
+
+		command.coordinates.push(...this.referencePoints)
 	}
 }

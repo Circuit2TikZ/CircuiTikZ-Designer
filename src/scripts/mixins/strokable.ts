@@ -6,6 +6,7 @@ import {
 	CircuitComponent,
 	ColorProperty,
 	ComponentSaveObject,
+	dashArrayToPattern,
 	PropertyCategories,
 	SectionHeaderProperty,
 	SliderProperty,
@@ -169,6 +170,35 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 					this.strokeInfo.style = saveObject.stroke.style
 					this.strokeStyleProperty.value = strokeStyleChoices.find(
 						(item) => item.key == saveObject.stroke.style
+					)
+				}
+			}
+		}
+
+		protected buildTikzCommand(command: { options: string[] }): void {
+			super.buildTikzCommand(command)
+			let width = this.strokeInfo.width.convertToUnit("pt").value
+			if (this.strokeInfo.opacity > 0 && width > 0) {
+				if (this.strokeInfo.color !== "default") {
+					let c = new SVG.Color(this.strokeInfo.color)
+					command.options.push("draw=" + c.toTikzString())
+				} else {
+					command.options.push("draw")
+				}
+
+				if (this.strokeInfo.opacity != 1) {
+					command.options.push("draw opacity=" + this.strokeInfo.opacity.toString())
+				}
+
+				if (width != 0.4) {
+					command.options.push("line width=" + width + "pt")
+				}
+				if (this.strokeInfo.style && this.strokeInfo.style != defaultStrokeStyleChoice.key) {
+					command.options.push(
+						dashArrayToPattern(
+							this.strokeInfo.width,
+							strokeStyleChoices.find((item) => item.key == this.strokeInfo.style).dasharray
+						)
 					)
 				}
 			}

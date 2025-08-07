@@ -1,34 +1,29 @@
 import * as SVG from "@svgdotjs/svg.js"
 import {
-	basicDirections,
 	BooleanProperty,
-	buildTikzNodeCommand,
+	buildTikzStringFromNodeCommand,
 	CanvasController,
 	ChoiceEntry,
 	ChoiceProperty,
 	CircuitComponent,
-	ComponentSaveObject,
 	ComponentSymbol,
-	defaultBasicDirection,
 	defaultFill,
 	defaultStroke,
 	EnumOption,
-	ExportController,
 	InfoProperty,
 	MainController,
 	NodeComponent,
 	NodeSaveObject,
 	PropertyCategories,
 	SectionHeaderProperty,
-	simpifyRotationAndScale,
 	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
 	SymbolOption,
-	TikzNode,
+	TikzNodeCommand,
 	Variant,
 } from "../internal"
-import { roundTikz, selectedBoxWidth } from "../utils/selectionHelper"
+import { selectedBoxWidth } from "../utils/selectionHelper"
 
 export type NodeSymbolSaveObject = NodeSaveObject & {
 	id: string
@@ -266,56 +261,17 @@ export class NodeSymbolComponent extends NodeComponent {
 	}
 
 	public toTikzString(): string {
-		let command: TikzNode = {
-			position: this.position,
+		let command: TikzNodeCommand = {
 			options: [this.referenceSymbol.tikzName],
 			additionalNodes: [],
 		}
 		this.buildTikzCommand(command)
-		return buildTikzNodeCommand(command)
+		return buildTikzStringFromNodeCommand(command)
 	}
 
-	protected buildTikzCommand(tikzCommand: TikzNode): void {
-		super.buildTikzCommand(tikzCommand)
-
-		tikzCommand.options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
-
-		if (this.mathJaxLabel.value) {
-			let labelDist = this.labelDistance.value.convertToUnit("cm")
-
-			if (!isNaN(this.anchorPos.direction.absSquared())) {
-				labelDist = labelDist.minus(0.12)
-			}
-
-			let labelShift = this.anchorPos.direction.mul(-labelDist.value)
-			let posShift = ""
-			if (labelShift.x !== 0) {
-				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
-			}
-			if (labelShift.y !== 0) {
-				posShift += posShift == "" ? "" : ", "
-				posShift += "yshift=" + roundTikz(-labelShift.y) + "cm"
-			}
-			posShift = posShift == "" ? "" : "[" + posShift + "]"
-
-			let posStr =
-				this.positionChoice.value.key == defaultBasicDirection.key ?
-					tikzCommand.name + ".text"
-				:	tikzCommand.name + "." + this.labelPos.name
-			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-			latexStr =
-				latexStr && this.labelColor.value ?
-					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-				:	latexStr
-
-			let labelCommand: TikzNode = {
-				position: posShift + posStr,
-				options: ["anchor=" + this.anchorPos.name],
-				additionalNodes: [],
-				content: latexStr,
-			}
-			tikzCommand.additionalNodes.push(labelCommand)
-		}
+	protected buildTikzCommand(command: TikzNodeCommand): void {
+		command.options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+		super.buildTikzCommand(command)
 	}
 
 	protected applyJson(saveObject: NodeSymbolSaveObject): void {

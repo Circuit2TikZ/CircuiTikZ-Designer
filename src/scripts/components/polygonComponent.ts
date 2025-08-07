@@ -3,11 +3,8 @@ import {
 	basicDirections,
 	CanvasController,
 	CircuitComponent,
-	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultStroke,
-	defaultStrokeStyleChoice,
-	ExportController,
 	Fillable,
 	FillInfo,
 	MainController,
@@ -18,12 +15,11 @@ import {
 	SnapPoint,
 	Strokable,
 	StrokeInfo,
-	strokeStyleChoices,
-	Nameable,
 	PositionLabelable,
 	bboxFromPoints,
 	closestBasicDirection,
 	SelectionController,
+	TikzPathCommand,
 } from "../internal"
 import { lineRectIntersection, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -34,7 +30,7 @@ export type PolygonSaveObject = PathSaveObject & {
 	label?: PositionedLabel
 }
 
-export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Fillable(PathComponent)))) {
+export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathComponent))) {
 	private static jsonID = "polygon"
 	static {
 		CircuitComponent.jsonSaveMap.set(PolygonComponent.jsonID, PolygonComponent)
@@ -166,80 +162,11 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 		this.labelRendering?.fill(labelColor)
 	}
 
-	public toTikzString(): string {
-		let optionsArray: string[] = []
-
-		if (this.fillInfo.opacity > 0) {
-			if (this.fillInfo.color !== "default") {
-				let c = new SVG.Color(this.fillInfo.color)
-				optionsArray.push("fill=" + c.toTikzString())
-			}
-
-			if (this.fillInfo.opacity != 1) {
-				optionsArray.push("fill opacity=" + this.fillInfo.opacity.toString())
-			}
-		}
-
-		if (this.strokeInfo.opacity > 0) {
-			if (this.strokeInfo.color !== "default") {
-				let c = new SVG.Color(this.strokeInfo.color)
-				optionsArray.push("draw=" + c.toTikzString())
-			} else {
-				optionsArray.push("draw")
-			}
-
-			if (this.strokeInfo.opacity != 1) {
-				optionsArray.push("draw opacity=" + this.strokeInfo.opacity.toString())
-			}
-
-			let width = this.strokeInfo.width.convertToUnit("pt").value
-			if (width != 0.4) {
-				optionsArray.push("line width=" + width + "pt")
-			}
-
-			if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-				optionsArray.push(
-					dashArrayToPattern(
-						this.strokeInfo.width,
-						strokeStyleChoices.find((item) => item.key == this.strokeInfo.style).dasharray
-					)
-				)
-			}
-		}
-
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("Ellipse")
-		}
-
-		let labelNodeStr = ""
-		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.anchorPos.name
-
-			let labelDist = this.labelDistance.value.convertToUnit("cm")
-
-			let norm = this.labelPos.direction.abs()
-			norm = norm == 0 ? 1 : norm
-			let labelShift = this.labelPos.direction.mul(-labelDist.value / norm)
-
-			let posStr = this.textPos.add(labelShift).toTikzString()
-
-			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-			latexStr =
-				latexStr && this.labelColor.value ?
-					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-				:	latexStr
-
-			labelNodeStr = " node[" + labelStr + "] at " + posStr + "{" + latexStr + "}"
-		}
-
-		let pointsStr = this.referencePoints
-			.map((point) => point.toTikzString())
-			.concat(["cycle"])
-			.join(" -- ")
-
-		let optionsStr = optionsArray.length > 0 ? `[${optionsArray.join(", ")}]` : ""
-		return `\\path${optionsStr} ${pointsStr} ${labelNodeStr};`
+	protected buildTikzCommand(command: TikzPathCommand): void {
+		super.buildTikzCommand(command)
+		command.additionalNodes.push(this.buildTikzNodeLabel(this.textPos))
+		this.referencePoints.forEach(() => command.connectors.push("--"))
+		command.coordinates.push("cycle")
 	}
 
 	public requiredTikzLibraries(): string[] {
@@ -378,6 +305,7 @@ export class PolygonComponent extends PositionLabelable(Nameable(Strokable(Filla
 
 		let textDir: SVG.Point // normalized direction to size (length not normalized) in local coords
 		let textPosNoTrans = new SVG.Point()
+		this.labelPos = this.positionChoice.value
 		if (this.positionChoice.value.key != defaultBasicDirection.key) {
 			textDir = this.positionChoice.value.direction
 			textPosNoTrans = halfSize.mul(this.positionChoice.value.direction)

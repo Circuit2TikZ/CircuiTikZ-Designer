@@ -8,10 +8,10 @@ import {
 	Nameable,
 	PositionedLabel,
 	simpifyRotationAndScale,
-	ExportController,
+	buildTikzStringFromNodeCommand,
+	TikzNodeCommand,
 } from "../internal"
 import { CircuitComponent } from "./circuitComponent"
-import { TikzNode } from "../utils/tikzBuilder"
 
 export const basicDirections: DirectionInfo[] = [
 	{ key: "default", name: "default", direction: new SVG.Point(NaN, NaN) },
@@ -191,24 +191,35 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 		}
 	}
 
-	protected buildTikzCommand(tikzCommand: TikzNode): void {
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("N")
+	public toTikzString(): string {
+		let command: TikzNodeCommand = {
+			additionalNodes: [],
+			options: [],
 		}
-		tikzCommand.name = id
-		tikzCommand.position = this.position
+		this.buildTikzCommand(command)
+		return buildTikzStringFromNodeCommand(command)
+	}
+
+	protected buildTikzCommand(command: TikzNodeCommand) {
+		super.buildTikzCommand(command)
+		command.position = this.position
 
 		let [rotation, scale] = simpifyRotationAndScale(this.rotationDeg, this.scaleState)
 
 		if (rotation !== 0) {
-			tikzCommand.options.push("rotate=" + rotation)
+			command.options.push("rotate=" + rotation)
 		}
 		if (scale.x != 1) {
-			tikzCommand.options.push("xscale=" + scale.x)
+			command.options.push("xscale=" + scale.x)
 		}
 		if (scale.y != 1) {
-			tikzCommand.options.push("yscale=" + scale.y)
+			command.options.push("yscale=" + scale.y)
+		}
+
+		const shouldAddLabel = this.mathJaxLabel.value !== ""
+		command.name = this.buildTikzName(shouldAddLabel)
+		if (shouldAddLabel) {
+			command.additionalNodes.push(this.buildTikzNodeLabel(command.name))
 		}
 	}
 

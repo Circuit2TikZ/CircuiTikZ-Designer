@@ -5,9 +5,7 @@ import {
 	ChoiceEntry,
 	ChoiceProperty,
 	CircuitComponent,
-	dashArrayToPattern,
 	defaultStroke,
-	defaultStrokeStyleChoice,
 	MainController,
 	PathComponent,
 	PathSaveObject,
@@ -18,7 +16,7 @@ import {
 	SnapPoint,
 	Strokable,
 	StrokeInfo,
-	strokeStyleChoices,
+	TikzPathCommand,
 } from "../internal"
 import { AdjustDragHandler } from "../snapDrag/dragHandlers"
 import {
@@ -567,50 +565,25 @@ export class WireComponent extends Strokable(PathComponent) {
 		return new WireComponent()
 	}
 
-	public toTikzString(): string {
-		let drawOptions: string[] = []
+	protected buildTikzCommand(command: TikzPathCommand): void {
+		super.buildTikzCommand(command)
+
+		let arrowOptions: string[] = []
 		if (this.arrowStartChoice.value.key !== defaultArrowTip.key) {
-			drawOptions.push(this.arrowStartChoice.value.tikz)
-			drawOptions.push("-")
+			arrowOptions.push(this.arrowStartChoice.value.tikz)
+			arrowOptions.push("-")
 		}
 		if (this.arrowEndChoice.value.key !== defaultArrowTip.key) {
-			if (drawOptions.length == 0) {
-				drawOptions.push("-")
+			if (arrowOptions.length == 0) {
+				arrowOptions.push("-")
 			}
-			drawOptions.push(this.arrowEndChoice.value.tikz)
+			arrowOptions.push(this.arrowEndChoice.value.tikz)
 		}
-
-		let optionsArray: string[] = drawOptions.length > 0 ? [drawOptions.join("")] : []
-
-		if (this.strokeInfo.opacity > 0) {
-			if (this.strokeInfo.color !== "default") {
-				let c = new SVG.Color(this.strokeInfo.color)
-				optionsArray.push("draw=" + c.toTikzString())
-			}
-
-			if (this.strokeInfo.opacity != 1) {
-				optionsArray.push("draw opacity=" + this.strokeInfo.opacity.toString())
-			}
-
-			let width = this.strokeInfo.width.convertToUnit("pt").value
-			if (width != 0.4) {
-				optionsArray.push("line width=" + width + "pt")
-			}
-			if (this.strokeInfo.style && this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-				optionsArray.push(
-					dashArrayToPattern(
-						this.strokeInfo.width,
-						strokeStyleChoices.find((item) => item.key == this.strokeInfo.style).dasharray
-					)
-				)
-			}
+		if (arrowOptions.length > 0) {
+			command.options.push(arrowOptions.join(""))
 		}
-		let optionsArrayStr = optionsArray.length > 0 ? "[" + optionsArray.join(", ") + "]" : ""
-
-		let outString = "\\draw" + optionsArrayStr + " "
 
 		let pointArray = this.referencePoints.map((point) => point)
-		outString += pointArray[0].toTikzString()
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			const previousPoint = pointArray[index]
 			const point = pointArray[index + 1]
@@ -624,9 +597,8 @@ export class WireComponent extends Strokable(PathComponent) {
 			if (!dir) {
 				dir = WireDirection.Straight
 			}
-			outString += " " + dir + " " + point.toTikzString()
+			command.connectors.push(dir)
 		}
-		return outString + ";"
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {

@@ -7,10 +7,8 @@ import {
 	SnapDragHandler,
 	SnappingInfo,
 	BooleanProperty,
-	MathJaxProperty,
 	SliderProperty,
 	SectionHeaderProperty,
-	ColorProperty,
 	defaultStroke,
 	SelectionController,
 	PathComponent,
@@ -27,14 +25,10 @@ import {
 	CircuitComponent,
 	PropertyCategories,
 	Nameable,
+	TikzPathCommand,
+	CircuitikzTo,
 } from "../internal"
-import {
-	lineRectIntersection,
-	pointInsideRect,
-	selectedBoxWidth,
-	roundTikz,
-	selectionSize,
-} from "../utils/selectionHelper"
+import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
 export type PathSymbolSaveObject = PathSaveObject & {
 	id: string
@@ -485,44 +479,27 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 
 		return data
 	}
-	public toTikzString(): string {
-		const optionsString = this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()).join(", ")
 
-		let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
-		let shouldDist = this.labelDistance.value && distStr != "0.0cm"
+	protected buildTikzCommand(command: TikzPathCommand): void {
+		super.buildTikzCommand(command)
+		let options: string[] = [this.referenceSymbol.tikzName]
+		options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+		if (this.mirror.value) {
+			options.push("mirror")
+		}
+		if (this.invert.value) {
+			options.push("invert")
+		}
 
 		const scaleFactor =
 			this.scaleProperty.value.value != 1 ? new SVG.Number(this.scaleProperty.value.value * 1.4, "cm") : undefined
+		if (scaleFactor) {
+			options.push("/tikz/circuitikz/bipoles/length=" + scaleFactor.value.toPrecision(3) + scaleFactor.unit)
+		}
 
-		let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-		latexStr =
-			latexStr && this.labelColor.value ?
-				"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-			:	latexStr
-		return (
-			"\\draw " +
-			this.referencePoints[0].toTikzString() +
-			" to[" +
-			this.referenceSymbol.tikzName +
-			(optionsString ? ", " + optionsString : "") +
-			(this.name.value === "" ? "" : ", name=" + this.name.value) +
-			(this.mathJaxLabel.value !== "" ?
-				", l" +
-				(this.labelSide.value ? "_" : "") +
-				"={" +
-				latexStr +
-				"}" +
-				(shouldDist ? ", label distance=" + distStr : "")
-			:	"") +
-			(this.mirror.value ? ", mirror" : "") +
-			(this.invert.value ? ", invert" : "") +
-			(scaleFactor ?
-				",/tikz/circuitikz/bipoles/length=" + scaleFactor.value.toPrecision(3) + scaleFactor.unit
-			:	"") +
-			"] " +
-			this.referencePoints[1].toTikzString() +
-			";"
-		)
+		let to: CircuitikzTo = { options: options, name: this.name.value }
+		this.buildTikzPathLabel(command)
+		command.connectors.push(to)
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {

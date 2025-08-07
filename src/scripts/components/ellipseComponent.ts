@@ -3,14 +3,11 @@ import {
 	basicDirections,
 	CanvasController,
 	CircuitComponent,
-	dashArrayToPattern,
 	defaultBasicDirection,
-	defaultStrokeStyleChoice,
-	ExportController,
 	ShapeComponent,
 	ShapeSaveObject,
 	SnapPoint,
-	strokeStyleChoices,
+	TikzNodeCommand,
 } from "../internal"
 import { pointInsideRect, roundTikz } from "../utils/selectionHelper"
 
@@ -128,113 +125,28 @@ export class EllipseComponent extends ShapeComponent {
 		return new EllipseComponent()
 	}
 
-	public toTikzString(): string {
-		let optionsArray: string[] = []
-
+	protected buildTikzCommand(command: TikzNodeCommand): void {
 		if (this.isCircle) {
-			optionsArray.push("shape=circle")
+			command.options.push("shape=circle")
 		} else {
-			optionsArray.push("shape=ellipse")
+			command.options.push("shape=ellipse")
 		}
-		if (this.fillInfo.opacity > 0) {
-			if (this.fillInfo.color !== "default") {
-				let c = new SVG.Color(this.fillInfo.color)
-				optionsArray.push("fill=" + c.toTikzString())
-			}
-
-			if (this.fillInfo.opacity != 1) {
-				optionsArray.push("fill opacity=" + this.fillInfo.opacity.toString())
-			}
-		}
-
-		if (this.strokeInfo.opacity > 0) {
-			if (this.strokeInfo.color !== "default") {
-				let c = new SVG.Color(this.strokeInfo.color)
-				optionsArray.push("draw=" + c.toTikzString())
-			} else {
-				optionsArray.push("draw")
-			}
-
-			if (this.strokeInfo.opacity != 1) {
-				optionsArray.push("draw opacity=" + this.strokeInfo.opacity.toString())
-			}
-
-			let width = this.strokeInfo.width.convertToUnit("pt").value
-			if (width != 0.4) {
-				optionsArray.push("line width=" + width + "pt")
-			}
-
-			if (this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-				optionsArray.push(
-					dashArrayToPattern(
-						this.strokeInfo.width,
-						strokeStyleChoices.find((item) => item.key == this.strokeInfo.style).dasharray
-					)
-				)
-			}
-		}
+		super.buildTikzCommand(command)
 
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
-		optionsArray.push("inner sep=0")
-		optionsArray.push(
+		command.options.push(
 			"minimum width=" +
 				roundTikz(new SVG.Number(this.size.x - strokeWidth, "px").convertToUnit("cm").value) +
 				"cm"
 		)
 		if (!this.isCircle) {
-			optionsArray.push(
+			command.options.push(
 				"minimum height=" +
 					roundTikz(new SVG.Number(this.size.y - strokeWidth, "px").convertToUnit("cm").value) +
 					"cm"
 			)
 		}
-
-		if (this.rotationDeg != 0) {
-			optionsArray.push(`rotate=${this.rotationDeg}`)
-		}
-
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("Ellipse")
-		}
-
-		let labelNodeStr = ""
-		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.anchorPos.name
-
-			let labelDist = this.labelDistance.value.convertToUnit("cm")
-
-			let labelShift: SVG.Point = new SVG.Point()
-			if (this.positionChoice.value.key != defaultBasicDirection.key) {
-				labelShift = this.labelPos.direction.mul(-labelDist.value / this.labelPos.direction.abs())
-			}
-			let posShift = ""
-			if (labelShift.x !== 0) {
-				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
-			}
-			if (labelShift.y !== 0) {
-				posShift += posShift == "" ? "" : ", "
-				posShift += "yshift=" + roundTikz(-labelShift.y) + "cm"
-			}
-			posShift = posShift == "" ? "" : "[" + posShift + "]"
-
-			let posStr =
-				this.positionChoice.value.key == defaultBasicDirection.key ?
-					id + ".center"
-				:	id + "." + this.positionChoice.value.name
-
-			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-			latexStr =
-				latexStr && this.labelColor.value ?
-					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-				:	latexStr
-
-			labelNodeStr = " node[" + labelStr + "] at (" + posShift + posStr + "){" + latexStr + "}"
-		}
-
-		let optionsStr = optionsArray.length > 0 ? `[${optionsArray.join(", ")}]` : ""
-		return `\\node${optionsStr}${id ? "(" + id + ")" : ""} at ${this.position.toTikzString()}{}${labelNodeStr};`
 	}
 
 	public requiredTikzLibraries(): string[] {

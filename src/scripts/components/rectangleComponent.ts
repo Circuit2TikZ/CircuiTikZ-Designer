@@ -5,18 +5,12 @@ import {
 	ChoiceProperty,
 	CircuitComponent,
 	ColorProperty,
-	ComponentSaveObject,
 	convertTextToNativeSVGText,
-	dashArrayToPattern,
 	defaultBasicDirection,
 	defaultFontSize,
-	defaultStrokeStyleChoice,
-	ExportController,
-	FillInfo,
 	FontSize,
 	fontSizes,
 	MathjaxParser,
-	NodeSaveObject,
 	PropertyCategories,
 	SectionHeaderProperty,
 	ShapeComponent,
@@ -27,6 +21,7 @@ import {
 	Text,
 	TextAlign,
 	TextAreaProperty,
+	TikzNodeCommand,
 } from "../internal"
 import { rectRectIntersection, roundTikz } from "../utils/selectionHelper"
 
@@ -251,70 +246,26 @@ export class RectangleComponent extends ShapeComponent {
 		}
 	}
 
-	public toTikzString(): string {
-		let optionsArray: string[] = ["shape=rectangle"]
-		if (this.fillInfo.opacity > 0) {
-			if (this.fillInfo.color !== "default") {
-				let c = new SVG.Color(this.fillInfo.color)
-				optionsArray.push("fill=" + c.toTikzString())
-			}
-
-			if (this.fillInfo.opacity != 1) {
-				optionsArray.push("fill opacity=" + this.fillInfo.opacity.toString())
-			}
-		}
-
-		if (this.strokeInfo.opacity > 0) {
-			if (this.strokeInfo.color !== "default") {
-				let c = new SVG.Color(this.strokeInfo.color)
-				optionsArray.push("draw=" + c.toTikzString())
-			} else {
-				optionsArray.push("draw")
-			}
-
-			if (this.strokeInfo.opacity != 1) {
-				optionsArray.push("draw opacity=" + this.strokeInfo.opacity.toString())
-			}
-
-			let width = this.strokeInfo.width.convertToUnit("pt").value
-			if (width != 0.4) {
-				optionsArray.push("line width=" + width + "pt")
-			}
-			if (this.strokeInfo.style && this.strokeInfo.style != defaultStrokeStyleChoice.key) {
-				optionsArray.push(
-					dashArrayToPattern(
-						this.strokeInfo.width,
-						strokeStyleChoices.find((item) => item.key == this.strokeInfo.style).dasharray
-					)
-				)
-			}
-		}
+	protected buildTikzCommand(command: TikzNodeCommand): void {
+		command.options.push("shape=rectangle")
+		super.buildTikzCommand(command)
 
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
-		optionsArray.push("inner sep=0")
-		optionsArray.push(
+		command.options.push(
 			"minimum width=" +
 				roundTikz(new SVG.Number(this.size.x - strokeWidth, "px").convertToUnit("cm").value) +
 				"cm"
 		)
-		optionsArray.push(
+		command.options.push(
 			"minimum height=" +
 				roundTikz(new SVG.Number(this.size.y - strokeWidth, "px").convertToUnit("cm").value) +
 				"cm"
 		)
 
-		if (this.rotationDeg != 0) {
-			optionsArray.push(`rotate=${this.rotationDeg}`)
-		}
-
-		let id = this.name.value
-		if (!id && this.mathJaxLabel.value) {
-			id = ExportController.instance.createExportID("Rect")
-		}
-
-		let textStr = ""
 		if (this.textAreaProperty.value.text) {
+			let options: string[] = []
+
 			//treat justify like left aligned
 			let alignDir =
 				this.textAreaProperty.value.align == TextAlign.JUSTIFY ? -1 : this.textAreaProperty.value.align - 1
@@ -322,22 +273,30 @@ export class RectangleComponent extends ShapeComponent {
 
 			// which anchor and position corresponds to the direction?
 			let anchor = basicDirections.find((item) => item.direction.eq(dir)).name
-
 			let pos = this.position.add(dir.mul(this.size.div(2)).rotate(this.rotationDeg))
+			options.push("anchor=" + anchor)
+
+			switch (this.textAreaProperty.value.align) {
+				case TextAlign.LEFT:
+					options.push("align=left")
+					break
+				case TextAlign.CENTER:
+					options.push("align=center")
+					break
+				case TextAlign.RIGHT:
+					options.push("align=right")
+					break
+				default:
+					options.push("align=justify")
+					break
+			}
 
 			// text dimensions
-			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width.times(0.5))
-			let textWidth = new SVG.Number(this.size.x, "px")
-				.minus(this.strokeInfo.width.plus(this.textInnerSep.value).times(2))
-				.convertToUnit("cm")
+			let innerSep = this.textInnerSep.value.plus(this.strokeInfo.width)
+			let textWidth = new SVG.Number(this.size.x, "px").minus(innerSep.times(2)).convertToUnit("cm")
 
-			let fontStr = this.textFontSize.value.key == defaultFontSize.key ? "" : `\\${this.textFontSize.value.name} `
-			let options = `[anchor=${anchor}, align=${
-				this.textAreaProperty.value.align == TextAlign.LEFT ? "left"
-				: this.textAreaProperty.value.align == TextAlign.CENTER ? "center"
-				: this.textAreaProperty.value.align == TextAlign.RIGHT ? "right"
-				: "justify"
-			}, text width=${roundTikz(textWidth.value)}cm, inner sep=${innerSep.toString()}${this.rotationDeg != 0 ? ", rotate=" + this.rotationDeg : ""}]`
+			options.push(`text width=${roundTikz(textWidth.value)}cm`)
+			options.push(`inner sep=${innerSep.toString()}`)
 
 			//escape special characters
 			const replaceDict = {
@@ -365,52 +324,15 @@ export class RectangleComponent extends ShapeComponent {
 			}
 			let escapedText = sections.join(" ")
 
+			let fontStr = this.textFontSize.value.key == defaultFontSize.key ? "" : `\\${this.textFontSize.value.name} `
 			let latexStr = `${fontStr}${escapedText}`
 			latexStr =
 				this.textColor.value ?
 					"\\textcolor" + this.textColor.value.toTikzString() + "{" + latexStr + "}"
 				:	latexStr
 
-			textStr = ` node ${options} at ${pos.toTikzString()}{${latexStr}}`
+			command.additionalNodes.push({ options: options, position: pos, content: latexStr, additionalNodes: [] })
 		}
-
-		let labelNodeStr = ""
-		if (this.mathJaxLabel.value) {
-			let labelStr = "anchor=" + this.anchorPos.name
-
-			let labelDist = this.labelDistance.value.convertToUnit("cm")
-
-			let anchorDir =
-				this.anchorChoice.value.key == defaultBasicDirection.key ?
-					new SVG.Point()
-				:	this.anchorChoice.value.direction
-			let labelShift = anchorDir.mul(-labelDist.value)
-			let posShift = ""
-			if (labelShift.x !== 0) {
-				posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
-			}
-			if (labelShift.y !== 0) {
-				posShift += posShift == "" ? "" : ", "
-				posShift += "yshift=" + roundTikz(-labelShift.y) + "cm"
-			}
-			posShift = posShift == "" ? "" : "[" + posShift + "]"
-
-			let posStr =
-				this.positionChoice.value.key == defaultBasicDirection.key ?
-					id + ".center"
-				:	id + "." + this.positionChoice.value.name
-
-			let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
-			latexStr =
-				latexStr && this.labelColor.value ?
-					"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
-				:	latexStr
-
-			labelNodeStr = " node[" + labelStr + "] at (" + posShift + posStr + "){" + latexStr + "}"
-		}
-
-		let optionsStr = optionsArray.length > 0 ? `[${optionsArray.join(", ")}]` : ""
-		return `\\node${optionsStr}${id ? "(" + id + ")" : ""} at ${this.position.toTikzString()}{}${textStr}${labelNodeStr};`
 	}
 
 	public copyForPlacement(): CircuitComponent {

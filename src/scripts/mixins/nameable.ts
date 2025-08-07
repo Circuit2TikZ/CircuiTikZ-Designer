@@ -1,15 +1,12 @@
-import * as SVG from "@svgdotjs/svg.js"
 import {
 	AbstractConstructor,
 	CircuitComponent,
-	ColorProperty,
-	SliderProperty,
 	PropertyCategories,
 	SectionHeaderProperty,
 	ComponentSaveObject,
-	FillInfo,
 	TextProperty,
 	MainController,
+	ExportController,
 } from "../internal"
 
 /**
@@ -67,6 +64,14 @@ export function Nameable<TBase extends AbstractConstructor<CircuitComponent>>(Ba
 			if (saveObject.name) {
 				this.name.updateValue(saveObject.name, true)
 			}
+		}
+
+		protected buildTikzName(ensureID = true): string {
+			let id = this.name.value
+			if (!id && ensureID) {
+				id = ExportController.instance.createExportID("N")
+			}
+			return id
 		}
 	}
 	return Nameable

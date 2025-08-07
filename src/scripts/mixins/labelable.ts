@@ -7,17 +7,19 @@ import {
 	ChoiceEntry,
 	ChoiceProperty,
 	CircuitComponent,
+	CircuitikzTo,
 	ColorProperty,
 	ComponentSaveObject,
 	defaultBasicDirection,
 	DirectionInfo,
 	MathJaxProperty,
-	PathComponent,
 	PropertyCategories,
 	renderMathJax,
 	SectionHeaderProperty,
 	SliderProperty,
+	TikzNodeCommand,
 } from "../internal"
+import { roundTikz } from "../utils/selectionHelper"
 
 /**
  * A type encompassing all information needed for the label
@@ -137,6 +139,51 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 			}
 		}
 
+		protected buildTikzNodeLabel(reference: string | SVG.Point): null | TikzNodeCommand {
+			if (this.mathJaxLabel.value) {
+				let labelDist = this.labelDistance.value.convertToUnit("cm")
+
+				if (!isNaN(this.anchorPos.direction.absSquared())) {
+					labelDist = labelDist.minus(0.12)
+				}
+
+				let labelShift = this.anchorPos.direction.mul(-labelDist.value)
+				let posShift = ""
+				if (labelShift.x !== 0) {
+					posShift += "xshift=" + roundTikz(labelShift.x) + "cm"
+				}
+				if (labelShift.y !== 0) {
+					posShift += posShift == "" ? "" : ", "
+					posShift += "yshift=" + roundTikz(-labelShift.y) + "cm"
+				}
+				posShift = posShift == "" ? "" : "[" + posShift + "]"
+
+				let posStr: string
+				if (typeof reference == "string") {
+					posStr =
+						this.positionChoice.value.key == defaultBasicDirection.key ?
+							reference + ".text"
+						:	reference + "." + this.labelPos.name
+				} else {
+					posStr = reference.toTikzString(true)
+				}
+				let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
+				latexStr =
+					latexStr && this.labelColor.value ?
+						"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
+					:	latexStr
+
+				let labelCommand: TikzNodeCommand = {
+					position: "(" + posShift + posStr + ")",
+					options: ["anchor=" + this.anchorPos.name],
+					additionalNodes: [],
+					content: latexStr,
+				}
+				return labelCommand
+			}
+			return null
+		}
+
 		/**
 		 * Generate a label visualization via mathjax
 		 */
@@ -232,6 +279,24 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 			this.visualization.add(this.labelRendering)
 			this.update()
 			this.updateTheme()
+		}
+
+		protected buildTikzPathLabel(to: CircuitikzTo) {
+			if (this.mathJaxLabel.value) {
+				let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
+				let shouldDist = this.labelDistance.value && distStr != "0.0cm"
+
+				let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
+				latexStr =
+					latexStr && this.labelColor.value ?
+						"\\textcolor" + this.labelColor.value.toTikzString() + "{" + latexStr + "}"
+					:	latexStr
+
+				to.options.push("l" + (this.labelSide.value ? "_" : "") + "={" + latexStr + "}")
+				if (shouldDist) {
+					to.options.push("label distance=" + distStr)
+				}
+			}
 		}
 
 		protected abstract updatePathLabel(): void

@@ -8,11 +8,9 @@ import {
 	CanvasController,
 	SelectionController,
 	SectionHeaderProperty,
-	TextProperty,
 	GroupComponent,
 	Undo,
 	EditableProperty,
-	basicDirections,
 	SnapDragHandler,
 	SnapCursorController,
 	PropertiesCollection,
@@ -372,6 +370,13 @@ export abstract class CircuitComponent {
 	 * convert this component into a draw command for CircuiTikz
 	 */
 	public abstract toTikzString(): string
+
+	/**
+	 * Override this in subclasses if it should provide a way of building (parts of) a tikz node or path command (remember to always call the superclass via super.buildTikzCommand)
+	 * @param command an object representing the components of a tikz command
+	 * @param contextData the context needed to build (parts of) the command
+	 */
+	protected buildTikzCommand(command: {}): void {}
 
 	/**
 	 * convert this component to be used with the svg export, i.e. clone the visualization and remove everything which is not needed

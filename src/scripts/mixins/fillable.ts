@@ -98,6 +98,20 @@ export function Fillable<TBase extends AbstractConstructor<CircuitComponent>>(Ba
 				}
 			}
 		}
+
+		protected buildTikzCommand(command: { options: string[] }): void {
+			super.buildTikzCommand(command)
+			if (this.fillInfo.opacity > 0) {
+				if (this.fillInfo.color !== "default") {
+					let c = new SVG.Color(this.fillInfo.color)
+					command.options.push("fill=" + c.toTikzString())
+				}
+
+				if (this.fillInfo.opacity != 1) {
+					command.options.push("fill opacity=" + this.fillInfo.opacity.toString())
+				}
+			}
+		}
 	}
 	return Fillable
 }
