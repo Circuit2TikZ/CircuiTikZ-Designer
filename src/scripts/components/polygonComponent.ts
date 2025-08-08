@@ -20,6 +20,7 @@ import {
 	closestBasicDirection,
 	SelectionController,
 	TikzPathCommand,
+	SaveController,
 } from "../internal"
 import { lineRectIntersection, selectedBoxWidth } from "../utils/selectionHelper"
 
@@ -67,8 +68,7 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 	}
 
 	public recalculateSnappingPoints(matrix?: SVG.Matrix): void {
-		// for polygons, these are always relative to (0,0)
-		let relPositions: { anchorname: string; relPos: SVG.Point }[] = []
+		let positions: { anchorname: string; relPos: SVG.Point }[] = []
 
 		let halfSize = this.size.div(2)
 		for (const anchor of basicDirections) {
@@ -76,30 +76,28 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 			if (anchor.key == defaultBasicDirection.key) {
 				continue
 			}
-			let dirLength = anchor.direction.abs()
-			dirLength = dirLength == 0 ? 1 : dirLength
-			relPositions.push({ relPos: this.position.add(halfSize.mul(anchor.direction)), anchorname: anchor.name })
+			positions.push({ relPos: this.position.add(halfSize.mul(anchor.direction)), anchorname: anchor.name })
 		}
 
 		for (let index = 0; index < this.referencePoints.length; index++) {
-			//the corner points as well as the center between to connected points
+			//the corner points as well as the center between 2 connected points
 			const p1 = this.referencePoints[index]
 			const p2 = this.referencePoints[(index + 1) % this.referencePoints.length]
 
-			relPositions.push({ relPos: p1, anchorname: "" })
-			relPositions.push({ relPos: p1.add(p2).div(2), anchorname: "" })
+			positions.push({ relPos: p1, anchorname: "" })
+			positions.push({ relPos: p1.add(p2).div(2), anchorname: "" })
 		}
 
-		if (!this.snappingPoints || this.snappingPoints.length != relPositions.length) {
+		if (!this.snappingPoints || this.snappingPoints.length != positions.length) {
 			this.snappingPoints.forEach((snapPoint) => snapPoint.show(false))
 			this.snappingPoints = []
-			for (const element of relPositions) {
-				this.snappingPoints.push(new SnapPoint(this, element.anchorname, element.relPos))
+			for (const position of positions) {
+				this.snappingPoints.push(new SnapPoint(this, position.anchorname, position.relPos))
 			}
 		} else {
 			const recalcMatrix = new SVG.Matrix()
-			for (let index = 0; index < relPositions.length; index++) {
-				const relPos = relPositions[index].relPos
+			for (let index = 0; index < positions.length; index++) {
+				const relPos = positions[index].relPos
 				const snappingPoint = this.snappingPoints[index]
 				snappingPoint.updateRelPosition(relPos)
 				snappingPoint.recalculate(recalcMatrix)
@@ -122,11 +120,24 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 	public applyJson(saveObject: PolygonSaveObject): void {
 		super.applyJson(saveObject)
 
-		this.updateTheme()
 		this.update()
+		this.updateTheme()
 	}
 
 	static fromJson(saveObject: PolygonSaveObject): PolygonComponent {
+		if (SaveController.instance.currentlyLoadedSaveVersion == "") {
+			//@ts-ignore
+			let rotation: number = saveObject.rotationDeg ?? 0
+			//@ts-ignore
+			let scale = saveObject.scale ? new SVG.Point(saveObject.scale) : new SVG.Point(1, 1)
+			let bbox = bboxFromPoints(saveObject.points)
+			let transformMatrix = new SVG.Matrix({
+				rotate: rotation,
+				scale: [scale.x, scale.y],
+				origin: [bbox.cx, bbox.cy],
+			})
+			saveObject.points = saveObject.points.map((point) => new SVG.Point(point).transform(transformMatrix))
+		}
 		return new PolygonComponent()
 	}
 

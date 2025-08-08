@@ -46,6 +46,7 @@ export function Fillable<TBase extends AbstractConstructor<CircuitComponent>>(Ba
 			this.fillOpacityProperty.addChangeListener((ev) => {
 				this.fillInfo.opacity = ev.value.value / 100
 				this.updateTheme()
+				this.update()
 			})
 
 			this.fillColorProperty = new ColorProperty("Color", null)
@@ -58,6 +59,7 @@ export function Fillable<TBase extends AbstractConstructor<CircuitComponent>>(Ba
 					this.fillInfo.opacity = this.fillOpacityProperty.value.value / 100
 				}
 				this.updateTheme()
+				this.update()
 			})
 
 			this.properties.add(PropertyCategories.fill, this.fillColorProperty)

@@ -91,6 +91,7 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 			this.labelColor = new ColorProperty("Color", null)
 			this.labelColor.addChangeListener((ev) => {
 				this.updateTheme()
+				this.update()
 			})
 			this.properties.add(PropertyCategories.label, this.labelColor)
 		}
@@ -117,12 +118,19 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 			super.applyJson(saveObject)
 
 			if (saveObject.label) {
-				this.labelDistance.value =
-					saveObject.label.distance ?
-						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-					:	new SVG.Number(0, "cm")
-				if (this.labelDistance.value.unit == "") {
-					this.labelDistance.value.unit = "cm"
+				if (saveObject.label.distance) {
+					if (typeof saveObject.label.distance != "string") {
+						// SVG.Number as object
+						this.labelDistance.value = new SVG.Number(
+							saveObject.label.distance.value,
+							saveObject.label.distance.unit
+						)
+					} else {
+						// SVG.Number as string
+						this.labelDistance.value = new SVG.Number(saveObject.label.distance)
+					}
+				} else {
+					this.labelDistance.value = new SVG.Number(0, "cm")
 				}
 				this.anchorChoice.value =
 					saveObject.label.anchor ?
@@ -235,6 +243,7 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 			this.labelColor = new ColorProperty("Color", null)
 			this.labelColor.addChangeListener((ev) => {
 				this.updateTheme()
+				this.update()
 			})
 			this.properties.add(PropertyCategories.label, this.labelColor)
 
@@ -264,12 +273,19 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 
 			if (saveObject.label) {
 				this.labelSide.value = saveObject.label.otherSide ?? false
-				this.labelDistance.value =
-					saveObject.label.distance ?
-						new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-					:	new SVG.Number(0, "cm")
-				if (this.labelDistance.value.unit == "") {
-					this.labelDistance.value.unit = "cm"
+				if (saveObject.label.distance) {
+					if (typeof saveObject.label.distance != "string") {
+						// SVG.Number as object
+						this.labelDistance.value = new SVG.Number(
+							saveObject.label.distance.value,
+							saveObject.label.distance.unit
+						)
+					} else {
+						// SVG.Number as string
+						this.labelDistance.value = new SVG.Number(saveObject.label.distance)
+					}
+				} else {
+					this.labelDistance.value = new SVG.Number(0, "cm")
 				}
 				this.mathJaxLabel.value = saveObject.label.value
 				this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null

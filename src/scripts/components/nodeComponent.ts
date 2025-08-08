@@ -10,6 +10,7 @@ import {
 	simpifyRotationAndScale,
 	buildTikzStringFromNodeCommand,
 	TikzNodeCommand,
+	SaveController,
 } from "../internal"
 import { CircuitComponent } from "./circuitComponent"
 
@@ -182,8 +183,10 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 	protected applyJson(saveObject: NodeSaveObject): void {
 		super.applyJson(saveObject)
 		this.position = new SVG.Point(saveObject.position)
-		if (saveObject.rotation) {
-			this.rotationDeg = saveObject.rotation
+		// @ts-ignore
+		if (saveObject.rotation || saveObject.rotationDeg) {
+			// @ts-ignore
+			this.rotationDeg = saveObject.rotation ?? saveObject.rotationDeg
 		}
 
 		if (saveObject.scale) {

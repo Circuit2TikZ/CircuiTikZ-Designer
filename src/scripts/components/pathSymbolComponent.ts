@@ -27,6 +27,8 @@ import {
 	Nameable,
 	TikzPathCommand,
 	CircuitikzTo,
+	SaveController,
+	buildTikzStringFromPathCommand,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -480,6 +482,17 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		return data
 	}
 
+	public toTikzString(): string {
+		let command: TikzPathCommand = {
+			options: ["draw"],
+			additionalNodes: [],
+			coordinates: [],
+			connectors: [],
+		}
+		this.buildTikzCommand(command)
+		return buildTikzStringFromPathCommand(command)
+	}
+
 	protected buildTikzCommand(command: TikzPathCommand): void {
 		super.buildTikzCommand(command)
 		let options: string[] = [this.referenceSymbol.tikzName]
@@ -498,7 +511,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		}
 
 		let to: CircuitikzTo = { options: options, name: this.name.value }
-		this.buildTikzPathLabel(command)
+		this.buildTikzPathLabel(to)
 		command.connectors.push(to)
 	}
 
@@ -563,9 +576,24 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 	}
 
 	public static fromJson(saveObject: PathSymbolSaveObject): PathSymbolComponent {
-		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
-		let pathComponent: PathSymbolComponent = new PathSymbolComponent(symbol)
-		return pathComponent
+		let symbol: ComponentSymbol
+
+		if (SaveController.instance.currentlyLoadedSaveVersion != "") {
+			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
+		} else {
+			let idParts = saveObject.id.split("_")
+			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == idParts[1])
+			saveObject.options = idParts.slice(2)
+			// @ts-ignore
+			saveObject.points = [saveObject.start, saveObject.end]
+		}
+		if (symbol) {
+			let pathComponent: PathSymbolComponent = new PathSymbolComponent(symbol)
+			return pathComponent
+		} else {
+			console.error("no path symbol found for saveObject: " + JSON.stringify(saveObject))
+			return null
+		}
 	}
 
 	public updatePathLabel(): void {
@@ -602,6 +630,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		// mirroring the symbol should not impact the label except from shifting its position to stay close to the symbol (only relevant for asymetric symbols)
 		let referenceoffsetY =
 			this.scaleState.y < 0 ? this.componentVariant.mid.y - symbolBBox.h : -this.componentVariant.mid.y
+		referenceoffsetY *= Math.abs(this.scaleState.y)
 
 		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
 		let referenceOffsetX = 0
@@ -610,7 +639,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		let other = otherSide ? -1 : 1
 		if (otherSide) {
 			labelRef.y = labelBBox.y - labelRef.y
-			referenceoffsetY += symbolBBox.h
+			referenceoffsetY += symbolBBox.h * Math.abs(this.scaleState.y)
 		}
 
 		// if the path is close to horizontal or vertical according to the break points

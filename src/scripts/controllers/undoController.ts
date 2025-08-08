@@ -72,7 +72,7 @@ export class Undo {
 
 		for (const component of state) {
 			let initalializedComponenent = SaveController.fromJson(component)
-			if (component.selected) {
+			if (component.selected && initalializedComponenent) {
 				components.push(initalializedComponenent)
 			}
 		}

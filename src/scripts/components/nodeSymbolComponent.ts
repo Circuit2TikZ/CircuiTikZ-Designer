@@ -15,6 +15,7 @@ import {
 	NodeComponent,
 	NodeSaveObject,
 	PropertyCategories,
+	SaveController,
 	SectionHeaderProperty,
 	SliderProperty,
 	SnappingInfo,
@@ -278,12 +279,27 @@ export class NodeSymbolComponent extends NodeComponent {
 		super.applyJson(saveObject)
 		let options = saveObject.options ?? []
 		this.setPropertiesFromOptions(this.referenceSymbol.getOptionsFromOptionNames(options))
+		this.update()
+		this.updateTheme()
 	}
 
 	public static fromJson(saveObject: NodeSymbolSaveObject): NodeSymbolComponent {
-		let symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
-		let nodeComponent: NodeSymbolComponent = new NodeSymbolComponent(symbol)
-		return nodeComponent
+		let symbol: ComponentSymbol
+
+		if (SaveController.instance.currentlyLoadedSaveVersion != "") {
+			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
+		} else {
+			let idParts = saveObject.id.split("_")
+			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == idParts[1])
+			saveObject.options = idParts.slice(2)
+		}
+		if (symbol) {
+			let nodeComponent: NodeSymbolComponent = new NodeSymbolComponent(symbol)
+			return nodeComponent
+		} else {
+			console.error("no node symbol found for saveObject: " + JSON.stringify(saveObject))
+			return null
+		}
 	}
 
 	public copyForPlacement(): NodeSymbolComponent {

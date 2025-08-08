@@ -10,6 +10,7 @@ import {
 	PathComponent,
 	PathSaveObject,
 	PropertyCategories,
+	SaveController,
 	SectionHeaderProperty,
 	SelectionController,
 	SnappingInfo,
@@ -91,7 +92,6 @@ export class WireComponent extends Strokable(PathComponent) {
 		CircuitComponent.jsonSaveMap.set(WireComponent.jsonID, WireComponent)
 	}
 
-	declare protected dragElement: SVG.Polyline
 	/**
 	 * the wire directions when drawing
 	 */
@@ -127,19 +127,12 @@ export class WireComponent extends Strokable(PathComponent) {
 
 		this.wire = CanvasController.instance.canvas.polyline()
 		this.wire.fill("none")
-		this.dragElement = CanvasController.instance.canvas.polyline()
-		this.dragElement.attr({
-			"fill": "none",
-			"stroke": "transparent",
-			"stroke-width": selectionSize,
-		})
 
 		// override default value
 		this.strokeWidthProperty.value = new SVG.Number("0.4pt")
 		this.strokeInfo.width = this.strokeWidthProperty.value
 
 		this.visualization.add(this.wire)
-		this.visualization.add(this.dragElement)
 		this.snappingPoints = []
 
 		this.properties.add(PropertyCategories.options, new SectionHeaderProperty("Arrows"))
@@ -169,7 +162,6 @@ export class WireComponent extends Strokable(PathComponent) {
 				WireComponent.arrowSymbols.set(tip.key, document.getElementById(tip.key) as any)
 			}
 		}
-		this.updateArrowTypesAndColors()
 	}
 
 	private lineWidthToArrowScale(): number {
@@ -252,6 +244,8 @@ export class WireComponent extends Strokable(PathComponent) {
 		if (strokeColor == "default") {
 			strokeColor = defaultStroke
 		}
+
+		this.updateArrowTypesAndColors()
 
 		this.wire.stroke({
 			color: strokeColor,
@@ -429,8 +423,6 @@ export class WireComponent extends Strokable(PathComponent) {
 		let plotPoints = new SVG.PointArray(pointArray.map((val) => val.toArray()))
 		this.wire.clear()
 		this.wire.plot(plotPoints)
-		this.dragElement.clear()
-		this.dragElement.plot(plotPoints)
 
 		//recalculate the snapping point offsets
 		if (this.snappingPoints.length == pointsNoArrow.length) {
@@ -562,6 +554,19 @@ export class WireComponent extends Strokable(PathComponent) {
 	}
 
 	public static fromJson(saveObject: WireSaveObject): WireComponent {
+		if (SaveController.instance.currentlyLoadedSaveVersion == "") {
+			//@ts-ignore
+			let points: SVG.Point[] = [saveObject.start]
+			let directions: WireDirection[] = []
+			//@ts-ignore
+			for (const segment of saveObject.segments) {
+				points.push(segment.endPoint)
+				directions.push(segment.direction)
+			}
+
+			saveObject.points = points
+			saveObject.directions = directions
+		}
 		return new WireComponent()
 	}
 
@@ -731,9 +736,8 @@ export class WireComponent extends Strokable(PathComponent) {
 			return
 		}
 
-		this.updateArrowTypesAndColors()
-		this.update()
 		this.updateTheme()
+		this.update()
 
 		this.finishedPlacing = true
 	}
@@ -752,10 +756,9 @@ export class WireComponent extends Strokable(PathComponent) {
 		if (saveObject.endArrow) {
 			this.arrowEndChoice.value = arrowTips.find((item) => item.key == saveObject.endArrow)
 		}
-		this.updateArrowTypesAndColors()
 
-		this.update()
 		this.updateTheme()
+		this.update()
 
 		this.finishedPlacing = true
 	}

@@ -78,6 +78,7 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 			this.strokeOpacityProperty.addChangeListener((ev) => {
 				this.strokeInfo.opacity = ev.value.value / 100
 				this.updateTheme()
+				this.update()
 			})
 
 			this.strokeColorProperty = new ColorProperty("Color", null)
@@ -90,12 +91,13 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 					this.strokeInfo.opacity = this.strokeOpacityProperty.value.value / 100
 				}
 				this.updateTheme()
+				this.update()
 			})
 			this.strokeWidthProperty = new SliderProperty("Width", 0, 10, 0.1, this.strokeInfo.width)
 			this.strokeWidthProperty.addChangeListener((ev) => {
 				this.strokeInfo.width = ev.value
-				this.update()
 				this.updateTheme()
+				this.update()
 			})
 			this.strokeStyleProperty = new ChoiceProperty<StrokeStyle>(
 				"Style",
@@ -105,6 +107,7 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 			this.strokeStyleProperty.addChangeListener((ev) => {
 				this.strokeInfo.style = ev.value.key
 				this.updateTheme()
+				this.update()
 			})
 			this.properties.add(PropertyCategories.stroke, this.strokeColorProperty)
 			this.properties.add(PropertyCategories.stroke, this.strokeOpacityProperty)
@@ -154,7 +157,7 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 					this.strokeOpacityProperty.value = new SVG.Number(saveObject.stroke.opacity * 100, "%")
 				}
 				if (saveObject.stroke.width) {
-					if ("value" in saveObject.stroke.width) {
+					if (typeof saveObject.stroke.width != "string") {
 						// SVG.Number as object
 						this.strokeInfo.width = new SVG.Number(
 							saveObject.stroke.width.value,

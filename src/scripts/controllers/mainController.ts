@@ -31,6 +31,7 @@ import {
 	memorySizeOf,
 	SaveFileFormat,
 	emtpySaveState,
+	currentSaveVersion,
 } from "../internal"
 
 type TabState = {
@@ -484,6 +485,7 @@ export class MainController {
 				data.open = "false"
 			}
 			data.data.components = Undo.getCurrentState()
+			data.data.version = currentSaveVersion
 			if (data.data.components.length > 0) {
 				data.settings.gridVisible = CanvasController.instance.gridVisible
 				data.settings.majorGridSizecm = CanvasController.instance.majorGridSizecm

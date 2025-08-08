@@ -8,6 +8,10 @@ import {
 	SelectionMode,
 	MainController,
 } from "../internal"
+import { version } from "../../../package.json"
+
+// bump this if something is removed or adjusted in how the save file is formatted. (No change necessary if something is added)
+export let currentSaveVersion = "0.1"
 
 export type SaveFileFormat = {
 	version: string
@@ -15,7 +19,7 @@ export type SaveFileFormat = {
 }
 
 export let emtpySaveState: SaveFileFormat = {
-	version: "",
+	version: currentSaveVersion,
 	components: [],
 }
 
@@ -69,7 +73,7 @@ export class SaveController {
 		for (const component of MainController.instance.circuitComponents) {
 			componentArray.push(component.toJson())
 		}
-		let data: SaveFileFormat = { version: "0.1", components: componentArray }
+		let data: SaveFileFormat = { version: currentSaveVersion, components: componentArray }
 
 		ExportController.instance.exportJSON(JSON.stringify(data, null, 4))
 	}
@@ -131,17 +135,30 @@ export class SaveController {
 		let components = []
 
 		if (!("version" in saveFile)) {
+			alert(
+				"You are using an old version of the json save file format. Please override all files exported from Circuitikz Designer version 0.6 and older by reexporting your circuit to json to update them to the newest json save file format version (currently: " +
+					currentSaveVersion +
+					" for Circuitikz Designer version " +
+					version +
+					"). Old versions might be deprecated at any time and therefore might not properly load."
+			)
 			// old file format
+			this.currentlyLoadedSaveVersion = ""
 			//@ts-ignore
 			for (const component of saveFile) {
 				let c = SaveController.fromJson(component)
-				components.push(c)
+				if (c) {
+					components.push(c)
+				}
 			}
 		} else {
 			this.currentlyLoadedSaveVersion = saveFile.version
+
 			for (const component of saveFile.components) {
 				let c = SaveController.fromJson(component)
-				components.push(c)
+				if (c) {
+					components.push(c)
+				}
 			}
 		}
 
@@ -151,6 +168,7 @@ export class SaveController {
 			SelectionController.instance.selectComponents(components, SelectionMode.RESET)
 		}
 		Undo.addState()
+		this.currentlyLoadedSaveVersion = currentSaveVersion
 	}
 
 	static fromJson(saveJson: ComponentSaveObject): CircuitComponent {

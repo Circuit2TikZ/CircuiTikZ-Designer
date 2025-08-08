@@ -413,8 +413,10 @@ export abstract class CircuitComponent {
 		}
 		// @ts-ignore
 		const component: CircuitComponent = ComponentConstructor.fromJson(saveObject)
-		component.applyJson(saveObject)
-		return component
+		if (component) {
+			component.applyJson(saveObject)
+			return component
+		}
 	}
 
 	/**

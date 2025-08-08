@@ -89,32 +89,6 @@ export class EllipseComponent extends ShapeComponent {
 
 	public applyJson(saveObject: EllipseSaveObject) {
 		super.applyJson(saveObject)
-		this.position = new SVG.Point(saveObject.position)
-		this.placePoint = saveObject.position
-		this.size = new SVG.Point(saveObject.size)
-
-		this.rotationDeg = saveObject.rotation ?? 0
-
-		if (saveObject.label) {
-			this.labelDistance.value =
-				saveObject.label.distance ?
-					new SVG.Number(saveObject.label.distance.value, saveObject.label.distance.unit)
-				:	new SVG.Number(0, "cm")
-			if (this.labelDistance.value.unit == "") {
-				this.labelDistance.value.unit = "cm"
-			}
-			this.anchorChoice.value =
-				saveObject.label.anchor ?
-					basicDirections.find((item) => item.key == saveObject.label.anchor)
-				:	defaultBasicDirection
-			this.positionChoice.value =
-				saveObject.label.position ?
-					basicDirections.find((item) => item.key == saveObject.label.position)
-				:	defaultBasicDirection
-			this.mathJaxLabel.value = saveObject.label.value
-			this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
-			this.generateLabelRender()
-		}
 
 		this.update()
 		this.componentVisualization.show()
