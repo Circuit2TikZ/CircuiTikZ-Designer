@@ -203,7 +203,7 @@ export class RectangleComponent extends ShapeComponent {
 				:	defaultFontSize
 
 			if (saveObject.text.innerSep) {
-				if ("value" in saveObject.text.innerSep) {
+				if (!(typeof saveObject.text.innerSep == "string")) {
 					// SVG.Number as object
 					this.textInnerSep.value = new SVG.Number(
 						saveObject.text.innerSep.value,

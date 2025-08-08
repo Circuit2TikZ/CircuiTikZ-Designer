@@ -42,6 +42,8 @@ export class SaveController {
 	private loadArea: HTMLDivElement
 	private loadAreaBackground: HTMLDivElement
 
+	public currentlyLoadedSaveVersion: string = ""
+
 	private constructor() {
 		this.modalElement = document.getElementById("loadModal") as HTMLDivElement
 		this.loadModal = new Modal(this.modalElement)
@@ -120,11 +122,6 @@ export class SaveController {
 	}
 
 	loadFromJSON(saveFile: SaveFileFormat, selectComponents = false) {
-		if (!("version" in saveFile)) {
-			alert(
-				"Save files in json format pre application version 0.7 are not compatible anymore. Please redo your circuits. Sorry :("
-			)
-		}
 		//delete current state if necessary
 		if ((document.getElementById("loadCheckRemove") as HTMLInputElement).checked) {
 			SelectionController.instance.selectAll()
@@ -133,9 +130,19 @@ export class SaveController {
 
 		let components = []
 
-		for (const component of saveFile.components) {
-			let c = SaveController.fromJson(component)
-			components.push(c)
+		if (!("version" in saveFile)) {
+			// old file format
+			//@ts-ignore
+			for (const component of saveFile) {
+				let c = SaveController.fromJson(component)
+				components.push(c)
+			}
+		} else {
+			this.currentlyLoadedSaveVersion = saveFile.version
+			for (const component of saveFile.components) {
+				let c = SaveController.fromJson(component)
+				components.push(c)
+			}
 		}
 
 		if (selectComponents) {

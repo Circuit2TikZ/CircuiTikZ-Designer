@@ -15,6 +15,7 @@ import {
 	MathJaxProperty,
 	PropertyCategories,
 	renderMathJax,
+	SaveController,
 	SectionHeaderProperty,
 	SliderProperty,
 	TikzNodeCommand,
@@ -102,7 +103,7 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 					value: this.mathJaxLabel.value,
 					anchor: this.anchorChoice.value.key,
 					position: this.positionChoice.value.key,
-					relativeToComponent: this.labelReferenceProperty.value.key == "component",
+					relativeToComponent: this.labelReferenceProperty.value.key == "component" ? true : undefined,
 					distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
 					color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 				}
@@ -131,8 +132,14 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 					saveObject.label.position ?
 						basicDirections.find((item) => item.key == saveObject.label.position)
 					:	defaultBasicDirection
-				this.labelReferenceProperty.value =
-					saveObject.label.relativeToComponent ? this.labelReferenceChoices[1] : this.labelReferenceChoices[0]
+				if (SaveController.instance.currentlyLoadedSaveVersion != "") {
+					this.labelReferenceProperty.value =
+						saveObject.label.relativeToComponent ?
+							this.labelReferenceChoices[1]
+						:	this.labelReferenceChoices[0]
+				} else {
+					this.labelReferenceProperty.value = this.labelReferenceChoices[1]
+				}
 				this.mathJaxLabel.value = saveObject.label.value
 				this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
 				this.generateLabelRender()
