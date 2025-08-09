@@ -158,7 +158,7 @@ declare module "@svgdotjs/svg.js" {
 		 * @returns true if the points are equal
 		 */
 		eq(other: Point, eps?: number): boolean
-		toTikzString(): string
+		toTikzString(noParantheses?: boolean): string
 		simplifyForJson(): Point
 	}
 
@@ -618,8 +618,12 @@ SVG.extend(SVG.Point, {
 	 * @this {SVG.Point}
 	 * @returns {string} the TikZ representation, e.g. "(0.1, 1.23)"
 	 */
-	toTikzString(): string {
-		return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`
+	toTikzString(noParantheses = false): string {
+		if (noParantheses) {
+			return `${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)}`
+		} else {
+			return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`
+		}
 	},
 	simplifyForJson(digits: 2 | 3 | 4 | 5 = 3): SVG.Point {
 		let factor = 10 ** digits

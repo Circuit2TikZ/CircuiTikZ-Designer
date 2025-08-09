@@ -8,8 +8,8 @@ export class ColorProperty extends EditableProperty<SVG.Color | null> {
 	private nullable: boolean
 	private enabler: HTMLInputElement
 
-	public constructor(label: string, initialValue?: SVG.Color | null, nullable = true) {
-		super(initialValue)
+	public constructor(label: string, initialValue?: SVG.Color | null, nullable = true, tooltip = "") {
+		super(initialValue, tooltip)
 		this.label = label
 		this.nullable = nullable
 	}
@@ -35,7 +35,7 @@ export class ColorProperty extends EditableProperty<SVG.Color | null> {
 		{
 			let labelElement = document.createElement("label") as HTMLLabelElement
 			labelElement.classList.add("input-group-text")
-			labelElement.innerHTML = this.label ?? "Choose color"
+			labelElement.innerHTML = this.label || "Choose color"
 			col.appendChild(labelElement)
 
 			if (this.nullable) {

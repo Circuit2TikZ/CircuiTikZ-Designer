@@ -4,24 +4,24 @@ import {
 	Undo,
 	ExportController,
 	ComponentSaveObject,
-	NodeComponent,
-	PathComponent,
-	NodeSaveObject,
-	PathSaveObject,
-	WireSaveObject,
 	CircuitComponent,
 	SelectionMode,
-	WireComponent,
 	MainController,
-	RectangleComponent,
-	RectangleSaveObject,
-	EllipseSaveObject,
-	EllipseComponent,
-	PolygonSaveObject,
-	PolygonComponent,
-	GroupComponent,
-	GroupSaveObject,
 } from "../internal"
+import { version } from "../../../package.json"
+
+// bump this if something is removed or adjusted in how the save file is formatted. (No change necessary if something is added)
+export let currentSaveVersion = "0.1"
+
+export type SaveFileFormat = {
+	version: string
+	components: ComponentSaveObject[]
+}
+
+export let emtpySaveState: SaveFileFormat = {
+	version: currentSaveVersion,
+	components: [],
+}
 
 /**
  * Controller for saving and loading the progress in json format
@@ -46,6 +46,8 @@ export class SaveController {
 	private loadArea: HTMLDivElement
 	private loadAreaBackground: HTMLDivElement
 
+	public currentlyLoadedSaveVersion: string = ""
+
 	private constructor() {
 		this.modalElement = document.getElementById("loadModal") as HTMLDivElement
 		this.loadModal = new Modal(this.modalElement)
@@ -67,12 +69,13 @@ export class SaveController {
 	}
 
 	save() {
-		let components = []
+		let componentArray = []
 		for (const component of MainController.instance.circuitComponents) {
-			components.push(component.toJson())
+			componentArray.push(component.toJson())
 		}
+		let data: SaveFileFormat = { version: currentSaveVersion, components: componentArray }
 
-		ExportController.instance.exportJSON(JSON.stringify(components, null, 4))
+		ExportController.instance.exportJSON(JSON.stringify(data, null, 4))
 	}
 
 	load() {
@@ -122,7 +125,7 @@ export class SaveController {
 		})
 	}
 
-	loadFromJSON(obj: any, selectComponents = false) {
+	loadFromJSON(saveFile: SaveFileFormat, selectComponents = false) {
 		//delete current state if necessary
 		if ((document.getElementById("loadCheckRemove") as HTMLInputElement).checked) {
 			SelectionController.instance.selectAll()
@@ -131,23 +134,31 @@ export class SaveController {
 
 		let components = []
 
-		if (obj.nodes || obj.paths || obj.lines) {
-			for (const node of obj.nodes) {
-				components.push(NodeComponent.fromJson(node as NodeSaveObject))
-			}
-
-			for (const path of obj.paths) {
-				components.push(PathComponent.fromJson(path as PathSaveObject))
-			}
-
-			for (const line of obj.lines) {
-				components.push(WireComponent.fromJson(line as WireSaveObject))
+		if (!("version" in saveFile)) {
+			alert(
+				"You are using an old version of the json save file format. Please override all files exported from Circuitikz Designer version 0.6 and older by reexporting your circuit to json to update them to the newest json save file format version (currently: " +
+					currentSaveVersion +
+					" for Circuitikz Designer version " +
+					version +
+					"). Old versions might be deprecated at any time and therefore might not properly load."
+			)
+			// old file format
+			this.currentlyLoadedSaveVersion = ""
+			//@ts-ignore
+			for (const component of saveFile) {
+				let c = SaveController.fromJson(component)
+				if (c) {
+					components.push(c)
+				}
 			}
 		} else {
-			for (const component of obj) {
+			this.currentlyLoadedSaveVersion = saveFile.version
+
+			for (const component of saveFile.components) {
 				let c = SaveController.fromJson(component)
-				components.push(c)
-				c.updateTheme()
+				if (c) {
+					components.push(c)
+				}
 			}
 		}
 
@@ -157,26 +168,10 @@ export class SaveController {
 			SelectionController.instance.selectComponents(components, SelectionMode.RESET)
 		}
 		Undo.addState()
+		this.currentlyLoadedSaveVersion = currentSaveVersion
 	}
 
 	static fromJson(saveJson: ComponentSaveObject): CircuitComponent {
-		switch (saveJson.type) {
-			case "node":
-				return NodeComponent.fromJson(saveJson as NodeSaveObject)
-			case "path":
-				return PathComponent.fromJson(saveJson as PathSaveObject)
-			case "wire":
-				return WireComponent.fromJson(saveJson as WireSaveObject)
-			case "rect":
-				return RectangleComponent.fromJson(saveJson as RectangleSaveObject)
-			case "ellipse":
-				return EllipseComponent.fromJson(saveJson as EllipseSaveObject)
-			case "polygon":
-				return PolygonComponent.fromJson(saveJson as PolygonSaveObject)
-			case "group":
-				return GroupComponent.fromJson(saveJson as GroupSaveObject)
-			default:
-				throw new Error("type " + saveJson.type + " not known")
-		}
+		return CircuitComponent.fromJson(saveJson)
 	}
 }

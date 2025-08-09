@@ -51,7 +51,8 @@ export class SnapPoint extends SVG.Point {
 					.circle(4)
 					.fill("none")
 					.stroke({ color: moving ? "var(--bs-cyan)" : selectionColor, width: 1 })
-				container.add(this.element)
+				this.element.node.style.pointerEvents = "none"
+				this.componentReference.visualization.before(this.element)
 				this.element.center(this.x, this.y)
 			}
 		} else {

@@ -1,6 +1,14 @@
 import * as SVG from "@svgdotjs/svg.js"
 import "@svgdotjs/svg.panzoom.js"
-import { SnapController, Undo, CircuitComponent, MainController, SelectionController } from "../internal"
+import {
+	SnapController,
+	Undo,
+	CircuitComponent,
+	MainController,
+	SelectionController,
+	CanvasSettings,
+	PropertyController,
+} from "../internal"
 
 type PanningEventDetail = {
 	box: SVG.Box
@@ -64,6 +72,9 @@ export class CanvasController {
 	private zoomMin = 0.25
 	private zoomMax = 10
 	private zoomCurrent = 2
+	public get currentZoom() {
+		return this.zoomCurrent
+	}
 
 	/**
 	 * the last point on the canvas
@@ -78,6 +89,8 @@ export class CanvasController {
 		if (CanvasController.instance) {
 			return
 		}
+		localStorage.removeItem("circuitikz-designer-view")
+		localStorage.removeItem("circuitikz-designer-grid")
 		CanvasController.instance = this
 
 		this.canvas = canvas
@@ -115,8 +128,8 @@ export class CanvasController {
 			}
 		})
 
-		// init viewBox
 		this.onResizeCanvas()
+		this.resetView()
 
 		// observe page size change
 		new ResizeObserver(this.onResizeCanvas.bind(this)).observe(this.canvas.node)
@@ -150,41 +163,7 @@ export class CanvasController {
 			return oldZoomFunction.apply(this.canvas, args)
 		}
 
-		// shift whole canvas down such that the origin is in the bottom left corner
-		let box = this.canvas.viewbox()
-		box.y -= box.h
-		// shift canvas up right to see the axes with the default view
-		let moveAmount = Math.max(0.05 * Math.min(box.w, box.h), 10)
-		box.x -= moveAmount
-		box.y += moveAmount
-		this.canvas.viewbox(box)
-		this.canvas.zoom(this.zoomCurrent, new SVG.Point())
-
 		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
-
-		let storage = localStorage.getItem("circuit2tikz-designer-grid")
-		if (storage) {
-			let gridSettings = JSON.parse(storage)
-			if (gridSettings) {
-				if (gridSettings.majorGridSizecm && gridSettings.majorGridSubdivisions) {
-					this.changeGrid(gridSettings.majorGridSizecm, gridSettings.majorGridSubdivisions)
-				}
-				this.gridVisible = gridSettings.gridVisible
-				if (!this.gridVisible) {
-					this.paper.addClass("d-none")
-				}
-			}
-		} else {
-			localStorage.setItem(
-				"circuit2tikz-designer-grid",
-				JSON.stringify({
-					majorGridSizecm: this.majorGridSizecm,
-					majorGridSubdivisions: this.majorGridSubdivisions,
-					gridVisible: this.gridVisible,
-				})
-			)
-		}
-		gridVisibleToggle.checked = this.gridVisible
 
 		gridVisibleToggle.addEventListener("change", (ev) => {
 			this.gridVisible = gridVisibleToggle.checked
@@ -195,19 +174,72 @@ export class CanvasController {
 			} else {
 				this.paper.addClass("d-none")
 			}
-			this.saveSettings()
 		})
 	}
 
-	private saveSettings() {
-		localStorage.setItem(
-			"circuit2tikz-designer-grid",
-			JSON.stringify({
-				majorGridSizecm: this.majorGridSizecm,
-				majorGridSubdivisions: this.majorGridSubdivisions,
-				gridVisible: this.gridVisible,
-			})
-		)
+	public setSettings(settings: CanvasSettings) {
+		this.majorGridSizecm = settings.majorGridSizecm || this.majorGridSizecm
+		this.majorGridSubdivisions = settings.majorGridSubdivisions || this.majorGridSubdivisions
+		PropertyController.instance.setSliderValues(this.majorGridSizecm, this.majorGridSubdivisions)
+		this.gridVisible = settings.gridVisible || this.gridVisible
+		let gridVisibleToggle = document.getElementById("gridVisible") as HTMLInputElement
+		gridVisibleToggle.checked = this.gridVisible
+		if (!this.gridVisible) {
+			this.paper.addClass("d-none")
+		}
+		if (settings.viewBox) {
+			this.canvas.viewbox(settings.viewBox)
+			this.canvas.zoom(settings.viewZoom, new SVG.Point())
+			this.zoomCurrent = settings.viewZoom
+			this.onResizeCanvas()
+		}
+	}
+
+	public resetView() {
+		// shift whole canvas down such that the origin is in the bottom left corner
+		let box = this.canvas.viewbox()
+		box.x = 0
+		box.y = 0
+
+		box.y -= box.h
+		// shift canvas up right to see the axes with the default view
+		let moveAmount = Math.max(0.05 * Math.min(box.w, box.h), 10)
+		box.x -= moveAmount
+		box.y += moveAmount
+		this.canvas.viewbox(box)
+		this.zoomCurrent = 2
+		this.canvas.zoom(this.zoomCurrent, new SVG.Point())
+		this.onResizeCanvas()
+	}
+
+	public fitView() {
+		let bbox: SVG.Box = null
+		for (const component of MainController.instance.circuitComponents) {
+			let compBBox = component.visualization.bbox()
+			if (bbox) {
+				bbox = bbox.merge(compBBox)
+			} else {
+				bbox = compBBox
+			}
+		}
+
+		if (bbox) {
+			let canvasBox = this.canvas.viewbox()
+			let zoomFactor = Math.min(canvasBox.w / bbox.w, canvasBox.h / bbox.h) * 0.98 // sligtly more zoomed out
+			if (zoomFactor * this.zoomCurrent > this.zoomMax) {
+				zoomFactor = this.zoomMax / this.zoomCurrent
+			} else if (zoomFactor * this.zoomCurrent < this.zoomMin) {
+				zoomFactor = this.zoomMin / this.zoomCurrent
+			}
+			let newSize = new SVG.Point(canvasBox.w, canvasBox.h).mul(zoomFactor)
+			canvasBox = new SVG.Box(bbox.cx - newSize.x / 2, bbox.cy - newSize.y / 2, newSize.x, newSize.y)
+			this.canvas.viewbox(canvasBox)
+			this.zoomCurrent *= zoomFactor
+			this.canvas.zoom(this.zoomCurrent, new SVG.Point(bbox.cx, bbox.cy))
+			this.onResizeCanvas()
+		} else {
+			this.resetView()
+		}
 	}
 
 	public moveComponentsForward(components: CircuitComponent[]) {
@@ -415,8 +447,6 @@ export class CanvasController {
 		majorGrid.children[0]?.setAttribute("width", majorDistanceNum)
 		majorGrid.children[0]?.setAttribute("height", majorDistanceNum)
 		majorGrid.children[1]?.setAttribute("d", `M ${majorDistancePx} 0 L 0 0 0 ${majorDistancePx}`)
-
-		this.saveSettings()
 	}
 
 	/**

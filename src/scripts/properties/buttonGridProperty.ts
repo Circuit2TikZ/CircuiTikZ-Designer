@@ -5,12 +5,14 @@ export class ButtonGridProperty extends EditableProperty<never> {
 	private labels: [string, string | [string, string]][]
 	private callbacks: ((ev: Event) => void)[]
 	private materialSymbols: boolean
+	private tooltips: string[]
 
 	public constructor(
 		buttonsPerRow: 1 | 2 | 3 | 4 | 6 | 12,
 		labels: [string, string | [string, string]][],
 		callbacks: ((ev: Event) => void)[],
-		materialSymbols = false
+		materialSymbols = false,
+		tooltips: string[] = []
 	) {
 		super()
 		if (labels.length !== callbacks.length) {
@@ -20,6 +22,7 @@ export class ButtonGridProperty extends EditableProperty<never> {
 		this.labels = labels
 		this.callbacks = callbacks
 		this.materialSymbols = materialSymbols
+		this.tooltips = tooltips
 	}
 
 	public eq(first: never, second: never): boolean {
@@ -43,6 +46,10 @@ export class ButtonGridProperty extends EditableProperty<never> {
 				"justify-content-center",
 				"gap-1"
 			)
+			if (this.tooltips[index]) {
+				button.setAttribute("data-bs-title", this.tooltips[index])
+				button.setAttribute("data-bs-toggle", "tooltip")
+			}
 			if (this.materialSymbols) {
 				button.classList.add("material-symbols-outlined")
 			}

@@ -3,8 +3,8 @@ import { EditableProperty, Undo } from "../internal"
 export class MathJaxProperty extends EditableProperty<string> {
 	private input: HTMLInputElement
 
-	public constructor(initialValue?: string) {
-		super(initialValue ?? "")
+	public constructor(initialValue?: string, tooltip = "") {
+		super(initialValue ?? "", tooltip)
 	}
 
 	public eq(first: string, second: string): boolean {

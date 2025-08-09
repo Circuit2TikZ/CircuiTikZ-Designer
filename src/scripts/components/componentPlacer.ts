@@ -5,7 +5,10 @@ import {
 	MainController,
 	Modes,
 	PropertyController,
+	SelectionController,
+	SelectionMode,
 	SnapController,
+	SnapCursorController,
 	Undo,
 } from "../internal"
 import hotkeys from "hotkeys-js"
@@ -23,6 +26,8 @@ export class ComponentPlacer {
 	public get component(): CircuitComponent | null {
 		return this._component
 	}
+
+	private previousComponent: CircuitComponent | null = null
 
 	private constructor() {
 		this.placeStep = this.placeStep.bind(this)
@@ -68,7 +73,9 @@ export class ComponentPlacer {
 	public placeMove(ev: MouseEvent | TouchEvent) {
 		let pt = ComponentPlacer.pointFromEvent(ev)
 		this.component.placeMove(pt, ev)
+		SnapController.instance.showSnapPoints(!ev.shiftKey)
 		SnapController.instance.recalculateAdditionalSnapPoints()
+		SnapCursorController.instance.moveTo(pt)
 	}
 
 	/**
@@ -102,6 +109,7 @@ export class ComponentPlacer {
 
 			// restart component placement for just finished component
 			if (window.TouchEvent && !(ev instanceof TouchEvent)) {
+				this.previousComponent = this.component
 				this.placeComponent(this.component.copyForPlacement())
 			} else {
 				this._component = null
@@ -112,7 +120,7 @@ export class ComponentPlacer {
 
 	/**
 	 * cancel the component placement
-	 * @param ev which event is responsible for the cancellastion
+	 * @param ev which event is responsible for the cancellation
 	 */
 	public placeCancel(ev?: KeyboardEvent) {
 		let component = this.component
@@ -121,7 +129,12 @@ export class ComponentPlacer {
 			MainController.instance.removeComponent(component)
 			this._component = null
 		}
+		if (this.previousComponent) {
+			SelectionController.instance.selectComponents([this.previousComponent], SelectionMode.RESET)
+		}
+		this.previousComponent = null
 		this.cleanUp()
+		SnapCursorController.instance.visible = false
 		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}
 
@@ -129,7 +142,7 @@ export class ComponentPlacer {
 	 * Get rid of now not needed event listeners
 	 */
 	private cleanUp() {
-		SnapController.instance.hideSnapPoints()
+		SnapController.instance.showSnapPoints(false)
 		//remove event listeners
 		let canvas = CanvasController.instance.canvas
 		canvas.off("mousemove", this.placeMove)
@@ -157,7 +170,6 @@ export class ComponentPlacer {
 		canvas.on("touchmove", this.placeMove)
 		canvas.on("mouseup", this.placeStep)
 		canvas.on("touchend", this.placeStep)
-		// canvas.on("dblclick",this.placeFinish)
 		hotkeys("enter", { keyup: false, keydown: true }, this.placeFinish)
 
 		// move once to actually place the component at the mouse position

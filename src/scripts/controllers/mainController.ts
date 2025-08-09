@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip } from "bootstrap"
+import { Button as _bootstrapButton, Collapse as _bootstrapCollapse, Offcanvas, Tooltip, Modal } from "bootstrap"
 import "../utils/impSVGNumber"
 import { waitForElementLoaded } from "../utils/domWatcher"
 import hotkeys from "hotkeys-js"
@@ -16,9 +16,8 @@ import {
 	PropertyController,
 	CircuitComponent,
 	ComponentPlacer,
-	NodeComponent,
-	CircuitikzComponent,
-	PathComponent,
+	NodeSymbolComponent,
+	PathSymbolComponent,
 	WireComponent,
 	ComponentSymbol,
 	ComponentSaveObject,
@@ -28,11 +27,26 @@ import {
 	defaultStroke,
 	defaultFill,
 	PolygonComponent,
+	GroupSaveObject,
+	memorySizeOf,
+	SaveFileFormat,
+	emtpySaveState,
+	currentSaveVersion,
 } from "../internal"
 
-type SaveState = {
-	currentIndices: number[]
-	currentData: ComponentSaveObject[][]
+type TabState = {
+	id: number
+	open: string
+	data: SaveFileFormat
+	settings: CanvasSettings
+}
+
+export type CanvasSettings = {
+	gridVisible?: boolean
+	majorGridSizecm?: number
+	majorGridSubdivisions?: number
+	viewBox?: SVG.Box
+	viewZoom?: number
 }
 
 export enum Modes {
@@ -85,14 +99,15 @@ export class MainController {
 	isMac = false
 	selectionController: SelectionController
 
+	broadcastChannel: BroadcastChannel
+
 	/**
 	 * Init the app.
 	 */
 	private constructor() {
 		MainController._instance = this
 		this.isMac = window.navigator.userAgent.toUpperCase().indexOf("MAC") >= 0
-
-		this.addSaveStateManagement()
+		this.broadcastChannel = new BroadcastChannel("circuitikz-designer")
 
 		// dark mode init
 		const htmlElement = document.documentElement
@@ -107,6 +122,7 @@ export class MainController {
 		let mathJaxPromise = this.loadMathJax()
 		let canvasPromise = this.initCanvas()
 		let symbolsDBPromise = this.initSymbolDB()
+		let fontPromise = document.fonts.load("1em CMU Serif")
 
 		MainController.appVersion = version
 		document.addEventListener("DOMContentLoaded", () => {
@@ -117,28 +133,7 @@ export class MainController {
 
 		this.initModeButtons()
 
-		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches
-
-		//enable tooltips globally
-		const tooltipTriggerList = document.querySelectorAll(
-			'[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]'
-		)
-		if (isMobile) {
-			const tooltipList = [...tooltipTriggerList].map(
-				(tooltipTriggerEl) =>
-					new Tooltip(tooltipTriggerEl, {
-						fallbackPlacements: [], //always show them exactly where defined
-						trigger: "manual",
-					})
-			)
-		} else {
-			const tooltipList = [...tooltipTriggerList].map(
-				(tooltipTriggerEl) =>
-					new Tooltip(tooltipTriggerEl, {
-						fallbackPlacements: [], //always show them exactly where defined
-					})
-			)
-		}
+		this.updateTooltips()
 
 		// init exporting
 		ExportController.instance
@@ -176,9 +171,8 @@ export class MainController {
 			PropertyController.instance
 			ComponentPlacer.instance
 		})
-		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise]).then(() => {
+		this.initPromise = Promise.all([canvasPromise, symbolsDBPromise, mathJaxPromise, fontPromise]).then(() => {
 			document.getElementById("loadingSpinner")?.classList.add("d-none")
-			SnapCursorController.instance
 			this.initAddComponentOffcanvas()
 			this.initShortcuts()
 
@@ -187,13 +181,7 @@ export class MainController {
 				.getElementById("canvas")
 				.addEventListener("contextmenu", (evt) => evt.preventDefault(), { passive: false })
 
-			let currentProgress: SaveState = JSON.parse(localStorage.getItem("circuitikz-designer-saveState"))
-
-			if (Object.keys(currentProgress.currentData[this.tabID]).length > 0) {
-				SaveController.instance.loadFromJSON(currentProgress.currentData[this.tabID])
-			} else {
-				Undo.addState()
-			}
+			this.addSaveStateManagement()
 
 			// prepare symbolDB for colorTheme
 			for (const g of this.symbolsSVG.defs().node.querySelectorAll("symbol>g")) {
@@ -216,6 +204,35 @@ export class MainController {
 			PropertyController.instance.update()
 			this.isInitDone = true
 		})
+	}
+
+	private allTooltips: Tooltip[] = []
+	public updateTooltips() {
+		var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches
+		//enable tooltips globally
+		const tooltipTriggerList = document.querySelectorAll(
+			'[data-bs-toggle="tooltip"],[data-bs-toggle-second="tooltip"]'
+		)
+		for (const tooltip of this.allTooltips) {
+			tooltip.dispose()
+		}
+		if (isMobile) {
+			this.allTooltips = [...tooltipTriggerList].map(
+				(tooltipTriggerEl) =>
+					new Tooltip(tooltipTriggerEl, {
+						fallbackPlacements: [], //always show them exactly where defined
+						trigger: "manual",
+					})
+			)
+		} else {
+			this.allTooltips = [...tooltipTriggerList].map(
+				(tooltipTriggerEl) =>
+					new Tooltip(tooltipTriggerEl, {
+						fallbackPlacements: [], //always show them exactly where defined
+						delay: { show: 1000, hide: 0 },
+					})
+			)
+		}
 	}
 
 	private async loadMathJax() {
@@ -243,71 +260,250 @@ export class MainController {
 	}
 
 	/**
-	 * make it possible to open multiple tabs and all with different save States.
+	 * handle tabs and save state management
 	 */
 	private addSaveStateManagement() {
-		const objname = "circuitikz-designer-saveState"
-		const tabname = "circuitikz-designer-tabID"
+		// remove old localStorage data
+		localStorage.removeItem("currentProgress")
+		localStorage.removeItem("circuit2tikz-designer-grid")
+		sessionStorage.removeItem("circuitikz-designer-tabID")
 
-		let defaultProgress: SaveState = {
-			currentIndices: [],
-			currentData: [],
+		const defaultSettings: CanvasSettings = {}
+
+		let db: IDBDatabase
+		const IDBrequest = indexedDB.open("circuitikz-designer-db", 1)
+		IDBrequest.onerror = function (event) {
+			console.error("IndexedDB error")
+			console.error(event)
 		}
-
-		// TODO check if multithreading of tabs can mess with localStorage due to a race condition???
-
-		// load localStorage or default if it doesn't exist
-		let storageString = localStorage.getItem(objname)
-		let current: SaveState = storageString ? JSON.parse(storageString) : defaultProgress
-
-		// load the tab ID if reopening the page was a reload/restore (sessionStorage persists in that case)
-		let sessionTabID = sessionStorage.getItem(tabname)
-		if (sessionTabID) {
-			this.tabID = Number.parseInt(sessionTabID)
-			current.currentIndices.push(this.tabID)
-		}
-
-		// this is a new tab --> assign tab ID
-		if (this.tabID < 0) {
-			// populate first available slot
-			let index = 0
-			while (current.currentIndices.includes(index)) {
-				index++
+		IDBrequest.onupgradeneeded = function (event) {
+			db = (event.target as IDBOpenDBRequest).result
+			if (!db.objectStoreNames.contains("tabs")) {
+				const objectStore = db.createObjectStore("tabs", { keyPath: "id" })
+				objectStore.createIndex("open", "open", { unique: false })
 			}
-			this.tabID = index
-			current.currentIndices.push(this.tabID)
+		}
+		IDBrequest.onsuccess = function (event) {
+			db = (event.target as IDBOpenDBRequest).result
+			let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+
+			// the URL of the current page
+			var url = new URL(window.location.href)
+			// check if a tabID is requested in the URL, otherwise use the first closed tab
+			var requestedID = parseInt(url.searchParams.get("tabID"))
+
+			tabsObjectStore.getAll().onsuccess = function (event) {
+				let allTabs: TabState[] = (event.target as IDBRequest).result
+
+				if (Number.isNaN(requestedID)) {
+					// no tabID is requested in the URL, so we need to find the first closed tab
+					requestedID = allTabs.findIndex((tab) => tab.open == "false")
+
+					if (requestedID < 0) {
+						// no closed tab found, use the next available ID
+						requestedID = 0
+						while (allTabs.find((tab) => tab.id == requestedID)) {
+							requestedID++
+						}
+					}
+				}
+
+				let requestedTab = allTabs.find((tab) => tab.id == requestedID)
+				if (requestedTab) {
+					// if the requested tab is closed, open it
+					requestedTab.open = "true"
+					MainController.instance.tabID = requestedTab.id
+					CanvasController.instance.setSettings(requestedTab.settings)
+					SaveController.instance.loadFromJSON(requestedTab.data)
+					tabsObjectStore.put(requestedTab).onsuccess = (event) => {
+						MainController.instance.broadcastChannel.postMessage("update")
+					}
+				} else {
+					// requested tab not found, so we create a new one
+					const newEntry: TabState = {
+						id: requestedID,
+						open: "true",
+						data: emtpySaveState,
+						settings: defaultSettings,
+					}
+					MainController.instance.tabID = requestedID
+					tabsObjectStore.add(newEntry).onsuccess = (event) => {
+						// as soon as the tab is created and saved in the db, we can notify the other tabs
+						MainController.instance.broadcastChannel.postMessage("update")
+					}
+				}
+			}
 		}
 
-		// save the assigned tab ID
-		sessionStorage.setItem(tabname, this.tabID.toString())
-
-		// adjust the saveData object to accomodate new data if necessary
-		if (current.currentData.length <= this.tabID) {
-			current.currentData.push([])
-		}
-
-		// save the current state of tabs
-		localStorage.setItem(objname, JSON.stringify(current))
-
-		//TODO get rid of unload events: will be removed from chrome in the future and is currently ignored by many browsers
-		// prepare saveState for unloading
-		window.addEventListener("beforeunload", (ev) => {
-			Undo.addState()
-			let currentProgress: SaveState = JSON.parse(localStorage.getItem(objname))
-
-			currentProgress.currentIndices.splice(
-				currentProgress.currentIndices.findIndex((value) => value == MainController.instance.tabID),
-				1
-			)
-			currentProgress.currentData[this.tabID] = Undo.getCurrentState()
-			localStorage.setItem(objname, JSON.stringify(currentProgress))
-
-			//use this here if the localStorage is fucked in development
-			// localStorage.removeItem(objname)
-			// localStorage.removeItem(tabname)
-
-			//TODO add manual way to clear the localStorage
+		window.addEventListener("visibilitychange", (ev) => {
+			if (document.visibilityState == "hidden") {
+				this.saveCurrentState(db, false)
+			}
 		})
+
+		window.addEventListener("beforeunload", (ev) => {
+			this.saveCurrentState(db)
+		})
+
+		//settings modal
+		const settingsModalEl = document.getElementById("settingsModal") as HTMLDivElement
+		const settingsTableBody = document.getElementById("settingsTableBody") as HTMLTableSectionElement
+
+		settingsModalEl.addEventListener("show.bs.modal", (event) => {
+			settingsTableBody.innerHTML = ""
+
+			let tabsObjectStoreRead = db.transaction("tabs").objectStore("tabs")
+
+			tabsObjectStoreRead.getAll().onsuccess = function (event) {
+				const currentData = (event.target as IDBRequest).result as TabState[]
+
+				let totalSize = 0
+
+				for (let i = 0; i < currentData.length; i++) {
+					const tabData = currentData[i]
+					let row = settingsTableBody.appendChild(document.createElement("tr"))
+					row.classList.add("text-end")
+					let cell1 = row.appendChild(document.createElement("td"))
+					cell1.innerText = "" + i
+					let cell2 = row.appendChild(document.createElement("td"))
+					cell2.innerText = countComponents(tabData.data.components) + ""
+					let cell3 = row.appendChild(document.createElement("td"))
+					let size = memorySizeOf(tabData.data)
+					totalSize += size
+					cell3.innerText = sizeString(size)
+					let cell4 = row.appendChild(document.createElement("td"))
+					if (tabData.open == "false") {
+						let openButton = cell4.appendChild(document.createElement("button"))
+						openButton.classList.add("btn", "btn-primary", "me-2")
+						openButton.innerText = "Open"
+						openButton.addEventListener("click", () => {
+							// set the data in the object store to open
+							window.open(".?tabID=" + tabData.id, "_blank")
+						})
+
+						let deleteButton = cell4.appendChild(document.createElement("button"))
+						deleteButton.classList.add("btn", "btn-danger", "material-symbols-outlined")
+						deleteButton.innerText = "delete"
+						deleteButton.addEventListener("click", () => {
+							let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+							tabsObjectStore.delete(tabData.id).onsuccess = function () {
+								settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+								MainController.instance.broadcastChannel.postMessage("update")
+							}
+						})
+					} else {
+						if (tabData.id == MainController.instance.tabID) {
+							let infoButton = cell4.appendChild(document.createElement("button"))
+							infoButton.classList.add("btn")
+							infoButton.innerText = "This tab"
+							infoButton.disabled = true
+							let _ = [cell1, cell2, cell3, cell4].forEach((cell) => {
+								cell.classList.add("bg-primary")
+							})
+						} else {
+							let closeButton = cell4.appendChild(document.createElement("button"))
+							closeButton.classList.add("btn", "btn-danger")
+							closeButton.innerText = "Close tab"
+							closeButton.addEventListener("click", () => {
+								// also set the open state to false in the db
+								let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+								const adjustedData = tabData
+								adjustedData.open = "false"
+								tabsObjectStore.put(adjustedData)
+								// send a message to the broadcast channel to close the tab
+								MainController.instance.broadcastChannel.postMessage("close=" + tabData.id)
+							})
+						}
+					}
+				}
+				let row = settingsTableBody.appendChild(document.createElement("tr"))
+				let cell1 = row.appendChild(document.createElement("td"))
+				cell1.colSpan = 4
+				cell1.classList.add("text-center")
+				let newTabButton = cell1.appendChild(document.createElement("button"))
+				newTabButton.classList.add("btn", "btn-primary")
+				newTabButton.innerText = "New tab"
+				newTabButton.addEventListener("click", () => {
+					// set the data in the object store to open
+					let requestedID = 0
+					while (currentData.find((tab) => tab.id == requestedID)) {
+						requestedID++
+					}
+					window.open(".?tabID=" + requestedID, "_blank")
+				})
+
+				document.getElementById("storageUsed").innerHTML = sizeString(totalSize)
+			}
+		})
+
+		this.broadcastChannel.onmessage = (event) => {
+			const msg = String(event.data)
+
+			if (msg.startsWith("close")) {
+				const tabID = parseInt(msg.split("=")[1]) // get the tabID
+				if (tabID == MainController.instance.tabID) {
+					// close the tab
+					window.close()
+				}
+			} else if (msg == "update") {
+				if (settingsModalEl.classList.contains("show")) {
+					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+				}
+			}
+		}
+
+		function sizeString(size: number) {
+			if (size < 1024) {
+				return size + " B"
+			} else if (size < 1024 * 1024) {
+				return (size / 1024).toFixed(2) + " KB"
+			} else if (size < 1024 * 1024 * 1024) {
+				return (size / (1024 * 1024)).toFixed(2) + " MB"
+			} else {
+				return (size / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+			}
+		}
+
+		function countComponents(data: ComponentSaveObject[]) {
+			let count = 0
+			for (const component of data) {
+				if (component.type == "group") {
+					count += countComponents((component as GroupSaveObject).components)
+				}
+				count++
+			}
+			return count
+		}
+	}
+
+	private saveCurrentState(db: IDBDatabase, closeTab = true) {
+		Undo.addState()
+		let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
+		tabsObjectStore.get(this.tabID).onsuccess = function (event) {
+			const data = (event.target as IDBRequest).result as TabState
+			if (closeTab) {
+				data.open = "false"
+			}
+			data.data.components = Undo.getCurrentState()
+			data.data.version = currentSaveVersion
+			if (data.data.components.length > 0) {
+				data.settings.gridVisible = CanvasController.instance.gridVisible
+				data.settings.majorGridSizecm = CanvasController.instance.majorGridSizecm
+				data.settings.majorGridSubdivisions = CanvasController.instance.majorGridSubdivisions
+				data.settings.viewBox = CanvasController.instance.canvas.viewbox()
+				data.settings.viewZoom = CanvasController.instance.currentZoom
+				tabsObjectStore.put(data).onsuccess = function () {
+					MainController.instance.broadcastChannel.postMessage("update")
+				}
+			} else {
+				if (closeTab) {
+					// if no data is present, delete the entry (keeps the db clean)
+					tabsObjectStore.delete(MainController.instance.tabID).onsuccess = function () {
+						MainController.instance.broadcastChannel.postMessage("update")
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -440,7 +636,7 @@ export class MainController {
 		})
 		hotkeys("t", () => {
 			this.switchMode(Modes.DRAG_PAN)
-			ComponentPlacer.instance.placeComponent(new RectangleComponent())
+			ComponentPlacer.instance.placeComponent(new RectangleComponent(true))
 			return false
 		})
 
@@ -508,23 +704,10 @@ export class MainController {
 
 		// Extract symbols
 		this.symbolsSVG = new SVG.Svg(symbolsSVGSVGElement)
-		const defs: SVG.Defs = this.symbolsSVG.defs()
-		const symbols: SVGSymbolElement[] = Array.prototype.filter.call(
-			defs.node.children,
-			(def) => def instanceof SVGSymbolElement
-		)
-		// let symbols = defs.children().filter((/** @type {SVG.Element} */def) => def instanceof SVG.Symbol);
-		this.symbols = symbols.flatMap((symbol) => {
-			const baseInfo = ComponentSymbol.getBaseInformation(symbol)
-			if (baseInfo.isNode === baseInfo.isPath) return [] // type not correctly set
-			try {
-				// if (baseInfo.isNode) return new NodeComponentSymbol(symbol, baseInfo);
-				// else return new PathComponentSymbol(symbol, baseInfo);
-				return new ComponentSymbol(symbol, baseInfo)
-			} catch (e) {
-				console.log(e)
-				return []
-			}
+		const componentsMetadata = Array.from(this.symbolsSVG.node.getElementsByTagName("component"))
+
+		this.symbols = componentsMetadata.flatMap((componentMetadata) => {
+			return new ComponentSymbol(componentMetadata)
 		})
 	}
 
@@ -555,7 +738,7 @@ export class MainController {
 
 	private addShapeComponentsToOffcanvas(leftOffcanvasAccordion: HTMLDivElement, leftOffcanvasOC: Offcanvas) {
 		// Add shapes accordion area
-		let groupName = "Shapes"
+		let groupName = "Basic"
 		const collapseGroupID = "collapseGroup-" + groupName.replace(/[^\d\w\-\_]+/gi, "-")
 
 		const accordionGroup = leftOffcanvasAccordion.appendChild(document.createElement("div"))
@@ -581,6 +764,34 @@ export class MainController {
 		const accordionItemBody = accordionItemCollapse.appendChild(document.createElement("div"))
 		accordionItemBody.classList.add("accordion-body", "iconLibAccordionBody")
 
+		//Add Text
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "text")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Text"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new RectangleComponent(true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -14, 30, 15)
+			svgIcon.text((add) => {
+				add.tspan("Text").fill({ color: defaultStroke })
+			})
+		}
+
 		//Add rectangle
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
@@ -591,13 +802,9 @@ export class MainController {
 
 			const listener = (ev: MouseEvent) => {
 				ev.preventDefault()
-				this.switchMode(Modes.COMPONENT)
 
-				if (ComponentPlacer.instance.component) {
-					ComponentPlacer.instance.placeCancel()
-				}
-
-				let newComponent = new RectangleComponent()
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new RectangleComponent(false)
 				ComponentPlacer.instance.placeComponent(newComponent)
 
 				leftOffcanvasOC.hide()
@@ -687,6 +894,110 @@ export class MainController {
 					width: 1,
 				})
 		}
+
+		//Add straight line
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight line")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Straight line"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(0, 0, 17, 12)
+			svgIcon.line(2, 10, 15, 2).stroke({ color: defaultStroke, width: 1, opacity: 1 })
+		}
+
+		//Add straight arrow
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight arrow")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Straight arrow"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(true, true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -1, 12, 6)
+			svgIcon
+				.polygon([
+					[6, 0],
+					[10, 2],
+					[6, 4],
+					[6, 2.2],
+					[0, 2.2],
+					[0, 1.8],
+					[6, 1.8],
+				])
+				.rotate(-30, 5, 2)
+				.fill({ color: defaultStroke })
+		}
+
+		//Add arrow
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "straight arrow")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Arrow"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new WireComponent(false, true)
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -2, 12, 8)
+			svgIcon
+				.polyline([
+					[0, 5],
+					[5, 5],
+					[5, 0],
+					[9.1, 0],
+				])
+				.stroke({ color: defaultStroke, width: 0.5 })
+				.fill("none")
+			svgIcon
+				.polygon([
+					[9, -1],
+					[10.5, 0],
+					[9, 1],
+				])
+				.fill({ color: defaultStroke })
+		}
 	}
 
 	/**
@@ -766,7 +1077,17 @@ export class MainController {
 				addButton.classList.add("libComponent")
 				addButton.setAttribute(
 					"searchData",
-					[symbol.tikzName].concat(Array.from(symbol._tikzOptions.keys())).join(" ")
+					[symbol.tikzName]
+						.concat(
+							symbol.possibleOptions
+								.map((option) => option.displayName ?? option.name)
+								.concat(
+									symbol.possibleEnumOptions.flatMap((enumOption) =>
+										enumOption.options.map((option) => option.displayName ?? option.name)
+									)
+								)
+						)
+						.join(" ")
 				)
 				addButton.ariaRoleDescription = "button"
 				addButton.title = symbol.displayName || symbol.tikzName
@@ -779,11 +1100,11 @@ export class MainController {
 						ComponentPlacer.instance.placeCancel()
 					}
 
-					let newComponent: CircuitikzComponent
+					let newComponent: CircuitComponent
 					if (symbol.isNodeSymbol) {
-						newComponent = new NodeComponent(symbol)
+						newComponent = new NodeSymbolComponent(symbol)
 					} else {
-						newComponent = new PathComponent(symbol)
+						newComponent = new PathSymbolComponent(symbol)
 					}
 					ComponentPlacer.instance.placeComponent(newComponent)
 
@@ -803,7 +1124,8 @@ export class MainController {
 
 					svgIcon.viewbox(viewBox).width(viewBox.width).height(viewBox.height)
 				}
-				svgIcon.use(symbol.id()).stroke(defaultStroke).fill(defaultFill).node.style.color = defaultStroke
+				svgIcon.use(symbol.symbolElement.id()).stroke(defaultStroke).fill(defaultFill).node.style.color =
+					defaultStroke
 			}
 		}
 	}
@@ -820,7 +1142,7 @@ export class MainController {
 		let text = element.value
 		let regex = null
 		try {
-			regex = new RegExp(text, "i")
+			regex = new RegExp(".*" + text.split("").join(".*") + ".*", "i")
 			element.classList.remove("is-invalid")
 			feedbacktext.classList.add("d-none")
 		} catch (e) {
@@ -880,9 +1202,6 @@ export class MainController {
 				this.modeSwitchButtons.modeDragPan.classList.remove("selected")
 				CanvasController.instance.deactivatePanning()
 				SelectionController.instance.deactivateSelection()
-				for (const instance of this.circuitComponents) {
-					instance.draggable(false)
-				}
 				break
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.remove("selected")
@@ -903,9 +1222,6 @@ export class MainController {
 				this.modeSwitchButtons.modeDragPan.classList.add("selected")
 				CanvasController.instance.activatePanning()
 				SelectionController.instance.activateSelection()
-				for (const instance of this.circuitComponents) {
-					instance.draggable(true)
-				}
 				break
 			case Modes.ERASE:
 				this.modeSwitchButtons.modeEraser.classList.add("selected")

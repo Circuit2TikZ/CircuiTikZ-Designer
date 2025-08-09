@@ -4,7 +4,9 @@ import {
 	CanvasController,
 	CircuitComponent,
 	DistributionMode,
+	EditableProperty,
 	GroupComponent,
+	MainController,
 	SectionHeaderProperty,
 	SelectionController,
 	Undo,
@@ -17,6 +19,44 @@ export type FormEntry = {
 	currentValue: any
 }
 
+export enum PropertyCategories {
+	manipulation,
+	ordering,
+	options,
+	fill,
+	stroke,
+	label,
+	text,
+	info,
+}
+
+export class PropertiesCollection extends Map<PropertyCategories, EditableProperty<any>[]> {
+	public add(category: PropertyCategories, property: EditableProperty<any>) {
+		if (this.has(category)) {
+			this.get(category).push(property)
+		} else {
+			this.set(category, [property])
+		}
+	}
+
+	public sorted(): EditableProperty<any>[] {
+		let properties: EditableProperty<any>[] = []
+
+		let key = Object.keys(PropertyCategories)[0]
+		PropertyCategories[key]
+		for (const element in PropertyCategories) {
+			if (isNaN(Number(element))) {
+				//@ts-ignore
+				let category: PropertyCategories = PropertyCategories[element]
+				if (this.has(category)) {
+					properties.push(...this.get(category))
+				}
+			}
+		}
+		return properties
+	}
+}
+
 export class PropertyController {
 	private static _instance: PropertyController
 	public static get instance(): PropertyController {
@@ -26,14 +66,20 @@ export class PropertyController {
 		return PropertyController._instance
 	}
 
-	private gridProperties: HTMLDivElement
+	private viewProperties: HTMLDivElement
 	private propertiesEntries: HTMLDivElement
 	private propertiesTitle: HTMLElement
 
 	private constructor() {
 		this.propertiesTitle = document.getElementById("propertiesTitle") as HTMLElement
-		this.gridProperties = document.getElementById("grid-properties") as HTMLDivElement
+		this.viewProperties = document.getElementById("view-properties") as HTMLDivElement
 		this.propertiesEntries = document.getElementById("propertiesEntries") as HTMLDivElement
+		;(document.getElementById("resetViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.resetView()
+		})
+		;(document.getElementById("fitViewButton") as HTMLButtonElement).addEventListener("click", (ev) => {
+			CanvasController.instance.fitView()
+		})
 	}
 
 	update() {
@@ -45,8 +91,10 @@ export class PropertyController {
 		} else if (components.length === 1) {
 			this.setForm(components[0])
 		} else {
-			this.setFormGrid()
+			this.setFormView()
 		}
+
+		MainController.instance.updateTooltips()
 	}
 
 	private setMultiForm(components: CircuitComponent[]) {
@@ -91,6 +139,15 @@ export class PropertyController {
 					SelectionController.instance.flipSelection(false)
 					Undo.addState()
 				},
+			],
+			false,
+			[
+				"Rotate the components 90 degrees clockwise",
+				"Rotate the components 90 degrees counter clockwise",
+				"Rotate the components 45 degrees clockwise",
+				"Rotate the components 45 degrees counter clockwise",
+				"Flip the components around its x-axis",
+				"Flip the components around its y-axis",
 			]
 		)
 		rows.push(positioning.buildHTML())
@@ -121,6 +178,13 @@ export class PropertyController {
 					CanvasController.instance.moveComponentsBackward(
 						SelectionController.instance.currentlySelectedComponents
 					),
+			],
+			false,
+			[
+				"Bring the components to the foreground",
+				"Move the components to the background",
+				"Move the components one step towards the foreground",
+				"Move the components one step towards the background",
 			]
 		)
 		rows.push(ordering.buildHTML())
@@ -179,12 +243,12 @@ export class PropertyController {
 	private setForm(component: CircuitComponent) {
 		this.propertiesEntries.classList.remove("d-none")
 		this.propertiesTitle.innerText = component.displayName
-		this.propertiesEntries.append(...component.propertiesHTMLRows)
+		this.propertiesEntries.append(...component.properties.sorted().map((property) => property.getHTMLElement()))
 	}
 
-	private setFormGrid() {
-		this.gridProperties.classList.remove("d-none")
-		this.propertiesTitle.innerText = "Grid settings"
+	private setFormView() {
+		this.viewProperties.classList.remove("d-none")
+		this.propertiesTitle.innerText = "View settings"
 
 		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
 		minorSlider.value = CanvasController.instance.majorGridSubdivisions.toString()
@@ -201,8 +265,14 @@ export class PropertyController {
 		})
 
 		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
+	}
 
-		//TODO add reset viewport button but save the viewport in localstorage
+	public setSliderValues(majorSizecm: number, majorSubdivisions: number) {
+		let minorSlider = document.getElementById("minorSliderInput") as HTMLInputElement
+		minorSlider.value = majorSubdivisions.toString()
+		let majorSlider = document.getElementById("majorSliderInput") as HTMLInputElement
+		majorSlider.value = majorSizecm.toString()
+		this.changeGrid(majorSizecm, majorSubdivisions)
 	}
 
 	private changeGrid(majorSizecm: number, majorSubdivisions: number) {
@@ -221,7 +291,7 @@ export class PropertyController {
 
 	private clearForm() {
 		this.propertiesTitle.innerText = "Properties"
-		this.gridProperties.classList.add("d-none")
+		this.viewProperties.classList.add("d-none")
 		this.propertiesEntries.classList.add("d-none")
 		this.propertiesEntries.innerText = ""
 

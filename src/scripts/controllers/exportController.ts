@@ -1,13 +1,5 @@
 import { Modal, Tooltip } from "bootstrap"
-import {
-	SelectionController,
-	MainController,
-	CircuitikzComponent,
-	CanvasController,
-	defaultStroke,
-	defaultFill,
-	WireComponent,
-} from "../internal"
+import { SelectionController, MainController, defaultStroke, defaultFill, TextProperty } from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
 import * as SVG from "@svgdotjs/svg.js"
@@ -57,8 +49,11 @@ export class ExportController {
 	private isIDUsed(id: string): boolean {
 		for (const component of MainController.instance.circuitComponents) {
 			// check if another component with the same name already exists
-			if (component instanceof CircuitikzComponent && component.name.value == id) {
-				return true
+			if ("name" in component) {
+				let name = component.name as TextProperty
+				if (name.value == id) {
+					return true
+				}
 			}
 		}
 		return false
@@ -175,6 +170,16 @@ export class ExportController {
 
 		for (const component of components) {
 			svgObj.add(component)
+		}
+
+		//basic cleanup of components used to improve dragging
+		for (const removeElement of svgObj
+			.find('[fill="none"][stroke="transparent"]')
+			.concat(svgObj.find('[fill="transparent"][stroke="none"]'))) {
+			removeElement.remove()
+		}
+		for (const removeClass of svgObj.find(".draggable")) {
+			removeClass.removeClass("draggable")
 		}
 
 		// bounding box to include all elements

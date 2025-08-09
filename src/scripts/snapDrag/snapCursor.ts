@@ -18,21 +18,16 @@ export class SnapCursorController {
 		return SnapCursorController._instance
 	}
 
-	#cursorViewBox: SVG.Box
-	cursor: SVG.Use
+	private cursorViewBox: SVG.Box
+	private cursor: SVG.Use
 
-	/**
-	 * Called only once by index.js. Use {@link controller} to get the instance.
-	 *
-	 * @param {SVG.Container} container
-	 */
-	private constructor() {
+	constructor() {
 		const cursorSymbol = new SVG.Symbol(document.getElementById("snapCursor"))
 		this.cursor = CanvasController.instance.canvas.use(cursorSymbol)
 		this.cursor.id("snapCursorUse")
-		this.#cursorViewBox = cursorSymbol.viewbox()
-		this.cursor.width(this.#cursorViewBox.width)
-		this.cursor.height(this.#cursorViewBox.height)
+		this.cursorViewBox = cursorSymbol.viewbox()
+		this.cursor.width(this.cursorViewBox.width)
+		this.cursor.height(this.cursorViewBox.height)
 		// CanvasController.instance.canvas.add(this.cursor);
 		this.cursor.hide()
 	}
@@ -43,7 +38,7 @@ export class SnapCursorController {
 	 * @param {SVG.Point} position - the new position
 	 */
 	moveTo(position: SVG.Point) {
-		this.cursor.move(position.x - this.#cursorViewBox.cx, position.y - this.#cursorViewBox.cy)
+		this.cursor.center(position.x, position.y)
 	}
 
 	/**

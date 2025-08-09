@@ -4,7 +4,7 @@ import {
 	CircuitComponent,
 	ComponentSaveObject,
 	MainController,
-	SaveController,
+	PropertyCategories,
 	SectionHeaderProperty,
 	SelectionController,
 	SelectionMode,
@@ -18,6 +18,11 @@ export type GroupSaveObject = ComponentSaveObject & {
 }
 
 export class GroupComponent extends CircuitComponent {
+	private static jsonID = "group"
+	static {
+		CircuitComponent.jsonSaveMap.set(GroupComponent.jsonID, GroupComponent)
+	}
+
 	public groupedComponents: CircuitComponent[] = []
 
 	constructor(components: CircuitComponent[]) {
@@ -40,9 +45,9 @@ export class GroupComponent extends CircuitComponent {
 
 		MainController.instance.circuitComponents.splice(firstIndex, 0, this) // added here
 
-		this.propertiesHTMLRows.push(new SectionHeaderProperty("Grouping").buildHTML())
+		this.properties.add(PropertyCategories.ordering, new SectionHeaderProperty("Grouping"))
 		let grouping = new ButtonGridProperty(1, [["Ungroup", ""]], [(ev) => this.ungroup()])
-		this.propertiesHTMLRows.push(grouping.buildHTML())
+		this.properties.add(PropertyCategories.ordering, grouping)
 
 		this.update()
 		SelectionController.instance.selectComponents([this], SelectionMode.RESET)
@@ -83,9 +88,7 @@ export class GroupComponent extends CircuitComponent {
 		}
 	}
 	public resizable(resize: boolean): void {
-		for (const element of this.groupedComponents) {
-			element.resizable(resize)
-		}
+		// Not all components are resizable, so this is not implemented here
 	}
 	protected recalculateResizePoints(): void {
 		//No resizing for now
@@ -125,7 +128,7 @@ export class GroupComponent extends CircuitComponent {
 		}
 		this.position = new SVG.Point(this._bbox.cx, this._bbox.cy)
 
-		this.relPosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
+		this.referencePosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
 		this.recalculateSelectionVisuals()
 	}
 	protected recalculateSelectionVisuals(): void {
@@ -142,7 +145,7 @@ export class GroupComponent extends CircuitComponent {
 			componentSaveObjects.push(component.toJson())
 		}
 		let saveObject: GroupSaveObject = {
-			type: "group",
+			type: GroupComponent.jsonID,
 			components: componentSaveObjects,
 		}
 
@@ -151,7 +154,7 @@ export class GroupComponent extends CircuitComponent {
 	public static fromJson(saveObject: GroupSaveObject): GroupComponent {
 		let components: CircuitComponent[] = []
 		for (const saveObj of saveObject.components) {
-			components.push(SaveController.fromJson(saveObj))
+			components.push(CircuitComponent.fromJson(saveObj))
 		}
 		return new GroupComponent(components)
 	}
@@ -160,7 +163,7 @@ export class GroupComponent extends CircuitComponent {
 		for (const component of this.groupedComponents) {
 			outStr.push(component.toTikzString())
 		}
-		return outStr.join("\n")
+		return outStr.join("\n\t")
 	}
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
 		let group = new SVG.G()
@@ -193,8 +196,15 @@ export class GroupComponent extends CircuitComponent {
 		//not needed
 		return
 	}
-	public updateLabelPosition(): void {
-		//not needed
-		return
+
+	public moveRel(delta: SVG.Point): void {
+		for (const component of this.groupedComponents) {
+			component.moveRel(delta)
+		}
+		this.update()
+	}
+
+	public updateTheme() {
+		// not needed
 	}
 }

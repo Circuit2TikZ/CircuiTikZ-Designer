@@ -25,8 +25,8 @@ export class CopyPaste {
 			let components: ComponentSaveObject[] = []
 			for (const component of SelectionController.instance.currentlySelectedComponents) {
 				let componentObject = component.toJson()
-				if (Object.hasOwn(componentObject, "name")) {
-					;(componentObject as any).name = ""
+				if ("name" in componentObject) {
+					componentObject.name = ""
 				}
 
 				components.push(componentObject)
