@@ -1115,17 +1115,21 @@ export class MainController {
 				addButton.addEventListener("touchstart", listener, { passive: false })
 
 				let svgIcon = SVG.SVG().addTo(addButton)
-				if (symbol.viewBox) {
-					let viewBox = new SVG.Box(symbol.viewBox)
-					viewBox.width += symbol.maxStroke
-					viewBox.height += symbol.maxStroke
-					viewBox.x -= symbol.maxStroke / 2
-					viewBox.y -= symbol.maxStroke / 2
 
-					svgIcon.viewbox(viewBox).width(viewBox.width).height(viewBox.height)
-				}
-				svgIcon.use(symbol.symbolElement.id()).stroke(defaultStroke).fill(defaultFill).node.style.color =
-					defaultStroke
+				let viewBox = new SVG.Box(symbol._mapping.values().toArray()[0].viewBox)
+
+				//oversize viewbox due to stroke widths
+				viewBox.width += symbol.maxStroke
+				viewBox.height += symbol.maxStroke
+				viewBox.x -= symbol.maxStroke / 2
+				viewBox.y -= symbol.maxStroke / 2
+
+				// svg icon should have new size
+				svgIcon.viewbox(viewBox).width(viewBox.width).height(viewBox.height)
+
+				let use = svgIcon.use(symbol.symbolElement.id())
+				use.width(symbol.viewBox.width).height(symbol.viewBox.height) // use should have original size values
+				use.stroke(defaultStroke).fill(defaultFill).node.style.color = defaultStroke
 			}
 		}
 	}

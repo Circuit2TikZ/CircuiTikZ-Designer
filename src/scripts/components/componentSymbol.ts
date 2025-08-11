@@ -106,6 +106,7 @@ export class ComponentSymbol extends SVG.Symbol {
 			this.possibleEnumOptions = []
 		}
 
+		this.viewBox = new SVG.Box(variants[0].getAttribute("viewBox"))
 		this._mapping = new Map<string, Variant>()
 		for (const variant of variants) {
 			// get options
@@ -118,20 +119,20 @@ export class ComponentSymbol extends SVG.Symbol {
 
 			let maxStroke = 0
 			if (symbol.node.id) {
-				// udpate the bbox for a tighter fit
 				symbol.node.querySelectorAll("[stroke-width]").forEach((item) => {
 					let strokeWidth = Number.parseFloat(item.getAttribute("stroke-width"))
 					maxStroke = strokeWidth > maxStroke ? strokeWidth : maxStroke
 				})
 
+				// udpate the bbox for a tighter fit
 				let use = CanvasController.instance.canvas.use(symbol.node.id)
 				let usenode = use.node as SVGGraphicsElement
-				const domrect = usenode.getBBox({ stroke: true })
-				use.remove()
+				const domrect = usenode.getBBox({ stroke: true, markers: true })
 
 				let box = new SVG.Box(domrect.x, domrect.y, domrect.width, domrect.height)
 
 				variant.setAttribute("viewBox", box.toString())
+				use.remove()
 			}
 
 			let pinArray = Array.from(variant.getElementsByTagName("pin")) ?? []
@@ -167,7 +168,9 @@ export class ComponentSymbol extends SVG.Symbol {
 				maxStroke: maxStroke,
 			}
 
-			const clickElement = symbol.rect(variantObject.viewBox.width, variantObject.viewBox.height)
+			const clickElement = symbol
+				.rect(variantObject.viewBox.width, variantObject.viewBox.height)
+				.center(variantObject.viewBox.cx, variantObject.viewBox.cy)
 			clickElement.fill("transparent").stroke("none").addClass("clickBackground")
 
 			symbol.add(clickElement)
@@ -177,7 +180,6 @@ export class ComponentSymbol extends SVG.Symbol {
 
 		const first = this._mapping.values().toArray()[0]
 		this.symbolElement = first.symbol
-		this.viewBox = first.viewBox
 		this.maxStroke = first.maxStroke
 	}
 

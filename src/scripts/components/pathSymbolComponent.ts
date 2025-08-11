@@ -378,6 +378,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 			// use the saved position instead of the bounding box (bbox position fails in safari)
 			let bbox = this.componentVariant.viewBox
 			this.selectionRect
+				.center(bbox.cx, bbox.cy)
 				.size(bbox.w + selectedBoxWidth, bbox.h + selectedBoxWidth)
 				.transform(this.getTransformMatrix())
 		}
