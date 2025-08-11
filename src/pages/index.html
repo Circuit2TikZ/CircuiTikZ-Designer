@@ -374,7 +374,7 @@
 					<h5 class="offcanvas-title" id="offcanvasLabel">Symbols</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 				</div>
-				<div class="offcanvas-search w-100">
+				<div class="d-flex offcanvas-search align-items-center w-100">
 					<span class="material-symbols-outlined">search</span>
 					<input
 						type="search"
@@ -382,6 +382,16 @@
 						id="componentFilterInput"
 						placeholder="Search"
 						aria-label="Search" />
+					<button
+						class="material-symbols-outlined btn px-1 ms-1"
+						id="filterRegexButton"
+						type="button"
+						data-bs-toggle="button"
+						data-bs-toggle-second="tooltip"
+						aria-pressed="false"
+						data-bs-title="Use regular expression">
+						regular_expression
+					</button>
 				</div>
 				<div id="invalid-feedback-text" class="invalid-feedback d-block d-none">
 					Please enter a valid (regex) search string!

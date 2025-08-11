@@ -102,6 +102,9 @@ export class CanvasController {
 		let body = document.getElementsByTagName("body")[0]
 		document.addEventListener("keydown", (ev) => {
 			// pan canvas manually/ move selection slightly
+			if (!ev.key) {
+				return
+			}
 			if (ev.key.startsWith("Arrow") && ev.target == body) {
 				let direction = new SVG.Point()
 				direction.x =

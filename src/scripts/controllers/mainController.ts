@@ -1007,6 +1007,7 @@ export class MainController {
 		const leftOffcanvas: HTMLDivElement = document.getElementById("leftOffcanvas") as HTMLDivElement
 		const leftOffcanvasOC = new Offcanvas(leftOffcanvas)
 		document.getElementById("componentFilterInput").addEventListener("input", this.filterComponents)
+		document.getElementById("filterRegexButton").addEventListener("click", this.filterComponents)
 
 		const addComponentButton: HTMLAnchorElement = document.getElementById("addComponentButton") as HTMLAnchorElement
 		addComponentButton.addEventListener(
@@ -1143,17 +1144,25 @@ export class MainController {
 
 		const element = document.getElementById("componentFilterInput") as HTMLInputElement
 		const feedbacktext = document.getElementById("invalid-feedback-text")
+		const filterWithRegex = document.getElementById("filterRegexButton").classList.contains("active")
+
 		let text = element.value
 		let regex = null
-		try {
-			regex = new RegExp(".*" + text.split("").join(".*") + ".*", "i")
+		if (filterWithRegex) {
+			regex = new RegExp(text, "i")
 			element.classList.remove("is-invalid")
 			feedbacktext.classList.add("d-none")
-		} catch (e) {
-			text = ""
-			regex = new RegExp(text, "i")
-			element.classList.add("is-invalid")
-			feedbacktext.classList.remove("d-none")
+		} else {
+			try {
+				regex = new RegExp(".*" + text.split("").join(".*") + ".*", "i")
+				element.classList.remove("is-invalid")
+				feedbacktext.classList.add("d-none")
+			} catch (e) {
+				text = ""
+				regex = new RegExp(text, "i")
+				element.classList.add("is-invalid")
+				feedbacktext.classList.remove("d-none")
+			}
 		}
 
 		const accordion = document.getElementById("leftOffcanvasAccordion")
