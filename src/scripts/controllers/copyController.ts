@@ -46,6 +46,10 @@ export class CopyPaste {
 			return
 		}
 
+		if (!CopyPaste.clipboard) {
+			return
+		}
+
 		SelectionController.instance.deactivateSelection()
 		SelectionController.instance.activateSelection()
 
