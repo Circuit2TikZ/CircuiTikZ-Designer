@@ -451,6 +451,8 @@ export class MainController {
 				if (settingsModalEl.classList.contains("show")) {
 					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
 				}
+			} else if (msg.startsWith("clipboard=")) {
+				CopyPaste.setClipboard(JSON.parse(msg.slice(10)))
 			}
 		}
 

@@ -38,7 +38,13 @@ export class CopyPaste {
 				components: components,
 				selectionPos: new Point(bbox.cx, bbox.cy),
 			}
+
+			MainController.instance.broadcastChannel.postMessage("clipboard=" + JSON.stringify(CopyPaste.clipboard))
 		}
+	}
+
+	public static setClipboard(clipboard: Clipboard) {
+		this.clipboard = clipboard
 	}
 
 	public static paste() {
