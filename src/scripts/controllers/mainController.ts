@@ -287,6 +287,17 @@ export class MainController {
 		}
 		IDBrequest.onsuccess = function (event) {
 			db = (event.target as IDBOpenDBRequest).result
+
+			window.addEventListener("visibilitychange", (ev) => {
+				if (document.visibilityState == "hidden") {
+					MainController.instance.saveCurrentState(db, false)
+				}
+			})
+
+			window.addEventListener("beforeunload", (ev) => {
+				MainController.instance.saveCurrentState(db)
+			})
+
 			let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
 
 			// the URL of the current page
@@ -336,16 +347,6 @@ export class MainController {
 				}
 			}
 		}
-
-		window.addEventListener("visibilitychange", (ev) => {
-			if (document.visibilityState == "hidden") {
-				this.saveCurrentState(db, false)
-			}
-		})
-
-		window.addEventListener("beforeunload", (ev) => {
-			this.saveCurrentState(db)
-		})
 
 		//settings modal
 		const settingsModalEl = document.getElementById("settingsModal") as HTMLDivElement
