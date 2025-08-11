@@ -90,7 +90,6 @@ export class CanvasController {
 			return
 		}
 		localStorage.removeItem("circuitikz-designer-view")
-		localStorage.removeItem("circuitikz-designer-grid")
 		CanvasController.instance = this
 
 		this.canvas = canvas

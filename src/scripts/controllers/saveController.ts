@@ -99,7 +99,17 @@ export class SaveController {
 				reader.readAsText(file, "UTF-8")
 				reader.onload = (evt) => {
 					let inputstring = evt.target.result instanceof ArrayBuffer ? "" : evt.target.result
-					this.loadFromJSON(JSON.parse(inputstring), true)
+					const input = JSON.parse(inputstring)
+					if (!("version" in input)) {
+						alert(
+							"You are using an old version of the json save file format. Please override all files exported from Circuitikz Designer version 0.6 and older by reexporting your circuit to json to update them to the newest json save file format version (currently: " +
+								currentSaveVersion +
+								" for Circuitikz Designer version " +
+								version +
+								"). Old versions might be deprecated at any time and therefore might not properly load."
+						)
+					}
+					this.loadFromJSON(input, true)
 					this.loadModal.hide()
 				}
 				reader.onerror = (evt) => {
@@ -135,13 +145,6 @@ export class SaveController {
 		let components = []
 
 		if (!("version" in saveFile)) {
-			alert(
-				"You are using an old version of the json save file format. Please override all files exported from Circuitikz Designer version 0.6 and older by reexporting your circuit to json to update them to the newest json save file format version (currently: " +
-					currentSaveVersion +
-					" for Circuitikz Designer version " +
-					version +
-					"). Old versions might be deprecated at any time and therefore might not properly load."
-			)
 			// old file format
 			this.currentlyLoadedSaveVersion = ""
 			//@ts-ignore

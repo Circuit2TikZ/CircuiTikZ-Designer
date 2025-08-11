@@ -266,6 +266,8 @@ export class MainController {
 		// remove old localStorage data
 		localStorage.removeItem("currentProgress")
 		localStorage.removeItem("circuit2tikz-designer-grid")
+		localStorage.removeItem("circuitikz-designer-grid")
+		localStorage.removeItem("circuitikz-designer-saveState")
 		sessionStorage.removeItem("circuitikz-designer-tabID")
 
 		const defaultSettings: CanvasSettings = {}
