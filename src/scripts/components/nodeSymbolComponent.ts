@@ -290,7 +290,9 @@ export class NodeSymbolComponent extends NodeComponent {
 			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
 		} else {
 			let idParts = saveObject.id.split("_")
-			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == idParts[1])
+			symbol = MainController.instance.symbols.find(
+				(symbol) => symbol.tikzName == idParts[1].replaceAll("-", " ")
+			)
 			saveObject.options = idParts.slice(2)
 		}
 		if (symbol) {

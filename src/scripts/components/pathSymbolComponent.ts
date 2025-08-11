@@ -582,7 +582,9 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == saveObject.id)
 		} else {
 			let idParts = saveObject.id.split("_")
-			symbol = MainController.instance.symbols.find((symbol) => symbol.tikzName == idParts[1])
+			symbol = MainController.instance.symbols.find(
+				(symbol) => symbol.tikzName == idParts[1].replaceAll("-", " ")
+			)
 			saveObject.options = idParts.slice(2)
 			// @ts-ignore
 			saveObject.points = [saveObject.start, saveObject.end]
