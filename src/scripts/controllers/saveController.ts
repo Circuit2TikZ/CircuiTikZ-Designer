@@ -46,7 +46,7 @@ export class SaveController {
 	private loadArea: HTMLDivElement
 	private loadAreaBackground: HTMLDivElement
 
-	public currentlyLoadedSaveVersion: string = ""
+	public currentlyLoadedSaveVersion: string = currentSaveVersion
 
 	private constructor() {
 		this.modalElement = document.getElementById("loadModal") as HTMLDivElement

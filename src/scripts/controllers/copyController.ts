@@ -68,7 +68,7 @@ export class CopyPaste {
 		if (allComponents.length > 0) {
 			SelectionController.instance.selectComponents(allComponents, SelectionMode.RESET)
 		}
-		SelectionController.instance.moveSelectionTo(CopyPaste.clipboard.selectionPos.add(new Point(20, 20)))
+		SelectionController.instance.moveSelectionTo(new Point(CopyPaste.clipboard.selectionPos).add(new Point(20, 20)))
 		Undo.addState()
 	}
 

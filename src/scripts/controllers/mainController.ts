@@ -352,11 +352,11 @@ export class MainController {
 		const settingsTableBody = document.getElementById("settingsTableBody") as HTMLTableSectionElement
 
 		settingsModalEl.addEventListener("show.bs.modal", (event) => {
-			settingsTableBody.innerHTML = ""
-
 			let tabsObjectStoreRead = db.transaction("tabs").objectStore("tabs")
 
 			tabsObjectStoreRead.getAll().onsuccess = function (event) {
+				settingsTableBody.innerHTML = ""
+
 				const currentData = (event.target as IDBRequest).result as TabState[]
 
 				let totalSize = 0
