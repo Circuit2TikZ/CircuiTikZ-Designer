@@ -142,6 +142,12 @@ export class SelectionController {
 	}
 
 	private selectionEnd(evt: MouseEvent | TouchEvent) {
+		if (CanvasController.instance.draggingFromInput) {
+			evt.preventDefault()
+			CanvasController.instance.draggingFromInput.focus()
+			return
+		}
+
 		if (!this.selectionEnabled) {
 			return
 		}

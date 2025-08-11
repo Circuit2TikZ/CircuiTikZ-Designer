@@ -82,6 +82,11 @@ export class CanvasController {
 	public lastCanvasPoint = new SVG.Point(0, 0)
 
 	/**
+	 * set this to the input element where a drag started to prevent the svg canvas from stealing the focus off the input element
+	 */
+	public draggingFromInput: HTMLElement = null
+
+	/**
 	 * Create the canvas controller.
 	 * @param {SVG.Svg} canvas - the (wrapped) svg element
 	 */
@@ -96,6 +101,10 @@ export class CanvasController {
 		this.paper = SVG.SVG("#grid") as SVG.Rect
 		this.xAxis = SVG.SVG("#xAxis") as SVG.Line
 		this.yAxis = SVG.SVG("#yAxis") as SVG.Line
+
+		document.addEventListener("mouseup", (ev) => {
+			CanvasController.instance.draggingFromInput = null
+		})
 
 		const panFactor = 20
 		let body = document.getElementsByTagName("body")[0]

@@ -1,4 +1,4 @@
-import { EditableProperty, Undo } from "../internal"
+import { CanvasController, EditableProperty, Undo } from "../internal"
 
 export class TextProperty extends EditableProperty<string> {
 	private input: HTMLInputElement
@@ -36,6 +36,10 @@ export class TextProperty extends EditableProperty<string> {
 			inputDiv.appendChild(this.invalidDiv)
 		}
 		row.appendChild(inputDiv)
+
+		this.input.addEventListener("mousedown", (ev) => {
+			CanvasController.instance.draggingFromInput = this.input
+		})
 
 		let previousState = ""
 		this.input.addEventListener("focusin", (ev) => {

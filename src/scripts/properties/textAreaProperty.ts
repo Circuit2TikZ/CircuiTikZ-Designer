@@ -1,6 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { ChoiceEntry, EditableProperty, Undo } from "../internal"
-import sanitizeHtml from "sanitize-html"
+import { CanvasController, ChoiceEntry, EditableProperty, Undo } from "../internal"
 
 export type FontSize = ChoiceEntry & {
 	size: number
@@ -57,12 +56,9 @@ export class TextAreaProperty extends EditableProperty<Text> {
 
 	public buildHTML(): HTMLElement {
 		let rowTextArea = this.getRow()
-		//font size
-		//align top-bottom, left-right
 
 		let inputDiv = document.createElement("div") as HTMLDivElement
 		inputDiv.classList.add("col-12", "mt-0")
-		//<textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
 		{
 			this.input = document.createElement("textArea") as HTMLTextAreaElement
 			this.input.classList.add("form-control")
@@ -84,6 +80,9 @@ export class TextAreaProperty extends EditableProperty<Text> {
 			if (this.value && previousState !== this.value) {
 				Undo.addState()
 			}
+		})
+		this.input.addEventListener("mousedown", (ev) => {
+			CanvasController.instance.draggingFromInput = this.input
 		})
 
 		let placeholderDiv = document.createElement("div") as HTMLDivElement
