@@ -768,7 +768,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "text")
+			addButton.setAttribute("searchData", "text node")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Text"
 
@@ -796,7 +796,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "rect rectangle")
+			addButton.setAttribute("searchData", "rect rectangle node")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Rectangle/Text"
 
@@ -824,7 +824,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "ellipse circle")
+			addButton.setAttribute("searchData", "ellipse circle node")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Ellipse"
 
@@ -857,7 +857,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "polygon")
+			addButton.setAttribute("searchData", "polygon path")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Polygon"
 
@@ -899,7 +899,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "straight line")
+			addButton.setAttribute("searchData", "straight line path")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Straight line"
 
@@ -925,7 +925,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "straight arrow")
+			addButton.setAttribute("searchData", "straight arrow path")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Straight arrow"
 
@@ -962,7 +962,7 @@ export class MainController {
 		{
 			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
 			addButton.classList.add("libComponent")
-			addButton.setAttribute("searchData", "straight arrow")
+			addButton.setAttribute("searchData", "arrow path")
 			addButton.ariaRoleDescription = "button"
 			addButton.title = "Arrow"
 
@@ -1077,7 +1077,7 @@ export class MainController {
 				addButton.classList.add("libComponent")
 				addButton.setAttribute(
 					"searchData",
-					[symbol.tikzName]
+					[symbol.tikzName, symbol.isNodeSymbol ? "node" : "path"]
 						.concat(
 							symbol.possibleOptions
 								.map((option) => option.displayName ?? option.name)

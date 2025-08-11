@@ -50,6 +50,7 @@ export class SelectionController {
 			})
 			.fill("none")
 			.id("selectionRectangle")
+		this.selectionRectangle.addClass("pointerNone")
 		this.selectionEnabled = true
 		this.currentlyDragging = false
 		this.selectionMode = SelectionMode.RESET
