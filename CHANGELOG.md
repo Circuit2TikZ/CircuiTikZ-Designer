@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0]
+
+### Added
+
+- Can now select the desired component variant via changing the options in the properties window (Issue #33)
+- Tab management system (open in settings)
+- Copy and paste between different tabs
+- Rectangle text now able to use mathjax/LaTeX expressions. Just enter math mode like you would do in LaTeX (surround with $-signs or \\(\\)-pair) (Issue #49)
+- Ability to use hyphenation in rectangle text. Use with caution: Very basic implementation --> LaTeX export will produce different hyphenation
+- Indication for which component is currently hovered over
+- Fit view button in canvas properties to fit the view to the components
+- Component for Text (Same as rectangle component but different default values) (Issue #48)
+- Different wire component defaults (some with arrows preapplied) (Issue #46)
+
+### Changed
+
+- Improved search function in component drawer (regex now supported)
+- Can now choose if the label should be placed relative to the component transform or the canvas for node components (components which are represented by node commands in Tikz)
+- Default opacity now 1 (Issue #47)
+- Rectangle text now uses computer modern like LaTeX
+- Selection and snapping visuals adjusted
+- Visuals for checkboxes in properties window now consistent with other properties
+
+### Fixed
+
+- Rectangle text now escapes special characters (Issue #51)
+- Bounding box size and position for some components
+- Selecting text inside a text input field in the properties is now not deselected when ending the selection inside the canvas
+- Pasting before copying for the first time now ignores the paste command
+- many minor fixes
+
 ## [0.6.0]
 
 ### Added
