@@ -1,13 +1,37 @@
-# CircuiTi<i>k</i>Z-Designer
+# CircuiTi*k*Z-Designer
 
-A GUI for easy and fast drawing of circuits to be used with [CircuiTikZ](https://github.com/circuitikz/circuitikz). Simply draw your circuit, export the CircuiTikZ code and include it in your LaTeX document!
+[![License](https://img.shields.io/github/license/circuit2tikz/circuitikz-designer)](LICENSE)
+![GitHub last commit](https://img.shields.io/github/last-commit/circuit2tikz/circuitikz-designer)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/circuit2tikz/circuitikz-designer)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/circuit2tikz/circuitikz-designer)
 
-The official hosting of the current build can be found under https://circuit2tikz.tf.fau.de/designer/
+An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTi*k*Z with ease. Try it out [online](https://circuit2tikz.tf.fau.de/designer/)!
+
+## Overview
+
+CircuiTi*k*Z-Designer bridges the gap between visual circuit design and precise LaTeX code, letting you design, customize, and export diagrams without manually writing TikZ commands.
+Whether you’re preparing academic papers, teaching materials, or engineering documentation, CircuiTi*k*Z-Designer provides:
+
+- A clean, intuitive interface for fast diagram creation
+- An extensive component library for all your circuit needs
+- Real-time previews and instant export to high-quality LaTeX code
+
+Stop wrestling with code syntax — focus on your circuit design, and let CircuiTikZ-Designer handle the Ti*k*Z.
 
 ![example_image](./example_image.png)
 ![example_image2](./example_image2.png)
 
-## Host locally
+## Key Features
+
+- **Visual Circuit Design:** Intuitive interface with multi-tab support and component grouping
+- **Wide Component Library:** Includes most circuit elements plus some tikz components like rectangles, ellipses and arrows
+- **Export Ready:** Generate clean LaTeX/TikZ code and compatible SVG exports for seamless document integration
+- **Advanced Editing:** Rotate, scale, align, and snap components with clear visuals and flexible editing capabilities
+- **Component Variants:** Easily switch between different versions of components and adjust their properties via the properties window
+- **Cross-Platform Friendly:** Dark mode and mobile support for comfortable online editing anywhere
+- **MathJax Support:** Write MathJax math expressions directly inside text components with real-time rendering
+
+## Use locally
 
 1. Have [Node.js](https://nodejs.org/) installed
 2. Clone the repository
@@ -19,14 +43,6 @@ The official hosting of the current build can be found under https://circuit2tik
 
 All controls of the application are explained in the help menu in the top right corner via the circled questionmark in the application itself.
 
-## Export the circuit
-
-You can export your circuit in multiple different formats:
-
-- as CircuiTi<i>k</i>Z code to use in your LaTeX project.
-- as SVG code to use almost anywhere.
-- as a JSON for sharing and loading designs.
-
-## Bugs and Features
+## Contributing
 
 Please use the [issues page](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/issues) of the project to report bugs and suggest features. Please always provide steps on how to reproduce the bug.
