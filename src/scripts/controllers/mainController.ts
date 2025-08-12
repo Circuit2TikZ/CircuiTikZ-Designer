@@ -381,7 +381,22 @@ export class MainController {
 						openButton.innerText = "Open"
 						openButton.addEventListener("click", () => {
 							// set the data in the object store to open
-							window.open(".?tabID=" + tabData.id, "_blank")
+							let allOpen = true
+							for (let index = 0; index < tabData.id; index++) {
+								// current data will not be stale since the tab management gets updated immediately when something changes
+								let current = currentData.find((tab) => tab.id == index)
+								if (current) {
+									allOpen = allOpen && current.open == "true"
+								} else {
+									allOpen = false
+								}
+							}
+							if (allOpen) {
+								// if possible, don't use the tabID parameter
+								window.open(".", "_blank")
+							} else {
+								window.open(".?tabID=" + tabData.id, "_blank")
+							}
 						})
 
 						let deleteButton = cell4.appendChild(document.createElement("button"))
@@ -429,10 +444,24 @@ export class MainController {
 				newTabButton.addEventListener("click", () => {
 					// set the data in the object store to open
 					let requestedID = 0
-					while (currentData.find((tab) => tab.id == requestedID)) {
-						requestedID++
+					let allOpen = true
+					while (true) {
+						// continue until no tab is found
+						let tab = currentData.find((tab) => tab.id == requestedID)
+
+						if (tab) {
+							requestedID++
+							allOpen = allOpen && tab.open == "true"
+						} else {
+							break
+						}
 					}
-					window.open(".?tabID=" + requestedID, "_blank")
+					if (allOpen) {
+						// if possible, don't use the tabID parameter
+						window.open(".", "_blank")
+					} else {
+						window.open(".?tabID=" + requestedID, "_blank")
+					}
 				})
 
 				document.getElementById("storageUsed").innerHTML = sizeString(totalSize)
