@@ -220,6 +220,7 @@ export class SelectionController {
 		this.selectionMode = SelectionMode.RESET
 		for (const component of MainController.instance.circuitComponents) {
 			component.isSelected = false
+			component.isHovered = false
 			component.viewSelected(false)
 			component.draggable(false)
 		}
