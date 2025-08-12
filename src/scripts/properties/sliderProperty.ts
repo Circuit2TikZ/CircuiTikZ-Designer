@@ -1,5 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
-import { EditableProperty, Undo } from "../internal"
+import { CanvasController, EditableProperty, Undo } from "../internal"
 
 export class SliderProperty extends EditableProperty<SVG.Number> {
 	public eq(first: SVG.Number, second: SVG.Number): boolean {
@@ -104,6 +104,9 @@ export class SliderProperty extends EditableProperty<SVG.Number> {
 		this.numberInput.addEventListener("focusout", () => {
 			this.updateNumberInput()
 			Undo.addState()
+		})
+		this.numberInput.addEventListener("mousedown", (ev) => {
+			CanvasController.instance.draggingFromInput = this.numberInput
 		})
 
 		this.sliderInput.addEventListener("input", sliderChanged)

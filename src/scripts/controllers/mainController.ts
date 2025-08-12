@@ -7,7 +7,6 @@ import { version } from "../../../package.json"
 
 import {
 	CanvasController,
-	SnapCursorController,
 	ExportController,
 	SelectionController,
 	SaveController,
@@ -353,6 +352,7 @@ export class MainController {
 		const settingsTableBody = document.getElementById("settingsTableBody") as HTMLTableSectionElement
 
 		settingsModalEl.addEventListener("show.bs.modal", (event) => {
+			this.saveCurrentState(db, false)
 			let tabsObjectStoreRead = db.transaction("tabs").objectStore("tabs")
 
 			tabsObjectStoreRead.getAll().onsuccess = function (event) {

@@ -174,6 +174,9 @@ export class ComponentPlacer {
 
 		// move once to actually place the component at the mouse position
 		this.component.placeMove(CanvasController.instance.lastCanvasPoint)
+		SnapCursorController.instance.moveTo(
+			SnapController.instance.snapPoint(CanvasController.instance.lastCanvasPoint, component)
+		)
 		SnapController.instance.recalculateAdditionalSnapPoints()
 	}
 }
