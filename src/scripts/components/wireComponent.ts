@@ -102,6 +102,8 @@ export class WireComponent extends Strokable(PathComponent) {
 
 	// essentially the main visualisation
 	private wire: SVG.Polyline
+	// a wider copy of wire, but invisible, Meant for dragging the wire
+	private draggableWire: SVG.Polyline
 
 	// the svg elements where adjusting the wire is possible
 	private adjustmentPoints: SVG.Element[] = []
@@ -128,11 +130,19 @@ export class WireComponent extends Strokable(PathComponent) {
 		this.wire = CanvasController.instance.canvas.polyline()
 		this.wire.fill("none")
 
+		this.draggableWire = CanvasController.instance.canvas.polyline()
+		this.draggableWire.attr({
+			"fill": "none",
+			"stroke": "transparent",
+			"stroke-width": selectionSize,
+		})
+
 		// override default value
 		this.strokeWidthProperty.value = new SVG.Number("0.4pt")
 		this.strokeInfo.width = this.strokeWidthProperty.value
 
 		this.visualization.add(this.wire)
+		this.visualization.add(this.draggableWire)
 		this.snappingPoints = []
 
 		this.properties.add(PropertyCategories.options, new SectionHeaderProperty("Arrows"))
@@ -423,6 +433,8 @@ export class WireComponent extends Strokable(PathComponent) {
 		let plotPoints = new SVG.PointArray(pointArray.map((val) => val.toArray()))
 		this.wire.clear()
 		this.wire.plot(plotPoints)
+		this.draggableWire.clear()
+		this.draggableWire.plot(plotPoints)
 
 		//recalculate the snapping point offsets
 		if (this.snappingPoints.length == pointsNoArrow.length) {
@@ -623,7 +635,10 @@ export class WireComponent extends Strokable(PathComponent) {
 		}
 
 		const copiedSVG = this.visualization.clone(true)
-		copiedSVG.removeElement(copiedSVG.find("polyline.draggable")[0])
+		let draggableWire = copiedSVG.find('polyline[fill="none"][stroke="transparent"]')[0]
+		if (draggableWire) {
+			copiedSVG.removeElement(draggableWire)
+		}
 		return copiedSVG
 	}
 
