@@ -612,21 +612,18 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 
 		// the bounding boxes for the label and the symbol
 		let labelBBox = labelSVG.bbox()
+		let labelHalfSize = new SVG.Point(labelBBox.w, labelBBox.h).div(2)
 		let symbolBBox = this.componentVisualization.bbox()
+		let symbolHalfSize = new SVG.Point(symbolBBox.w, symbolBBox.h).div(2)
 
 		// the nominal reference point of the label (bottom center)
 		let labelRef = new SVG.Point(labelBBox.cx, labelBBox.y2)
 		// the rotation angle of the label (not always identical to the path rotation angle)
 		let rotAngle = this.rotationDeg
-		if (rotAngle > 90) {
-			// upper left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
-			rotAngle -= 180
-			// the label reference point should now be the top center
-			labelRef.y = labelBBox.y
-		} else if (rotAngle < -90) {
-			// lower left quadrant -> don't show label upside down -> rotate the label by additional 180 deg
+		if (rotAngle > 90 || rotAngle < -90) {
+			// left halfplane -> don't show label upside down -> rotate the label by additional 180 deg
 			rotAngle += 180
-			// the label reference point should now be the top center
+			// the dafault label reference point should now be the top center
 			labelRef.y = labelBBox.y
 		}
 
@@ -638,9 +635,8 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		// nominally the reference point of the symbol is its center (w.r.t. the x coordinate for a path which is horizontal)
 		let referenceOffsetX = 0
 
-		let otherSide = this.labelSide.value
-		let other = otherSide ? -1 : 1
-		if (otherSide) {
+		let other = this.labelSide.value ? -1 : 1
+		if (other < 0) {
 			labelRef.y = labelBBox.y - labelRef.y
 			referenceoffsetY += symbolBBox.h * Math.abs(this.scaleState.y)
 		}
@@ -654,24 +650,24 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		if (nearHorizontal) {
 			// the label should not be rotated w.r.t. the x axis
 			rotAngle = 0
+			let right = Math.sign(pathDiff.x)
+			let up = Math.sign(this.rotationDeg)
 			//the offset where the rotation pivot point should lie (for both label and symbol)
-			let horizontalOffset = (Math.min(labelBBox.w, symbolBBox.w) * Math.sign(this.rotationDeg)) / 2
-			referenceOffsetX = horizontalOffset * Math.sign(pathDiff.x) * other
+			let horizontalOffset = Math.min(labelHalfSize.x, symbolHalfSize.x) * up
+			referenceOffsetX = horizontalOffset * right * other
 			labelRef.x += horizontalOffset * other
 		} else if (nearVertical) {
 			// the label should not be rotated w.r.t. the x axis
 			rotAngle = 0
-			let right = this.rotationDeg > 0 ? Math.sign(90 - this.rotationDeg) : Math.sign(this.rotationDeg + 90)
+			let right = Math.sign(pathDiff.x)
 			let up = Math.sign(this.rotationDeg)
 			//the offset where the rotation pivot point should lie (for both label and symbol)
-			let verticalOffset = Math.min(labelBBox.h, symbolBBox.w) / 2
+			let verticalOffset = Math.min(labelHalfSize.y, symbolHalfSize.x) * right * other
 
-			referenceOffsetX = -verticalOffset * right * up * other
+			referenceOffsetX = -verticalOffset * up
 
-			labelRef = new SVG.Point(
-				(labelBBox.w / 2) * (1 + up * other),
-				labelBBox.h / 2 + verticalOffset * other * right
-			)
+			labelRef.y = labelBBox.cy + verticalOffset
+			labelRef.x += labelHalfSize.x * (up * other)
 		}
 
 		referenceoffsetY -= other * (this.labelDistance.value ? this.labelDistance.value.convertToUnit("px").value : 0)
@@ -683,7 +679,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 			})
 		)
 
-		// acutally move and rotate the label to the correct position
+		// actually move and rotate the label to the correct position
 		let compRef = this.position.add(referenceOffset)
 		let movePos = compRef.sub(labelRef)
 		labelSVG.transform({
