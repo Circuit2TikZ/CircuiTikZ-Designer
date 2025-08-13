@@ -129,7 +129,7 @@ function layoutText(lines: LineInfo[], text: Text, textBox: SVG.Box): SVG.G {
 	svgText.transform({ translateX: textPos.x, translateY: textPos.y })
 	svgText.fill(text.color == "default" ? "black" : text.color)
 	svgText.node.innerHTML = tspans.join("\n")
-	svgText.attr("font-family", "CMU Serif")
+	svgText.attr("font-family", "Computer Modern Serif")
 	svgText.stroke("none")
 	svgText.attr("font-size", fontSize)
 	group.add(svgText)
@@ -318,7 +318,7 @@ function fitWord(syllables: string[], currentLineWidth: number, maxWidth: number
 function getTextMetrics(text: string, fontSize: string): TextMetrics {
 	const canvas = document.createElement("canvas")
 	const context = canvas.getContext("2d")
-	context.font = `${fontSize} "CMU Serif"`
+	context.font = `${fontSize} "Computer Modern Serif"`
 	return context.measureText(text)
 }
 export type MathJaxRenderInfo = {

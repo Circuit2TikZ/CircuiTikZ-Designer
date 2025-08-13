@@ -121,7 +121,7 @@ export class MainController {
 		let mathJaxPromise = this.loadMathJax()
 		let canvasPromise = this.initCanvas()
 		let symbolsDBPromise = this.initSymbolDB()
-		let fontPromise = document.fonts.load("1em CMU Serif")
+		let fontPromise = document.fonts.load("1em Computer Modern Serif")
 
 		MainController.appVersion = version
 		document.addEventListener("DOMContentLoaded", () => {
