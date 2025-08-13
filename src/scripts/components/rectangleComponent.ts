@@ -335,6 +335,49 @@ export class RectangleComponent extends ShapeComponent {
 		}
 	}
 
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		// save which symbols are used by this component
+		const backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
+
+		let labelUse = this.labelRendering?.find("use") ?? []
+		let textUse = this.textSVG?.find("use") ?? []
+
+		for (const element of labelUse.concat(textUse)) {
+			const id = element.node.getAttribute("xlink:href")
+			if (!defs.has(id)) {
+				const symbol = backgroundDefs.findOne(id) as SVG.Element
+				defs.set(id, symbol.clone(true, false))
+			}
+		}
+
+		this.labelRendering?.addClass("labelRendering")
+		this.textSVG?.addClass("textSVG")
+		const copiedSVG = this.visualization.clone(true)
+		if (this.labelRendering) {
+			if (!this.mathJaxLabel.value) {
+				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
+			}
+			this.labelRendering.removeClass("labelRendering")
+			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
+		}
+		if (this.textSVG) {
+			if (!this.textAreaProperty.value) {
+				copiedSVG.removeElement(copiedSVG.find(".textSVG")[0])
+			}
+			this.textSVG.removeClass("textSVG")
+			copiedSVG.findOne(".textSVG")?.removeClass("textSVG")
+		}
+
+		let draggable = copiedSVG.find(".draggable")[0]
+		if (draggable) {
+			copiedSVG.removeElement(draggable)
+		}
+
+		const viz = copiedSVG.findOne('[fill-opacity="0"][stroke-opacity="0"]')
+		viz?.remove()
+		return copiedSVG
+	}
+
 	public copyForPlacement(): CircuitComponent {
 		return new RectangleComponent(this.createAsText)
 	}
