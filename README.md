@@ -43,6 +43,18 @@ Stop wrestling with code syntax — focus on your circuit design, and let Circui
 
 All controls of the application are explained in the help menu in the top right corner via the circled questionmark in the application itself.
 
+If you help, please use the [general discussions](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/discussions/categories/general) page.
+
 ## Contributing
 
-Please use the [issues page](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/issues) of the project to report bugs and suggest features. Please always provide steps on how to reproduce the bug.
+### Bug reporting
+
+Please use the [issues page](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/issues) of the project to report bugs. Please always provide steps on how to reproduce the bug.
+
+### Feature requests
+
+You can post feature requests and discuss them on the [discussions](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/discussions/categories/ideas) page.
+
+### Contribute code/component implementations
+
+Fork the repo, and create a pull request. Please always test your code thoroughly!
