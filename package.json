@@ -1,8 +1,8 @@
 {
-	"name": "circutikz-pwa",
+	"name": "circutikz-designer",
 	"version": "0.7.2",
 	"private": "true",
-	"description": "A GUI for drawing CircuiTikZ circuits",
+	"description": "An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTikZ with ease.",
 	"license": "GPL-3.0-only",
 	"author": "Manuel Kirzinger",
 	"contributors": [
@@ -25,6 +25,7 @@
 		"update": "npx npm-check-updates -u",
 		"prepack": "npm run build",
 		"start": "parcel serve --lazy",
+		"postversion": "git push && git push origin tag $(git describe --tags --abbrev=0)",
 		"standalone": "electron-forge start",
 		"electron": "npm run build && electron .",
 		"package": "electron-forge package",
@@ -37,13 +38,10 @@
 		"@svgdotjs/svg.js": "^3.2.4",
 		"@svgdotjs/svg.panzoom.js": "^2.1.2",
 		"bootstrap": "^5.3.7",
-		"computer-modern": "^0.1.3",
 		"electron-squirrel-startup": "^1.0.1",
 		"file-saver": "^2.0.5",
 		"hotkeys-js": "^3.13.15",
-		"mdb-ui-kit": "^9.1.0",
-		"prettier": "^3.6.2",
-		"sanitize-html": "^2.17.0"
+		"prettier": "^3.6.2"
 	},
 	"devDependencies": {
 		"@electron-forge/cli": "^7.8.2",
