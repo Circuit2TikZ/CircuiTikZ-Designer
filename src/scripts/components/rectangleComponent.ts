@@ -21,6 +21,7 @@ import {
 	Text,
 	TextAlign,
 	TextAreaProperty,
+	textToSVG,
 	TikzNodeCommand,
 } from "../internal"
 import { rectRectIntersection, roundTikz } from "../utils/selectionHelper"
@@ -361,6 +362,30 @@ export class RectangleComponent extends ShapeComponent {
 			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
 		}
 		if (this.textSVG) {
+			let texts = copiedSVG.find("text") as SVG.List<SVG.Text>
+			for (const textElement of texts) {
+				let transform = textElement.transform()
+				let fontSize = new SVG.Number(textElement.attr("font-size")).convertToUnit("px").value
+				let fill = textElement.fill()
+
+				let g = new SVG.G()
+				g.fill(fill)
+				g.transform(transform)
+
+				let tspans = textElement.find("tspan") as SVG.List<SVG.Tspan>
+				for (const tspanElement of tspans) {
+					let pathString = textToSVG.getD(tspanElement.node.textContent, {
+						x: Number.parseFloat(tspanElement.node.getAttribute("x")),
+						y: Number.parseFloat(tspanElement.node.getAttribute("y")),
+						fontSize: fontSize,
+					})
+					let path = new SVG.Path({ d: pathString })
+					g.add(path)
+				}
+				textElement.parent().add(g)
+				textElement.remove()
+			}
+
 			if (!this.textAreaProperty.value) {
 				copiedSVG.removeElement(copiedSVG.find(".textSVG")[0])
 			}

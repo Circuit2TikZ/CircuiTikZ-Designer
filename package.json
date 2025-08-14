@@ -41,7 +41,8 @@
 		"electron-squirrel-startup": "^1.0.1",
 		"file-saver": "^2.0.5",
 		"hotkeys-js": "^3.13.15",
-		"prettier": "^3.6.2"
+		"prettier": "^3.6.2",
+		"text-to-svg": "^3.1.5"
 	},
 	"devDependencies": {
 		"@electron-forge/cli": "^7.8.2",
@@ -67,10 +68,13 @@
 		"@parcel/transformer-xml": "^2.15.4",
 		"@types/bootstrap": "^5.2.10",
 		"@types/file-saver": "^2.0.7",
+		"@types/text-to-svg": "^3.1.4",
 		"buffer": "^6.0.3",
 		"electron": "^37.2.5",
 		"parcel": "^2.15.4",
+		"path-browserify": "^1.0.1",
 		"posthtml-include": "^2.0.1",
+		"process": "^0.11.10",
 		"sass": "^1.89.2",
 		"typescript": "^5.9.2"
 	}

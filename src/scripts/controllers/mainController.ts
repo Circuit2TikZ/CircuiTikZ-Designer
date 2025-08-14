@@ -31,6 +31,7 @@ import {
 	SaveFileFormat,
 	emtpySaveState,
 	currentSaveVersion,
+	loadTextConverter,
 } from "../internal"
 
 type TabState = {
@@ -121,7 +122,7 @@ export class MainController {
 		let mathJaxPromise = this.loadMathJax()
 		let canvasPromise = this.initCanvas()
 		let symbolsDBPromise = this.initSymbolDB()
-		let fontPromise = document.fonts.load("1em Computer Modern Serif")
+		let fontPromise = Promise.all([document.fonts.load("1em Computer Modern Serif"), loadTextConverter()])
 
 		MainController.appVersion = version
 		document.addEventListener("DOMContentLoaded", () => {

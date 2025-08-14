@@ -1,4 +1,5 @@
 import * as SVG from "@svgdotjs/svg.js"
+import TextToSVG from "text-to-svg"
 import { CanvasController, fontSizes, Text, TextAlign } from "../internal"
 
 // the information of a single line
@@ -25,6 +26,20 @@ type ElementInfo = {
 }
 
 const syllableRegex = /([^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?)|[^aeiouy]+$/gi
+
+export let textToSVG: TextToSVG
+
+export function loadTextConverter() {
+	return new Promise<void>((resolve) => {
+		TextToSVG.load(
+			"https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/font/Serif/cmunrm.woff",
+			(err, tTSVG) => {
+				textToSVG = tTSVG
+				resolve()
+			}
+		)
+	})
+}
 
 // this function converts text into an SVG group containing the text tags and mathjax renderings
 // it uses the Mathjax parser to parse the text and then renders the mathjax elements
