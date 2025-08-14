@@ -18,15 +18,20 @@ Whether you’re preparing academic papers, teaching materials, or engineering d
 
 Stop wrestling with code syntax — focus on your circuit design, and let CircuiTikZ-Designer handle the Ti*k*Z.
 
-![example_image](./example_image.png)
-![example_image2](./example_image2.png)
+|         Edit in CircuiTi*k*Z-Designer         |            Export to compilable Ti*k*Z code            |
+| :-------------------------------------------: | :----------------------------------------------------: |
+| ![sallen-key edit](./examples/sallen-key.png) | ![sallen-key export](./examples/sallen-key_export.png) |
+
+|               Use it in your LaTeX project!                |
+| :--------------------------------------------------------: |
+| ![sallen-key overleaf](./examples/sallen-key_overleaf.png) |
 
 ## Key Features
 
 - **Visual Circuit Design:** Intuitive interface with multi-tab support and component grouping
 - **Wide Component Library:** Includes most circuit elements plus some tikz components like rectangles, ellipses and arrows
 - **Export Ready:** Generate clean LaTeX/TikZ code and compatible SVG exports for seamless document integration
-- **Advanced Editing:** Rotate, scale, align, and snap components with clear visuals and flexible editing capabilities
+- **Advanced Editing:** Rotate, scale, align, distribute, and snap components with clear visuals and flexible editing capabilities
 - **Component Variants:** Easily switch between different versions of components and adjust their properties via the properties window
 - **Cross-Platform Friendly:** Dark mode and mobile support for comfortable online editing anywhere
 - **MathJax Support:** Write MathJax math expressions directly inside text components with real-time rendering
@@ -43,7 +48,7 @@ Stop wrestling with code syntax — focus on your circuit design, and let Circui
 
 All controls of the application are explained in the help menu in the top right corner via the circled questionmark in the application itself.
 
-If you help, please use the [general discussions](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/discussions/categories/general) page.
+If you need help, please use the [general discussions](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/discussions/categories/general) page.
 
 ## Contributing
 

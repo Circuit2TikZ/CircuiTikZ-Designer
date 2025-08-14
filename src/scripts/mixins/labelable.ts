@@ -306,8 +306,9 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 
 		protected buildTikzPathLabel(to: CircuitikzTo) {
 			if (this.mathJaxLabel.value) {
-				let distStr = roundTikz(this.labelDistance.value.convertToUnit("cm").minus(0.1).value) + "cm"
-				let shouldDist = this.labelDistance.value && distStr != "0.0cm"
+				let distVal = this.labelDistance.value.convertToUnit("cm").minus(0.12).value
+				let distStr = roundTikz(distVal) + "cm"
+				let shouldDist = this.labelDistance.value && Math.abs(distVal) > 0.0001
 
 				let latexStr = this.mathJaxLabel.value ? "$" + this.mathJaxLabel.value + "$" : ""
 				latexStr =
