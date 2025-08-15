@@ -279,6 +279,7 @@ export class NodeSymbolComponent extends NodeComponent {
 		super.applyJson(saveObject)
 		let options = saveObject.options ?? []
 		this.setPropertiesFromOptions(this.referenceSymbol.getOptionsFromOptionNames(options))
+		this.scaleProperty.value = new SVG.Number(Math.abs(this.scaleState.x))
 		this.update()
 		this.updateTheme()
 	}

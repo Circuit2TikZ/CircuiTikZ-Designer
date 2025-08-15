@@ -248,8 +248,8 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 				textDir = this.positionChoice.value.direction.transform(
 					new SVG.Matrix({
 						rotate: -this.rotationDeg,
-						scaleX: this.scaleState.x,
-						scaleY: this.scaleState.y,
+						scaleX: Math.sign(this.scaleState.x),
+						scaleY: Math.sign(this.scaleState.y),
 					}).inverse()
 				)
 				// check which label direction should be used to get the final correct direction
@@ -271,8 +271,8 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 			let labelRefDir = textDir.mul(-1).transform(
 				new SVG.Matrix({
 					rotate: -this.rotationDeg,
-					scaleX: this.scaleState.x,
-					scaleY: this.scaleState.y,
+					scaleX: Math.sign(this.scaleState.x),
+					scaleY: Math.sign(this.scaleState.y),
 				})
 			)
 
