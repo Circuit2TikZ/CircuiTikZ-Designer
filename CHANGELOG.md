@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.3]
+
+## Added
+
+- Basic Flip flops
+
+## Changed
+
+- Exporting to SVG now doesn't require Computer Modern on the device, where the SVG will be used
+- Symbols now updated to circuitikz version 1.8.2
+
+## Fixed
+
+- Default text position for circuitikz nodes now correct (bug fixed in circuitikz v1.8.2)
+- Path label distance now correctly reflected in exported tikz code
+
 ## [0.7.2]
 
 ### Fixed
