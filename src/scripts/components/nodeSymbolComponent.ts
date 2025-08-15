@@ -197,6 +197,7 @@ export class NodeSymbolComponent extends NodeComponent {
 
 	protected updateOptions() {
 		this.componentVariant = this.referenceSymbol.getVariant(this.optionsFromProperties())
+		this.referencePosition = this.componentVariant.mid
 		this.symbolUse.node.setAttribute("href", "#" + this.componentVariant.symbol.id())
 		this.size = new SVG.Point(this.componentVariant.viewBox.w, this.componentVariant.viewBox.h)
 		this.defaultTextPosition = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
