@@ -175,7 +175,9 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 
 	protected buildTikzCommand(command: TikzPathCommand): void {
 		super.buildTikzCommand(command)
-		command.additionalNodes.push(this.buildTikzNodeLabel(this.textPos))
+		if (this.mathJaxLabel.value !== "" && this.textPos) {
+			command.additionalNodes.push(this.buildTikzNodeLabel(this.textPos))
+		}
 		this.referencePoints.forEach(() => command.connectors.push("--"))
 		command.coordinates.push("cycle")
 	}
@@ -374,7 +376,11 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 			this.labelRendering.removeClass("labelRendering")
 			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
 		}
-		copiedSVG.removeElement(copiedSVG.find(".draggable")[0])
+
+		let draggable = copiedSVG.find(".draggable")[0]
+		if (draggable) {
+			copiedSVG.removeElement(draggable)
+		}
 
 		const viz = copiedSVG.findOne('[fill-opacity="0"][stroke-opacity="0"]')
 		viz?.remove()

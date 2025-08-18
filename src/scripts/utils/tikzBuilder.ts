@@ -86,7 +86,10 @@ function convertPathCommand(command: TikzPathCommand): string {
 	outputString.push(" " + coordToString(command.coordinates.at(-1)))
 
 	for (const additionalCommand of command.additionalNodes) {
-		outputString.push(" " + convertNodeCommand(additionalCommand))
+		// check that additionalCommand is not null
+		if (additionalCommand) {
+			outputString.push(" " + convertNodeCommand(additionalCommand))
+		}
 	}
 
 	return outputString.join("")

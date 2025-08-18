@@ -155,7 +155,7 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 		}
 
 		protected buildTikzNodeLabel(reference: string | SVG.Point): null | TikzNodeCommand {
-			if (this.mathJaxLabel.value) {
+			if (this.mathJaxLabel.value && reference) {
 				let labelDist = this.labelDistance.value.convertToUnit("cm")
 
 				if (!isNaN(this.anchorPos.direction.absSquared())) {
