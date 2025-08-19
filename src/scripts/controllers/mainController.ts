@@ -421,16 +421,11 @@ export class MainController {
 							})
 						} else {
 							let closeButton = cell4.appendChild(document.createElement("button"))
-							closeButton.classList.add("btn", "btn-danger")
-							closeButton.innerText = "Close tab"
+							closeButton.classList.add("btn", "btn-primary")
+							closeButton.innerText = "Highlight tab"
 							closeButton.addEventListener("click", () => {
-								// also set the open state to false in the db
-								let tabsObjectStore = db.transaction("tabs", "readwrite").objectStore("tabs")
-								const adjustedData = tabData
-								adjustedData.open = "false"
-								tabsObjectStore.put(adjustedData)
-								// send a message to the broadcast channel to close the tab
-								MainController.instance.broadcastChannel.postMessage("close=" + tabData.id)
+								// send a message to the broadcast channel to show the tab
+								MainController.instance.broadcastChannel.postMessage("show=" + tabData.id)
 							})
 						}
 					}
@@ -469,14 +464,51 @@ export class MainController {
 			}
 		})
 
+		const favicon = document.getElementById("favicon") as HTMLLinkElement
+		const faviconAlternate = document.getElementById("faviconAlternate") as HTMLLinkElement
+		const faviconLink = favicon.href
+		const alternateLink = faviconAlternate.href
+		favicon.disabled = false
+		favicon.href = faviconLink
+		faviconAlternate.disabled = true
+		faviconAlternate.href = " "
+
 		this.broadcastChannel.onmessage = (event) => {
 			const msg = String(event.data)
 
-			if (msg.startsWith("close")) {
+			if (msg.startsWith("show")) {
 				const tabID = parseInt(msg.split("=")[1]) // get the tabID
 				if (tabID == MainController.instance.tabID) {
-					// close the tab
-					window.close()
+					const oldTitle = document.title
+
+					let darkMode = true
+					const cb = () => {
+						if (darkMode) {
+							favicon.disabled = true
+							favicon.href = ""
+							faviconAlternate.disabled = false
+							faviconAlternate.href = alternateLink
+							document.title = "Click here!"
+						} else {
+							favicon.disabled = false
+							favicon.href = faviconLink
+							faviconAlternate.disabled = true
+							faviconAlternate.href = " "
+							document.title = oldTitle
+						}
+						darkMode = !darkMode
+					}
+					cb()
+					const interval = setInterval(cb, 1000)
+
+					// Stop flashing if tab becomes visible
+					document.addEventListener("visibilitychange", () => {
+						if (!document.hidden) {
+							clearInterval(interval)
+							darkMode = false
+							cb()
+						}
+					})
 				}
 			} else if (msg == "update") {
 				if (settingsModalEl.classList.contains("show")) {
@@ -485,6 +517,7 @@ export class MainController {
 			} else if (msg.startsWith("clipboard=")) {
 				CopyPaste.setClipboard(JSON.parse(msg.slice(10)))
 			}
+			return false
 		}
 
 		function sizeString(size: number) {
