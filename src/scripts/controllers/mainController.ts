@@ -465,13 +465,11 @@ export class MainController {
 		})
 
 		const favicon = document.getElementById("favicon") as HTMLLinkElement
-		const faviconAlternate = document.getElementById("faviconAlternate") as HTMLLinkElement
 		const faviconLink = favicon.href
+		const faviconAlternate = document.getElementById("faviconAlternate") as HTMLLinkElement
 		const alternateLink = faviconAlternate.href
-		favicon.disabled = false
-		favicon.href = faviconLink
-		faviconAlternate.disabled = true
 		faviconAlternate.href = " "
+		faviconAlternate.disabled = true
 
 		this.broadcastChannel.onmessage = (event) => {
 			const msg = String(event.data)
@@ -482,31 +480,25 @@ export class MainController {
 					const oldTitle = document.title
 
 					let darkMode = true
-					const cb = () => {
+					const switchFavicon = () => {
 						if (darkMode) {
-							favicon.disabled = true
-							favicon.href = ""
-							faviconAlternate.disabled = false
-							faviconAlternate.href = alternateLink
+							favicon.href = alternateLink
 							document.title = "Click here!"
 						} else {
-							favicon.disabled = false
 							favicon.href = faviconLink
-							faviconAlternate.disabled = true
-							faviconAlternate.href = " "
 							document.title = oldTitle
 						}
 						darkMode = !darkMode
 					}
-					cb()
-					const interval = setInterval(cb, 1000)
+					const interval = setInterval(switchFavicon, 1100)
+					switchFavicon()
 
 					// Stop flashing if tab becomes visible
 					document.addEventListener("visibilitychange", () => {
 						if (!document.hidden) {
 							clearInterval(interval)
 							darkMode = false
-							cb()
+							switchFavicon()
 						}
 					})
 				}
