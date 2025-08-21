@@ -1,6 +1,6 @@
 {
 	"name": "circutikz-designer",
-	"version": "0.7.4",
+	"version": "0.7.5",
 	"private": "true",
 	"description": "An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTikZ with ease.",
 	"license": "GPL-3.0-only",
