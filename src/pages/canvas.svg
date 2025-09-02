@@ -4,16 +4,14 @@
 	version="1.2"
 	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	style="font-size: 10pt"
->
+	style="font-size: 10pt">
 	<defs id="backgroundDefs">
 		<pattern
 			id="smallGridPattern"
 			width=".25cm"
 			height=".25cm"
 			patternUnits="userSpaceOnUse"
-			style="translate: .025pt .025pt; "
-		>
+			style="translate: .025pt .025pt; ">
 			<path d="M 9.44882 0 L 0 0 0 9.44882" fill="none" stroke="var(--bs-secondary-text-emphasis)" stroke-width="0.1pt" />
 			</pattern>
 		<pattern id="gridPattern" width="1cm" height="1cm" patternUnits="userSpaceOnUse" style="translate: -.05pt -.05pt; ">
@@ -43,6 +41,9 @@
 		</symbol>
 		<symbol id="line">
 			<path fill="none" d="M .5 0 L .5 1" />
+		</symbol>
+		<symbol id="currarrow">
+			<path stroke="none" d="M0 0 1.7.8 0 1.6Z" />
 		</symbol>
 	</defs>
 	<rect id="grid" x="0" y="0" width="100%" height="100%" fill="url(#gridPattern)" />

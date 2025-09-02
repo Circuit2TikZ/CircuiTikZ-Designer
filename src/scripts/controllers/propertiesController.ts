@@ -26,6 +26,8 @@ export enum PropertyCategories {
 	fill,
 	stroke,
 	label,
+	voltage,
+	current,
 	text,
 	info,
 }

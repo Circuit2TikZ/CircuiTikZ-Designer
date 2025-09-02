@@ -328,7 +328,7 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 	return PathLabelable
 }
 
-function generateLabelRender(labelRendering: SVG.Element, mathJaxLabel: MathJaxProperty): SVG.Element {
+export function generateLabelRender(labelRendering: SVG.Element, mathJaxLabel: MathJaxProperty): SVG.Element {
 	// if a previous label was rendered, remove everything concerning that rendering
 	if (labelRendering) {
 		let removeIDs = new Set<string>()

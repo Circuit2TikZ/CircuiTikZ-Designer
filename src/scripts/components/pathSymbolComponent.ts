@@ -29,6 +29,10 @@ import {
 	CircuitikzTo,
 	SaveController,
 	buildTikzStringFromPathCommand,
+	MathJaxProperty,
+	generateLabelRender,
+	generateVoltageArrow,
+	VoltageArrowOptions,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -79,6 +83,17 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 	protected optionProperties: Map<BooleanProperty, SymbolOption>
 	protected optionEnumProperties: Map<ChoiceProperty<ChoiceEntry>, EnumOption>
 	protected componentVariant: Variant
+
+	protected voltageLabel: MathJaxProperty
+	protected voltageLabelRendering: SVG.Element
+	protected voltageArrowRendering: SVG.Element
+	protected voltageRendering: SVG.Element
+
+	protected bumpB: SliderProperty
+	protected distanceFromNode: SliderProperty
+	protected voltageShift: SliderProperty
+	protected switchSide: BooleanProperty
+	protected switchDirection: BooleanProperty
 
 	constructor(symbol: ComponentSymbol) {
 		super()
@@ -184,6 +199,60 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		})
 		this.properties.add(PropertyCategories.manipulation, this.invert)
 
+		this.properties.add(PropertyCategories.voltage, new SectionHeaderProperty("Voltage label"))
+
+		this.voltageLabel = new MathJaxProperty()
+		this.voltageLabel.addChangeListener((ev) => this.generateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.voltageLabel)
+
+		this.bumpB = new SliderProperty(
+			"Bump b",
+			0,
+			5,
+			0.1,
+			new SVG.Number(1.5, ""),
+			false,
+			"How much the voltage arrow should bump away from the component"
+		)
+		this.bumpB.addChangeListener((ev) => this.updateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.bumpB)
+
+		this.distanceFromNode = new SliderProperty(
+			"Distance from node",
+			0,
+			1,
+			0.1,
+			new SVG.Number(0.5, ""),
+			true,
+			"How far away from the component the voltage arrow should start/end"
+		)
+		this.distanceFromNode.addChangeListener((ev) => this.updateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.distanceFromNode)
+
+		this.voltageShift = new SliderProperty(
+			"Shift voltage",
+			-1,
+			2,
+			0.1,
+			new SVG.Number(0, ""),
+			false,
+			"Shift the voltage away from the component"
+		)
+		this.voltageShift.addChangeListener((ev) => this.updateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.voltageShift)
+
+		this.switchSide = new BooleanProperty("Switch side", false, "On which side the voltage arrow should be drawn")
+		this.switchSide.addChangeListener((ev) => this.updateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.switchSide)
+
+		this.switchDirection = new BooleanProperty(
+			"Switch direction",
+			false,
+			"In which direction the arrow should point"
+		)
+		this.switchDirection.addChangeListener((ev) => this.updateVoltageRender())
+		this.properties.add(PropertyCategories.voltage, this.switchDirection)
+
 		this.addInfo()
 
 		this.snappingPoints = [
@@ -193,6 +262,60 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
 				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))),
 		]
+	}
+
+	protected generateVoltageRender(): void {
+		this.voltageLabelRendering = generateLabelRender(this.voltageLabelRendering, this.voltageLabel)
+		this.voltageLabelRendering.fill(defaultStroke)
+
+		this.voltageRendering = new SVG.G()
+		this.voltageRendering.add(this.voltageLabelRendering)
+		this.visualization.add(this.voltageRendering)
+		this.update()
+		this.updateTheme()
+	}
+
+	protected updateVoltageRender() {
+		this.voltageArrowRendering?.remove()
+		if (this.voltageLabel.value != "") {
+			const options: VoltageArrowOptions = {
+				bump: this.bumpB.value.value,
+				distanceFromNode: this.distanceFromNode.value.value,
+				invertDirection: this.switchDirection.value,
+				shift: this.voltageShift.value.value,
+				invertSide: this.switchSide.value,
+			}
+			let voltageArrow = generateVoltageArrow(
+				this.referencePoints[0],
+				this.referencePoints[1],
+				this.componentVariant.mid.mul(-1),
+				new SVG.Point(this.componentVariant.viewBox.x2, this.componentVariant.viewBox.y2).sub(
+					this.componentVariant.mid
+				),
+				this.scaleState,
+				options
+			)
+			this.voltageArrowRendering = voltageArrow.arrow
+			this.voltageRendering.add(this.voltageArrowRendering)
+			//TODO adjust position of voltage label
+			let labelAnchorDir = this.position.sub(voltageArrow.labelPos)
+			labelAnchorDir.x =
+				labelAnchorDir.x > 0 ? 1
+				: labelAnchorDir.x < 0 ? -1
+				: 0
+			labelAnchorDir.y =
+				labelAnchorDir.y > 0 ? 1
+				: labelAnchorDir.y < 0 ? -1
+				: 0
+
+			const voltageLabelBbox = this.voltageLabelRendering.bbox()
+			const voltageLabelReference = new SVG.Point(voltageLabelBbox.cx, voltageLabelBbox.cy).add(
+				new SVG.Point(voltageLabelBbox.w / 2, voltageLabelBbox.h / 2).mul(labelAnchorDir)
+			)
+			this.voltageLabelRendering.transform(
+				new SVG.Matrix({ translate: voltageArrow.labelPos.sub(voltageLabelReference) })
+			)
+		}
 	}
 
 	protected addInfo() {
@@ -366,6 +489,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		)
 
 		this.updatePathLabel()
+		this.updateVoltageRender()
 		this._bbox = this.visualization.bbox()
 		this.referencePosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
 

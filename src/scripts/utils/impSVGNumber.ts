@@ -159,6 +159,7 @@ declare module "@svgdotjs/svg.js" {
 		 */
 		eq(other: Point, eps?: number): boolean
 		toTikzString(noParantheses?: boolean): string
+		toSVGPathString(precision?: number): string
 		simplifyForJson(): Point
 	}
 
@@ -624,6 +625,9 @@ SVG.extend(SVG.Point, {
 		} else {
 			return `(${roundTikz(this.x * unitConvertMap.px.cm)}, ${roundTikz(-this.y * unitConvertMap.px.cm)})`
 		}
+	},
+	toSVGPathString() {
+		return this.x + " " + this.y
 	},
 	simplifyForJson(digits: 2 | 3 | 4 | 5 = 3): SVG.Point {
 		let factor = 10 ** digits
