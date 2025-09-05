@@ -95,9 +95,6 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 		protected voltageDirection: ChoiceProperty<ChoiceEntry>
 		protected voltageStyle: ChoiceProperty<ChoiceEntry>
 
-		private plusRender: SVG.Element
-		private minusRender: SVG.Element
-
 		constructor(...args: any[]) {
 			super(...args)
 			this.properties.add(PropertyCategories.voltage, new SectionHeaderProperty("Voltage label"))
