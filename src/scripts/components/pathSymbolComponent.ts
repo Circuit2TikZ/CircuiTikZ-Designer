@@ -29,10 +29,9 @@ import {
 	CircuitikzTo,
 	SaveController,
 	buildTikzStringFromPathCommand,
-	MathJaxProperty,
-	generateLabelRender,
-	generateVoltageArrow,
 	VoltageArrowOptions,
+	VoltageLabel,
+	Voltageable,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -42,9 +41,10 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	name?: string
 	options?: string[]
 	label?: PathLabel
+	voltage?: VoltageLabel
 }
 
-export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) {
+export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(PathComponent))) {
 	private static jsonID = "path"
 	static {
 		CircuitComponent.jsonSaveMap.set(PathSymbolComponent.jsonID, PathSymbolComponent)
@@ -83,17 +83,6 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 	protected optionProperties: Map<BooleanProperty, SymbolOption>
 	protected optionEnumProperties: Map<ChoiceProperty<ChoiceEntry>, EnumOption>
 	protected componentVariant: Variant
-
-	protected voltageLabel: MathJaxProperty
-	protected voltageLabelRendering: SVG.Element
-	protected voltageArrowRendering: SVG.Element
-	protected voltageRendering: SVG.Element
-
-	protected bumpB: SliderProperty
-	protected distanceFromNode: SliderProperty
-	protected voltageShift: SliderProperty
-	protected switchSide: BooleanProperty
-	protected switchDirection: BooleanProperty
 
 	constructor(symbol: ComponentSymbol) {
 		super()
@@ -199,60 +188,6 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 		})
 		this.properties.add(PropertyCategories.manipulation, this.invert)
 
-		this.properties.add(PropertyCategories.voltage, new SectionHeaderProperty("Voltage label"))
-
-		this.voltageLabel = new MathJaxProperty()
-		this.voltageLabel.addChangeListener((ev) => this.generateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.voltageLabel)
-
-		this.bumpB = new SliderProperty(
-			"Bump b",
-			0,
-			5,
-			0.1,
-			new SVG.Number(1.5, ""),
-			false,
-			"How much the voltage arrow should bump away from the component"
-		)
-		this.bumpB.addChangeListener((ev) => this.updateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.bumpB)
-
-		this.distanceFromNode = new SliderProperty(
-			"Distance from node",
-			0,
-			1,
-			0.1,
-			new SVG.Number(0.5, ""),
-			true,
-			"How far away from the component the voltage arrow should start/end"
-		)
-		this.distanceFromNode.addChangeListener((ev) => this.updateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.distanceFromNode)
-
-		this.voltageShift = new SliderProperty(
-			"Shift voltage",
-			-1,
-			2,
-			0.1,
-			new SVG.Number(0, ""),
-			false,
-			"Shift the voltage away from the component"
-		)
-		this.voltageShift.addChangeListener((ev) => this.updateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.voltageShift)
-
-		this.switchSide = new BooleanProperty("Switch side", false, "On which side the voltage arrow should be drawn")
-		this.switchSide.addChangeListener((ev) => this.updateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.switchSide)
-
-		this.switchDirection = new BooleanProperty(
-			"Switch direction",
-			false,
-			"In which direction the arrow should point"
-		)
-		this.switchDirection.addChangeListener((ev) => this.updateVoltageRender())
-		this.properties.add(PropertyCategories.voltage, this.switchDirection)
-
 		this.addInfo()
 
 		this.snappingPoints = [
@@ -262,17 +197,6 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
 				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))),
 		]
-	}
-
-	protected generateVoltageRender(): void {
-		this.voltageLabelRendering = generateLabelRender(this.voltageLabelRendering, this.voltageLabel)
-		this.voltageLabelRendering.fill(defaultStroke)
-
-		this.voltageRendering = new SVG.G()
-		this.voltageRendering.add(this.voltageLabelRendering)
-		this.visualization.add(this.voltageRendering)
-		this.update()
-		this.updateTheme()
 	}
 
 	protected updateVoltageRender() {
@@ -285,7 +209,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 				shift: this.voltageShift.value.value,
 				invertSide: this.switchSide.value,
 			}
-			let voltageArrow = generateVoltageArrow(
+			let voltageArrow = this.generateVoltageArrow(
 				this.referencePoints[0],
 				this.referencePoints[1],
 				this.componentVariant.mid.mul(-1),
@@ -297,7 +221,7 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 			)
 			this.voltageArrowRendering = voltageArrow.arrow
 			this.voltageRendering.add(this.voltageArrowRendering)
-			//TODO adjust position of voltage label
+
 			let labelAnchorDir = this.position.sub(voltageArrow.labelPos)
 			labelAnchorDir.x =
 				labelAnchorDir.x > 0 ? 1
@@ -637,31 +561,21 @@ export class PathSymbolComponent extends PathLabelable(Nameable(PathComponent)) 
 
 		let to: CircuitikzTo = { options: options, name: this.name.value }
 		this.buildTikzPathLabel(to)
+		this.buildTikzVoltage(to)
 		command.connectors.push(to)
 	}
 
 	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		let symbolID = this.componentVariant.symbol.id()
-		if (!defs.has(symbolID)) {
-			const symbol = this.componentVariant.symbol.clone(true, false)
-			defs.set(symbolID, symbol)
-		}
-		this.labelRendering?.addClass("labelRendering")
 		const copiedSVG = this.visualization.clone(true)
-		if (this.labelRendering) {
-			this.labelRendering.removeClass("labelRendering")
-			if (!this.mathJaxLabel.value) {
-				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
-			} else {
-				for (const use of copiedSVG.find(".labelRendering")[0].find("use")) {
-					const id = use.node.getAttribute("xlink:href")
-					if (!defs.has(id)) {
-						defs.set(id, CanvasController.instance.canvas.find(id)[0].clone(true, false))
-					}
+		for (const use of copiedSVG.find("use")) {
+			let id = use.node.getAttribute("xlink:href") ?? use.node.getAttribute("href")
+			if (id) {
+				id = id.startsWith("#") ? id.slice(1) : id
+				if (!defs.has(id)) {
+					const element = new SVG.Element(document.getElementById(id).cloneNode(true))
+					defs.set(id, element)
 				}
 			}
-
-			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
 		}
 		return copiedSVG
 	}

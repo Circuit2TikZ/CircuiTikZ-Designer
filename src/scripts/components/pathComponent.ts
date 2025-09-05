@@ -130,7 +130,7 @@ export abstract class PathComponent extends CircuitComponent {
 		data.points = this.referencePoints.map((point) => point.simplifyForJson())
 		return data
 	}
-	public applyJson(saveObject: PathSaveObject): void {
+	protected applyJson(saveObject: PathSaveObject): void {
 		super.applyJson(saveObject)
 		this.referencePoints = saveObject.points.map((point) => new SVG.Point(point)) ?? []
 	}

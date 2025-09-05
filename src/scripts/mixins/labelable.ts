@@ -105,7 +105,7 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 					anchor: this.anchorChoice.value.key,
 					position: this.positionChoice.value.key,
 					relativeToComponent: this.labelReferenceProperty.value.key == "component" ? true : undefined,
-					distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
+					distance: this.labelDistance.value.value != 0.12 ? this.labelDistance.value : undefined,
 					color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 				}
 				data.label = labelWithoutRender
@@ -130,7 +130,7 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 						this.labelDistance.value = new SVG.Number(saveObject.label.distance)
 					}
 				} else {
-					this.labelDistance.value = new SVG.Number(0, "cm")
+					this.labelDistance.value = new SVG.Number(0.12, "cm")
 				}
 				this.anchorChoice.value =
 					saveObject.label.anchor ?
@@ -259,7 +259,7 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 				let label: PathLabel = {
 					value: this.mathJaxLabel.value,
 					otherSide: this.labelSide.value ? true : undefined,
-					distance: this.labelDistance.value.value != 0 ? this.labelDistance.value : undefined,
+					distance: this.labelDistance.value.value != 0.12 ? this.labelDistance.value : undefined,
 					color: this.labelColor.value ? this.labelColor.value.toString() : undefined,
 				}
 				data.label = label
@@ -285,7 +285,7 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 						this.labelDistance.value = new SVG.Number(saveObject.label.distance)
 					}
 				} else {
-					this.labelDistance.value = new SVG.Number(0, "cm")
+					this.labelDistance.value = new SVG.Number(0.12, "cm")
 				}
 				this.mathJaxLabel.value = saveObject.label.value
 				this.labelColor.value = saveObject.label.color ? new SVG.Color(saveObject.label.color) : null
