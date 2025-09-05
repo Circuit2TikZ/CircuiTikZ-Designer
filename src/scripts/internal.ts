@@ -26,6 +26,7 @@ export * from "./mixins/strokable"
 export * from "./mixins/nameable"
 export * from "./mixins/labelable"
 export * from "./mixins/voltageable"
+export * from "./mixins/currentable"
 // components
 export * from "./components/circuitComponent"
 export * from "./components/pathComponent"

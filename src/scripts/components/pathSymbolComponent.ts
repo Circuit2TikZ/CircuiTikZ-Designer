@@ -31,6 +31,7 @@ import {
 	buildTikzStringFromPathCommand,
 	VoltageLabel,
 	Voltageable,
+	Currentable,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -43,7 +44,7 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	voltage?: VoltageLabel
 }
 
-export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(PathComponent))) {
+export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(Nameable(PathComponent)))) {
 	private static jsonID = "path"
 	static {
 		CircuitComponent.jsonSaveMap.set(PathSymbolComponent.jsonID, PathSymbolComponent)
@@ -223,6 +224,31 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 		}
 	}
 
+	protected updateCurrentRender(): void {
+		this.currentArrowRendering?.remove()
+		if (this.currentLabel.value != "") {
+			let currentArrow = this.generateCurrentArrow(
+				this.referencePoints[0],
+				this.referencePoints[1],
+				this.componentVariant.mid.mul(-1),
+				new SVG.Point(this.componentVariant.viewBox.x2, this.componentVariant.viewBox.y2).sub(
+					this.componentVariant.mid
+				),
+				this.scaleState
+			)
+			this.currentArrowRendering = currentArrow.arrow
+			this.currentRendering.add(this.currentArrowRendering)
+
+			const currentLabelBbox = this.currentLabelRendering.bbox()
+			const currentLabelReference = new SVG.Point(currentLabelBbox.cx, currentLabelBbox.cy).add(
+				new SVG.Point(currentLabelBbox.w / 2, currentLabelBbox.h / 2).mul(currentArrow.labelAnchorDir)
+			)
+			this.currentLabelRendering.transform(
+				new SVG.Matrix({ translate: currentArrow.labelPos.sub(currentLabelReference) })
+			)
+		}
+	}
+
 	protected addInfo() {
 		this.properties.add(PropertyCategories.info, new SectionHeaderProperty("Info"))
 		this.properties.add(PropertyCategories.info, new InfoProperty("ID", this.referenceSymbol.tikzName))
@@ -395,6 +421,7 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 
 		this.updatePathLabel()
 		this.updateVoltageRender()
+		this.updateCurrentRender()
 		this._bbox = this.visualization.bbox()
 		this.referencePosition = this.position.sub(new SVG.Point(this._bbox.x, this._bbox.y))
 
@@ -543,6 +570,7 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 		let to: CircuitikzTo = { options: options, name: this.name.value }
 		this.buildTikzPathLabel(to)
 		this.buildTikzVoltage(to)
+		this.buildTikzCurrent(to)
 		command.connectors.push(to)
 	}
 
