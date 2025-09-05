@@ -34,6 +34,14 @@ export function simpifyRotationAndScale(rotation: number, scale: SVG.Point): [nu
 	return [rotation, s]
 }
 
+export function approxCompare(value1: number, value2: number, eps: number = 1e-7) {
+	return (
+		value1 > value2 + eps ? 1
+		: value1 < value2 - eps ? -1
+		: 0
+	)
+}
+
 export function closestBasicDirection(direction: SVG.Point): DirectionInfo {
 	return basicDirections
 		.map((val) => {

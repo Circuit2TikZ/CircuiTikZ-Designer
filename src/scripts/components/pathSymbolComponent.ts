@@ -29,7 +29,6 @@ import {
 	CircuitikzTo,
 	SaveController,
 	buildTikzStringFromPathCommand,
-	VoltageArrowOptions,
 	VoltageLabel,
 	Voltageable,
 } from "../internal"
@@ -202,13 +201,6 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 	protected updateVoltageRender() {
 		this.voltageArrowRendering?.remove()
 		if (this.voltageLabel.value != "") {
-			const options: VoltageArrowOptions = {
-				bump: this.bumpB.value.value,
-				distanceFromNode: this.distanceFromNode.value.value,
-				invertDirection: this.switchDirection.value,
-				shift: this.voltageShift.value.value,
-				invertSide: this.switchSide.value,
-			}
 			let voltageArrow = this.generateVoltageArrow(
 				this.referencePoints[0],
 				this.referencePoints[1],
@@ -216,25 +208,14 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 				new SVG.Point(this.componentVariant.viewBox.x2, this.componentVariant.viewBox.y2).sub(
 					this.componentVariant.mid
 				),
-				this.scaleState,
-				options
+				this.scaleState
 			)
 			this.voltageArrowRendering = voltageArrow.arrow
 			this.voltageRendering.add(this.voltageArrowRendering)
 
-			let labelAnchorDir = this.position.sub(voltageArrow.labelPos)
-			labelAnchorDir.x =
-				labelAnchorDir.x > 0 ? 1
-				: labelAnchorDir.x < 0 ? -1
-				: 0
-			labelAnchorDir.y =
-				labelAnchorDir.y > 0 ? 1
-				: labelAnchorDir.y < 0 ? -1
-				: 0
-
 			const voltageLabelBbox = this.voltageLabelRendering.bbox()
 			const voltageLabelReference = new SVG.Point(voltageLabelBbox.cx, voltageLabelBbox.cy).add(
-				new SVG.Point(voltageLabelBbox.w / 2, voltageLabelBbox.h / 2).mul(labelAnchorDir)
+				new SVG.Point(voltageLabelBbox.w / 2, voltageLabelBbox.h / 2).mul(voltageArrow.labelAnchorDir)
 			)
 			this.voltageLabelRendering.transform(
 				new SVG.Matrix({ translate: voltageArrow.labelPos.sub(voltageLabelReference) })
