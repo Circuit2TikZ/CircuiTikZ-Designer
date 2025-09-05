@@ -565,21 +565,6 @@ export class PathSymbolComponent extends Voltageable(PathLabelable(Nameable(Path
 		command.connectors.push(to)
 	}
 
-	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		const copiedSVG = this.visualization.clone(true)
-		for (const use of copiedSVG.find("use")) {
-			let id = use.node.getAttribute("xlink:href") ?? use.node.getAttribute("href")
-			if (id) {
-				id = id.startsWith("#") ? id.slice(1) : id
-				if (!defs.has(id)) {
-					const element = new SVG.Element(document.getElementById(id).cloneNode(true))
-					defs.set(id, element)
-				}
-			}
-		}
-		return copiedSVG
-	}
-
 	public remove(): void {
 		SnapDragHandler.snapDrag(this, false)
 		this.resizable(false)

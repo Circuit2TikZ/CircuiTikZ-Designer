@@ -354,36 +354,4 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 		// acutally move the label
 		labelSVG.transform({ translate: this.textPos.sub(ref) })
 	}
-
-	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		if (this.labelRendering) {
-			const backgroundDefs = CanvasController.instance.canvas.findOne("#backgroundDefs") as SVG.Defs
-
-			for (const element of this.labelRendering.find("use")) {
-				const id = element.node.getAttribute("xlink:href")
-				if (!defs.has(id)) {
-					const symbol = backgroundDefs.findOne(id) as SVG.Element
-					defs.set(id, symbol.clone(true, false))
-				}
-			}
-		}
-		this.labelRendering?.addClass("labelRendering")
-		const copiedSVG = this.visualization.clone(true)
-		if (this.labelRendering) {
-			if (!this.mathJaxLabel.value) {
-				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
-			}
-			this.labelRendering.removeClass("labelRendering")
-			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
-		}
-
-		let draggable = copiedSVG.find(".draggable")[0]
-		if (draggable) {
-			copiedSVG.removeElement(draggable)
-		}
-
-		const viz = copiedSVG.findOne('[fill-opacity="0"][stroke-opacity="0"]')
-		viz?.remove()
-		return copiedSVG
-	}
 }

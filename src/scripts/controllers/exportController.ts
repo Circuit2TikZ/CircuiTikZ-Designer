@@ -172,12 +172,13 @@ export class ExportController {
 			svgObj.add(component)
 		}
 
-		//basic cleanup of components used to improve dragging
-		for (const removeElement of svgObj
-			.find('[fill="none"][stroke="transparent"]')
-			.concat(svgObj.find('[fill="transparent"][stroke="none"]'))) {
+		//basic cleanup of invisible components (fill and stroke both need to be invisible)
+		for (const removeElement of svgObj.find(
+			':is([fill-opacity="0"],[fill="none"],[fill="transparent"]):is([stroke-opacity="0"],[stroke="none"],[stroke-width="0"],[stroke="transparent"])'
+		)) {
 			removeElement.remove()
 		}
+		//basic draggable class
 		for (const removeClass of svgObj.find(".draggable")) {
 			removeClass.removeClass("draggable")
 		}

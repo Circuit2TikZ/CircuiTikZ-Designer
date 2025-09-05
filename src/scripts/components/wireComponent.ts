@@ -618,30 +618,6 @@ export class WireComponent extends Strokable(PathComponent) {
 		}
 	}
 
-	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		if (this.arrowStartChoice.value != defaultArrowTip) {
-			const id = this.arrowStartChoice.value.key
-			if (!defs.has(id)) {
-				const marker = document.getElementById(id).cloneNode(true)
-				defs.set(id, new SVG.Element(marker))
-			}
-		}
-		if (this.arrowEndChoice.value != defaultArrowTip) {
-			const id = this.arrowEndChoice.value.key
-			if (!defs.has(id)) {
-				const marker = document.getElementById(id).cloneNode(true)
-				defs.set(id, new SVG.Element(marker))
-			}
-		}
-
-		const copiedSVG = this.visualization.clone(true)
-		let draggableWire = copiedSVG.find('polyline[fill="none"][stroke="transparent"]')[0]
-		if (draggableWire) {
-			copiedSVG.removeElement(draggableWire)
-		}
-		return copiedSVG
-	}
-
 	public copyForPlacement(): WireComponent {
 		return new WireComponent(this.onlyStraight, this.defaultArrowHead)
 	}

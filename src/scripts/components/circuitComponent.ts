@@ -379,10 +379,23 @@ export abstract class CircuitComponent {
 	protected buildTikzCommand(command: {}): void {}
 
 	/**
-	 * convert this component to be used with the svg export, i.e. clone the visualization and remove everything which is not needed
+	 * convert this component to be used with the svg export, i.e. clones the visualization and handles all use elements. override this to add custom functionality like removing additional elements.
 	 * @param defs which definitions this component uses should be added to the map<id, element>. defs should be checked before adding to avoid duplicates
 	 */
-	public abstract toSVG(defs: Map<string, SVG.Element>): SVG.Element
+	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
+		const copiedSVG = this.visualization.clone(true)
+		for (const use of copiedSVG.find("use")) {
+			let id = use.node.getAttribute("xlink:href") ?? use.node.getAttribute("href")
+			if (id) {
+				id = id.startsWith("#") ? id.slice(1) : id
+				if (!defs.has(id)) {
+					const element = new SVG.Element(document.getElementById(id).cloneNode(true))
+					defs.set(id, element)
+				}
+			}
+		}
+		return copiedSVG
+	}
 	/**
 	 * Convert a ComponentSaveObject to a component. This requires 2 steps:
 	 * 1) Define a public static fromJson method which returns an instance of the component. This should only handle proper initialization and no parameter setting. See NodeSymbolComponent

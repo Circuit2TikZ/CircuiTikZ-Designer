@@ -145,32 +145,6 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.properties.add(PropertyCategories.info, new InfoProperty("ID", this.referenceSymbol.tikzName))
 	}
 
-	public toSVG(defs: Map<string, SVG.Element>): SVG.Element {
-		let symbolID = this.componentVariant.symbol.id()
-		if (!defs.has(symbolID)) {
-			const symbol = this.componentVariant.symbol.clone(true, false)
-			defs.set(symbolID, symbol)
-		}
-		this.labelRendering?.addClass("labelRendering")
-		const copiedSVG = this.visualization.clone(true)
-		if (this.labelRendering) {
-			this.labelRendering.removeClass("labelRendering")
-			if (!this.mathJaxLabel.value) {
-				copiedSVG.removeElement(copiedSVG.find(".labelRendering")[0])
-			} else {
-				for (const use of copiedSVG.find(".labelRendering")[0].find("use")) {
-					const id = use.node.getAttribute("xlink:href")
-					if (!defs.has(id)) {
-						defs.set(id, CanvasController.instance.canvas.find(id)[0].clone(true, false))
-					}
-				}
-			}
-
-			copiedSVG.findOne(".labelRendering")?.removeClass("labelRendering")
-		}
-		return copiedSVG
-	}
-
 	protected setPropertiesFromOptions(options: SymbolOption[]) {
 		this.optionProperties.forEach((value, property) => {
 			if (options.find((op) => op.name == value.name)) {
