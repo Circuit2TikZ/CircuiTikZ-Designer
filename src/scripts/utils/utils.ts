@@ -42,6 +42,10 @@ export function approxCompare(value1: number, value2: number, eps: number = 1e-7
 	)
 }
 
+export function interpolate(a: SVG.Point, b: SVG.Point, t: number) {
+	return a.add(b.sub(a).mul(t))
+}
+
 export function closestBasicDirection(direction: SVG.Point): DirectionInfo {
 	return basicDirections
 		.map((val) => {

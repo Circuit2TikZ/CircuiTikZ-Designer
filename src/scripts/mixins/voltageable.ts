@@ -14,6 +14,7 @@ import {
 	ChoiceProperty,
 	ChoiceEntry,
 	approxCompare,
+	interpolate,
 } from "../internal"
 
 export type VoltageLabel = {
@@ -57,10 +58,6 @@ const defaultVoltageStyleChoice = voltageStyleChoices[0]
 let voltageEuropean = true
 let voltageStraight = false
 let voltageRaised = false
-
-function interpolate(a: SVG.Point, b: SVG.Point, t: number) {
-	return a.add(b.sub(a).mul(t))
-}
 
 const arrowStrokeWidth = 0.5
 const distanceFromLine = 0.08
