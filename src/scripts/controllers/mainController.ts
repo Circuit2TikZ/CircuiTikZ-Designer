@@ -1433,33 +1433,32 @@ export class MainController {
 	 * @param {Element} node
 	 */
 	private preprocessSymbolColors(node: Element) {
-		let elementsWithFill = node.querySelectorAll("[fill]")
-		let elementsWithStroke = node.querySelectorAll("[stroke]")
-
-		//this group
-		let currentFill = node.getAttribute("fill")
-		if (currentFill == "#fff") {
-			node.setAttribute("fill", "currentFill")
-		}
-		let currentStroke = node.getAttribute("stroke")
-		if (currentStroke == "#000") {
-			node.setAttribute("stroke", "currentStroke")
-		}
-
-		for (const element of elementsWithFill) {
-			let currentFill = element.getAttribute("fill")
-
-			if (currentFill == "#fff") {
-				element.setAttribute("fill", "currentFill")
+		//exchange all explicit blacks with defaultStroke and all explicit whites with defaultFill
+		node.querySelectorAll("[fill]").forEach((elem) => {
+			if (elem.getAttribute("fill") == "#000") {
+				elem.setAttribute("fill", defaultStroke)
+			} else if (elem.getAttribute("fill") == "#fff") {
+				elem.setAttribute("fill", defaultFill)
 			}
+		})
+		node.querySelectorAll("[stroke]").forEach((elem) => {
+			if (elem.getAttribute("stroke") == "#000") {
+				elem.setAttribute("stroke", defaultStroke)
+			} else if (elem.getAttribute("stroke") == "#fff") {
+				elem.setAttribute("stroke", defaultFill)
+			}
+		})
+
+		if (node.getAttribute("fill") == "#000") {
+			node.setAttribute("fill", defaultStroke)
+		} else if (node.getAttribute("fill") == "#fff") {
+			node.setAttribute("fill", defaultFill)
 		}
 
-		for (const element of elementsWithStroke) {
-			let currentStroke = element.getAttribute("stroke")
-
-			if (currentStroke == "#000") {
-				element.setAttribute("stroke", "currentStroke")
-			}
+		if (node.getAttribute("stroke") == "#000") {
+			node.setAttribute("stroke", defaultStroke)
+		} else if (node.getAttribute("stroke") == "#fff") {
+			node.setAttribute("stroke", defaultFill)
 		}
 
 		this.addFill(node)
