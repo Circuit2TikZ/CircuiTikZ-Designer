@@ -527,7 +527,10 @@ export class MainController {
 				).then(() => {
 					// after all tabs are closed, send a probe message to all tabs
 					// this will cause all open tabs to set their state to open=true again
-					MainController.instance.sendBroadcastMessage("probe")
+					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
+					setTimeout(() => {
+						MainController.instance.sendBroadcastMessage("probe")
+					}, 10)
 				})
 			}
 		})
@@ -595,6 +598,9 @@ export class MainController {
 							MainController.instance.sendBroadcastMessage("update")
 						}
 					}
+				}
+				if (settingsModalEl.classList.contains("show")) {
+					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
 				}
 			}
 			return false
