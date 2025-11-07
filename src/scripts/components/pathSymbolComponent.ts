@@ -124,6 +124,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				const property = new BooleanProperty(
 					option.displayName ?? option.name,
 					false,
+					true,
 					undefined,
 					"options:option" + option.name
 				)
@@ -206,14 +207,14 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			new SectionHeaderProperty("Symbol Orientation", undefined, "manipulation:header")
 		)
 
-		this.mirror = new BooleanProperty("Mirror", false, undefined, "manipulation:mirror")
+		this.mirror = new BooleanProperty("Mirror", false, undefined, undefined, "manipulation:mirror")
 		this.mirror.addChangeListener((ev) => {
 			this.scaleState.y *= -1
 			this.update()
 		})
 		this.properties.add(PropertyCategories.manipulation, this.mirror)
 
-		this.invert = new BooleanProperty("Invert", false, undefined, "manipulation:invert")
+		this.invert = new BooleanProperty("Invert", false, undefined, undefined, "manipulation:invert")
 		this.invert.addChangeListener((ev) => {
 			this.scaleState.x *= -1
 			this.update()

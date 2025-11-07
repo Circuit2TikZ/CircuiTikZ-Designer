@@ -125,7 +125,13 @@ export class RectangleComponent extends ShapeComponent {
 		})
 		this.properties.add(PropertyCategories.text, this.textAreaProperty)
 
-		this.textAreaPlaceHolder = new BooleanProperty("Placeholder", createAsText, undefined, "text:placeholder")
+		this.textAreaPlaceHolder = new BooleanProperty(
+			"Placeholder",
+			createAsText,
+			undefined,
+			undefined,
+			"text:placeholder"
+		)
 		this.textAreaPlaceHolder.addChangeListener((ev) => {
 			this.createAsText = ev.value
 			this.update()
@@ -135,6 +141,7 @@ export class RectangleComponent extends ShapeComponent {
 		this.textAreaHyphenation = new BooleanProperty(
 			"Hyphenation",
 			this.useHyphenation,
+			undefined,
 			undefined,
 			"text:hyphenation"
 		)

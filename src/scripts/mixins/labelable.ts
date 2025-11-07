@@ -279,7 +279,7 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 			})
 			this.properties.add(PropertyCategories.label, this.labelColor)
 
-			this.labelSide = new BooleanProperty("Switch side", undefined, undefined, "label:side")
+			this.labelSide = new BooleanProperty("Switch side", undefined, undefined, undefined, "label:side")
 			this.labelSide.addChangeListener((ev) => this.updatePathLabel())
 			this.properties.add(PropertyCategories.label, this.labelSide)
 		}

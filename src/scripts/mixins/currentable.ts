@@ -72,29 +72,19 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.currentLabel.addChangeListener((ev) => this.generateCurrentRender())
 			this.properties.add(PropertyCategories.current, this.currentLabel)
 
-			this.currentDirection = new BooleanProperty(
-				"Backwards",
-				currentDirectionBackward,
-				undefined,
-				"current:backwards"
-			)
+			this.currentDirection = new BooleanProperty("Backwards", null, true, undefined, "current:backwards")
 			this.currentDirection.addChangeListener((ev) => {
 				this.updateCurrentRender()
 			})
 			this.properties.add(PropertyCategories.current, this.currentDirection)
 
-			this.currentLabelPosition = new BooleanProperty(
-				"Label below",
-				currentLabelBelow,
-				undefined,
-				"current:below"
-			)
+			this.currentLabelPosition = new BooleanProperty("Label below", null, true, undefined, "current:below")
 			this.currentLabelPosition.addChangeListener((ev) => {
 				this.updateCurrentRender()
 			})
 			this.properties.add(PropertyCategories.current, this.currentLabelPosition)
 
-			this.currentPosition = new BooleanProperty("At start", currentPositionStart, undefined, "current:start")
+			this.currentPosition = new BooleanProperty("At start", null, true, undefined, "current:start")
 			this.currentPosition.addChangeListener((ev) => this.updateCurrentRender())
 			this.properties.add(PropertyCategories.current, this.currentPosition)
 
