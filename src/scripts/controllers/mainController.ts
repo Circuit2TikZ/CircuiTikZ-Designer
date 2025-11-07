@@ -1449,6 +1449,12 @@ export class MainController {
 			}
 		})
 
+		node.querySelectorAll(".fillable").forEach((elem) => {
+			if (elem.getAttribute("fill") == "none") {
+				elem.setAttribute("fill", "currentFill")
+			}
+		})
+
 		if (node.getAttribute("fill") == "#000") {
 			node.setAttribute("fill", defaultStroke)
 		} else if (node.getAttribute("fill") == "#fff") {

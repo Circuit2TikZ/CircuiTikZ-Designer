@@ -45,6 +45,10 @@ export class ComponentSymbol extends SVG.Symbol {
 	possibleOptions: SymbolOption[]
 	possibleEnumOptions: EnumOption[]
 
+	source: "isVoltage" | "isCurrent" | false
+	componentClass: string
+	fillable: boolean
+
 	/**
 	 * what the component is called
 	 */
@@ -79,6 +83,9 @@ export class ComponentSymbol extends SVG.Symbol {
 		this.tikzName = componentMetadata?.getAttribute("tikz") ?? null
 		this.displayName = componentMetadata?.getAttribute("display") ?? this.tikzName
 		this.groupName = componentMetadata?.getAttribute("group") ?? null
+		this.componentClass = componentMetadata?.getAttribute("class") ?? ""
+		this.fillable = componentMetadata?.getAttribute("fillable") == "True" || false
+		this.source = (componentMetadata?.getAttribute("source") as "isVoltage" | "isCurrent") ?? false
 
 		const tikzOptions = componentMetadata.getElementsByTagName("options")[0]
 		if (tikzOptions) {

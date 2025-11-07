@@ -84,6 +84,8 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 	protected optionEnumProperties: Map<ChoiceProperty<ChoiceEntry>, EnumOption>
 	protected componentVariant: Variant
 
+	private isBattery: boolean = false
+
 	constructor(symbol: ComponentSymbol) {
 		super()
 		this.scaleState = new SVG.Point(1, 1)
@@ -108,6 +110,10 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		this.optionProperties = new Map()
 		this.optionEnumProperties = new Map()
+
+		if (symbol.componentClass == "batteries") {
+			this.isBattery = true
+		}
 
 		if (symbol.possibleOptions.length > 0 || symbol.possibleEnumOptions.length > 0) {
 			this.properties.add(
@@ -151,7 +157,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		this.componentVariant = symbol.getVariant(this.optionsFromProperties())
 
 		this.componentVisualization = CanvasController.instance.canvas.use(this.componentVariant.symbol)
-		this.componentVisualization.fill(defaultFill)
+		this.componentVisualization.fill("none")
 		this.componentVisualization.stroke(defaultStroke)
 		this.componentVisualization.node.style.color = defaultStroke
 
@@ -235,7 +241,8 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				new SVG.Point(this.componentVariant.viewBox.x2, this.componentVariant.viewBox.y2).sub(
 					this.componentVariant.mid
 				),
-				this.scaleState
+				this.scaleState,
+				{ isOpen: false, sourceType: this.isBattery ? "isBattery" : this.referenceSymbol.source }
 			)
 			this.voltageArrowRendering = voltageArrow.arrow
 			this.voltageRendering.add(this.voltageArrowRendering)
@@ -260,7 +267,8 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				new SVG.Point(this.componentVariant.viewBox.x2, this.componentVariant.viewBox.y2).sub(
 					this.componentVariant.mid
 				),
-				this.scaleState
+				this.scaleState,
+				{ isVoltageSource: this.referenceSymbol.source === "isVoltage" }
 			)
 			this.currentArrowRendering = currentArrow.arrow
 			this.currentRendering.add(this.currentArrowRendering)

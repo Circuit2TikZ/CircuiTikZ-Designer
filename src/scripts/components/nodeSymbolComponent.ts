@@ -125,7 +125,7 @@ export class NodeSymbolComponent extends NodeComponent {
 		this.defaultTextPosition = this.componentVariant.textPosition.point.add(this.componentVariant.mid)
 
 		this.componentVisualization = CanvasController.instance.canvas.use(this.componentVariant.symbol)
-		this.componentVisualization.fill(defaultFill)
+		this.componentVisualization.fill("none")
 		this.componentVisualization.stroke(defaultStroke)
 		this.componentVisualization.node.style.color = defaultStroke
 		this.referencePosition = this.componentVariant.mid

@@ -24,6 +24,10 @@ export type CurrentLabel = {
 	backwards?: boolean
 }
 
+export type CurrentOptions = {
+	isVoltageSource?: boolean
+}
+
 let currentDirectionBackward = false
 let currentPositionStart = false
 let currentLabelBelow = false
@@ -126,8 +130,13 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			end: SVG.Point,
 			northwestDelta: SVG.Point,
 			southeastDelta: SVG.Point,
-			scale: SVG.Point
+			scale: SVG.Point,
+			options?: CurrentOptions
 		): { arrow: SVG.Element; labelPos: SVG.Point; labelAnchorDir: SVG.Point } {
+			if (!options) {
+				options = {}
+			}
+
 			const group = new SVG.G()
 
 			const scaleFactor = Math.abs(scale.x)

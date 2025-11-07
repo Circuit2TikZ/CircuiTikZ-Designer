@@ -29,6 +29,7 @@ export type VoltageLabel = {
 
 export type VoltageArrowOptions = {
 	isOpen?: boolean
+	sourceType?: "isVoltage" | "isCurrent" | "isBattery" | false
 }
 
 const voltageDirectionChoices: ChoiceEntry[] = [
@@ -37,7 +38,7 @@ const voltageDirectionChoices: ChoiceEntry[] = [
 	{ key: "<", name: "backward" },
 ]
 const defaultVoltageDirectionChoice = voltageDirectionChoices[0]
-let voltageDirectionBackward = false
+let defaultVoltageDirectionBackward = false
 
 const voltagePositionChoices: ChoiceEntry[] = [
 	{ key: "", name: "default" },
@@ -45,7 +46,7 @@ const voltagePositionChoices: ChoiceEntry[] = [
 	{ key: "^", name: "above" },
 ]
 const defaultVoltagePositionChoice = voltagePositionChoices[0]
-let voltagePositionAbove = false
+let defaultVoltagePositionAbove = false
 
 const voltageStyleChoices: ChoiceEntry[] = [
 	{ key: "", name: "default" },
@@ -206,11 +207,11 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			let distanceFromNode = this.voltageDistanceFromNode.value.value
 			let bump = this.voltageBumpB.value.value
 			let shift = this.voltageShift.value.value
-			let directionBackwards = voltageDirectionBackward
+			let directionBackwards = defaultVoltageDirectionBackward
 			if (this.voltageDirection.value.key != defaultVoltageDirectionChoice.key) {
 				directionBackwards = this.voltageDirection.value.key == voltageDirectionChoices.at(-1).key
 			}
-			let positionAbove = voltagePositionAbove
+			let positionAbove = defaultVoltagePositionAbove
 			if (this.voltagePosition.value.key != defaultVoltagePositionChoice.key) {
 				positionAbove = this.voltagePosition.value.key == voltagePositionChoices.at(-1).key
 			}
