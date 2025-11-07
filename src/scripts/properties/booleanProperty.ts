@@ -4,11 +4,16 @@ export class BooleanProperty extends EditableProperty<boolean> {
 	private checkBox: HTMLInputElement
 	private label: string
 	private nullable: boolean
+	private checkBoxState: number = 0 //0=unchecked, 1=indeterminate, 2=checked
 
 	public constructor(label: string, initialValue?: boolean, nullable = false, tooltip = "", id: string = "") {
 		super(initialValue, tooltip, id)
 		this.label = label
 		this.nullable = nullable
+		this.checkBoxState =
+			this.value == undefined || this.value == null ? 1
+			: this.value ? 2
+			: 0 //0=unchecked, 1=indeterminate, 2=checked
 	}
 	public eq(first: boolean, second: boolean): boolean {
 		if (!this.nullable) {
@@ -39,22 +44,22 @@ export class BooleanProperty extends EditableProperty<boolean> {
 				if (this.nullable) {
 					//checkbox should cycle through checked, unchecked and indeterminate states
 
-					let checkboxState =
+					this.checkBoxState =
 						this.value == undefined || this.value == null ? 1
 						: this.value ? 2
 						: 0 //0=unchecked, 1=indeterminate, 2=checked
 					this.checkBox.addEventListener("change", (ev) => {
 						ev.preventDefault()
 
-						checkboxState = (checkboxState + 1) % 3
+						this.checkBoxState = (this.checkBoxState + 1) % 3
 
-						if (checkboxState === 0) {
+						if (this.checkBoxState === 0) {
 							this.checkBox.checked = false
 							this.checkBox.indeterminate = false
-						} else if (checkboxState === 1) {
+						} else if (this.checkBoxState === 1) {
 							this.checkBox.checked = false
 							this.checkBox.indeterminate = true
-						} else if (checkboxState === 2) {
+						} else if (this.checkBoxState === 2) {
 							this.checkBox.checked = true
 							this.checkBox.indeterminate = false
 						}
@@ -89,9 +94,11 @@ export class BooleanProperty extends EditableProperty<boolean> {
 	public updateHTML(): void {
 		if (this.checkBox) {
 			if (this.value == null) {
+				this.checkBoxState = 1
 				this.checkBox.indeterminate = true
 				this.checkBox.checked = false
 			} else {
+				this.checkBoxState = this.value ? 2 : 0
 				this.checkBox.indeterminate = false
 				this.checkBox.checked = this.value
 			}
