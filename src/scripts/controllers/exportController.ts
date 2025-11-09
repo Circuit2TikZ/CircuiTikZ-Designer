@@ -1,5 +1,12 @@
 import { Modal, Tooltip } from "bootstrap"
-import { SelectionController, MainController, defaultStroke, defaultFill, TextProperty } from "../internal"
+import {
+	SelectionController,
+	MainController,
+	defaultStroke,
+	defaultFill,
+	TextProperty,
+	EnvironmentVariableController,
+} from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
 import * as SVG from "@svgdotjs/svg.js"
@@ -122,7 +129,15 @@ export class ExportController {
 					"\\usetikzlibrary{" + requiredTikzLibraries.values().toArray().join(", ") + "}"
 				:	""
 
-			let arr = ["\\begin{tikzpicture}", "\t% Paths, nodes and wires:", ...circuitElements, "\\end{tikzpicture}"]
+			const tikzSettings = EnvironmentVariableController.instance.getTikzSettings()
+			let arr = [
+				"\\begin{tikzpicture}" +
+					(tikzSettings.environment.length > 0 ? "[" + tikzSettings.environment.join(",") + "]" : ""),
+				...tikzSettings.ctikzset.map((setting) => "\t\\ctikzset{" + setting + "}"),
+				"\t% Paths, nodes and wires:",
+				...circuitElements,
+				"\\end{tikzpicture}",
+			]
 			if (libraryStr) {
 				arr = [libraryStr].concat(arr)
 			}

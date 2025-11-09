@@ -5,6 +5,7 @@ import {
 	CircuitComponent,
 	DistributionMode,
 	EditableProperty,
+	EnvironmentVariableController,
 	GroupComponent,
 	MainController,
 	SectionHeaderProperty,
@@ -320,6 +321,10 @@ export class PropertyController {
 		})
 
 		this.changeGrid(CanvasController.instance.majorGridSizecm, CanvasController.instance.majorGridSubdivisions)
+
+		if (!document.getElementById("envVarView")) {
+			document.getElementById("view-properties").appendChild(EnvironmentVariableController.instance.getHTML())
+		}
 	}
 
 	public setSliderValues(majorSizecm: number, majorSubdivisions: number) {

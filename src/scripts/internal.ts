@@ -8,6 +8,7 @@ export * from "./controllers/selectionController"
 export * from "./controllers/undoController"
 export * from "./controllers/copyController"
 export * from "./controllers/propertiesController"
+export * from "./controllers/environmentVariableController"
 // properties
 export * from "./properties/editableProperty"
 export * from "./properties/booleanProperty"
