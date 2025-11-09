@@ -388,7 +388,7 @@ export class WireComponent extends Strokable(PathComponent) {
 		this.update()
 	}
 
-	protected update(): void {
+	public update(): void {
 		//recalculate the bounding box and position
 		this._bbox = bboxFromPoints(this.referencePoints)
 		this.position = new SVG.Point(this._bbox.cx, this._bbox.cy)

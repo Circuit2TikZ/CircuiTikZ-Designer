@@ -46,7 +46,7 @@ export class EllipseComponent extends ShapeComponent {
 		this.visualization.add(this.dragElement)
 	}
 
-	protected update(): void {
+	public update(): void {
 		super.update()
 		this.componentVisualization.center(this.referencePosition.x, this.referencePosition.y)
 		this.dragElement.center(this.referencePosition.x, this.referencePosition.y)

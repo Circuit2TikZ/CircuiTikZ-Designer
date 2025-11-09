@@ -283,7 +283,7 @@ export abstract class CircuitComponent {
 	/**
 	 * Update the component, it's visualization, snapping points, selection visuals and transform matrix/position
 	 */
-	protected abstract update(): void
+	public abstract update(): void
 
 	/**
 	 * update the graphics corresponding to the component selection visualization

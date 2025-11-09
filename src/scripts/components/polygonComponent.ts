@@ -202,7 +202,7 @@ export class PolygonComponent extends PositionLabelable(Strokable(Fillable(PathC
 	}
 
 	private size: SVG.Point
-	protected update(): void {
+	public update(): void {
 		let pointsArray: [number, number][] = this.referencePoints.map((point) => point.toArray())
 
 		const bbox = bboxFromPoints(this.referencePoints)

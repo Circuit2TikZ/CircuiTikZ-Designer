@@ -100,7 +100,7 @@ export abstract class ShapeComponent extends Strokable(Fillable(NodeComponent)) 
 		)
 	}
 
-	protected update(): void {
+	public update(): void {
 		let strokeWidth = this.strokeInfo.width.convertToUnit("px").value
 
 		let transformMatrix = this.getTransformMatrix()

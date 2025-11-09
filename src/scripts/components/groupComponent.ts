@@ -124,7 +124,7 @@ export class GroupComponent extends CircuitComponent {
 		}
 		this.update()
 	}
-	protected update(): void {
+	public update(): void {
 		this._bbox = undefined
 		for (const component of this.groupedComponents) {
 			if (this._bbox) {

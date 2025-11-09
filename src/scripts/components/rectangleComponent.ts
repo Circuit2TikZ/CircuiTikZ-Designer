@@ -257,7 +257,7 @@ export class RectangleComponent extends ShapeComponent {
 		return rectRectIntersection(rect, selectionRectangle, this.rotationDeg)
 	}
 
-	protected update(): void {
+	public update(): void {
 		super.update()
 		this.updateText()
 	}

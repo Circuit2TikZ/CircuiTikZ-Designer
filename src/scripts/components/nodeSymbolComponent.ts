@@ -211,7 +211,7 @@ export class NodeSymbolComponent extends NodeComponent {
 		}
 	}
 
-	protected update() {
+	public update() {
 		let m = this.getTransformMatrix()
 		this.componentVisualization.transform(m)
 		this._bbox = this.componentVariant.viewBox.transform(m)

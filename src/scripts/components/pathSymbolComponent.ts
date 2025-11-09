@@ -395,7 +395,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		}
 	}
 
-	protected update(): void {
+	public update(): void {
 		this.position = this.referencePoints[0].add(this.referencePoints[1]).div(2)
 
 		const angle = Math.atan2(
