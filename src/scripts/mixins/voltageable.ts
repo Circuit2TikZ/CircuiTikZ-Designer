@@ -31,6 +31,7 @@ export type VoltageLabel = {
 export type VoltageArrowOptions = {
 	isOpen?: boolean
 	sourceType?: "isVoltage" | "isCurrent" | "isBattery" | false
+	componentStyle?: "american" | "european" | "onlyLabel"
 }
 
 const voltageDirectionChoices: ChoiceEntry[] = [
@@ -200,33 +201,77 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			const scaleFactor = Math.abs(scale.x)
 
 			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
-			const globalVoltageDirection = globalSettings.voltageConvention
+			const globalVoltageConvention = globalSettings.voltageConvention
 			const globalVoltageStyle = globalSettings.voltages
+
+			const voltageStyle = this.voltageStyle.value.key || globalVoltageStyle
+			const voltageOrBattery =
+				options.sourceType != undefined ?
+					options.sourceType == "isVoltage" || options.sourceType == "isBattery"
+				:	false
+
+			const isBattery = options.sourceType != undefined ? options.sourceType == "isBattery" : false
 
 			let distanceFromNode = this.voltageDistanceFromNode.value.value
 			let bump = this.voltageBumpB.value.value
 			let shift = this.voltageShift.value.value
-			let directionBackwards = defaultVoltageDirectionBackward
-			if (this.voltageDirection.value.key != voltageDirectionChoices[0].key) {
-				directionBackwards = this.voltageDirection.value.key == voltageDirectionChoices.at(-1).key
-			}
-			let positionAbove = defaultVoltagePositionAbove
+			let positionAbove = voltageOrBattery // has the same default condition
 			if (this.voltagePosition.value.key != voltagePositionChoices[0].key) {
 				positionAbove = this.voltagePosition.value.key == voltagePositionChoices.at(-1).key
 			}
 			let above = positionAbove ? -1 : 1
 
-			let isEuropeanVoltage =
-				this.voltageStyle.value.key == "european" ||
-				this.voltageStyle.value.key == "straight" ||
-				(this.voltageStyle.value.key == "" &&
-					(globalVoltageStyle == "european" || globalVoltageStyle == "straight"))
-			let isStraightVoltage =
-				this.voltageStyle.value.key == "straight" ||
-				(this.voltageStyle.value.key == "" && globalVoltageStyle == "straight")
-			let isRaisedVoltage =
-				this.voltageStyle.value.key == "raised" ||
-				(this.voltageStyle.value.key == "" && globalVoltageStyle == "raised")
+			let isEuropean = voltageStyle == "european" || voltageStyle == "straight"
+			let isStraight = voltageStyle == "straight"
+			let isRaised = voltageStyle == "raised"
+
+			let directionBackwards = false
+			// come on circuitikz, this is so convoluted
+			if (this.voltageDirection.value.key != voltageDirectionChoices[0].key) {
+				// voltage direction is set locally
+				directionBackwards = this.voltageDirection.value.key == voltageDirectionChoices.at(-1).key
+
+				// TODO: should this rather be done when exporting?
+				// account for counting direction from global settings
+				if (!isEuropean) {
+					// only american voltages are affected by this
+					if (voltageOrBattery) {
+						directionBackwards = !directionBackwards
+					} else {
+						// for non voltage sources, invert the direction depending on the global setting
+						if (globalVoltageConvention == "old" || globalVoltageConvention == "RP") {
+							directionBackwards = !directionBackwards
+						}
+					}
+				}
+			} else {
+				// use global setting
+				if (options.sourceType) {
+					if (voltageOrBattery) {
+						if (!isEuropean) {
+							if (globalVoltageConvention == "RP" || globalVoltageConvention == "EF") {
+								directionBackwards = true
+							}
+						}
+					} else if (options.sourceType == "isCurrent") {
+						if (isEuropean) {
+							if (globalVoltageConvention != "RP") {
+								directionBackwards = true
+							}
+						} else {
+							if (globalVoltageConvention != "old") {
+								directionBackwards = true
+							}
+						}
+					}
+				} else {
+					if (isEuropean) {
+						if (globalVoltageConvention == "old" || globalVoltageConvention == "RP") {
+							directionBackwards = true
+						}
+					}
+				}
+			}
 
 			let diff = end.sub(start)
 			let angle = Math.atan2(diff.y, diff.x)
@@ -280,106 +325,105 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 			const labelOffset = new SVG.Point(0, above * 0.08 * cmtopx)
 
-			if (isEuropeanVoltage) {
+			if (isEuropean) {
 				//european
-
-				let d: string
-
 				let arrowPos: SVG.Point
 				let arrowAngle: number
 				const sin20 = 0.34202 // sin of 20 degrees
-
-				if (isStraightVoltage) {
-					//straight voltages
+				if (voltageOrBattery) {
+					// place flow arrow as voltage arrow since this is a voltage source
 					let bottom = new SVG.Point(0, sizing.y)
 					let Vfrom1 = Vfrom_flat.add(bottom)
 					let Vto1 = Vto_flat.add(bottom)
 					Vfrom = Vfrom1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
 					Vto = Vto1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
-
-					d = `M${Vfrom.toSVGPathString()}L${Vto.toSVGPathString()}`
-					arrowPos = Vto
-					arrowAngle = angle
-					if (directionBackwards) {
-						arrowAngle += Math.PI
-						arrowPos = Vfrom
-					}
-					labPos = Vfrom.add(Vto).div(2)
+					arrowPos = Vfrom.add(Vto).div(2)
+					let arrow = CanvasController.instance.canvas.use("node_flowarrow")
+					arrowAngle = angle + (directionBackwards ? Math.PI : 0)
+					arrow.transform(
+						new SVG.Matrix({
+							translate: [-13.49397, -2.91132],
+						}).lmultiply({
+							scale: 1,
+							rotate: (180 * arrowAngle) / Math.PI,
+							translate: arrowPos,
+						})
+					)
+					group.add(arrow)
+					labPos = arrowPos
 				} else {
-					//curved voltage arrows
-					let C110 = interpolate(
-						new SVG.Point(),
-						new SVG.Point(-sin20 * Math.abs(sizing.y), sizing.y),
-						bump * scaleFactor
-					)
-						.add(mid)
-						.add(new SVG.Point(0, absVShift))
-						.rotate(-angle, mid, true)
-					let C70 = interpolate(
-						new SVG.Point(),
-						new SVG.Point(sin20 * Math.abs(sizing.y), sizing.y),
-						bump * scaleFactor
-					)
-						.add(mid)
-						.add(new SVG.Point(0, absVShift))
-						.rotate(-angle, mid, true)
+					let d: string
 
-					Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
-					Vto = Vto_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
-					d = `M${Vfrom.toSVGPathString()}C${C110.toSVGPathString()} ${C70.toSVGPathString()} ${Vto.toSVGPathString()}`
+					if (isStraight) {
+						//straight voltages
+						let bottom = new SVG.Point(0, sizing.y)
+						let Vfrom1 = Vfrom_flat.add(bottom)
+						let Vto1 = Vto_flat.add(bottom)
+						Vfrom = Vfrom1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
+						Vto = Vto1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
 
-					labPos = C110.add(C70).div(2)
-
-					let arrowAngleDiff: SVG.Point
-					arrowPos = Vto
-					if (directionBackwards) {
-						arrowAngleDiff = Vfrom.sub(C110)
-						arrowPos = Vfrom
+						d = `M${Vfrom.toSVGPathString()}L${Vto.toSVGPathString()}`
+						arrowPos = Vto
+						arrowAngle = angle
+						if (directionBackwards) {
+							arrowAngle += Math.PI
+							arrowPos = Vfrom
+						}
+						labPos = Vfrom.add(Vto).div(2)
 					} else {
-						arrowAngleDiff = Vto.sub(C70)
+						//curved voltage arrows
+						let C110 = interpolate(
+							new SVG.Point(),
+							new SVG.Point(-sin20 * Math.abs(sizing.y), sizing.y),
+							bump * scaleFactor
+						)
+							.add(mid)
+							.add(new SVG.Point(0, absVShift))
+							.rotate(-angle, mid, true)
+						let C70 = interpolate(
+							new SVG.Point(),
+							new SVG.Point(sin20 * Math.abs(sizing.y), sizing.y),
+							bump * scaleFactor
+						)
+							.add(mid)
+							.add(new SVG.Point(0, absVShift))
+							.rotate(-angle, mid, true)
+
+						Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
+						Vto = Vto_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
+						d = `M${Vfrom.toSVGPathString()}C${C110.toSVGPathString()} ${C70.toSVGPathString()} ${Vto.toSVGPathString()}`
+
+						labPos = C110.add(C70).div(2)
+
+						let arrowAngleDiff: SVG.Point
+						arrowPos = Vto
+						if (directionBackwards) {
+							arrowAngleDiff = Vfrom.sub(C110)
+							arrowPos = Vfrom
+						} else {
+							arrowAngleDiff = Vto.sub(C70)
+						}
+						arrowAngle = Math.atan2(arrowAngleDiff.y, arrowAngleDiff.x)
 					}
-					arrowAngle = Math.atan2(arrowAngleDiff.y, arrowAngleDiff.x)
+
+					const path = new SVG.Path({ d: d })
+					path.fill("none").stroke({ color: defaultStroke, width: arrowStrokeWidth })
+					const arrowTip = CanvasController.instance.canvas.use("currarrow").fill(defaultStroke)
+					const arrowTipTransform = new SVG.Matrix({
+						translate: [-1.7 + (2 * arrowStrokeWidth) / arrowScale, -0.8],
+					}).lmultiply({
+						scale: arrowScale,
+						rotate: (180 * arrowAngle) / Math.PI,
+						translate: arrowPos,
+					})
+					arrowTip.transform(arrowTipTransform)
+
+					group.add(path)
+					group.add(arrowTip)
 				}
-
 				labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
-
-				const path = new SVG.Path({ d: d })
-				path.fill("none").stroke({ color: defaultStroke, width: arrowStrokeWidth })
-				const arrowTip = CanvasController.instance.canvas.use("currarrow").fill(defaultStroke)
-				const arrowTipTransform = new SVG.Matrix({
-					translate: [-1.7 + (2 * arrowStrokeWidth) / arrowScale, -0.8],
-				}).lmultiply({
-					scale: arrowScale,
-					rotate: (180 * arrowAngle) / Math.PI,
-					translate: arrowPos,
-				})
-				arrowTip.transform(arrowTipTransform)
-
-				group.add(path)
-				group.add(arrowTip)
 			} else {
 				//american
-				if (isRaisedVoltage) {
-					//raised voltages
-					let refHeight = 10
-					absVShift += above * refHeight
-					labelAnchor.x = 0
-					labelAnchor.y = 0
-				}
-
-				labPos = midTrans.add(new SVG.Point(0, sizing.y + absVShift))
-				Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift))
-				Vto = Vto_flat.add(new SVG.Point(0, absVShift))
-				if (isRaisedVoltage) {
-					//raised voltages
-					Vfrom.y = labPos.y
-					Vto.y = labPos.y
-				}
-
-				Vfrom = Vfrom.rotate(-angle, start, true)
-				Vto = Vto.rotate(-angle, start, true)
-				labPos = labPos.rotate(-angle, start, true)
-
 				const plus = new SVG.Path({ d: "M0 4.5 H9 M4.5 0V9" }).stroke({
 					linejoin: "round",
 					width: 0.5,
@@ -391,22 +435,100 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 					color: defaultStroke,
 				})
 
-				const plusBBox = plus.bbox()
-				const plusHalfSize = new SVG.Point(plusBBox.w / 2, plusBBox.h / 2)
-				const anchorOffset = plusHalfSize.add(plusHalfSize.mul(labelAnchor))
-				if (directionBackwards) {
-					plus.transform({ translate: Vto.sub(anchorOffset) })
-					minus.transform({ translate: Vfrom.sub(anchorOffset) })
+				if (voltageOrBattery) {
+					if (options.componentStyle != "onlyLabel") {
+						const sin35 = 0.574 // sin of 35 degrees
+
+						let signPos1 = interpolate(
+							new SVG.Point(),
+							new SVG.Point(-sin35 * Math.abs(sizing.y), sizing.y),
+							scaleFactor
+						)
+							.add(mid)
+							.rotate(-angle, mid, true)
+						let signPos2 = interpolate(
+							new SVG.Point(),
+							new SVG.Point(sin35 * Math.abs(sizing.y), sizing.y),
+							scaleFactor
+						)
+							.add(mid)
+							.rotate(-angle, mid, true)
+
+						const plusBBox = plus.bbox()
+						const plusHalfSize = new SVG.Point(plusBBox.w / 2, plusBBox.h / 2)
+						const anchorOffset = plusHalfSize.add(plusHalfSize.mul(labelAnchor))
+						if (directionBackwards) {
+							plus.transform({ translate: signPos2.sub(anchorOffset) })
+							minus.transform({ translate: signPos1.sub(anchorOffset) })
+						} else {
+							plus.transform({ translate: signPos1.sub(anchorOffset) })
+							minus.transform({ translate: signPos2.sub(anchorOffset) })
+						}
+						group.add(plus)
+						group.add(minus)
+						labPos = midTrans.add(
+							new SVG.Point(
+								0,
+								scaleFactor * sizing.y + absVShift + (Math.sign(sizing.y) * plusBBox.h) / 2
+							)
+						)
+						labPos = labPos.rotate(-angle, start, true)
+					} else {
+						if (isRaised) {
+							//raised voltages
+							let refHeight = 10
+							absVShift += above * refHeight
+							labelAnchor.x = 0
+							labelAnchor.y = 0
+						}
+
+						labPos = midTrans.add(new SVG.Point(0, sizing.y * scaleFactor + absVShift))
+						labPos = labPos.rotate(-angle, start, true)
+
+						if (!isRaised) {
+							labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
+						}
+					}
 				} else {
-					plus.transform({ translate: Vfrom.sub(anchorOffset) })
-					minus.transform({ translate: Vto.sub(anchorOffset) })
-				}
+					if (isRaised) {
+						//raised voltages
+						let refHeight = 10
+						absVShift += above * refHeight
+						labelAnchor.x = 0
+						labelAnchor.y = 0
+					}
 
-				group.add(plus)
-				group.add(minus)
+					labPos = midTrans.add(new SVG.Point(0, sizing.y + absVShift))
+					labPos = labPos.rotate(-angle, start, true)
 
-				if (!isRaisedVoltage) {
-					labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
+					Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift))
+					Vto = Vto_flat.add(new SVG.Point(0, absVShift))
+					if (isRaised) {
+						//raised voltages
+						Vfrom.y = labPos.y
+						Vto.y = labPos.y
+					}
+
+					Vfrom = Vfrom.rotate(-angle, start, true)
+					Vto = Vto.rotate(-angle, start, true)
+
+					const plusBBox = plus.bbox()
+					const plusHalfSize = new SVG.Point(plusBBox.w / 2, plusBBox.h / 2)
+					const anchorOffset = plusHalfSize.add(plusHalfSize.mul(labelAnchor))
+					if (directionBackwards) {
+						plus.transform({ translate: Vto.sub(anchorOffset) })
+						minus.transform({ translate: Vfrom.sub(anchorOffset) })
+					} else {
+						plus.transform({ translate: Vfrom.sub(anchorOffset) })
+						minus.transform({ translate: Vto.sub(anchorOffset) })
+					}
+
+					group.add(plus)
+					group.add(minus)
+
+					if (!isRaised) {
+						labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
+					}
 				}
 			}
 

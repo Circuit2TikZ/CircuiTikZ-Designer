@@ -32,6 +32,7 @@ import {
 	VoltageLabel,
 	Voltageable,
 	Currentable,
+	EnvironmentVariableController,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -216,7 +217,18 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		this.invert = new BooleanProperty("Invert", false, undefined, undefined, "manipulation:invert")
 		this.invert.addChangeListener((ev) => {
-			this.scaleState.x *= -1
+			let voltageConventionInvert = 1
+			if (
+				this.referenceSymbol.tikzName == "american voltage source" ||
+				this.referenceSymbol.tikzName == "american controlled voltage source"
+			) {
+				// in american voltage sources, the internal + and - are inverted, i.e. the symbol is inverted, if the voltage convention is old or RP
+				const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
+				if (globalSettings.voltageConvention == "old" || globalSettings.voltageConvention == "RP") {
+					voltageConventionInvert = -1
+				}
+			}
+			this.scaleState.x = (this.invert.value ? -1 : 1) * voltageConventionInvert
 			this.update()
 		})
 		this.properties.add(PropertyCategories.manipulation, this.invert)
@@ -234,7 +246,13 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 	protected updateVoltageRender() {
 		this.voltageArrowRendering?.remove()
+
 		if (this.voltageLabel.value != "") {
+			let onlyLabel =
+				this.referenceSymbol.tikzName == "american voltage source" ||
+				this.referenceSymbol.tikzName == "american controlled voltage source"
+			let isEuropean = this.referenceSymbol.tikzName.includes("european")
+			let isAmerican = this.referenceSymbol.tikzName.includes("american")
 			let voltageArrow = this.generateVoltageArrow(
 				this.referencePoints[0],
 				this.referencePoints[1],
@@ -243,7 +261,15 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 					this.componentVariant.mid
 				),
 				this.scaleState,
-				{ isOpen: false, sourceType: this.isBattery ? "isBattery" : this.referenceSymbol.source }
+				{
+					isOpen: false,
+					sourceType: this.isBattery ? "isBattery" : this.referenceSymbol.source,
+					componentStyle:
+						onlyLabel ? "onlyLabel"
+						: isEuropean ? "european"
+						: isAmerican ? "american"
+						: undefined,
+				}
 			)
 			this.voltageArrowRendering = voltageArrow.arrow
 			this.voltageRendering.add(this.voltageArrowRendering)
@@ -404,13 +430,26 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		)
 		this.rotationDeg = (angle * 180) / Math.PI
 
+		let voltageConventionInvert = false
+		if (
+			this.referenceSymbol.tikzName == "american voltage source" ||
+			this.referenceSymbol.tikzName == "american controlled voltage source"
+		) {
+			// in american voltage sources, the internal + and - are inverted, i.e. the symbol is inverted, if the voltage convention is old or RP
+			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
+			if (globalSettings.voltageConvention == "old" || globalSettings.voltageConvention == "RP") {
+				voltageConventionInvert = true
+			}
+			this.scaleState.x = Math.abs(this.scaleState.x) * (this.invert.value != voltageConventionInvert ? -1 : 1)
+		}
+
 		let m = this.getTransformMatrix()
 		this.componentVisualization.transform(m)
 
 		let startLineEndPoint = this.relSymbolStart.add(this.componentVariant.mid).transform(m)
 		let endLineStartPoint = this.relSymbolEnd.add(this.componentVariant.mid).transform(m)
 
-		if (this.invert.value) {
+		if (this.invert.value != voltageConventionInvert) {
 			let switchPos = startLineEndPoint
 			startLineEndPoint = endLineStartPoint
 			endLineStartPoint = switchPos

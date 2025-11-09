@@ -10,11 +10,6 @@ import {
 } from "../internal"
 import { resizeSVG } from "../utils/selectionHelper"
 
-export type PathOrientation = {
-	mirror: boolean
-	invert: boolean
-}
-
 export type PathSaveObject = ComponentSaveObject & {
 	points: SVG.Point[]
 }
