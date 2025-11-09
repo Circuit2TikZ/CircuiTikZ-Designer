@@ -15,6 +15,7 @@ import {
 	ChoiceEntry,
 	approxCompare,
 	interpolate,
+	EnvironmentVariableController,
 } from "../internal"
 
 export type VoltageLabel = {
@@ -37,7 +38,6 @@ const voltageDirectionChoices: ChoiceEntry[] = [
 	{ key: ">", name: "forward" },
 	{ key: "<", name: "backward" },
 ]
-const defaultVoltageDirectionChoice = voltageDirectionChoices[0]
 let defaultVoltageDirectionBackward = false
 
 const voltagePositionChoices: ChoiceEntry[] = [
@@ -45,7 +45,6 @@ const voltagePositionChoices: ChoiceEntry[] = [
 	{ key: "_", name: "below" },
 	{ key: "^", name: "above" },
 ]
-const defaultVoltagePositionChoice = voltagePositionChoices[0]
 let defaultVoltagePositionAbove = false
 
 const voltageStyleChoices: ChoiceEntry[] = [
@@ -55,10 +54,6 @@ const voltageStyleChoices: ChoiceEntry[] = [
 	{ key: "straight", name: "straight" },
 	{ key: "european", name: "european" },
 ]
-const defaultVoltageStyleChoice = voltageStyleChoices[0]
-let voltageEuropean = true
-let voltageStraight = false
-let voltageRaised = false
 
 const arrowStrokeWidth = 0.5
 const distanceFromLine = 0.08
@@ -107,7 +102,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.voltageStyle = new ChoiceProperty(
 				"Style",
 				voltageStyleChoices,
-				defaultVoltageStyleChoice,
+				voltageStyleChoices[0],
 				undefined,
 				"voltage:style"
 			)
@@ -117,7 +112,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.voltagePosition = new ChoiceProperty(
 				"Position",
 				voltagePositionChoices,
-				defaultVoltagePositionChoice,
+				voltagePositionChoices[0],
 				undefined,
 				"voltage:position"
 			)
@@ -127,7 +122,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.voltageDirection = new ChoiceProperty(
 				"Direction",
 				voltageDirectionChoices,
-				defaultVoltageDirectionChoice,
+				voltageDirectionChoices[0],
 				undefined,
 				"voltage:direction"
 			)
@@ -204,15 +199,19 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			let mirror = scale.y < 0
 			const scaleFactor = Math.abs(scale.x)
 
+			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
+			const globalVoltageDirection = globalSettings.voltageConvention
+			const globalVoltageStyle = globalSettings.voltages
+
 			let distanceFromNode = this.voltageDistanceFromNode.value.value
 			let bump = this.voltageBumpB.value.value
 			let shift = this.voltageShift.value.value
 			let directionBackwards = defaultVoltageDirectionBackward
-			if (this.voltageDirection.value.key != defaultVoltageDirectionChoice.key) {
+			if (this.voltageDirection.value.key != voltageDirectionChoices[0].key) {
 				directionBackwards = this.voltageDirection.value.key == voltageDirectionChoices.at(-1).key
 			}
 			let positionAbove = defaultVoltagePositionAbove
-			if (this.voltagePosition.value.key != defaultVoltagePositionChoice.key) {
+			if (this.voltagePosition.value.key != voltagePositionChoices[0].key) {
 				positionAbove = this.voltagePosition.value.key == voltagePositionChoices.at(-1).key
 			}
 			let above = positionAbove ? -1 : 1
@@ -220,9 +219,14 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			let isEuropeanVoltage =
 				this.voltageStyle.value.key == "european" ||
 				this.voltageStyle.value.key == "straight" ||
-				(this.voltageStyle.value.key == "" && voltageEuropean)
-			let isStraightVoltage = this.voltageStyle.value.key == "straight" || voltageStraight
-			let isRaisedVoltage = this.voltageStyle.value.key == "raised" || voltageRaised
+				(this.voltageStyle.value.key == "" &&
+					(globalVoltageStyle == "european" || globalVoltageStyle == "straight"))
+			let isStraightVoltage =
+				this.voltageStyle.value.key == "straight" ||
+				(this.voltageStyle.value.key == "" && globalVoltageStyle == "straight")
+			let isRaisedVoltage =
+				this.voltageStyle.value.key == "raised" ||
+				(this.voltageStyle.value.key == "" && globalVoltageStyle == "raised")
 
 			let diff = end.sub(start)
 			let angle = Math.atan2(diff.y, diff.x)
@@ -425,17 +429,15 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 					:	undefined
 				voltageLabel.shift = this.voltageShift.value.value != 0 ? this.voltageShift.value.value : undefined
 				voltageLabel.dir =
-					this.voltageDirection.value.key != defaultVoltageDirectionChoice.key ?
+					this.voltageDirection.value.key != voltageDirectionChoices[0].key ?
 						this.voltageDirection.value.key
 					:	undefined
 				voltageLabel.pos =
-					this.voltagePosition.value.key != defaultVoltagePositionChoice.key ?
+					this.voltagePosition.value.key != voltagePositionChoices[0].key ?
 						this.voltagePosition.value.key
 					:	undefined
 				voltageLabel.style =
-					this.voltageStyle.value.key != defaultVoltageStyleChoice.key ?
-						this.voltageStyle.value.key
-					:	undefined
+					this.voltageStyle.value.key != voltageStyleChoices[0].key ? this.voltageStyle.value.key : undefined
 				data.voltage = voltageLabel
 			}
 
@@ -478,10 +480,10 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				const options = to.options
 
 				let voltageString = "v"
-				if (this.voltagePosition.value.key != defaultVoltagePositionChoice.key) {
+				if (this.voltagePosition.value.key != voltagePositionChoices[0].key) {
 					voltageString += this.voltagePosition.value.key
 				}
-				if (this.voltageDirection.value.key != defaultVoltageDirectionChoice.key) {
+				if (this.voltageDirection.value.key != voltageDirectionChoices[0].key) {
 					voltageString += this.voltageDirection.value.key
 				}
 				voltageString += "=$" + this.voltageLabel.value + "$"
@@ -499,7 +501,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 					options.push("voltage/shift=" + this.voltageShift.value.value.toString())
 				}
 
-				if (this.voltageStyle.value.key != defaultVoltageStyleChoice.key) {
+				if (this.voltageStyle.value.key != voltageStyleChoices[0].key) {
 					options.push("voltage=" + this.voltageStyle.value.key)
 				}
 			}
