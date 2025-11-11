@@ -332,7 +332,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				const sin20 = 0.34202 // sin of 20 degrees
 				if (voltageOrBattery) {
 					// place flow arrow as voltage arrow since this is a voltage source
-					let bottom = new SVG.Point(0, sizing.y)
+					let bottom = new SVG.Point(0, sizing.y * scaleFactor)
 					let Vfrom1 = Vfrom_flat.add(bottom)
 					let Vto1 = Vto_flat.add(bottom)
 					Vfrom = Vfrom1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
@@ -344,19 +344,19 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 						new SVG.Matrix({
 							translate: [-13.49397, -2.91132],
 						}).lmultiply({
-							scale: 1,
+							scale: scaleFactor,
 							rotate: (180 * arrowAngle) / Math.PI,
 							translate: arrowPos,
 						})
 					)
 					group.add(arrow)
-					labPos = arrowPos
+					labPos = arrowPos.add(labelOffset.mul(scaleFactor).rotate(-angle, undefined, true))
 				} else {
 					let d: string
 
 					if (isStraight) {
 						//straight voltages
-						let bottom = new SVG.Point(0, sizing.y)
+						let bottom = new SVG.Point(0, sizing.y * scaleFactor)
 						let Vfrom1 = Vfrom_flat.add(bottom)
 						let Vto1 = Vto_flat.add(bottom)
 						Vfrom = Vfrom1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
@@ -420,8 +420,8 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 					group.add(path)
 					group.add(arrowTip)
+					labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
 				}
-				labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
 			} else {
 				//american
 				const plus = new SVG.Path({ d: "M0 4.5 H9 M4.5 0V9" }).stroke({
@@ -481,7 +481,6 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 							labelAnchor.x = 0
 							labelAnchor.y = 0
 						}
-
 						labPos = midTrans.add(new SVG.Point(0, sizing.y * scaleFactor + absVShift))
 						labPos = labPos.rotate(-angle, start, true)
 

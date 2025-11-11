@@ -216,21 +216,13 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		this.properties.add(PropertyCategories.manipulation, this.mirror)
 
 		this.invert = new BooleanProperty("Invert", false, undefined, undefined, "manipulation:invert")
+
 		this.invert.addChangeListener((ev) => {
-			let voltageConventionInvert = 1
-			if (
-				this.referenceSymbol.tikzName == "american voltage source" ||
-				this.referenceSymbol.tikzName == "american controlled voltage source"
-			) {
-				// in american voltage sources, the internal + and - are inverted, i.e. the symbol is inverted, if the voltage convention is old or RP
-				const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
-				if (globalSettings.voltageConvention == "old" || globalSettings.voltageConvention == "RP") {
-					voltageConventionInvert = -1
-				}
-			}
-			this.scaleState.x = (this.invert.value ? -1 : 1) * voltageConventionInvert
+			this.scaleState.x =
+				Math.abs(this.scaleState.x) * (this.invert.value ? -1 : 1) * this.voltageConventionInvert()
 			this.update()
 		})
+		this.scaleState.x = Math.abs(this.scaleState.x) * (this.invert.value ? -1 : 1) * this.voltageConventionInvert()
 		this.properties.add(PropertyCategories.manipulation, this.invert)
 
 		this.addInfo()
@@ -242,6 +234,22 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				.filter((_, index) => !(index == startPinIndex || index == endPinIndex))
 				.map((pin) => new SnapPoint(this, pin.name, pin.point.add(this.componentVariant.mid))),
 		]
+	}
+
+	private voltageConventionInvert() {
+		// TODO: also use this when loading the component in applyJson. otherwise, invert might be set incorrectly. make sure global settings are loaded before that
+		let voltageConventionInvert = 1
+		if (
+			this.referenceSymbol.tikzName == "american voltage source" ||
+			this.referenceSymbol.tikzName == "american controlled voltage source"
+		) {
+			// in american voltage sources, the internal + and - are inverted, i.e. the symbol is inverted, if the voltage convention is old or RP
+			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
+			if (globalSettings.voltageConvention == "old" || globalSettings.voltageConvention == "RP") {
+				voltageConventionInvert = -1
+			}
+		}
+		return voltageConventionInvert
 	}
 
 	protected updateVoltageRender() {
