@@ -438,18 +438,8 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		)
 		this.rotationDeg = (angle * 180) / Math.PI
 
-		let voltageConventionInvert = false
-		if (
-			this.referenceSymbol.tikzName == "american voltage source" ||
-			this.referenceSymbol.tikzName == "american controlled voltage source"
-		) {
-			// in american voltage sources, the internal + and - are inverted, i.e. the symbol is inverted, if the voltage convention is old or RP
-			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
-			if (globalSettings.voltageConvention == "old" || globalSettings.voltageConvention == "RP") {
-				voltageConventionInvert = true
-			}
-			this.scaleState.x = Math.abs(this.scaleState.x) * (this.invert.value != voltageConventionInvert ? -1 : 1)
-		}
+		let voltageConventionInvert = this.voltageConventionInvert() < 0
+		this.scaleState.x = Math.abs(this.scaleState.x) * (this.invert.value != voltageConventionInvert ? -1 : 1)
 
 		let m = this.getTransformMatrix()
 		this.componentVisualization.transform(m)
@@ -614,8 +604,12 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			data.options = this.componentVariant.options.map((option) => option.displayName ?? option.name)
 		}
 
-		if (this.scaleState && (this.scaleState.x != 1 || this.scaleState.y != 1)) {
-			data.scale = this.scaleState
+		if (this.scaleState) {
+			let scaleSave = this.scaleState.clone()
+			scaleSave.x *= this.voltageConventionInvert()
+			if (scaleSave && (scaleSave.x != 1 || scaleSave.y != 1)) {
+				data.scale = scaleSave
+			}
 		}
 
 		return data
@@ -680,7 +674,6 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		if (saveObject.scale) {
 			this.scaleState = new SVG.Point(saveObject.scale)
-			this.scaleProperty.updateValue(new SVG.Number(Math.abs(saveObject.scale.x)))
 		}
 		this.mirror.value = this.scaleState.y < 0
 		this.invert.value = this.scaleState.x < 0

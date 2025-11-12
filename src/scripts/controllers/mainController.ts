@@ -649,8 +649,7 @@ export class MainController {
 			if (closeTab) {
 				data.open = "false"
 			}
-			data.data.components = Undo.getCurrentState()
-			data.data.version = currentSaveVersion
+			data.data = Undo.getCurrentState()
 			if (data.data.components.length > 0) {
 				data.settings.gridVisible = CanvasController.instance.gridVisible
 				data.settings.majorGridSizecm = CanvasController.instance.majorGridSizecm

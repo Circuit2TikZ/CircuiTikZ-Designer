@@ -1,13 +1,26 @@
-import { ButtonGridProperty, ChoiceEntry, ChoiceProperty, MainController, SectionHeaderProperty } from "../internal"
+import {
+	ButtonGridProperty,
+	ChoiceEntry,
+	ChoiceProperty,
+	MainController,
+	SectionHeaderProperty,
+	Undo,
+} from "../internal"
 
 export type StylePreset = "default" | "american" | "european"
 
-export type GlobalTikzSettings = {
+type TikzSetting = {
 	environment: string[]
 	ctikzset: string[]
 }
 
-export type GlobalSettings = Record<OptionsChoice, string>
+export type GlobalTikzSettings = Record<OptionsChoice, string>
+
+// export type GlobalSettings = {
+// 	voltageStyle?: "american" | "european" | "straight" | "raised"
+// 	currentStyle?: "american" | "european"
+// 	voltageConvention?: "old" |"noold" |"RP" |"EF"
+// }
 
 type OptionsChoice =
 	| "voltages"
@@ -133,7 +146,7 @@ const STYLE_PRESETS: Record<StylePreset, Partial<Record<OptionsChoice, string>>>
 export class EnvironmentVariableController {
 	private static _instance: EnvironmentVariableController
 
-	private globalSettings: GlobalSettings
+	private globalSettings: GlobalTikzSettings
 
 	private htmlElement: HTMLDivElement
 
@@ -162,7 +175,7 @@ export class EnvironmentVariableController {
 
 		let defaults = STYLE_PRESETS["default"]
 
-		this.globalSettings = {} as GlobalSettings
+		this.globalSettings = {} as GlobalTikzSettings
 
 		for (const option of allOptions) {
 			let choiceProperty = new ChoiceProperty(
@@ -174,7 +187,8 @@ export class EnvironmentVariableController {
 
 			this.globalSettings[option.key] = defaults[option.key]
 
-			choiceProperty.addChangeListener(() => {
+			choiceProperty.addChangeListener((ev) => {
+				this.globalSettings[option.key] = ev.value.key
 				this.updateComponents()
 			})
 
@@ -182,12 +196,12 @@ export class EnvironmentVariableController {
 		}
 	}
 
-	public getGlobalSettings(): GlobalSettings {
+	public getGlobalSettings(): GlobalTikzSettings {
 		return this.globalSettings
 	}
 
 	private updateComponents() {
-		for (const key of Object.keys(this.globalSettings)) {
+		for (const key of this.propertyMap.keys()) {
 			this.globalSettings[key as OptionsChoice] = this.propertyMap.get(key as OptionsChoice).value.key
 		}
 		MainController.instance.circuitComponents.forEach((component) => {
@@ -246,7 +260,7 @@ export class EnvironmentVariableController {
 		return this.htmlElement
 	}
 
-	public getTikzSettings(): GlobalTikzSettings {
+	public getTikzSettings(): TikzSetting {
 		let environment: string[] = []
 		let ctikzset: string[] = []
 
@@ -270,5 +284,30 @@ export class EnvironmentVariableController {
 		}
 
 		return { environment, ctikzset }
+	}
+
+	public toJson() {
+		let saveSettings: GlobalTikzSettings = {} as GlobalTikzSettings
+		let defaults = STYLE_PRESETS["default"]
+		for (const key of Object.keys(this.globalSettings)) {
+			if (this.globalSettings[key as OptionsChoice] !== defaults[key as OptionsChoice]) {
+				saveSettings[key as OptionsChoice] = this.globalSettings[key as OptionsChoice]
+			}
+		}
+		return saveSettings
+	}
+
+	public fromJson(saveSettings: GlobalTikzSettings) {
+		let defaults = STYLE_PRESETS["default"]
+		Object.assign(this.globalSettings, defaults)
+		Object.assign(this.globalSettings, saveSettings)
+		for (const key of Object.keys(this.globalSettings)) {
+			let property = this.propertyMap.get(key as OptionsChoice)
+			property.updateValue(
+				property.entries.find((entry) => entry.key === this.globalSettings[key as OptionsChoice]),
+				true,
+				false
+			)
+		}
 	}
 }

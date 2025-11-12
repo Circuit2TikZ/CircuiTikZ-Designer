@@ -1,22 +1,37 @@
-import { MainController, SelectionController, SaveController, ComponentSaveObject, SelectionMode } from "../internal"
+import {
+	MainController,
+	SelectionController,
+	SaveController,
+	SelectionMode,
+	SaveFileFormat,
+	currentSaveVersion,
+	GlobalTikzSettings,
+	EnvironmentVariableController,
+} from "../internal"
 
 /**
  * Class handling undo and redo via save states
  * @class
  */
 export class Undo {
-	private static states: ComponentSaveObject[][] = []
+	private static states: SaveFileFormat[] = []
 
 	private static currentIndex = -1
 
 	//TODO discuss if selections should be remembered or not???
 	public static addState() {
 		// get json object
-		let currentState = []
+		let components = []
 		for (const component of MainController.instance.circuitComponents) {
 			let componentObject = component.toJson()
 			componentObject.selected = component.isSelected
-			currentState.push(componentObject)
+			components.push(componentObject)
+		}
+
+		let currentState: SaveFileFormat = {
+			version: currentSaveVersion,
+			tikzSettings: EnvironmentVariableController.instance.toJson(),
+			components: components,
 		}
 
 		let shouldAddState = true
@@ -66,8 +81,9 @@ export class Undo {
 		}
 
 		// load state
-		let state = Undo.states[Undo.currentIndex]
+		let state = Undo.states[Undo.currentIndex].components
 
+		EnvironmentVariableController.instance.fromJson(Undo.states[Undo.currentIndex].tikzSettings)
 		let components = []
 
 		for (const component of state) {

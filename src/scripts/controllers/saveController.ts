@@ -7,6 +7,8 @@ import {
 	CircuitComponent,
 	SelectionMode,
 	MainController,
+	GlobalTikzSettings,
+	EnvironmentVariableController,
 } from "../internal"
 import { version } from "../../../package.json"
 
@@ -15,11 +17,13 @@ export let currentSaveVersion = "0.1"
 
 export type SaveFileFormat = {
 	version: string
+	tikzSettings: GlobalTikzSettings
 	components: ComponentSaveObject[]
 }
 
 export let emtpySaveState: SaveFileFormat = {
 	version: currentSaveVersion,
+	tikzSettings: {} as GlobalTikzSettings,
 	components: [],
 }
 
@@ -73,7 +77,12 @@ export class SaveController {
 		for (const component of MainController.instance.circuitComponents) {
 			componentArray.push(component.toJson())
 		}
-		let data: SaveFileFormat = { version: currentSaveVersion, components: componentArray }
+		let settingsData = EnvironmentVariableController.instance.toJson()
+		let data: SaveFileFormat = {
+			version: currentSaveVersion,
+			tikzSettings: settingsData,
+			components: componentArray,
+		}
 
 		ExportController.instance.exportJSON(JSON.stringify(data, null, 4))
 	}
@@ -156,6 +165,11 @@ export class SaveController {
 			}
 		} else {
 			this.currentlyLoadedSaveVersion = saveFile.version
+
+			if (saveFile.tikzSettings) {
+				// check if tikzSettings are present and load them
+				EnvironmentVariableController.instance.fromJson(saveFile.tikzSettings)
+			}
 
 			for (const component of saveFile.components) {
 				let c = SaveController.fromJson(component)
