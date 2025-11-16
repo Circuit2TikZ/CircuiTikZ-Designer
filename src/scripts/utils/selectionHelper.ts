@@ -44,6 +44,10 @@ export function linelineIntersection(line1: SVG.Line | number[][], line2: SVG.Li
 }
 
 export function lineRectIntersection(line: SVG.Line | [[number, number], [number, number]], rect: SVG.Box) {
+	// shortcut if endpoint is inside rect
+	const l = line instanceof SVG.Line ? line.array() : line
+	if (pointInsideRect(l[0], rect) || pointInsideRect(l[1], rect)) return true
+
 	let boxPoints = [
 		[rect.x, rect.y],
 		[rect.x2, rect.y],
@@ -57,11 +61,6 @@ export function lineRectIntersection(line: SVG.Line | [[number, number], [number
 		if (linelineIntersection(line, [boxPoints[index], boxPoints[index + 1]])) {
 			return true
 		}
-	}
-
-	// line inside rect?
-	if (pointInsideRect(line instanceof SVG.Line ? new SVG.Point(line.cx(), line.cy()) : line[0], rect)) {
-		return true
 	}
 
 	return false
