@@ -14,6 +14,7 @@ import {
 	approxCompare,
 	interpolate,
 	BooleanProperty,
+	EnvironmentVariableController,
 } from "../internal"
 
 export type CurrentLabel = {
@@ -27,10 +28,6 @@ export type CurrentLabel = {
 export type CurrentOptions = {
 	isVoltageSource?: boolean
 }
-
-let currentDirectionBackward = false
-let currentPositionStart = false
-let currentLabelBelow = false
 
 const arrowStrokeWidth = 0.5
 const currentArrowScale = 16
@@ -61,6 +58,9 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 		protected currentDirection: BooleanProperty
 		protected currentLabelPosition: BooleanProperty
 
+		private defaultDirectionIsBackwards = false
+		private defaultPositionIsAtStart = false
+
 		constructor(...args: any[]) {
 			super(...args)
 			this.properties.add(
@@ -78,7 +78,7 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			})
 			this.properties.add(PropertyCategories.current, this.currentDirection)
 
-			this.currentLabelPosition = new BooleanProperty("Label below", null, true, undefined, "current:below")
+			this.currentLabelPosition = new BooleanProperty("Label below", false, false, undefined, "current:below")
 			this.currentLabelPosition.addChangeListener((ev) => {
 				this.updateCurrentRender()
 			})
@@ -133,9 +133,27 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 			let distance = this.currentDistance.value.value
 
-			let directionBackwards = this.currentDirection.value
-			let positionStart = this.currentPosition.value
+			const globalSettings = EnvironmentVariableController.instance.getGlobalSettings()
+			const globalVoltageConvention = globalSettings.voltageConvention
+
+			// overwrite default values if voltage source and voltage convention is noold or EF
+			const currentFlip =
+				options.isVoltageSource && (globalVoltageConvention == "noold" || globalVoltageConvention == "EF")
+			this.defaultDirectionIsBackwards = currentFlip
+			this.defaultPositionIsAtStart = currentFlip
+
+			// init default values
+			let directionBackwards = this.defaultDirectionIsBackwards
+			let positionStart = this.defaultPositionIsAtStart
 			let labelPositionBelow = this.currentLabelPosition.value
+
+			// overwrite default values for position and direction if set explicitly
+			if (this.currentPosition.value != null) {
+				positionStart = this.currentPosition.value
+			}
+			if (this.currentDirection.value != null) {
+				directionBackwards = this.currentDirection.value
+			}
 
 			let labelBelow = labelPositionBelow ? -1 : 1
 
@@ -143,7 +161,7 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			let angle = Math.atan2(diff.y, diff.x)
 			let endTrans = end.rotate(angle, start, true)
 
-			// in which direction the the anchor of the current label should point
+			// in which direction the anchor of the current label should point
 			const sin4 = 0.06976 // the sin of 4 degrees
 			let labelAnchor = new SVG.Point(
 				approxCompare(Math.sin(angle), 0, sin4),
@@ -189,8 +207,8 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				const currentLabel: CurrentLabel = { label: this.currentLabel.value }
 				currentLabel.dist =
 					this.currentDistance.value.value != 0.5 ? this.currentDistance.value.value : undefined
-				currentLabel.backwards = this.currentDirection.value ? true : undefined
-				currentLabel.start = this.currentPosition.value ? true : undefined
+				currentLabel.backwards = this.currentDirection.value != null ? this.currentDirection.value : undefined
+				currentLabel.start = this.currentPosition.value != null ? this.currentPosition.value : undefined
 				currentLabel.below = this.currentLabelPosition.value ? true : undefined
 				data.current = currentLabel
 			}
@@ -206,12 +224,9 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				if (saveObject.current.dist) {
 					this.currentDistance.value = new SVG.Number(saveObject.current.dist, "")
 				}
-				if (saveObject.current.backwards) {
-					this.currentDirection.value = true
-				}
-				if (saveObject.current.start) {
-					this.currentPosition.value = true
-				}
+				this.currentDirection.value =
+					saveObject.current.backwards != undefined ? saveObject.current.backwards : null
+				this.currentPosition.value = saveObject.current.start != undefined ? saveObject.current.start : null
 				if (saveObject.current.below) {
 					this.currentLabelPosition.value = true
 				}
@@ -223,28 +238,50 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			if (this.currentLabel.value != "") {
 				const options = to.options
 
-				let currentString = "i"
-				let labelPosString = this.currentLabelPosition.value ? "_" : "^"
-				let dirString = this.currentDirection.value ? "<" : ">"
+				// init default values
+				let directionBackwards = this.defaultDirectionIsBackwards
+				let positionStart = this.defaultPositionIsAtStart
+				let labelPositionBelow = this.currentLabelPosition.value
 
-				if (this.currentPosition.value) {
-					// if position is start, the label position comes after the direction and both are required, exept:
-					if (this.currentLabelPosition.value == false && this.currentDirection.value == true) {
-						// if direction is backward and the label position is default above, the label position is not required
+				// overwrite default values for position and direction if set explicitly
+				if (this.currentPosition.value != null) {
+					positionStart = this.currentPosition.value
+				}
+				if (this.currentDirection.value != null) {
+					directionBackwards = this.currentDirection.value
+				}
+
+				let currentString = "i"
+				let labelPosString = labelPositionBelow ? "_" : "^"
+				let dirString = directionBackwards ? "<" : ">"
+
+				if (
+					positionStart == this.defaultPositionIsAtStart &&
+					directionBackwards == this.defaultDirectionIsBackwards
+				) {
+					// only the label is required if both the direction and the position are default
+					if (!labelPositionBelow) {
+						// if the label position is default above, the label is also not required
 						labelPosString = ""
 					}
-					currentString += dirString + labelPosString
+					currentString += labelPosString
 				} else {
-					// if position is end, the label position comes before the direction
-					if (this.currentDirection.value == false) {
-						// if direction is forward the label position is not required
-						dirString = ""
-						if (this.currentLabelPosition.value == false) {
-							// if the label position is default above and the direction is forward, the label position is also not required
-							labelPosString = ""
-						}
+					// the direction and the label position are required with their order being determined by position
+
+					if (
+						!labelPositionBelow &&
+						directionBackwards == positionStart &&
+						positionStart == this.defaultPositionIsAtStart
+					) {
+						// exception: the label position is not required if the label position is default above and the direction is the same as the position
+						labelPosString = ""
 					}
-					currentString += labelPosString + dirString
+
+					if (positionStart) {
+						currentString += dirString + labelPosString
+					} else {
+						currentString += labelPosString + dirString
+					}
 				}
 
 				currentString += "=$" + this.currentLabel.value + "$"

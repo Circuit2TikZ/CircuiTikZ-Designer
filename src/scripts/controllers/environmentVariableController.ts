@@ -1,11 +1,4 @@
-import {
-	ButtonGridProperty,
-	ChoiceEntry,
-	ChoiceProperty,
-	MainController,
-	SectionHeaderProperty,
-	Undo,
-} from "../internal"
+import { ButtonGridProperty, ChoiceEntry, ChoiceProperty, MainController, SectionHeaderProperty } from "../internal"
 
 export type StylePreset = "default" | "american" | "european"
 
@@ -24,7 +17,7 @@ export type GlobalTikzSettings = Record<OptionsChoice, string>
 
 type OptionsChoice =
 	| "voltages"
-	| "currents"
+	// | "currents"
 	// | "resistors"
 	// | "inductors"
 	// | "logic"
@@ -52,15 +45,15 @@ const voltageOption: GlobalOption = {
 	],
 }
 
-const currentOption: GlobalOption = {
-	key: "currents",
-	name: "Current Style",
-	tikz: "environment",
-	choices: [
-		{ key: "american", name: "American Currents", tikz: "american currents" },
-		{ key: "european", name: "European Currents", tikz: "european currents" },
-	],
-}
+// const currentOption: GlobalOption = {
+// 	key: "currents",
+// 	name: "Current Style",
+// 	tikz: "environment",
+// 	choices: [
+// 		{ key: "american", name: "American Currents", tikz: "american currents" },
+// 		{ key: "european", name: "European Currents", tikz: "european currents" },
+// 	],
+// }
 
 // const resistorOption: GlobalOption = {
 // 	key: "resistors",
@@ -120,7 +113,7 @@ const labelOrientationOption: GlobalOption = {
 const STYLE_PRESETS: Record<StylePreset, Partial<Record<OptionsChoice, string>>> = {
 	default: {
 		voltages: "european",
-		currents: "european",
+		// currents: "european",
 		// resistors: "american",
 		// inductors: "cute",
 		// logic: "american",
@@ -128,14 +121,14 @@ const STYLE_PRESETS: Record<StylePreset, Partial<Record<OptionsChoice, string>>>
 		labelOrientation: "smart",
 	},
 	american: {
-		currents: "american",
+		// currents: "american",
 		voltages: "american",
 		// resistors: "american",
 		// inductors: "american",
 		// logic: "american",
 	},
 	european: {
-		currents: "european",
+		// currents: "european",
 		voltages: "european",
 		// resistors: "european",
 		// inductors: "european",
@@ -165,7 +158,7 @@ export class EnvironmentVariableController {
 
 		const allOptions = [
 			voltageOption,
-			currentOption,
+			// currentOption,
 			// resistorOption,
 			// inductorOption,
 			// logicOption,

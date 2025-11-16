@@ -231,7 +231,6 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				// voltage direction is set locally
 				directionBackwards = this.voltageDirection.value.key == voltageDirectionChoices.at(-1).key
 
-				// TODO: should this rather be done when exporting?
 				// account for counting direction from global settings
 				if (!isEuropean) {
 					// only american voltages are affected by this

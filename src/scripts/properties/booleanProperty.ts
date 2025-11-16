@@ -111,7 +111,7 @@ export class BooleanProperty extends EditableProperty<boolean> {
 		const result = new BooleanProperty(
 			this.label,
 			allEqual ? this.value : null,
-			allEqual ? this.nullable : false,
+			this.nullable,
 			this.tooltip,
 			this.id
 		)

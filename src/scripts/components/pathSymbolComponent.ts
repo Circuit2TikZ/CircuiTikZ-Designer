@@ -237,7 +237,6 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 	}
 
 	private voltageConventionInvert() {
-		// TODO: also use this when loading the component in applyJson. otherwise, invert might be set incorrectly. make sure global settings are loaded before that
 		let voltageConventionInvert = 1
 		if (
 			this.referenceSymbol.tikzName == "american voltage source" ||
