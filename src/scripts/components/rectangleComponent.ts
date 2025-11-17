@@ -441,16 +441,23 @@ export class RectangleComponent extends ShapeComponent {
 				"\n": "\\\\",
 			}
 			const mathjaxParser = new MathjaxParser()
-			const sections: string[] = []
-			const textSections = mathjaxParser.parse(this.textAreaProperty.value)
-			for (const section of textSections) {
-				if (section.type == "text") {
-					sections.push(section.text.replaceAll(/[\#\%\$\&\_\{\}\~\^\\\n]/g, (match) => replaceDict[match]))
-				} else {
-					sections.push("$" + section.text + "$")
+			const lineSections: string[] = []
+			const explicitInputLines = this.textAreaProperty.value.split("\n").map((line) => line.trim())
+			for (const inputLine of explicitInputLines) {
+				const parsedLine = mathjaxParser.parse(inputLine)
+				const lineElements = []
+				for (const element of parsedLine) {
+					if (element.type == "text") {
+						lineElements.push(
+							element.text.replaceAll(/[\#\%\$\&\_\{\}\~\^\\\n]/g, (match) => replaceDict[match])
+						)
+					} else {
+						lineElements.push("$" + element.text + "$")
+					}
 				}
+				lineSections.push(lineElements.join(" "))
 			}
-			let escapedText = sections.join(" ")
+			let escapedText = lineSections.join("\\\\")
 
 			let fontStr = this.textFontSize.value.key == defaultFontSize.key ? "" : `\\${this.textFontSize.value.name} `
 			let latexStr = `${fontStr}${escapedText}`
