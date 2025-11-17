@@ -105,7 +105,7 @@ const labelOrientationOption: GlobalOption = {
 	tikz: "ctikzset",
 	choices: [
 		{ key: "smart", name: "Smart Label Orientation", tikz: "label/align=smart" },
-		{ key: "rotated", name: "Rotated Label Orientation", tikz: "label/align=rotate" },
+		{ key: "rotate", name: "Rotated Label Orientation", tikz: "label/align=rotate" },
 		{ key: "straight", name: "Straight Label Orientation", tikz: "label/align=straight" },
 	],
 }

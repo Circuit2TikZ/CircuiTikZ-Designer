@@ -711,8 +711,10 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		}
 		let labelSVG = this.labelRendering
 		// breaking points where the label is parallel to the path or to the x axis. in degrees
-		const breakVertical = 70
-		const breakHorizontal = 21
+		let breakVertical = 70
+		let breakHorizontal = 21
+
+		const globalSettings = EnvironmentVariableController.instance.getGlobalSettings().labelOrientation
 
 		let pathDiff = this.referencePoints[1].sub(this.referencePoints[0])
 
@@ -747,33 +749,40 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			referenceoffsetY += symbolBBox.h * Math.abs(this.scaleState.y)
 		}
 
-		// if the path is close to horizontal or vertical according to the break points
-		let nearHorizontal =
-			Math.abs(this.rotationDeg) < breakHorizontal || Math.abs(this.rotationDeg) > 180 - breakHorizontal
-		let nearVertical =
-			Math.abs(this.rotationDeg) > breakVertical && Math.abs(this.rotationDeg) < 180 - breakVertical
+		if (globalSettings != "rotate") {
+			if (globalSettings == "straight") {
+				breakHorizontal = 46
+				breakVertical = 46
+			}
 
-		if (nearHorizontal) {
-			// the label should not be rotated w.r.t. the x axis
-			rotAngle = 0
-			let right = Math.sign(pathDiff.x)
-			let up = Math.sign(this.rotationDeg)
-			//the offset where the rotation pivot point should lie (for both label and symbol)
-			let horizontalOffset = Math.min(labelHalfSize.x, symbolHalfSize.x) * up
-			referenceOffsetX = horizontalOffset * right * other
-			labelRef.x += horizontalOffset * other
-		} else if (nearVertical) {
-			// the label should not be rotated w.r.t. the x axis
-			rotAngle = 0
-			let right = Math.sign(pathDiff.x)
-			let up = Math.sign(this.rotationDeg)
-			//the offset where the rotation pivot point should lie (for both label and symbol)
-			let verticalOffset = Math.min(labelHalfSize.y, symbolHalfSize.x) * right * other
+			// if the path is close to horizontal or vertical according to the break points
+			let nearHorizontal =
+				Math.abs(this.rotationDeg) < breakHorizontal || Math.abs(this.rotationDeg) > 180 - breakHorizontal
+			let nearVertical =
+				Math.abs(this.rotationDeg) > breakVertical && Math.abs(this.rotationDeg) < 180 - breakVertical
 
-			referenceOffsetX = -verticalOffset * up
+			if (nearHorizontal) {
+				// the label should not be rotated w.r.t. the x axis
+				rotAngle = 0
+				let right = Math.sign(pathDiff.x)
+				let up = Math.sign(this.rotationDeg)
+				//the offset where the rotation pivot point should lie (for both label and symbol)
+				let horizontalOffset = Math.min(labelHalfSize.x, symbolHalfSize.x) * up
+				referenceOffsetX = horizontalOffset * right * other
+				labelRef.x += horizontalOffset * other
+			} else if (nearVertical) {
+				// the label should not be rotated w.r.t. the x axis
+				rotAngle = 0
+				let right = Math.sign(pathDiff.x)
+				let up = Math.sign(this.rotationDeg)
+				//the offset where the rotation pivot point should lie (for both label and symbol)
+				let verticalOffset = Math.min(labelHalfSize.y, symbolHalfSize.x) * right * other
 
-			labelRef.y = labelBBox.cy + verticalOffset
-			labelRef.x += labelHalfSize.x * (up * other)
+				referenceOffsetX = -verticalOffset * up
+
+				labelRef.y = labelBBox.cy + verticalOffset
+				labelRef.x += labelHalfSize.x * (up * other)
+			}
 		}
 
 		referenceoffsetY -= other * (this.labelDistance.value ? this.labelDistance.value.convertToUnit("px").value : 0)
