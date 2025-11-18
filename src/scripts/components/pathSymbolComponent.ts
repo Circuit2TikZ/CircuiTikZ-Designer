@@ -15,11 +15,9 @@ import {
 	ChoiceEntry,
 	ChoiceProperty,
 	EnumOption,
-	PathLabel,
 	PathSaveObject,
 	SymbolOption,
 	Variant,
-	defaultFill,
 	PathLabelable,
 	InfoProperty,
 	CircuitComponent,
@@ -29,20 +27,34 @@ import {
 	CircuitikzTo,
 	SaveController,
 	buildTikzStringFromPathCommand,
-	VoltageLabel,
 	Voltageable,
 	Currentable,
 	EnvironmentVariableController,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
+//TODO: add "line join" to poles, i.e. dot (.): this is essentially just a square with side length = line width (chapter 6.4 in documentation)
+export type PoleEntry = { key: string; name: string; shortcut: string }
+const poleChoices: PoleEntry[] = [
+	{ key: "none", name: "none", shortcut: "" },
+	{ key: "circ", name: "circ", shortcut: "*" },
+	{ key: "ocirc", name: "ocirc", shortcut: "o" },
+	{ key: "diamondpole", name: "diamond", shortcut: "d" },
+	{ key: "odiamondpole", name: "odiamond", shortcut: null },
+	{ key: "squarepole", name: "square", shortcut: null },
+	{ key: "osquarepole", name: "osquare", shortcut: null },
+]
+
+export type Pole = {
+	start?: string
+	end?: string
+}
+
 export type PathSymbolSaveObject = PathSaveObject & {
 	id: string
 	scale?: SVG.Point
-	name?: string
 	options?: string[]
-	label?: PathLabel
-	voltage?: VoltageLabel
+	poles?: Pole
 }
 
 export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(Nameable(PathComponent)))) {
@@ -59,6 +71,9 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 	private selectionRect: SVG.Rect
 	private dragStartLine: SVG.Line
 	private dragEndLine: SVG.Line
+
+	private poleStartElement: SVG.Element
+	private poleEndElement: SVG.Element
 	/**
 	 * the vector in local coordinates from componentVariant.mid to the point where the first half of the path line should end
 	 */
@@ -72,6 +87,9 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 	private mirror: BooleanProperty
 	private invert: BooleanProperty
+
+	private poleStart: ChoiceProperty<PoleEntry>
+	private poleEnd: ChoiceProperty<PoleEntry>
 
 	protected scaleProperty: SliderProperty
 
@@ -106,6 +124,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				Math.sign(this.scaleState.y) * ev.value.value
 			)
 			this.update()
+			this.updatePoles()
 		})
 		this.properties.add(PropertyCategories.manipulation, this.scaleProperty)
 
@@ -115,6 +134,27 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		if (symbol.componentClass == "batteries") {
 			this.isBattery = true
 		}
+
+		this.properties.add(
+			PropertyCategories.options,
+			new SectionHeaderProperty("Poles", undefined, "options:poles_header")
+		)
+		this.poleStart = new ChoiceProperty<PoleEntry>(
+			"Start",
+			poleChoices,
+			poleChoices[0],
+			undefined,
+			"options:poles_start"
+		)
+		this.poleEnd = new ChoiceProperty<PoleEntry>("End", poleChoices, poleChoices[0], undefined, "options:poles_end")
+		this.poleStart.addChangeListener((ev) => {
+			this.updatePoles()
+		})
+		this.poleEnd.addChangeListener((ev) => {
+			this.updatePoles()
+		})
+		this.properties.add(PropertyCategories.options, this.poleStart)
+		this.properties.add(PropertyCategories.options, this.poleEnd)
 
 		if (symbol.possibleOptions.length > 0 || symbol.possibleEnumOptions.length > 0) {
 			this.properties.add(
@@ -412,6 +452,48 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		]
 		this.update()
 	}
+	private updatePoles() {
+		this.poleStartElement?.remove()
+		this.poleEndElement?.remove()
+		this.poleStartElement = null
+		this.poleEndElement = null
+
+		if (this.poleStart.value.key != "none") {
+			this.poleStartElement = CanvasController.instance.canvas.use("node_" + this.poleStart.value.key)
+			this.visualization.add(this.poleStartElement)
+		}
+
+		if (this.poleEnd.value.key != "none") {
+			this.poleEndElement = CanvasController.instance.canvas.use("node_" + this.poleEnd.value.key)
+			this.visualization.add(this.poleEndElement)
+		}
+
+		this.updatePolePositions()
+	}
+	private updatePolePositions() {
+		if (this.poleStartElement) {
+			const bbox = this.poleStartElement.bbox()
+			const point = new SVG.Point(bbox.w / 2, bbox.h / 2)
+			this.poleStartElement.transform(
+				new SVG.Matrix({
+					scale: Math.abs(this.scaleState.x),
+					translate: point.mul(-1),
+					origin: point,
+				}).lmultiply({ translate: this.referencePoints[0] })
+			)
+		}
+		if (this.poleEndElement) {
+			const bbox = this.poleEndElement.bbox()
+			const point = new SVG.Point(bbox.w / 2, bbox.h / 2)
+			this.poleEndElement.transform(
+				new SVG.Matrix({
+					scale: Math.abs(this.scaleState.x),
+					translate: point.mul(-1),
+					origin: point,
+				}).lmultiply({ translate: this.referencePoints[1] })
+			)
+		}
+	}
 
 	public getSnappingInfo(): SnappingInfo {
 		if (this.finishedPlacing) {
@@ -489,6 +571,8 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			endLineStartPoint.x,
 			endLineStartPoint.y
 		)
+
+		this.updatePolePositions()
 
 		this.updatePathLabel()
 		this.updateVoltageRender()
@@ -611,6 +695,14 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			}
 		}
 
+		if (this.poleStartElement || this.poleEndElement) {
+			const poles: Pole = {
+				start: this.poleStart.value.key != "none" ? this.poleStart.value.key : undefined,
+				end: this.poleEnd.value.key != "none" ? this.poleEnd.value.key : undefined,
+			}
+			data.poles = poles
+		}
+
 		return data
 	}
 
@@ -634,6 +726,14 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		}
 		if (this.invert.value) {
 			options.push("invert")
+		}
+
+		if (this.poleStartElement || this.poleEndElement) {
+			if (this.poleStart.value.shortcut != null && this.poleEnd.value.shortcut != null) {
+				options.push(this.poleStart.value.shortcut + "-" + this.poleEnd.value.shortcut)
+			} else {
+				options.push("bipole nodes={" + this.poleStart.value.key + "}{" + this.poleEnd.value.key + "}")
+			}
 		}
 
 		const scaleFactor =
@@ -678,8 +778,18 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		this.invert.value = this.scaleState.x < 0
 		this.scaleProperty.value = new SVG.Number(Math.abs(this.scaleState.x))
 
+		if (saveObject.poles) {
+			if (saveObject.poles.start != undefined) {
+				this.poleStart.value = poleChoices.find((choice) => choice.key == saveObject.poles.start)
+			}
+			if (saveObject.poles.end != undefined) {
+				this.poleEnd.value = poleChoices.find((choice) => choice.key == saveObject.poles.end)
+			}
+		}
+
 		this.update()
 		this.visualization.show()
+		this.updatePoles()
 	}
 
 	public static fromJson(saveObject: PathSymbolSaveObject): PathSymbolComponent {
