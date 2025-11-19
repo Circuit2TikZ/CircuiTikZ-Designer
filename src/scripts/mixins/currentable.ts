@@ -27,6 +27,7 @@ export type CurrentLabel = {
 
 export type CurrentOptions = {
 	isVoltageSource?: boolean
+	isShort?: boolean
 }
 
 const arrowStrokeWidth = 0.5
@@ -174,8 +175,11 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 			const arrowScale = (cmtopx * defaultRlen) / (currentArrowScale / scaleFactor) + 2 * arrowStrokeWidth
 
-			const arrowPositionTrans =
+			let arrowPositionTrans =
 				positionStart ? interpolate(start, compStart, distance) : interpolate(compEnd, endTrans, distance)
+			if (options.isShort) {
+				arrowPositionTrans = interpolate(start, endTrans, distance)
+			}
 			const arrowPos = arrowPositionTrans.rotate(-angle, start, true)
 
 			const labelOffset = new SVG.Point(0, -labelBelow * 0.12 * cmtopx)

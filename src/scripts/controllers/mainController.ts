@@ -33,6 +33,7 @@ import {
 	currentSaveVersion,
 	loadTextConverter,
 	TextProperty,
+	ShortComponent,
 } from "../internal"
 
 type TabState = {
@@ -928,6 +929,32 @@ export class MainController {
 
 		const accordionItemBody = accordionItemCollapse.appendChild(document.createElement("div"))
 		accordionItemBody.classList.add("accordion-body", "iconLibAccordionBody")
+
+		//Add Short
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "short path")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Short"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new ShortComponent()
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -14, 30, 15)
+			svgIcon.line(0, -7, 29, -7).stroke({ color: defaultStroke, width: 2 })
+		}
 
 		//Add Text
 		{

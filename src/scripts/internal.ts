@@ -43,6 +43,7 @@ export * from "./components/rectangleComponent"
 export * from "./components/ellipseComponent"
 export * from "./components/polygonComponent"
 export * from "./components/groupComponent"
+export * from "./components/shortComponent"
 // snapDrag
 export * from "./snapDrag/dragHandlers"
 export * from "./snapDrag/snapController"

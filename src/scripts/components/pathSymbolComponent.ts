@@ -35,7 +35,7 @@ import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize 
 
 //TODO: add "line join" to poles, i.e. dot (.): this is essentially just a square with side length = line width (chapter 6.4 in documentation)
 export type PoleEntry = { key: string; name: string; shortcut: string }
-const poleChoices: PoleEntry[] = [
+export const poleChoices: PoleEntry[] = [
 	{ key: "none", name: "none", shortcut: "" },
 	{ key: "circ", name: "circ", shortcut: "*" },
 	{ key: "ocirc", name: "ocirc", shortcut: "o" },
