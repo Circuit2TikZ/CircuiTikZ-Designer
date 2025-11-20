@@ -34,6 +34,7 @@ import {
 	loadTextConverter,
 	TextProperty,
 	ShortComponent,
+	OpenComponent,
 } from "../internal"
 
 type TabState = {
@@ -954,6 +955,33 @@ export class MainController {
 			let svgIcon = SVG.SVG().addTo(addButton)
 			svgIcon.viewbox(-1, -14, 30, 15)
 			svgIcon.line(0, -7, 29, -7).stroke({ color: defaultStroke, width: 2 })
+		}
+
+		//Add Open
+		{
+			const addButton: HTMLDivElement = accordionItemBody.appendChild(document.createElement("div"))
+			addButton.classList.add("libComponent")
+			addButton.setAttribute("searchData", "open path")
+			addButton.ariaRoleDescription = "button"
+			addButton.title = "Open"
+
+			const listener = (ev: MouseEvent) => {
+				ev.preventDefault()
+
+				this.switchMode(Modes.DRAG_PAN)
+				let newComponent = new OpenComponent()
+				ComponentPlacer.instance.placeComponent(newComponent)
+
+				leftOffcanvasOC.hide()
+			}
+
+			addButton.addEventListener("mouseup", listener)
+			addButton.addEventListener("touchstart", listener, { passive: false })
+
+			let svgIcon = SVG.SVG().addTo(addButton)
+			svgIcon.viewbox(-1, -14, 30, 15)
+			svgIcon.circle(5).fill("none").stroke({ color: defaultStroke, width: 1 }).center(4, -7)
+			svgIcon.circle(5).fill("none").stroke({ color: defaultStroke, width: 1 }).center(25, -7)
 		}
 
 		//Add Text

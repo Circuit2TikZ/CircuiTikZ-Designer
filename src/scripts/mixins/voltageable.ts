@@ -39,14 +39,12 @@ const voltageDirectionChoices: ChoiceEntry[] = [
 	{ key: ">", name: "forward" },
 	{ key: "<", name: "backward" },
 ]
-let defaultVoltageDirectionBackward = false
 
 const voltagePositionChoices: ChoiceEntry[] = [
 	{ key: "", name: "default" },
 	{ key: "_", name: "below" },
 	{ key: "^", name: "above" },
 ]
-let defaultVoltagePositionAbove = false
 
 const voltageStyleChoices: ChoiceEntry[] = [
 	{ key: "", name: "default" },
@@ -283,7 +281,10 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 				-approxCompare(Math.cos(angle), 0, sin4)
 			).mul(above)
 
-			const distFromLine = distanceFromLine * defaultRlen * scaleFactor * cmtopx
+			let distFromLine = distanceFromLine * defaultRlen * scaleFactor * cmtopx
+			if (options.isOpen) {
+				distanceFromNode = 0.25
+			}
 
 			let absVShift = above * (1 + shift) * distFromLine
 
@@ -302,7 +303,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			tmp = interpolate(endTrans, compEnd, arrowOffset)
 			let Vto_flat = interpolate(tmp, compEnd, distanceFromNode)
 
-			const minYSize = 3
+			const minYSize = options.isOpen ? 9 : 3
 			let sizing = southeastDelta
 			if (southeastDelta.y < minYSize) {
 				// set minimum size if no height is given
@@ -355,11 +356,11 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 					if (isStraight) {
 						//straight voltages
-						let bottom = new SVG.Point(0, sizing.y * scaleFactor)
+						let bottom = new SVG.Point(0, options.isOpen ? 0 : sizing.y * scaleFactor)
 						let Vfrom1 = Vfrom_flat.add(bottom)
 						let Vto1 = Vto_flat.add(bottom)
-						Vfrom = Vfrom1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
-						Vto = Vto1.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
+						Vfrom = Vfrom1.add(new SVG.Point(0, options.isOpen ? 0 : absVShift)).rotate(-angle, start, true)
+						Vto = Vto1.add(new SVG.Point(0, options.isOpen ? 0 : absVShift)).rotate(-angle, start, true)
 
 						d = `M${Vfrom.toSVGPathString()}L${Vto.toSVGPathString()}`
 						arrowPos = Vto
@@ -388,8 +389,12 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 							.add(new SVG.Point(0, absVShift))
 							.rotate(-angle, mid, true)
 
-						Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
-						Vto = Vto_flat.add(new SVG.Point(0, absVShift)).rotate(-angle, start, true)
+						Vfrom = Vfrom_flat.add(new SVG.Point(0, options.isOpen ? 0 : absVShift)).rotate(
+							-angle,
+							start,
+							true
+						)
+						Vto = Vto_flat.add(new SVG.Point(0, options.isOpen ? 0 : absVShift)).rotate(-angle, start, true)
 						d = `M${Vfrom.toSVGPathString()}C${C110.toSVGPathString()} ${C70.toSVGPathString()} ${Vto.toSVGPathString()}`
 
 						labPos = C110.add(C70).div(2)
@@ -488,7 +493,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 						}
 					}
 				} else {
-					if (isRaised) {
+					if (isRaised || options.isOpen) {
 						//raised voltages
 						let refHeight = 10
 						absVShift += above * refHeight
@@ -496,12 +501,12 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 						labelAnchor.y = 0
 					}
 
-					labPos = midTrans.add(new SVG.Point(0, sizing.y + absVShift))
+					labPos = options.isOpen ? midTrans : midTrans.add(new SVG.Point(0, sizing.y + absVShift))
 					labPos = labPos.rotate(-angle, start, true)
 
-					Vfrom = Vfrom_flat.add(new SVG.Point(0, absVShift))
-					Vto = Vto_flat.add(new SVG.Point(0, absVShift))
-					if (isRaised) {
+					Vfrom = Vfrom_flat.add(new SVG.Point(0, options.isOpen ? 0 : absVShift))
+					Vto = Vto_flat.add(new SVG.Point(0, options.isOpen ? 0 : absVShift))
+					if (isRaised || options.isOpen) {
 						//raised voltages
 						Vfrom.y = labPos.y
 						Vto.y = labPos.y
@@ -512,7 +517,9 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 
 					const plusBBox = plus.bbox()
 					const plusHalfSize = new SVG.Point(plusBBox.w / 2, plusBBox.h / 2)
-					const anchorOffset = plusHalfSize.add(plusHalfSize.mul(labelAnchor))
+					const anchorOffset = plusHalfSize.add(
+						plusHalfSize.mul(options.isOpen ? new SVG.Point() : labelAnchor)
+					)
 					if (directionBackwards) {
 						plus.transform({ translate: Vto.sub(anchorOffset) })
 						minus.transform({ translate: Vfrom.sub(anchorOffset) })
@@ -524,7 +531,7 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 					group.add(plus)
 					group.add(minus)
 
-					if (!isRaised) {
+					if (!isRaised && !options.isOpen) {
 						labPos = labPos.add(labelOffset.rotate(-angle, undefined, true))
 					}
 				}

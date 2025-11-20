@@ -44,6 +44,7 @@ export * from "./components/ellipseComponent"
 export * from "./components/polygonComponent"
 export * from "./components/groupComponent"
 export * from "./components/shortComponent"
+export * from "./components/openComponent"
 // snapDrag
 export * from "./snapDrag/dragHandlers"
 export * from "./snapDrag/snapController"
