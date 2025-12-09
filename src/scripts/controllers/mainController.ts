@@ -813,6 +813,7 @@ export class MainController {
 			{ shortcut: "g", component: "Ground" },
 			{ shortcut: "alt+g,option+g", component: "Ground (tailless)" },
 			{ shortcut: "r", component: "Resistor (american)" },
+			{ shortcut: "alt+r,option+r", component: "Resistor (european)" },
 			{ shortcut: "c", component: "Capacitor" },
 			{ shortcut: "alt+c,option+c", component: "Curved (polarized) capacitor" },
 			{ shortcut: "l", component: "Inductor (american)" },
