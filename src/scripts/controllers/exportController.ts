@@ -131,8 +131,7 @@ export class ExportController {
 
 			const tikzSettings = EnvironmentVariableController.instance.getTikzSettings()
 			let arr = [
-				"\\begin{tikzpicture}" +
-					(tikzSettings.environment.length > 0 ? "[" + tikzSettings.environment.join(",") + "]" : ""),
+				"\\begin{tikzpicture}" + "[" + ["transform shape"].concat(tikzSettings.environment).join(", ") + "]",
 				...tikzSettings.ctikzset.map((setting) => "\t\\ctikzset{" + setting + "}"),
 				"\t% Paths, nodes and wires:",
 				...circuitElements,
