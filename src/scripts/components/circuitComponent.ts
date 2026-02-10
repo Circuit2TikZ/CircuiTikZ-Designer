@@ -427,6 +427,7 @@ export abstract class CircuitComponent {
 		// @ts-ignore
 		const component: CircuitComponent = ComponentConstructor.fromJson(saveObject)
 		if (component) {
+			// only apply the json if the component was created successfully
 			component.applyJson(saveObject)
 			return component
 		}

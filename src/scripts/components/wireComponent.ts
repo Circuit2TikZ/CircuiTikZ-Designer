@@ -468,6 +468,10 @@ export class WireComponent extends Strokable(PathComponent) {
 	}
 
 	private pointsFromCornerPoints() {
+		if (this.referencePoints.length == 0) {
+			// something went wrong somewhere, just return an empty array
+			return []
+		}
 		let pointArray: SVG.Point[] = [this.referencePoints[0].clone()]
 		for (let index = 0; index < this.wireDirections.length; index++) {
 			const direction = this.wireDirections[index]
@@ -581,6 +585,10 @@ export class WireComponent extends Strokable(PathComponent) {
 
 			saveObject.points = points
 			saveObject.directions = directions
+		} else {
+			if (saveObject.points == undefined || saveObject.points.length < 2) {
+				return null
+			}
 		}
 		return new WireComponent()
 	}
