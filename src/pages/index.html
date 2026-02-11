@@ -180,9 +180,9 @@
 									type="button"
 									class="dropdown-item"
 									data-bs-toggle="modal"
-									data-bs-target="#settingsModal">
-									<span class="toolbarButton material-symbols-outlined">settings</span>
-									<span class="d-md-none fs-4"> Settings </span>
+									data-bs-target="#tabManagementModal">
+									<span class="toolbarButton material-symbols-outlined">tab_group</span>
+									<span class="d-md-none fs-4"> Tab management </span>
 								</button>
 							</li>
 							<li class="nav-item py-2 py-md-1 col-12 col-md-auto">
@@ -561,19 +561,18 @@
 		<!-- Modal (settings) -->
 		<div
 			class="modal fade"
-			id="settingsModal"
+			id="tabManagementModal"
 			tabindex="-1"
-			aria-labelledby="aboutModalLabel"
+			aria-labelledby="tabManagementModalLabel"
 			aria-hidden="true"
 			role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1 class="modal-title fs-3" id="aboutModalLabel">Settings</h1>
+						<h1 class="modal-title fs-3" id="tabManagementModalLabel">Tab management</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<h1 class="fs-4">Manage tab storage</h1>
 						<p>
 							CircuiTi<i>k</i>Z Designer can manage a different canvas for each tab to allow multiple
 							drawings at the same time.
@@ -592,7 +591,7 @@
 									</th>
 								</tr>
 							</thead>
-							<tbody id="settingsTableBody" class="table-group-divider"></tbody>
+							<tbody id="tabManagementTableBody" class="table-group-divider"></tbody>
 						</table>
 					</div>
 				</div>

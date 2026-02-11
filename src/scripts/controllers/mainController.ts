@@ -379,8 +379,8 @@ export class MainController {
 		}
 
 		//settings modal
-		const settingsModalEl = document.getElementById("settingsModal") as HTMLDivElement
-		const settingsTableBody = document.getElementById("settingsTableBody") as HTMLTableSectionElement
+		const settingsModalEl = document.getElementById("tabManagementModal") as HTMLDivElement
+		const settingsTableBody = document.getElementById("tabManagementTableBody") as HTMLTableSectionElement
 
 		settingsModalEl.addEventListener("show.bs.modal", (event) => {
 			this.saveCurrentState(false)
