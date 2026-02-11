@@ -505,15 +505,16 @@ export class MainController {
 				let requests: IDBRequest[] = []
 				for (const tab of allTabs) {
 					if (tab.id == MainController.instance.tabID) {
-						// don't close this tab
+						// skip this tab
 						continue
 					}
 					if (tab.open == "true") {
+						// set the tab to closed in the db, but keep the data (even if the tab is empty)
 						tab.open = "false"
-						if (tab.data.components.length > 0) {
-							requests.push(tabsObjectStore.put(tab))
-						} else {
-							// if no data is present, delete the entry (keeps the db clean)
+						requests.push(tabsObjectStore.put(tab))
+					} else {
+						// if the tab is already closed and has no data, delete the entry (keeps the db clean)
+						if (tab.data.components.length == 0) {
 							requests.push(tabsObjectStore.delete(tab.id))
 						}
 					}
@@ -527,7 +528,7 @@ export class MainController {
 							})
 					)
 				).then(() => {
-					// after all tabs are closed, send a probe message to all tabs
+					// after all tabs are closed (in the db, not the tab in the browser), send a probe message to all tabs
 					// this will cause all open tabs to set their state to open=true again
 					settingsModalEl.dispatchEvent(new Event("show.bs.modal"))
 					setTimeout(() => {
