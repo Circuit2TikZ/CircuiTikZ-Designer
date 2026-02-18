@@ -579,7 +579,7 @@ export class WireComponent extends Strokable(PathComponent) {
 			let directions: WireDirection[] = []
 			//@ts-ignore
 			for (const segment of saveObject.segments) {
-				points.push(segment.endPoint)
+				points.push(segment.endPoint || segment.position)
 				directions.push(segment.direction)
 			}
 
