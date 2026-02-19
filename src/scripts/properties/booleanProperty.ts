@@ -56,12 +56,18 @@ export class BooleanProperty extends EditableProperty<boolean> {
 						if (this.checkBoxState === 0) {
 							this.checkBox.checked = false
 							this.checkBox.indeterminate = false
+							this.checkBox.style.backgroundImage = ""
+							this.checkBox.style.backgroundPositionX = ""
 						} else if (this.checkBoxState === 1) {
 							this.checkBox.checked = false
 							this.checkBox.indeterminate = true
+							this.checkBox.style.backgroundImage = "var(--bs-form-check-bg-image)"
+							this.checkBox.style.backgroundPositionX = "50%"
 						} else if (this.checkBoxState === 2) {
 							this.checkBox.checked = true
 							this.checkBox.indeterminate = false
+							this.checkBox.style.backgroundImage = ""
+							this.checkBox.style.backgroundPositionX = ""
 						}
 
 						this.updateValue(this.checkBox.indeterminate ? null : this.checkBox.checked)
@@ -78,6 +84,10 @@ export class BooleanProperty extends EditableProperty<boolean> {
 					this.checkBox.checked = this.value
 				} else {
 					this.checkBox.indeterminate = true
+					if (this.nullable) {
+						this.checkBox.style.backgroundImage = "var(--bs-form-check-bg-image)"
+						this.checkBox.style.backgroundPositionX = "50%"
+					}
 				}
 				checkBoxContainer.appendChild(this.checkBox)
 			}
@@ -111,7 +121,7 @@ export class BooleanProperty extends EditableProperty<boolean> {
 		const result = new BooleanProperty(
 			this.label,
 			allEqual ? this.value : null,
-			this.nullable,
+			this.nullable || !allEqual,
 			this.tooltip,
 			this.id
 		)

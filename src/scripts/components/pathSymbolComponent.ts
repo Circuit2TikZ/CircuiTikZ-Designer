@@ -165,7 +165,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 				const property = new BooleanProperty(
 					option.displayName ?? option.name,
 					false,
-					true,
+					false,
 					undefined,
 					"options:option" + option.name
 				)

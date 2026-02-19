@@ -90,7 +90,7 @@ export class NodeSymbolComponent extends NodeComponent {
 				const property = new BooleanProperty(
 					option.displayName ?? option.name,
 					false,
-					true,
+					false,
 					undefined,
 					"options:option" + option.name
 				)
