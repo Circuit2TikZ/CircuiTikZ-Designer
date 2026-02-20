@@ -426,6 +426,11 @@ export class RectangleComponent extends ShapeComponent {
 			options.push(`text width=${roundTikz(textWidth.value)}cm`)
 			options.push(`inner sep=${innerSep.toString()}`)
 
+			// rectangle rotation
+			if (this.rotationDeg != 0) {
+				options.push("rotate=" + this.rotationDeg)
+			}
+
 			//escape special characters
 			const replaceDict = {
 				"#": "\\#",
