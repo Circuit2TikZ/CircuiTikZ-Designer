@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0]
+
+### Added
+
+- Can now give the design a name
+- Multi component editing
+- Open component
+- Short component
+- Voltage and current arrows
+- Poles (nodes) added to path symbol components
+- Basic global circuitikz key management
+- Global voltage styles option
+- Global label alignment option
+
+### Changed
+
+- Boolean properties now more intuitive to use (also tristate capability)
+- Settings modal is now only tab management
+- Tab management deletes empty DB entries on refresh if already closed
+
+### Fixed
+
+- Text rotation in TikZ output for rectangle component
+- Backwards compatibility for wire JSON format before CTD v0.6.0
+- Issue #60 and #63: arrows disappearing when changing the theme or exporting them to svg
+- Issue #67: wrong output for multiline text for export to tikz
+- Issue #70: disappearing selection box
+- Issue #73: Transformer core not rotating correctly; now always using transform shape in tikz output
+
 ## [0.7.5]
 
 ### Changed
