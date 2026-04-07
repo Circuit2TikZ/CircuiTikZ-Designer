@@ -25,7 +25,7 @@
 		"update": "npx npm-check-updates -u",
 		"prepack": "npm run build",
 		"start": "parcel serve --lazy",
-		"postversion": "git push && git push origin tag $(git describe --tags --abbrev=0)",
+		"postversion": "git push origin HEAD && node -e \"require('child_process').execSync('git push origin v' + require('./package.json').version, {stdio: 'inherit'})\"",
 		"standalone": "electron-forge start",
 		"electron": "npm run build && electron .",
 		"package": "electron-forge package",
