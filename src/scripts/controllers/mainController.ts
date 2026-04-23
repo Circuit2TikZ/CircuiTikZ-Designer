@@ -10,6 +10,8 @@ import {
 	ExportController,
 	SelectionController,
 	SaveController,
+	ImportController,
+	ImportReportController,
 	Undo,
 	CopyPaste,
 	PropertyController,
@@ -194,6 +196,17 @@ export class MainController {
 		loadButton.addEventListener("click", SaveController.instance.load.bind(SaveController.instance), {
 			passive: true,
 		})
+
+		// Dedicated entry point for CircuiTikZ paste imports — opens the unified modal pre-switched
+		// to the Paste tab with the CircuiTikZ format radio already selected.
+		ImportController.instance
+		ImportReportController.instance // eager-construct so the modal wiring is ready for the first import
+		const importTikZButton: HTMLButtonElement = document.getElementById("importTikZButton") as HTMLButtonElement
+		importTikZButton.addEventListener(
+			"click",
+			() => ImportController.instance.open("paste", "tikz"),
+			{ passive: true }
+		)
 
 		canvasPromise.then(() => {
 			EraseController.instance
@@ -768,6 +781,10 @@ export class MainController {
 		})
 		hotkeys("ctrl+o,command+o", () => {
 			SaveController.instance.load()
+			return false
+		})
+		hotkeys("ctrl+shift+o,command+shift+o", () => {
+			ImportController.instance.open("paste", "tikz")
 			return false
 		})
 		hotkeys("ctrl+e,command+e", () => {

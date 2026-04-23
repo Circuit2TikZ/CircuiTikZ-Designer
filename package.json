@@ -1,6 +1,6 @@
 {
 	"name": "circutikz-designer",
-	"version": "0.8.1",
+	"version": "0.9.0",
 	"private": "true",
 	"description": "An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTikZ with ease.",
 	"license": "GPL-3.0-only",
@@ -29,7 +29,8 @@
 		"standalone": "electron-forge start",
 		"electron": "npm run build && electron .",
 		"package": "electron-forge package",
-		"make": "electron-forge make"
+		"make": "electron-forge make",
+		"test:import": "node --experimental-transform-types --import ./tests/import/register.mjs tests/import/run-import-tests.mjs"
 	},
 	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"dependencies": {

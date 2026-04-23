@@ -121,6 +121,18 @@
 									<span class="d-md-none fs-4"> Save </span>
 								</button>
 							</li>
+							<li class="nav-item col-12 col-md-auto">
+								<button
+									type="button"
+									class="dropdown-item"
+									id="importTikZButton"
+									data-bs-toggle="tooltip"
+									data-bs-placement="bottom"
+									data-bs-title="Paste CircuiTikZ code to recreate a diagram (Ctrl/⌘ + Shift + O)">
+									<span class="material-symbols-outlined toolbarButton">content_paste_go</span>
+									<span class="d-md-none fs-4"> Import CircuiTi<i>k</i>Z </span>
+								</button>
+							</li>
 							<li class="nav-item py-2 py-md-1 col-12 col-md-auto">
 								<div class="vr d-none d-md-flex h-100 mx-md-2"></div>
 								<hr class="d-md-none my-2" />
@@ -391,7 +403,7 @@
 			</div>
 		</div>
 
-		<!-- Modal (load json) -->
+		<!-- Modal (import: JSON or CircuiTikZ) -->
 		<div
 			class="modal fade"
 			id="loadModal"
@@ -399,29 +411,157 @@
 			aria-hidden="true"
 			tabindex="-1"
 			role="dialog">
-			<div class="modal-dialog">
+			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1 class="modal-title fs-3">Load JSON</h1>
+						<h1 class="modal-title fs-3" id="loadModalLabel">Import</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body d-flex flex-column gap-3">
-						<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
-							<div
-								id="dragdroparea"
-								class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
-								<div
-									id="dragdropbackground"
-									class="position-absolute top-0 start-0 w-100 h-100 bg-secondary"
-									style="opacity: 0"></div>
-								<span class="material-symbols-outlined" style="font-size: 50px">place_item</span>
-								<span class="fs-4">Drag&Drop here</span>
-								<span class="fs-6">or</span>
-								<button class="btn btn-primary">Browse file</button>
-								<input id="file-input" type="file" accept=".json,.txt" />
+						<ul class="nav nav-tabs" id="importTabs" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button
+									class="nav-link active"
+									id="importTabUpload"
+									data-bs-toggle="tab"
+									data-bs-target="#importPaneUpload"
+									type="button"
+									role="tab"
+									aria-controls="importPaneUpload"
+									aria-selected="true">
+									<span class="material-symbols-outlined align-middle me-1" style="font-size: 18px">upload_file</span>Upload file
+								</button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button
+									class="nav-link"
+									id="importTabPaste"
+									data-bs-toggle="tab"
+									data-bs-target="#importPanePaste"
+									type="button"
+									role="tab"
+									aria-controls="importPanePaste"
+									aria-selected="false">
+									<span class="material-symbols-outlined align-middle me-1" style="font-size: 18px">content_paste</span>Paste code
+								</button>
+							</li>
+							<li class="nav-item ms-auto" role="presentation">
+								<button
+									class="nav-link"
+									id="importTabHelp"
+									data-bs-toggle="tab"
+									data-bs-target="#importPaneHelp"
+									type="button"
+									role="tab"
+									aria-controls="importPaneHelp"
+									aria-selected="false"
+									data-bs-toggle-tooltip="tooltip"
+									data-bs-title="What can I import?">
+									<span class="material-symbols-outlined align-middle">help</span>
+								</button>
+							</li>
+						</ul>
+						<div class="tab-content">
+							<!-- Upload tab: keeps all legacy IDs (#dragdroparea, #file-input, #load-message) -->
+							<div class="tab-pane fade show active" id="importPaneUpload" role="tabpanel" aria-labelledby="importTabUpload">
+								<div class="position-relative p-0 border-dashed border-primary border-1 rounded-2">
+									<div
+										id="dragdroparea"
+										class="d-flex gap-3 flex-column justify-content-center align-items-center w-100 h-auto py-5 px-4">
+										<div
+											id="dragdropbackground"
+											class="position-absolute top-0 start-0 w-100 h-100 bg-secondary"
+											style="opacity: 0"></div>
+										<span class="material-symbols-outlined" style="font-size: 50px">place_item</span>
+										<span class="fs-4">Drag &amp; Drop here</span>
+										<span class="fs-6">JSON save file <em>or</em> CircuiTi<i>k</i>Z code &mdash; or</span>
+										<button class="btn btn-primary">Browse file</button>
+										<input id="file-input" type="file" accept=".json,.txt,.tex,.tikz,.pgf" />
+									</div>
+								</div>
+								<span id="load-message" class="mt-2 d-block">No file selected</span>
+							</div>
+							<!-- Paste tab -->
+							<div class="tab-pane fade" id="importPanePaste" role="tabpanel" aria-labelledby="importTabPaste">
+								<div class="mb-2 d-flex gap-3 align-items-center flex-wrap">
+									<label class="form-label m-0 fs-6">Format:</label>
+									<div class="btn-group btn-group-sm" role="group" aria-label="Paste format">
+										<input type="radio" class="btn-check" name="pasteFormat" id="pasteFormatAuto" value="auto" autocomplete="off" checked>
+										<label class="btn btn-outline-primary" for="pasteFormatAuto">Auto-detect</label>
+										<input type="radio" class="btn-check" name="pasteFormat" id="pasteFormatJSON" value="json" autocomplete="off">
+										<label class="btn btn-outline-primary" for="pasteFormatJSON">JSON</label>
+										<input type="radio" class="btn-check" name="pasteFormat" id="pasteFormatTikZ" value="tikz" autocomplete="off">
+										<label class="btn btn-outline-primary" for="pasteFormatTikZ">CircuiTi<i>k</i>Z</label>
+									</div>
+									<span id="pasteDetectionHint" class="text-muted small ms-auto"></span>
+								</div>
+								<textarea
+									id="pasteTextArea"
+									class="form-control font-monospace"
+									rows="14"
+									spellcheck="false"
+									placeholder="Paste your JSON save file or CircuiTikZ code here.
+
+Example (CircuiTikZ):
+\begin{tikzpicture}
+  \draw (0,0) to[R, l=$R_1$] (2,0);
+\end{tikzpicture}"></textarea>
+							</div>
+							<!-- Help tab -->
+							<div class="tab-pane fade" id="importPaneHelp" role="tabpanel" aria-labelledby="importTabHelp">
+								<h5 class="mb-2">What can I paste here?</h5>
+								<p class="mb-2">
+									Two formats are supported. The importer figures out which one you have automatically &mdash; you don't need to pick.
+								</p>
+								<ul class="mb-3">
+									<li class="mb-1"><strong>JSON save file</strong> &mdash; anything the <em>Save</em> button produced, including legacy files from older versions of this app.</li>
+									<li class="mb-1"><strong>CircuiTi<i>k</i>Z code</strong> &mdash; a <code>\begin{tikzpicture}&hellip;\end{tikzpicture}</code> block, or just a handful of <code>\draw</code> / <code>\node</code> lines on their own.</li>
+								</ul>
+
+								<h6 class="mt-4 mb-2">CircuiTi<i>k</i>Z examples that work</h6>
+								<p class="small text-muted mb-2">Copy any of these snippets and paste them into the <em>Paste code</em> tab.</p>
+
+								<div class="mb-3">
+									<div class="small fw-semibold mb-1">A simple voltage divider</div>
+<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\begin{tikzpicture}
+  \draw (0,0) to[V=$V_\text{in}$] (0,3)
+              to[R=$R_1$]         (2,3)
+              to[R=$R_2$]         (2,0) -- (0,0);
+\end{tikzpicture}</pre>
+								</div>
+
+								<div class="mb-3">
+									<div class="small fw-semibold mb-1">Named points you can reuse</div>
+<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\coordinate (A) at (0,0);
+\coordinate (B) at (3,0);
+\draw (A) to[R=1k] (B);</pre>
+								</div>
+
+								<div class="mb-3">
+									<div class="small fw-semibold mb-1">Transistors and other node symbols</div>
+<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\node [nmos] (M1) at (0,0) {};
+\node [pnp]  (Q1) at (3,0) {};</pre>
+								</div>
+
+								<div class="mb-3">
+									<div class="small fw-semibold mb-1">Plain wires with bends</div>
+<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\draw (0,0) -- (2,0) -| (4,2) |- (6,4);</pre>
+								</div>
+
+								<h6 class="mt-4 mb-2">What happens if something goes wrong</h6>
+								<p class="small mb-2">
+									If a line can't be understood, the importer will <strong>skip just that line</strong> and keep going. When it's finished, an <em>Import report</em> opens showing a summary and a list of every warning, including the exact line number and a plain-English explanation. Clicking a warning highlights the offending line in your source so you can find it instantly.
+								</p>
+
+								<h6 class="mt-4 mb-2">Known limits</h6>
+								<p class="small text-muted mb-2">
+									Custom LaTeX macros (<code>\newcommand</code>, <code>\def</code>), <code>\if</code>/<code>\else</code> conditionals, and TikZ features beyond CircuiTi<i>k</i>Z (<code>plot</code>, <code>arc</code>, Bezier curves) aren't expanded &mdash; they'll appear as warnings. Anchors like <code>(R1.north)</code> import as the named point itself; use numeric coordinates if you need precise placement.
+								</p>
+								<p class="small text-muted mb-0">
+									Tip: if your file starts with <code>\documentclass</code>, just paste the contents of the <code>\begin{tikzpicture}&hellip;\end{tikzpicture}</code> block.
+								</p>
 							</div>
 						</div>
-						<span id="load-message">No file selected</span>
 					</div>
 					<div class="modal-footer justify-content-between">
 						<div
@@ -432,8 +572,66 @@
 							<label class="form-check-label" for="loadCheckRemove"> Remove existing components </label>
 						</div>
 						<button type="button" class="btn btn-primary icon-button" id="loadJSONButton">
-							<span class="material-symbols-outlined">file_open</span>Load
+							<span class="material-symbols-outlined">file_open</span>Import
 						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal (import report) -->
+		<div
+			class="modal fade"
+			id="importReportModal"
+			aria-labelledby="importReportModalLabel"
+			aria-hidden="true"
+			tabindex="-1"
+			role="dialog">
+			<div class="modal-dialog modal-xl modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-3" id="importReportModalLabel">Import report</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div id="importReportSummary" class="alert mb-3" role="alert"></div>
+						<div class="row g-3">
+							<div class="col-12 col-lg-6">
+								<h5 class="mb-2">Issues</h5>
+								<div
+									id="importReportDiagnostics"
+									class="list-group"
+									style="max-height: 420px; overflow-y: auto"></div>
+							</div>
+							<div class="col-12 col-lg-6">
+								<div class="d-flex justify-content-between align-items-center mb-2">
+									<h5 class="m-0">Source</h5>
+									<small class="text-muted">Click any issue to jump to its line</small>
+								</div>
+								<textarea
+									id="importReportSource"
+									class="form-control font-monospace"
+									rows="18"
+									spellcheck="false"
+									readonly></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer justify-content-between flex-wrap gap-2">
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-outline-secondary" id="importReportCopy">
+								<span class="material-symbols-outlined align-middle me-1" style="font-size: 18px">content_copy</span>Copy log
+							</button>
+							<button type="button" class="btn btn-outline-secondary" id="importReportDownload">
+								<span class="material-symbols-outlined align-middle me-1" style="font-size: 18px">download</span>Download log
+							</button>
+						</div>
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-outline-primary" id="importReportRetry">
+								<span class="material-symbols-outlined align-middle me-1" style="font-size: 18px">edit</span>Fix and retry
+							</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+						</div>
 					</div>
 				</div>
 			</div>
