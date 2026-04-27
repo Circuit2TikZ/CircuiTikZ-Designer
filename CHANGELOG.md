@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0]
+
+### Added
+
+- CircuiTikZ import: paste, drop, or open a `.tex` / `.tikz` file and get an editable diagram. Covers the common textbook idioms (voltage dividers, transistor amplifiers, op-amps, rectifiers, DIP chips with 7-segment displays, mixed-signal prototypes).
+- JSON round-trip import: Designer-exported JSON files can now be re-opened with forgiving schema validation (missing optional fields degrade to warnings, unknown fields are preserved).
+- Unified Load modal that routes paste, file upload, and drag-and-drop through a single ImportController, with automatic format sniffing (JSON vs. TikZ).
+- Import Report modal with severity filtering (error / warning / info). Every diagnostic carries a code, line, column, and a one-sentence plain-English suggestion; the report persists across Retry.
+- Symbol alias table for CircuiTikZ short-forms (`R`, `V`, `L`, `C`, `D`, `sw`, …) mapped in preference order to the canonical Designer names (`american resistor`, `american voltage source`, …), with graceful fallback.
+- TikZ coordinate-intersection shorthand `(A |- B)` / `(A -| B)` is now understood and resolved against the named-point table.
+- Compound anchor names such as `(ic.pin 15)`, `(ic.pin 1)`, `(ic.pin edge)` for DIP / multi-pin ICs are parsed with original spacing preserved.
+- `\node[...] at (name.anchor) {...}` now accepts named-point references (previously only numeric / polar coords were honoured).
+- Bare `-` and `+` are admitted as anchor / identifier tokens, so op-amp pin references (`(oa.-)`, `(oa.+)`) and math-mode labels with a leading sign (`{$+V_{CC}$}`) import without diagnostics.
+- CircuiTikZ annotation-position modifiers `i^=` and `v^=` (current / voltage label above) tokenize cleanly alongside the pre-existing `i_=` / `v_=` idioms.
+- Multi-character end-marker decorations `*-*`, `-*`, `*-` (and the `o`-prefixed variants on option lists) are recognised and ignored (visual-only in v0.9).
+- In-app help page documenting supported idioms and known limitations.
+- 62 automated import tests (lexer, parser, transformer, integration, fuzz).
+
+### Changed
+
+- All importer diagnostics are non-throwing by design: the parser and transformer never abort on user input, so a single unrecognised token or malformed coordinate yields a warning and the rest of the document still imports.
+- `\draw` walk is now a state-machine that buffers wire segments and flushes them when a path-symbol (`to[R=…]`, `to[V=…]`, …) is hit, so mixed component-and-wire paths come across faithfully.
+- Inline embedded-node names (`\draw (0,0) node[nmos] (M1) {}`) are now registered in the named-point table as they are emitted, making later references (`(M1.drain)`) resolve correctly.
+
+### Known limitations
+
+- Anchors are parsed but not used for precise placement; components snap to node centers. Anchor-aware placement is planned for v1.0.
+- LaTeX macros (`\newcommand`, `\def`) are not expanded — users should paste post-expansion source.
+- PGF transforms (`[scale=…]`, `[transform shape]`) are parsed but not applied to geometry.
+- Path shapes (`rectangle`, `circle`) are accepted as bounding-box annotations rather than first-class shapes.
+
 ## [0.8.1]
 
 ### Fixed
