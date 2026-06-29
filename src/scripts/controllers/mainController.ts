@@ -197,16 +197,8 @@ export class MainController {
 			passive: true,
 		})
 
-		// Dedicated entry point for CircuiTikZ paste imports — opens the unified modal pre-switched
-		// to the Paste tab with the CircuiTikZ format radio already selected.
 		ImportController.instance
-		ImportReportController.instance // eager-construct so the modal wiring is ready for the first import
-		const importTikZButton: HTMLButtonElement = document.getElementById("importTikZButton") as HTMLButtonElement
-		importTikZButton.addEventListener(
-			"click",
-			() => ImportController.instance.open("paste", "tikz"),
-			{ passive: true }
-		)
+		ImportReportController.instance
 
 		canvasPromise.then(() => {
 			EraseController.instance

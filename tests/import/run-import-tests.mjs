@@ -19,16 +19,16 @@
 // Node. `tikzLexer` has no runtime deps; `tikzParser` only imports from `internal` — but only
 // the *type* of DiagnosticsCollector + tikzLexer output. We stub-import from a narrow shim.
 
-import { fileURLToPath } from "node:url"
+import { fileURLToPath, pathToFileURL } from "node:url"
 import path from "node:path"
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const rootSrc = path.resolve(here, "../../src/scripts")
 
 // Node strips TS at import time when the extension is .ts; our files are .ts so this works.
-const { tokenizeTikz } = await import(`${rootSrc}/import/tikzLexer.ts`)
-const diagnosticsMod = await import(`${rootSrc}/import/diagnostics.ts`)
-const parserMod = await import(`${rootSrc}/import/tikzParser.ts`)
+const { tokenizeTikz } = await import(pathToFileURL(path.join(rootSrc, "import/tikzLexer.ts")).href)
+const diagnosticsMod = await import(pathToFileURL(path.join(rootSrc, "import/diagnostics.ts")).href)
+const parserMod = await import(pathToFileURL(path.join(rootSrc, "import/tikzParser.ts")).href)
 const { DiagnosticsCollector } = diagnosticsMod
 const { parseTikz } = parserMod
 
@@ -321,6 +321,49 @@ summary("Parser: compound anchor names like (ic.pin 15)")
 	// No "Couldn't parse coordinate" warnings should be emitted by the parser.
 	const rawWarnings = collector.all().filter((d) => d.code === "transform-coord-raw")
 	assert(rawWarnings.length === 0, "No raw-coordinate fallback warnings", `got ${rawWarnings.length}`)
+}
+
+summary("Parser: warning for non-command unknown top-level syntax")
+{
+	const src = "random_garbage_without_backslash;\n\\draw (0,0) -- (1,0);"
+	const collector = new DiagnosticsCollector(src)
+	const doc = parseTikz(src, collector)
+	const draws = doc.statements.filter((s) => s.kind === "draw")
+	assert(draws.length === 1, "\\draw statement parsed after recovery")
+	assert(
+		collector.all().some((d) => d.code === "parse-unknown-syntax"),
+		"Emitted 'parse-unknown-syntax' warning diagnostic"
+	)
+}
+
+summary("Transformer: cleanLatexLabel helper logic")
+{
+	function cleanLatexLabel(val) {
+		let s = val.trim()
+		let changed = true
+		while (changed) {
+			const prev = s
+			if (s.startsWith("{") && s.endsWith("}")) {
+				s = s.slice(1, -1).trim()
+			}
+			if (s.startsWith("$") && s.endsWith("$")) {
+				s = s.slice(1, -1).trim()
+			}
+			const textColorRegex = /^\\textcolor(?:\[[^\]]*\])?\{[^{}]*\}\{(.*)\}$/
+			const match = textColorRegex.exec(s)
+			if (match) {
+				s = match[1].trim()
+			}
+			changed = s !== prev
+		}
+		return s
+	}
+
+	assert(cleanLatexLabel("$R_1$") === "R_1", "Strips surrounding dollars")
+	assert(cleanLatexLabel("{$R_1$}") === "R_1", "Strips outer braces and dollars")
+	assert(cleanLatexLabel("\\textcolor{red}{$V_{in}$}") === "V_{in}", "Strips textcolor and inner dollars")
+	assert(cleanLatexLabel("{\\textcolor{blue}{{$V_{CC}$}}}") === "V_{CC}", "Strips nested braces, textcolor and dollars")
+	assert(cleanLatexLabel("V_{in}") === "V_{in}", "Leaves clean labels untouched")
 }
 
 // --- Done -------------------------------------------------------------------------------- //

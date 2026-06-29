@@ -299,19 +299,30 @@ class TikzParser {
 		}
 
 		// Anything else at the top level: consume up to the next `;` or command as an unknown
-		// statement. We only warn for COMMANDs (bare identifiers outside statements are usually
-		// leftovers from options that were already consumed).
-		if (tok.type === "COMMAND") {
-			this.collector.warning(
-				`I don't know what to do with the command '\\${tok.parsed?.name ?? tok.value}' at the top level — skipping it.`,
-				{
-					line: tok.line,
-					column: tok.column,
-					code: "parse-unknown-command",
-					suggestion:
-						"Only \\draw, \\node, \\coordinate, \\path, \\ctikzset, \\usetikzlibrary, \\begin and \\end are understood. The rest of the circuit will still be imported.",
-				}
-			)
+		// statement. We warn for all unrecognised elements (if not EOF) so there are no silent failures.
+		if (tok.type !== "EOF") {
+			if (tok.type === "COMMAND") {
+				this.collector.warning(
+					`I don't know what to do with the command '\\${tok.parsed?.name ?? tok.value}' at the top level — skipping it.`,
+					{
+						line: tok.line,
+						column: tok.column,
+						code: "parse-unknown-command",
+						suggestion:
+							"Only \\draw, \\node, \\coordinate, \\path, \\ctikzset, \\usetikzlibrary, \\begin and \\end are understood. The rest of the circuit will still be imported.",
+					}
+				)
+			} else {
+				this.collector.warning(
+					`Skipped unrecognised top-level syntax: '${tok.value}'`,
+					{
+						line: tok.line,
+						column: tok.column,
+						code: "parse-unknown-syntax",
+						suggestion: "Make sure all top-level statements are valid CircuiTikZ commands (like \\draw or \\node).",
+					}
+				)
+			}
 		}
 
 		const captured = this.captureSliceUntilSync(tok)

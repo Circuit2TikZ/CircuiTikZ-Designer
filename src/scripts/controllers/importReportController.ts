@@ -31,6 +31,7 @@ export class ImportReportController {
 	private copyBtn: HTMLButtonElement
 	private downloadBtn: HTMLButtonElement
 	private retryBtn: HTMLButtonElement
+	private diagnosticsTitleEl: HTMLHeadingElement
 
 	/** The result currently on screen — null when the modal is closed. */
 	private currentResult: ImportResult | null = null
@@ -42,6 +43,7 @@ export class ImportReportController {
 		this.summaryEl = document.getElementById("importReportSummary") as HTMLDivElement
 		this.diagnosticsList = document.getElementById("importReportDiagnostics") as HTMLDivElement
 		this.sourceEl = document.getElementById("importReportSource") as HTMLTextAreaElement
+		this.diagnosticsTitleEl = document.getElementById("importReportDiagnosticsTitle") as HTMLHeadingElement
 
 		this.copyBtn = document.getElementById("importReportCopy") as HTMLButtonElement
 		this.downloadBtn = document.getElementById("importReportDownload") as HTMLButtonElement
@@ -88,6 +90,10 @@ export class ImportReportController {
 		const errors = result.diagnostics.filter((d) => d.severity === "error").length
 		const warnings = result.diagnostics.filter((d) => d.severity === "warning").length
 		const info = result.diagnostics.filter((d) => d.severity === "info").length
+
+		if (this.diagnosticsTitleEl) {
+			this.diagnosticsTitleEl.textContent = (errors > 0 || warnings > 0) ? "Issues" : "Import logs"
+		}
 
 		let cls: string
 		let icon: string

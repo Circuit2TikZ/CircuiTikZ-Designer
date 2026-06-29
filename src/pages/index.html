@@ -104,9 +104,9 @@
 									id="loadButton"
 									data-bs-toggle="tooltip"
 									data-bs-placement="bottom"
-									data-bs-title="Load a circuit (part) from a JSON file (Ctrl/⌘ + O)">
+									data-bs-title="Import JSON or CircuiTikZ code (Ctrl/⌘ + O)">
 									<span class="material-symbols-outlined toolbarButton">file_open</span>
-									<span class="d-md-none fs-4"> Load </span>
+									<span class="d-md-none fs-4"> Import </span>
 								</button>
 							</li>
 							<li class="nav-item col-12 col-md-auto">
@@ -119,18 +119,6 @@
 									data-bs-title="Save the circuit in a JSON file (Ctrl/⌘ + S)">
 									<span class="material-symbols-outlined toolbarButton">save</span>
 									<span class="d-md-none fs-4"> Save </span>
-								</button>
-							</li>
-							<li class="nav-item col-12 col-md-auto">
-								<button
-									type="button"
-									class="dropdown-item"
-									id="importTikZButton"
-									data-bs-toggle="tooltip"
-									data-bs-placement="bottom"
-									data-bs-title="Paste CircuiTikZ code to recreate a diagram (Ctrl/⌘ + Shift + O)">
-									<span class="material-symbols-outlined toolbarButton">content_paste_go</span>
-									<span class="d-md-none fs-4"> Import CircuiTi<i>k</i>Z </span>
 								</button>
 							</li>
 							<li class="nav-item py-2 py-md-1 col-12 col-md-auto">
@@ -413,9 +401,12 @@
 			role="dialog">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-3" id="loadModalLabel">Import</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<div class="modal-header flex-column align-items-start">
+						<div class="d-flex justify-content-between align-items-center w-100">
+							<h1 class="modal-title fs-3" id="loadModalLabel">Import</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="text-muted small">JSON or CircuiTikZ code</div>
 					</div>
 					<div class="modal-body d-flex flex-column gap-3">
 						<ul class="nav nav-tabs" id="importTabs" role="tablist">
@@ -474,7 +465,7 @@
 											style="opacity: 0"></div>
 										<span class="material-symbols-outlined" style="font-size: 50px">place_item</span>
 										<span class="fs-4">Drag &amp; Drop here</span>
-										<span class="fs-6">JSON save file <em>or</em> CircuiTi<i>k</i>Z code &mdash; or</span>
+										<span class="fs-6">or</span>
 										<button class="btn btn-primary">Browse file</button>
 										<input id="file-input" type="file" accept=".json,.txt,.tex,.tikz,.pgf" />
 									</div>
@@ -523,7 +514,7 @@ Example (CircuiTikZ):
 
 								<div class="mb-3">
 									<div class="small fw-semibold mb-1">A simple voltage divider</div>
-<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\begin{tikzpicture}
+<pre class="bg-body-secondary p-2 small mb-0" style="white-space: pre-wrap">\begin{tikzpicture}
   \draw (0,0) to[V=$V_\text{in}$] (0,3)
               to[R=$R_1$]         (2,3)
               to[R=$R_2$]         (2,0) -- (0,0);
@@ -532,20 +523,20 @@ Example (CircuiTikZ):
 
 								<div class="mb-3">
 									<div class="small fw-semibold mb-1">Named points you can reuse</div>
-<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\coordinate (A) at (0,0);
+<pre class="bg-body-secondary p-2 small mb-0" style="white-space: pre-wrap">\coordinate (A) at (0,0);
 \coordinate (B) at (3,0);
 \draw (A) to[R=1k] (B);</pre>
 								</div>
 
 								<div class="mb-3">
 									<div class="small fw-semibold mb-1">Transistors and other node symbols</div>
-<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\node [nmos] (M1) at (0,0) {};
+<pre class="bg-body-secondary p-2 small mb-0" style="white-space: pre-wrap">\node [nmos] (M1) at (0,0) {};
 \node [pnp]  (Q1) at (3,0) {};</pre>
 								</div>
 
 								<div class="mb-3">
 									<div class="small fw-semibold mb-1">Plain wires with bends</div>
-<pre class="bg-light p-2 small mb-0" style="white-space: pre-wrap">\draw (0,0) -- (2,0) -| (4,2) |- (6,4);</pre>
+<pre class="bg-body-secondary p-2 small mb-0" style="white-space: pre-wrap">\draw (0,0) -- (2,0) -| (4,2) |- (6,4);</pre>
 								</div>
 
 								<h6 class="mt-4 mb-2">What happens if something goes wrong</h6>
@@ -597,7 +588,7 @@ Example (CircuiTikZ):
 						<div id="importReportSummary" class="alert mb-3" role="alert"></div>
 						<div class="row g-3">
 							<div class="col-12 col-lg-6">
-								<h5 class="mb-2">Issues</h5>
+								<h5 class="mb-2" id="importReportDiagnosticsTitle">Issues</h5>
 								<div
 									id="importReportDiagnostics"
 									class="list-group"
@@ -986,7 +977,12 @@ Example (CircuiTikZ):
 								<tr>
 									<td></td>
 									<td>Ctrl/⌘ + O</td>
-									<td>Load from JSON</td>
+									<td>Import JSON / CircuiTikZ file</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>Ctrl/⌘ + Shift + O</td>
+									<td>Import CircuiTi<i>k</i>Z code (Paste)</td>
 								</tr>
 								<tr>
 									<td></td>

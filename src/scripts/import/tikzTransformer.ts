@@ -497,6 +497,28 @@ function findSymbolInOptions(
 	return null
 }
 
+/** Unpacks LaTeX wrappers like braces, math delimiters ($...$), and textcolor commands from label values. */
+function cleanLatexLabel(val: string): string {
+	let s = val.trim()
+	let changed = true
+	while (changed) {
+		const prev = s
+		if (s.startsWith("{") && s.endsWith("}")) {
+			s = s.slice(1, -1).trim()
+		}
+		if (s.startsWith("$") && s.endsWith("$")) {
+			s = s.slice(1, -1).trim()
+		}
+		const textColorRegex = /^\\textcolor(?:\[[^\]]*\])?\{[^{}]*\}\{(.*)\}$/
+		const match = textColorRegex.exec(s)
+		if (match) {
+			s = match[1].trim()
+		}
+		changed = s !== prev
+	}
+	return s
+}
+
 // ------------- PathSymbolComponent save-object ------------------------------------------- //
 
 function buildPathSymbolSave(
@@ -517,14 +539,121 @@ function buildPathSymbolSave(
 		if (known.has(o.key)) recognised.push(o.key)
 	}
 
-	// Capture `name=...` and `<label>=value` where present. We recognise `=value` on the symbol's
-	// primary key as the component label (the "R=1k" idiom). The primary key is whatever the user
-	// wrote — either the CircuiTikZ short form (R) or the canonical tikzName (american resistor).
+	// Capture options: label, voltage, current, name, poles, mirror/invert, scaling factor.
 	let label: string | undefined
+	let labelSide: boolean | undefined
 	let name: string | undefined
+
+	let voltageLabel: string | undefined
+	let voltageDir: string | undefined
+	let voltagePos: string | undefined
+	let voltageStyle: string | undefined
+
+	let currentLabel: string | undefined
+	let currentBackwards: boolean | undefined
+	let currentStart: boolean | undefined
+	let currentBelow: boolean | undefined
+
+	let poles: { start?: string; end?: string } | undefined
+	let mirror = false
+	let invert = false
+	let scaleFactor: number | undefined
+
 	for (const o of hit.options) {
-		if ((o.key === hit.matchedKey || o.key === hit.symbol.tikzName) && o.value) label = o.value
-		if (o.key === "name" && o.value) name = o.value
+		const key = o.key.trim()
+
+		// 1. Name
+		if (key === "name" && o.value) {
+			name = o.value
+		}
+		// 2. Main symbol key / label key
+		else if (key === hit.matchedKey || key === hit.symbol.tikzName) {
+			if (o.value) {
+				label = cleanLatexLabel(o.value)
+			}
+		}
+		// 3. Dedicated label option keys: l, l^, l_, label
+		else if (/^(l|l\^|l_|label)$/.test(key) && o.value) {
+			label = cleanLatexLabel(o.value)
+			if (key === "l_") {
+				labelSide = true
+			} else if (key === "l^") {
+				labelSide = false
+			}
+		}
+		// 4. Voltage option keys: v, v^, v_, v<, v>, v^<, v^>, v_<, v_>
+		else if (/^v([_\^])?([<>])?$/.test(key) && o.value) {
+			const m = /^v([_\^])?([<>])?$/.exec(key)
+			voltageLabel = cleanLatexLabel(o.value)
+			if (m) {
+				voltagePos = m[1] || "_" // Defaults to "_" (below) in CircuiTikZ
+				if (m[2]) voltageDir = m[2]
+			}
+		}
+		else if (key === "voltage" && o.value) {
+			voltageStyle = o.value.trim()
+		}
+		// 5. Current option keys: i, i^, i_, i<, i>, i<^, i^<, i<_, i_<, etc.
+		else if (/^i(?:([<>])([_\^])?|([_\^])([<>])?)?$/.test(key) && o.value) {
+			const m = /^i(?:([<>])([_\^])?|([_\^])([<>])?)?$/.exec(key)
+			currentLabel = cleanLatexLabel(o.value)
+			if (m) {
+				if (m[1]) {
+					currentStart = true
+					currentBackwards = m[1] === "<"
+					if (m[2]) currentBelow = m[2] === "_"
+				} else if (m[3]) {
+					currentStart = false
+					currentBelow = m[3] === "_"
+					if (m[4]) currentBackwards = m[4] === "<"
+				} else {
+					currentStart = false
+					currentBelow = false // Defaults to above
+					currentBackwards = false
+				}
+			}
+		}
+		// 6. Poles (shortcuts and bipole nodes)
+		else if (key === "*-*") poles = { start: "circ", end: "circ" }
+		else if (key === "*-") poles = { start: "circ", end: "none" }
+		else if (key === "-*") poles = { start: "none", end: "circ" }
+		else if (key === "o-o") poles = { start: "ocirc", end: "ocirc" }
+		else if (key === "o-") poles = { start: "ocirc", end: "none" }
+		else if (key === "-o") poles = { start: "none", end: "ocirc" }
+		else if (key === "*-o") poles = { start: "circ", end: "ocirc" }
+		else if (key === "o-*") poles = { start: "ocirc", end: "circ" }
+		else if (key === "bipole nodes" && o.value) {
+			const m = /^\{([^}]*)\}\s*\{([^}]*)\}$/.exec(o.value.trim())
+			if (m) {
+				poles = {
+					start: m[1] || "none",
+					end: m[2] || "none"
+				}
+			}
+		}
+		// 7. Mirror and Invert
+		else if (key === "mirror") {
+			mirror = true
+		}
+		else if (key === "invert") {
+			invert = true
+		}
+		// 8. Scale / Bipoles length
+		else if (key.includes("bipoles/length") && o.value) {
+			const val = parseFloat(o.value)
+			if (!Number.isNaN(val)) {
+				scaleFactor = val / 1.4
+			}
+		}
+	}
+
+	// If both label and voltage are present, and the label side is not explicitly specified,
+	// ensure they are on opposite sides to prevent overlap in CTD.
+	if (label && voltageLabel && labelSide === undefined) {
+		const vPos = voltagePos || "_"
+		if (vPos === "^") {
+			labelSide = true // Put label below if voltage is above
+		}
 	}
 
 	const save: any = {
@@ -532,16 +661,53 @@ function buildPathSymbolSave(
 		id: hit.symbol.tikzName,
 		points: [start, end],
 	}
+
 	if (recognised.length > 0) save.options = recognised
 	if (name) save.name = name
+
+	// Hydrate Label
 	if (label) {
 		save.label = { value: label }
-		// Diagnostic: labels are a best-effort port, and math-mode users might have richer labels.
+		if (labelSide !== undefined) {
+			save.label.otherSide = labelSide ? true : undefined
+		}
+		// Diagnostic: labels are a best-effort port
 		ctx.collector.info(
-			`Imported label "${label}" as plain text — you may want to re-wrap it in $...$ for math mode.`,
+			`Imported label "${label}"`,
 			{ line: stmt.line, column: stmt.column, code: "transform-label-plain" }
 		)
 	}
+
+	// Hydrate Voltage
+	if (voltageLabel) {
+		save.voltage = { label: voltageLabel }
+		if (voltageDir) save.voltage.dir = voltageDir
+		if (voltagePos) save.voltage.pos = voltagePos
+		if (voltageStyle) save.voltage.style = voltageStyle
+	}
+
+	// Hydrate Current
+	if (currentLabel) {
+		save.current = { label: currentLabel }
+		if (currentBackwards !== undefined) save.current.backwards = currentBackwards
+		if (currentStart !== undefined) save.current.start = currentStart
+		if (currentBelow !== undefined) save.current.below = currentBelow
+	}
+
+	// Hydrate Poles
+	if (poles) {
+		save.poles = poles
+	}
+
+	// Hydrate Scale (includes mirror, invert, scaleFactor)
+	if (mirror || invert || scaleFactor !== undefined) {
+		const s = scaleFactor !== undefined ? scaleFactor : 1
+		save.scale = {
+			x: (invert ? -1 : 1) * s,
+			y: (mirror ? -1 : 1) * s
+		}
+	}
+
 	return save as ComponentSaveObject
 }
 
@@ -615,13 +781,13 @@ function transformNode(stmt: NodeStatement, ctx: TransformContext): ComponentSav
 			if (stmt.name) save.name = stmt.name
 			const rotation = numericOption(stmt.options.entries, "rotate") ?? numericOption(stmt.options.entries, "rotation")
 			if (rotation !== undefined) save.rotation = rotation
-			if (stmt.label && stmt.label.length > 0) save.label = { value: stmt.label }
+			if (stmt.label && stmt.label.length > 0) save.label = { value: cleanLatexLabel(stmt.label) }
 			return [save as ComponentSaveObject]
 		}
 	}
 
 	// Fall-back: a plain node with a label renders as a rectangle with text.
-	const textContent = stmt.label ?? ""
+	const textContent = stmt.label ? cleanLatexLabel(stmt.label) : ""
 	const save: any = {
 		type: "rect",
 		position: pos,
@@ -645,12 +811,12 @@ function buildEmbeddedNodeSave(
 		if (hit) {
 			const save: any = { type: "node", id: hit.symbol.tikzName, position: pos }
 			if (el.name) save.name = el.name
-			if (el.label && el.label.length > 0) save.label = { value: el.label }
+			if (el.label && el.label.length > 0) save.label = { value: cleanLatexLabel(el.label) }
 			return save as ComponentSaveObject
 		}
 	}
 	// Fallback — a labelled rectangle.
-	const text = el.label ?? ""
+	const text = el.label ? cleanLatexLabel(el.label) : ""
 	const save: any = {
 		type: "rect",
 		position: pos,
