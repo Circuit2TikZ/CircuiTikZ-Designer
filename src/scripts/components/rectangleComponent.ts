@@ -267,6 +267,11 @@ export class RectangleComponent extends ShapeComponent {
 		data.type = RectangleComponent.jsonID
 		data.size = this.size.simplifyForJson()
 
+		if (!this.textAreaProperty.value && this.textAreaPlaceHolder.value) {
+			// save placeholder text state even if the text area is empty
+			data.text = { text: "", showPlaceholderText: true }
+		}
+
 		if (this.textAreaProperty.value) {
 			let textData: Text = {
 				text: undefined,
@@ -502,7 +507,7 @@ export class RectangleComponent extends ShapeComponent {
 				textElement.remove()
 			}
 
-			if (!this.textAreaProperty.value) {
+			if (!this.textAreaProperty.value && !this.textAreaPlaceHolder.value) {
 				copiedSVG.removeElement(copiedSVG.find(".textSVG")[0])
 			}
 			this.textSVG.removeClass("textSVG")

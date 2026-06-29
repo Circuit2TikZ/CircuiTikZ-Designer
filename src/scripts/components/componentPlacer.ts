@@ -129,13 +129,13 @@ export class ComponentPlacer {
 			MainController.instance.removeComponent(component)
 			this._component = null
 		}
-		if (this.previousComponent) {
+		if (this.previousComponent && MainController.instance.mode == Modes.DRAG_PAN) {
+			// only select the previous component if we are switching to/currently are in DRAG_PAN mode
 			SelectionController.instance.selectComponents([this.previousComponent], SelectionMode.RESET)
 		}
 		this.previousComponent = null
 		this.cleanUp()
 		SnapCursorController.instance.visible = false
-		MainController.instance.switchMode(Modes.DRAG_PAN)
 	}
 
 	/**

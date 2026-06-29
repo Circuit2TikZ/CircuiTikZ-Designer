@@ -775,7 +775,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			this.scaleState = new SVG.Point(saveObject.scale)
 		}
 		this.mirror.value = this.scaleState.y < 0
-		this.invert.value = this.scaleState.x < 0
+		this.invert.value = this.scaleState.x * this.voltageConventionInvert() < 0
 		this.scaleProperty.value = new SVG.Number(Math.abs(this.scaleState.x))
 
 		if (saveObject.poles) {

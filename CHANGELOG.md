@@ -36,6 +36,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PGF transforms (`[scale=…]`, `[transform shape]`) are parsed but not applied to geometry.
 - Path shapes (`rectangle`, `circle`) are accepted as bounding-box annotations rather than first-class shapes.
 
+## [0.8.2]
+
+### Changed
+
+- Text in canvas now unselectable
+
+### Fixed
+
+- Power source polarity reversed when exporting TikZ from Circuitikz Designer (Issue [#77](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/issues/77))
+- Sometimes selecting components deletes them (Issue [#83](https://github.com/Circuit2TikZ/CircuiTikZ-Designer/issues/83))
+- Text placeholder sometimes crashing SVG export
+- Text placeholder state not saved to json
+
 ## [0.8.1]
 
 ### Fixed

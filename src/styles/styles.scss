@@ -41,7 +41,9 @@ $danger: #c50f3c;
 	width: 200px !important;
 }
 
-.unselectable {
+// all svg text should also be unselectable
+.unselectable,
+svg text {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
