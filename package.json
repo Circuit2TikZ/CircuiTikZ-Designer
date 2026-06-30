@@ -29,7 +29,8 @@
 		"standalone": "electron-forge start",
 		"electron": "npm run build && electron .",
 		"package": "electron-forge package",
-		"make": "electron-forge make"
+		"make": "electron-forge make",
+		"test:import": "node --experimental-transform-types --import ./tests/import/register.mjs tests/import/run-import-tests.mjs"
 	},
 	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"dependencies": {

@@ -106,3 +106,5 @@
 *.7z
 *.zip
 /out
+
+.vercel

@@ -10,6 +10,8 @@ import {
 	ExportController,
 	SelectionController,
 	SaveController,
+	ImportController,
+	ImportReportController,
 	Undo,
 	CopyPaste,
 	PropertyController,
@@ -194,6 +196,9 @@ export class MainController {
 		loadButton.addEventListener("click", SaveController.instance.load.bind(SaveController.instance), {
 			passive: true,
 		})
+
+		ImportController.instance
+		ImportReportController.instance
 
 		canvasPromise.then(() => {
 			EraseController.instance
@@ -768,6 +773,10 @@ export class MainController {
 		})
 		hotkeys("ctrl+o,command+o", () => {
 			SaveController.instance.load()
+			return false
+		})
+		hotkeys("ctrl+shift+o,command+shift+o", () => {
+			ImportController.instance.open("paste", "tikz")
 			return false
 		})
 		hotkeys("ctrl+e,command+e", () => {

@@ -50,6 +50,7 @@ export interface Strokable {
 export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(Base: TBase) {
 	abstract class Strokable extends Base {
 		protected strokeInfo: StrokeInfo
+		protected defaultStrokeWidth: SVG.Number
 
 		protected strokeColorProperty: ColorProperty
 		protected strokeOpacityProperty: SliderProperty
@@ -58,10 +59,11 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 
 		constructor(...args: any[]) {
 			super(...args)
+			this.defaultStrokeWidth = new SVG.Number("1pt")
 			this.strokeInfo = {
 				color: "default",
 				opacity: 1,
-				width: new SVG.Number("1pt"),
+				width: this.defaultStrokeWidth,
 				style: defaultStrokeStyleChoice.key,
 			}
 
@@ -167,7 +169,7 @@ export function Strokable<TBase extends AbstractConstructor<CircuitComponent>>(B
 			this.strokeInfo = {
 				color: "default",
 				opacity: 1,
-				width: new SVG.Number("1pt"),
+				width: this.defaultStrokeWidth || new SVG.Number("1pt"),
 				style: defaultStrokeStyleChoice.key,
 			}
 			this.strokeWidthProperty.value = this.strokeInfo.width
