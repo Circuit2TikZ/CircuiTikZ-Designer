@@ -1,4 +1,13 @@
-import { ButtonGridProperty, ChoiceEntry, ChoiceProperty, MainController, SectionHeaderProperty } from "../internal"
+import {
+	ButtonGridProperty,
+	ChoiceEntry,
+	ChoiceProperty,
+	DocumentBaseFontSize,
+	getBaseFontSize,
+	MainController,
+	SectionHeaderProperty,
+	setBaseFontSize,
+} from "../internal"
 
 export type StylePreset = "default" | "american" | "european"
 
@@ -110,6 +119,18 @@ const labelOrientationOption: GlobalOption = {
 	],
 }
 
+// the base font size (LaTeX \documentclass option) of the document the exported diagram is designed to be
+// included in. unlike the options above, this is not a tikzpicture option: it only determines the pt sizes
+// used to preview \tiny .. \Huge text on the canvas (see setBaseFontSize), so that they match once the
+// exported code (which keeps using the relative \tiny .. \Huge commands) is embedded in a document with the
+// same base font size.
+type BaseFontSizeChoice = ChoiceEntry & { pt: DocumentBaseFontSize }
+const baseFontSizeChoices: BaseFontSizeChoice[] = [
+	{ key: "10", name: "10pt (default)", pt: 10 },
+	{ key: "11", name: "11pt", pt: 11 },
+	{ key: "12", name: "12pt", pt: 12 },
+]
+
 const STYLE_PRESETS: Record<StylePreset, Partial<Record<OptionsChoice, string>>> = {
 	default: {
 		voltages: "european",
@@ -145,6 +166,8 @@ export class EnvironmentVariableController {
 
 	private propertyMap: Map<OptionsChoice, ChoiceProperty<ChoiceEntry>> = new Map()
 	private optionsMap: Map<OptionsChoice, GlobalOption> = new Map()
+
+	private baseFontSizeProperty: ChoiceProperty<BaseFontSizeChoice>
 
 	public static get instance(): EnvironmentVariableController {
 		if (!EnvironmentVariableController._instance) {
@@ -187,6 +210,20 @@ export class EnvironmentVariableController {
 
 			this.optionsMap.set(option.key, option)
 		}
+
+		this.baseFontSizeProperty = new ChoiceProperty(
+			"Base Font Size",
+			baseFontSizeChoices,
+			baseFontSizeChoices.find((choice) => choice.pt === getBaseFontSize()),
+			"The base font size of the document this diagram will be included in (the \\documentclass[...] option). " +
+				"Text on the canvas and the \\tiny .. \\Huge commands in the exported code are sized to match, so they " +
+				"come out correctly once the diagram is embedded in a document using this base font size.",
+			"baseFontSize"
+		)
+		this.baseFontSizeProperty.addChangeListener((ev) => {
+			setBaseFontSize(ev.value.pt)
+			this.updateComponents()
+		})
 	}
 
 	public getGlobalSettings(): GlobalTikzSettings {
@@ -221,6 +258,9 @@ export class EnvironmentVariableController {
 		this.htmlElement = document.createElement("div")
 		this.htmlElement.id = "envVarView"
 		this.htmlElement.classList.add("container-fluid", "w-100", "m-0", "gap-3", "px-0")
+
+		this.htmlElement.appendChild(new SectionHeaderProperty("Document Font Size").getHTMLElement())
+		this.htmlElement.appendChild(this.baseFontSizeProperty.getHTMLElement())
 
 		this.htmlElement.appendChild(new SectionHeaderProperty("Environment Variable Presets").getHTMLElement())
 		let presetButtons = new ButtonGridProperty(
@@ -302,5 +342,17 @@ export class EnvironmentVariableController {
 				false
 			)
 		}
+	}
+
+	// undefined means "10pt (default)", matching the other settings' convention of omitting values at their default
+	public getBaseFontSizeJson(): string | undefined {
+		const current = this.baseFontSizeProperty.value
+		return current.pt === baseFontSizeChoices[0].pt ? undefined : current.key
+	}
+
+	public setBaseFontSizeFromJson(key: string | undefined) {
+		const choice = baseFontSizeChoices.find((entry) => entry.key === key) ?? baseFontSizeChoices[0]
+		this.baseFontSizeProperty.updateValue(choice, true, false)
+		setBaseFontSize(choice.pt)
 	}
 }

@@ -31,19 +31,51 @@ export type RectangleSaveObject = ShapeSaveObject & {
 export type FontSize = ChoiceEntry & {
 	size: number
 }
-export const fontSizes: FontSize[] = [
-	{ key: "tiny", name: "tiny", size: 5 },
-	{ key: "scriptsize", name: "scriptsize", size: 7 },
-	{ key: "footnotesize", name: "footnotesize", size: 8 },
-	{ key: "small", name: "small", size: 9 },
-	{ key: "normalsize", name: "normalsize", size: 10 },
-	{ key: "large", name: "large", size: 12 },
-	{ key: "Large", name: "Large", size: 14.4 },
-	{ key: "LARGE", name: "LARGE", size: 17.28 },
-	{ key: "huge", name: "huge", size: 20.74 },
-	{ key: "Huge", name: "Huge", size: 24.88 },
+
+// pt sizes for \tiny .. \Huge, taken from the LaTeX kernel's size10.clo/size11.clo/size12.clo - this is how
+// the relative size commands resolve for a given document base font size (\documentclass[10pt|11pt|12pt]).
+// exported tikz code uses the relative commands (e.g. \footnotesize) instead of absolute sizes, so text only
+// comes out at the intended size if the including document's base font size matches what the diagram was
+// designed for. see setBaseFontSize/getBaseFontSize below.
+const fontSizeTablePt: Record<DocumentBaseFontSize, number[]> = {
+	10: [5, 7, 8, 9, 10, 12, 14, 17, 20, 25],
+	11: [6, 8, 9, 10, 11, 12, 14, 17, 20, 25],
+	12: [6, 8, 10, 11, 12, 14, 17, 20, 25, 25],
+}
+const fontSizeKeys = [
+	"tiny",
+	"scriptsize",
+	"footnotesize",
+	"small",
+	"normalsize",
+	"large",
+	"Large",
+	"LARGE",
+	"huge",
+	"Huge",
 ]
+export const fontSizes: FontSize[] = fontSizeKeys.map((key, index) => ({
+	key,
+	name: key,
+	size: fontSizeTablePt[10][index],
+}))
 export const defaultFontSize = fontSizes[4]
+
+export type DocumentBaseFontSize = 10 | 11 | 12
+let currentBaseFontSize: DocumentBaseFontSize = 10
+export function getBaseFontSize(): DocumentBaseFontSize {
+	return currentBaseFontSize
+}
+// updates the pt sizes backing \tiny .. \Huge for the given base font size. mutates the existing fontSizes
+// entries in place instead of replacing the array, so FontSize references already picked (e.g. text.fontSize
+// on individual text components) pick up the new size automatically.
+export function setBaseFontSize(base: DocumentBaseFontSize) {
+	currentBaseFontSize = base
+	const table = fontSizeTablePt[base]
+	fontSizes.forEach((fontSize, index) => {
+		fontSize.size = table[index]
+	})
+}
 
 export type Text = {
 	text: string
