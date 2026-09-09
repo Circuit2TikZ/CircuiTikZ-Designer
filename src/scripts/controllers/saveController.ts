@@ -18,6 +18,7 @@ export let currentSaveVersion = "0.1"
 export type SaveFileFormat = {
 	version: string
 	tikzSettings: GlobalTikzSettings
+	baseFontSize?: string
 	components: ComponentSaveObject[]
 }
 
@@ -81,6 +82,7 @@ export class SaveController {
 		let data: SaveFileFormat = {
 			version: currentSaveVersion,
 			tikzSettings: settingsData,
+			baseFontSize: EnvironmentVariableController.instance.getBaseFontSizeJson(),
 			components: componentArray,
 		}
 
@@ -170,6 +172,8 @@ export class SaveController {
 				// check if tikzSettings are present and load them
 				EnvironmentVariableController.instance.fromJson(saveFile.tikzSettings)
 			}
+			// falls back to the 10pt default if the save file doesn't specify a base font size
+			EnvironmentVariableController.instance.setBaseFontSizeFromJson(saveFile.baseFontSize)
 
 			for (const component of saveFile.components) {
 				let c = SaveController.fromJson(component)
