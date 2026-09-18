@@ -25,6 +25,7 @@ export * from "./properties/radioButtonProperty"
 //mixins
 export * from "./mixins/fillable"
 export * from "./mixins/strokable"
+export * from "./mixins/symbolColorable"
 export * from "./mixins/nameable"
 export * from "./mixins/labelable"
 export * from "./mixins/voltageable"

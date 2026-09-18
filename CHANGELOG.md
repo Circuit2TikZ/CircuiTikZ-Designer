@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Draw and fill color options for circuit symbol components (resistors, sources, switches, etc.), matching the existing color support for rectangles and ellipses. Fill color is only available for symbols with a closed body (e.g. European-style resistors)
+- "Solid body diode" option for transistors with a body diode (NFET/PFET/NMOS/PMOS, NIGFET/PIGFET, BJTs, IGBTs, JFETs, UJTs, HEMTs and related families), to draw it filled instead of as a hollow outline, matching CircuiTikZ's `diode/full` style. Always the same color as the rest of the transistor. Covers all option combinations (tr circle, ferroelectric gate, bulk/emptycircle, etc.)
+
 ## [0.8.2]
 
 ### Changed

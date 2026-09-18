@@ -30,6 +30,7 @@ import {
 	Voltageable,
 	Currentable,
 	EnvironmentVariableController,
+	SymbolColorable,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -57,7 +58,9 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	poles?: Pole
 }
 
-export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(Nameable(PathComponent)))) {
+export class PathSymbolComponent extends (
+	Currentable(Voltageable(PathLabelable(Nameable(SymbolColorable(PathComponent)))))
+) {
 	private static jsonID = "path"
 	static {
 		CircuitComponent.jsonSaveMap.set(PathSymbolComponent.jsonID, PathSymbolComponent)
@@ -200,8 +203,10 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		this.componentVisualization = CanvasController.instance.canvas.use(this.componentVariant.symbol)
 		this.componentVisualization.fill("none")
-		this.componentVisualization.stroke(defaultStroke)
-		this.componentVisualization.node.style.color = defaultStroke
+		if (symbol.fillable) {
+			this.enableFillColor()
+		}
+		this.updateSymbolColors()
 
 		this.displayName = symbol.displayName
 		this.referenceSymbol = symbol
@@ -624,6 +629,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			labelColor = this.labelColor.value.toString()
 		}
 		this.labelRendering?.fill(labelColor)
+		this.updateSymbolColors()
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
@@ -790,6 +796,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		this.update()
 		this.visualization.show()
 		this.updatePoles()
+		this.updateTheme()
 	}
 
 	public static fromJson(saveObject: PathSymbolSaveObject): PathSymbolComponent {

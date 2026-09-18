@@ -7,8 +7,6 @@ import {
 	ChoiceProperty,
 	CircuitComponent,
 	ComponentSymbol,
-	defaultFill,
-	defaultStroke,
 	EnumOption,
 	InfoProperty,
 	MainController,
@@ -20,6 +18,7 @@ import {
 	SliderProperty,
 	SnappingInfo,
 	SnapPoint,
+	SymbolColorable,
 	SymbolOption,
 	TikzNodeCommand,
 	Variant,
@@ -31,12 +30,13 @@ import { selectedBoxWidth } from "../utils/selectionHelper"
 export type NodeSymbolSaveObject = NodeSaveObject & {
 	id: string
 	options?: string[]
+	bodyDiodeSolid?: boolean
 }
 
 /**
  * The class representing all node components which are based on static symbols from the symbol database, i.e. node circuitikz symbols
  */
-export class NodeSymbolComponent extends NodeComponent {
+export class NodeSymbolComponent extends SymbolColorable(NodeComponent) {
 	private static jsonID = "node"
 	static {
 		CircuitComponent.jsonSaveMap.set(NodeSymbolComponent.jsonID, NodeSymbolComponent)
@@ -51,6 +51,14 @@ export class NodeSymbolComponent extends NodeComponent {
 	protected componentVariant: Variant
 
 	protected scaleProperty: SliderProperty
+
+	/**
+	 * Whether the transistor's body diode (if any) is drawn solid/filled instead of as a hollow outline,
+	 * matching CircuiTikZ's `circuitikz/diode/full` style. Always the same color as the rest of the symbol.
+	 */
+	private bodyDiodeSolid = false
+	private bodyDiodeSolidProperty: BooleanProperty
+	private bodyDiodeOptionProperty: BooleanProperty
 
 	constructor(symbol: ComponentSymbol) {
 		super()
@@ -94,11 +102,33 @@ export class NodeSymbolComponent extends NodeComponent {
 					undefined,
 					"options:option" + option.name
 				)
+				if (option.name === "bodydiode") {
+					this.bodyDiodeOptionProperty = property
+				}
 				property.addChangeListener((ev) => {
 					this.updateOptions()
 				})
 				this.optionProperties.set(property, option)
 				this.properties.add(PropertyCategories.options, property)
+			}
+
+			if (this.bodyDiodeOptionProperty) {
+				this.bodyDiodeSolidProperty = new BooleanProperty(
+					"solid body diode",
+					false,
+					false,
+					undefined,
+					"options:bodydiode_solid"
+				)
+				this.bodyDiodeSolidProperty.disabled = true
+				this.bodyDiodeSolidProperty.addChangeListener((ev) => {
+					this.bodyDiodeSolid = ev.value
+					this.updateBodyDiodeStyle()
+				})
+				this.bodyDiodeOptionProperty.addChangeListener((ev) => {
+					this.bodyDiodeSolidProperty.disabled = !ev.value
+				})
+				this.properties.add(PropertyCategories.stroke, this.bodyDiodeSolidProperty)
 			}
 			for (const enumOption of symbol.possibleEnumOptions) {
 				let choices: ChoiceEntry[] = enumOption.selectNone ? [{ key: "-", name: "--default--" }] : []
@@ -127,8 +157,11 @@ export class NodeSymbolComponent extends NodeComponent {
 
 		this.componentVisualization = CanvasController.instance.canvas.use(this.componentVariant.symbol)
 		this.componentVisualization.fill("none")
-		this.componentVisualization.stroke(defaultStroke)
-		this.componentVisualization.node.style.color = defaultStroke
+		if (symbol.fillable) {
+			this.enableFillColor()
+		}
+		this.updateSymbolColors()
+		this.updateBodyDiodeStyle()
 		this.referencePosition = this.componentVariant.mid
 		this.visualization.add(this.componentVisualization)
 		this.dragElement = this.componentVisualization
@@ -141,6 +174,26 @@ export class NodeSymbolComponent extends NodeComponent {
 	}
 
 	public resizable(resize: boolean): void {}
+
+	public updateTheme(): void {
+		super.updateTheme()
+		this.updateSymbolColors()
+		this.updateBodyDiodeStyle()
+	}
+
+	/**
+	 * Applies bodyDiodeSolid to the componentVisualization. The symbol's body-diode shape (where tagged in
+	 * symbols.svg) references a --bodydiode-fill custom property; setting it to currentColor fills the diode
+	 * solid in the same color as the rest of the symbol, matching CircuiTikZ's `diode/full` style.
+	 */
+	private updateBodyDiodeStyle(): void {
+		if (this.bodyDiodeSolidProperty) {
+			this.componentVisualization.node.style.setProperty(
+				"--bodydiode-fill",
+				this.bodyDiodeSolid ? "currentColor" : "none"
+			)
+		}
+	}
 
 	protected optionsFromProperties(): SymbolOption[] {
 		const selectedOptions: SymbolOption[] = []
@@ -254,6 +307,9 @@ export class NodeSymbolComponent extends NodeComponent {
 		if (this.name.value) {
 			data.name = this.name.value
 		}
+		if (this.bodyDiodeSolid) {
+			data.bodyDiodeSolid = true
+		}
 
 		return data
 	}
@@ -269,6 +325,9 @@ export class NodeSymbolComponent extends NodeComponent {
 
 	protected buildTikzCommand(command: TikzNodeCommand): void {
 		command.options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+		if (this.bodyDiodeSolid && this.bodyDiodeOptionProperty?.value) {
+			command.options.push("circuitikz/diode/full")
+		}
 		super.buildTikzCommand(command)
 	}
 
@@ -277,6 +336,13 @@ export class NodeSymbolComponent extends NodeComponent {
 		let options = saveObject.options ?? []
 		this.setPropertiesFromOptions(this.referenceSymbol.getOptionsFromOptionNames(options))
 		this.scaleProperty.value = new SVG.Number(Math.abs(this.scaleState.x))
+		if (this.bodyDiodeSolidProperty) {
+			this.bodyDiodeSolidProperty.disabled = !this.bodyDiodeOptionProperty.value
+			if (saveObject.bodyDiodeSolid) {
+				this.bodyDiodeSolidProperty.value = true
+				this.bodyDiodeSolid = true
+			}
+		}
 		this.update()
 		this.updateTheme()
 	}
