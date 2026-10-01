@@ -264,6 +264,15 @@ export abstract class NodeComponent extends PositionLabelable(Nameable(CircuitCo
 
 		let labelBBox = labelSVG.bbox()
 
+		if (labelBBox.w === 0 && labelBBox.h === 0) {
+			// In Firefox, a freshly inserted label (glyphs referenced via <use> from shared
+			// <defs>) can briefly report a zero bbox before layout catches up, e.g. right after
+			// bulk component recreation on undo/redo or loading a save file. Retry once the
+			// browser has settled rather than positioning the label from bogus geometry.
+			requestAnimationFrame(() => this.updatePositionedLabel())
+			return
+		}
+
 		// calculate where on the label the anchor point should be
 		let labelDist = this.labelDistance.value.convertToUnit("px").value ?? 0
 		if (this.anchorChoice.value.key == defaultBasicDirection.key) {
