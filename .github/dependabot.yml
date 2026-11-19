@@ -1,0 +1,19 @@
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: /
+      target-branch: dev
+      schedule:
+          interval: monthly
+      groups:
+          npm-dependencies:
+              patterns: ["*"]
+      commit-message:
+          prefix: "chore(deps)"
+    - package-ecosystem: github-actions
+      directory: /
+      target-branch: dev
+      schedule:
+          interval: monthly
+      commit-message:
+          prefix: "ci"

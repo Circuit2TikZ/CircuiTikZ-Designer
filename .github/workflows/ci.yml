@@ -1,0 +1,31 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches: [main, dev]
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        name: ci
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - name: Type check
+              run: npx tsc --noEmit
+            - name: Check formatting
+              run: npx prettier --check .
+            - name: Build
+              run: npm run build

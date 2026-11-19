@@ -4,6 +4,9 @@
 	"private": "true",
 	"description": "An interactive, visual, online editor for creating electrical circuit diagrams for LaTeX/CircuiTikZ with ease.",
 	"license": "GPL-3.0-only",
+	"engines": {
+		"node": ">=22.13.0"
+	},
 	"author": "Manuel Kirzinger",
 	"contributors": [
 		{
