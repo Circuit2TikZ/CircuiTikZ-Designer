@@ -37,7 +37,7 @@ export default new Transformer({
 					const URL_FILENAME_REGEX = /(?<=url\()[\w \/\-.]+(?=#)/
 
 					let processed = ""
-					for (let match; (match = fragment.match(URL_FILENAME_REGEX)); ) {
+					for (let match; (match = fragment.match(URL_FILENAME_REGEX));) {
 						// Content before filename; "[...]url("
 						processed += fragment.substring(0, match.index)
 
