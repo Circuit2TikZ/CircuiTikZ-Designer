@@ -1,0 +1,19 @@
+name: PR title
+
+# pull_request_target so the check also works for PRs from forks. This workflow
+# never checks out or runs code from the PR, it only reads the title.
+on:
+    pull_request_target:
+        types: [opened, edited, synchronize, reopened]
+
+permissions:
+    pull-requests: read
+
+jobs:
+    pr-title:
+        name: pr-title
+        runs-on: ubuntu-latest
+        steps:
+            - uses: amannn/action-semantic-pull-request@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

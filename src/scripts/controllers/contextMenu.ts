@@ -45,7 +45,7 @@ export class ContextMenu {
 				button.classList.add("dropdown-item")
 				if (entry.disabled === true) {
 					button.disabled = true
-					button.ariaDisabled = true
+					button.ariaDisabled = "true"
 				}
 				button.append(icon, entry.text)
 
