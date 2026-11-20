@@ -1,9 +1,10 @@
 name: PR title
 
-# pull_request_target so the check also works for PRs from forks. This workflow
-# never checks out or runs code from the PR, it only reads the title.
+# Plain pull_request: the workflow file comes from the PR itself, so it also runs for
+# PRs from forks and doesn't depend on the base or default branch. Reading the PR
+# title only needs a read-only token.
 on:
-    pull_request_target:
+    pull_request:
         types: [opened, edited, synchronize, reopened]
 
 permissions:
