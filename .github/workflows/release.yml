@@ -53,8 +53,9 @@ jobs:
               if: steps.release.outputs.release == 'true'
               run: npm ci
 
-            # The version is not committed to package.json (main is protected), the tag is the
-            # source of truth. The app embeds package.json's version, so set it for this build only.
+            # package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
+            # for a release), the tag is the source of truth. The app embeds the version from
+            # package.json, so set it for this build only.
             - name: Build
               if: steps.release.outputs.release == 'true'
               run: |

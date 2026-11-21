@@ -43,7 +43,7 @@ Everything except the final merge and the website deployment is automatic.
 3. The `Release` workflow runs on the push to `main`. It computes the version and the notes again, builds the website and creates the tag, the GitHub release (with the notes) and the zip `circuitikz-designer-web-vX.Y.Z.zip`.
 4. Deploy the website manually: download the zip from the release and upload it to the server.
 
-No commit is made for a release: `package.json` keeps its version, and the tag is the source of truth. The release build sets the version for the build only.
+No commit is made for a release: the version in `package.json` (and the lockfile) is the placeholder `0.0.0` and is intentionally never changed. The tag is the source of truth. The release workflow runs `npm version <version> --no-git-tag-version` in the CI workspace before building, so only the released build contains the real version. Local and development builds show `v0.0.0`. Do not run `npm version` yourself or commit a version bump. Any future build job (for example Electron) needs the same step before it builds.
 
 ### Version rules
 
