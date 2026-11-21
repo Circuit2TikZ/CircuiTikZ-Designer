@@ -1,57 +1,76 @@
 name: Release
 
-# Triggered by the version tag that `npm version` pushes (see postversion in package.json).
+# Every push to main is a merge of the dev -> main release PR (direct pushes are blocked by the
+# ruleset). The version and the notes are derived from the conventional commit titles since the
+# last release, see scripts/release.mjs. If nothing releasable is in there, no release is made.
 on:
     push:
-        tags: ["v*"]
+        branches: [main]
 
 permissions:
     contents: write
+    pull-requests: read
+
+concurrency:
+    group: release
+    cancel-in-progress: false
 
 jobs:
     release:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v7
-
-            - name: Check tag against package.json and changelog
-              env:
-                  TAG: ${{ github.ref_name }}
-              run: |
-                  VERSION=$(node -p "require('./package.json').version")
-                  if [ "$TAG" != "v$VERSION" ]; then
-                    echo "::error::Tag $TAG does not match package.json version v$VERSION"
-                    exit 1
-                  fi
-                  # Release notes = the matching section of CHANGELOG.md
-                  awk -v v="$VERSION" '
-                    index($0, "## [" v "]") == 1 { found = 1; next }
-                    found && /^## \[/ { exit }
-                    found { print }
-                  ' CHANGELOG.md > release-notes.md
-                  if ! grep -q '[^[:space:]]' release-notes.md; then
-                    echo "::error::No entry for $VERSION found in CHANGELOG.md"
-                    exit 1
-                  fi
-                  echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+              with:
+                  fetch-depth: 0 # full history and tags are needed to find the changes since the last release
 
             - uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
                   cache: npm
-            - run: npm ci
-            - name: Build
-              run: npm run build
 
-            - name: Package website
-              run: (cd dist && zip -r "../circuitikz-designer-web-v$VERSION.zip" .)
-
-            - name: Create GitHub release
+            # A "release-as:X.Y.Z" label on the release PR overrides the computed version,
+            # e.g. to go from 0.x to 1.0.0
+            - name: Look up release-as label
+              id: label
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  TAG: ${{ github.ref_name }}
               run: |
-                  FLAGS=""
-                  case "$VERSION" in *-*) FLAGS="--prerelease" ;; esac
-                  gh release create "$TAG" "circuitikz-designer-web-v$VERSION.zip" \
-                    --title "$TAG" --notes-file release-notes.md $FLAGS
+                  LABEL=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+                    --jq '[.[].labels[].name | select(startswith("release-as:"))][0] // ""')
+                  echo "release_as=${LABEL#release-as:}" >> "$GITHUB_OUTPUT"
+
+            - name: Compute version and notes
+              id: release
+              env:
+                  RELEASE_AS: ${{ steps.label.outputs.release_as }}
+              run: node scripts/release.mjs --release-as "$RELEASE_AS" --notes-file release-notes.md
+
+            - name: Nothing to release
+              if: steps.release.outputs.release != 'true'
+              run: echo "::notice::No feat/fix/perf/breaking change since ${{ steps.release.outputs.since }}, no release created."
+
+            - name: Install dependencies
+              if: steps.release.outputs.release == 'true'
+              run: npm ci
+
+            # The version is not committed to package.json (main is protected), the tag is the
+            # source of truth. The app embeds package.json's version, so set it for this build only.
+            - name: Build
+              if: steps.release.outputs.release == 'true'
+              run: |
+                  npm version "${{ steps.release.outputs.version }}" --no-git-tag-version
+                  npm run build
+
+            - name: Package website
+              if: steps.release.outputs.release == 'true'
+              run: (cd dist && zip -r "../circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" .)
+
+            - name: Create GitHub release
+              if: steps.release.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release create "${{ steps.release.outputs.tag }}" \
+                    "circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" \
+                    --target "$GITHUB_SHA" --title "${{ steps.release.outputs.tag }}" \
+                    --notes-file release-notes.md
