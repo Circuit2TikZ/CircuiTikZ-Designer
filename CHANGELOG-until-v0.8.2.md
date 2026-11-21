@@ -1,7 +1,8 @@
-# Changelog
+# Changelog (archived, up to v0.8.2)
 
-> Release notes for versions after 0.8.2 are generated from the pull request titles and published on the
-> [GitHub Releases page](../../releases). This file only keeps the earlier history.
+> **This file is no longer updated.** Release notes for versions after 0.8.2 are generated from the pull
+> request titles and published on the [GitHub Releases page](../../releases). This file only keeps the
+> earlier history.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
