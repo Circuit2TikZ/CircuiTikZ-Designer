@@ -20,6 +20,10 @@ updates:
           # Major Electron updates need testing of the desktop build, do them manually.
           - dependency-name: electron
             update-types: ["version-update:semver-major"]
+          # MathJax 4 is a different engine (other fonts and metrics, lazily loaded components), the
+          # label rendering in src/scripts/utils/textHelper.ts is tuned for 3.x and uses its synchronous API.
+          - dependency-name: mathjax
+            update-types: ["version-update:semver-major"]
       commit-message:
           prefix: "chore(deps)"
     - package-ecosystem: github-actions
