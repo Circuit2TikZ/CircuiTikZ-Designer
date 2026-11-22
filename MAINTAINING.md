@@ -45,15 +45,16 @@ Everything except the final merge and the website deployment is automatic.
 
 The release contains:
 
-| File                                                     | Content                                 |
-| -------------------------------------------------------- | --------------------------------------- |
-| `circuitikz-designer-web-vX.Y.Z.zip`                     | the website (what you deploy)           |
-| `circuitikz-designer-X.Y.Z-win-x64-setup.exe`            | Windows installer (Squirrel)            |
-| `CircuiTikZ-Designer-win32-x64-X.Y.Z.zip`                | Windows, portable                       |
-| `circuitikz-designer_*.deb`, `circuitikz-designer-*.rpm` | Debian/Ubuntu and Fedora/openSUSE (x64) |
-| `CircuiTikZ-Designer-linux-x64-X.Y.Z.zip`                | Linux, any distribution, portable       |
-| `CircuiTikZ-Designer-darwin-arm64-X.Y.Z.zip`             | macOS (Apple Silicon)                   |
-| `SHA256SUMS.txt`                                         | checksums of all files above            |
+| File                                          | Content                               |
+| --------------------------------------------- | ------------------------------------- |
+| `circuitikz-designer-web-vX.Y.Z.zip`          | the website (what you deploy)         |
+| `circuitikz-designer-X.Y.Z-win-x64-setup.exe` | Windows installer (Squirrel)          |
+| `CircuiTikZ-Designer-win32-x64-X.Y.Z.zip`     | Windows, portable                     |
+| `circuitikz-designer_X.Y.Z_amd64.deb`         | Debian/Ubuntu and derivatives (x64)   |
+| `circuitikz-designer-X.Y.Z-1.x86_64.rpm`      | Fedora/openSUSE and derivatives (x64) |
+| `CircuiTikZ-Designer-linux-x64-X.Y.Z.zip`     | Linux, any distribution, portable     |
+| `CircuiTikZ-Designer-darwin-arm64-X.Y.Z.zip`  | macOS (Apple Silicon)                 |
+| `SHA256SUMS.txt`                              | checksums of all files above          |
 
 The desktop apps are **not code signed**. Windows shows a SmartScreen warning ("Windows protected your PC", then "More info", then "Run anyway") and macOS refuses to open the unsigned app at first (right click the app, "Open", or remove the quarantine flag). Signing needs a paid Apple Developer account for macOS and a certificate (or a signing service) for Windows, and is not set up yet. There is no Intel macOS or arm64 Linux build yet.
 
