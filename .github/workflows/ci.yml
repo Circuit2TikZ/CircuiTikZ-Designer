@@ -47,3 +47,7 @@ jobs:
             - run: npm ci
             - name: Build
               run: npm run build
+            # catches desktop packaging problems before a release; the installers themselves
+            # are only built by the release workflow
+            - name: Package desktop app (smoke test)
+              run: npx electron-forge package

@@ -71,6 +71,6 @@ You don't need to do anything for releases, but it explains why the title matter
 
 - Merged pull requests collect on `dev`.
 - A bot keeps a draft pull request from `dev` to `main` whose description shows the next version and the release notes. Both are generated from the titles of the merged pull requests.
-- When the maintainers merge that pull request, a release with the website build attached is created automatically.
+- When the maintainers merge that pull request, a release with the website build and the desktop apps attached is created automatically.
 
 Versions follow [semantic versioning](https://semver.org/). Maintainer details are in [MAINTAINING.md](MAINTAINING.md).

@@ -40,8 +40,27 @@ Everything except the final merge and the website deployment is automatic.
 
 1. Whenever `dev` contains a releasable change (`feat`, `fix`, `perf` or a breaking change since the last release), the `Release preview` workflow opens a **draft** pull request `chore(release): next release` from `dev` to `main`. On every further push to `dev` it updates the description with the next version and the notes. With only `chore`, `ci`, `docs`, `refactor`, `test` or `build` changes, no PR is opened.
 2. When you want to release, review the version and notes in the description, mark the PR **Ready for review**, wait for the checks and merge it with a **merge commit**.
-3. The `Release` workflow runs on the push to `main`. It computes the version and the notes again, builds the website and creates the tag, the GitHub release (with the notes) and the zip `circuitikz-designer-web-vX.Y.Z.zip`.
+3. The `Release` workflow runs on the push to `main`. It computes the version and the notes again, builds the website and the desktop app, and only when every build succeeded creates the tag and the GitHub release (with the notes and all files). If a build fails, nothing is released: fix the cause, or re-run the failed jobs from the Actions tab, and the release follows.
 4. Deploy the website manually: download the zip from the release and upload it to the server.
+
+The release contains:
+
+| File                                          | Content                               |
+| --------------------------------------------- | ------------------------------------- |
+| `circuitikz-designer-web-vX.Y.Z.zip`          | the website (what you deploy)         |
+| `circuitikz-designer-X.Y.Z-win-x64-setup.exe` | Windows installer (Squirrel)          |
+| `CircuiTikZ-Designer-win32-x64-X.Y.Z.zip`     | Windows, portable                     |
+| `circuitikz-designer_X.Y.Z_amd64.deb`         | Debian/Ubuntu and derivatives (x64)   |
+| `circuitikz-designer-X.Y.Z-1.x86_64.rpm`      | Fedora/openSUSE and derivatives (x64) |
+| `CircuiTikZ-Designer-linux-x64-X.Y.Z.zip`     | Linux, any distribution, portable     |
+| `CircuiTikZ-Designer-darwin-arm64-X.Y.Z.zip`  | macOS (Apple Silicon)                 |
+| `SHA256SUMS.txt`                              | checksums of all files above          |
+
+The desktop apps are **not code signed**. Windows shows a SmartScreen warning ("Windows protected your PC", then "More info", then "Run anyway") and macOS refuses to open the unsigned app at first (right click the app, "Open", or remove the quarantine flag). Signing needs a paid Apple Developer account for macOS and a certificate (or a signing service) for Windows, and is not set up yet. There is no Intel macOS or arm64 Linux build yet.
+
+**Dry run:** to test the builds without releasing, run the `Release` workflow manually (Actions tab → Release → Run workflow, optionally with a dummy version). It builds the website and the desktop apps for all platforms and keeps the files as workflow artifacts for 3 days. It creates no tag and no release. Do this after changing the desktop packaging or the release workflow.
+
+The desktop packaging is configured in `forge.config.js`, the icons are in `src/icons/` (`app.ico` and `app.icns` are generated from `android-icon-512x512.png`). Pull requests only run a packaging smoke test on Linux (`electron-forge package` in the `build` check), the installers are built by the release workflow. To try the packaging locally: `npm run package` (`npm run make` also creates the installers, which needs `dpkg`, `fakeroot` and `rpmbuild` on Linux).
 
 No commit is made for a release: the version in `package.json` (and the lockfile) is the placeholder `0.0.0` and is intentionally never changed. The tag is the source of truth. The release workflow runs `npm version <version> --no-git-tag-version` in the CI workspace before building, so only the released build contains the real version. Local and development builds show `v0.0.0`. Do not run `npm version` yourself or commit a version bump. Any future build job (for example Electron) needs the same step before it builds.
 
@@ -80,13 +99,13 @@ Add a label named `release-as:X.Y.Z` (for example `release-as:1.0.0`) to the rel
 
 ## Workflows
 
-| File                  | Trigger                          | Purpose                                        |
-| --------------------- | -------------------------------- | ---------------------------------------------- |
-| `ci.yml`              | every push, pull requests        | type check, formatting, build for `main`/`dev` |
-| `pr-title.yml`        | pull requests                    | conventional commit check for the PR title     |
-| `source-branch.yml`   | pull requests into `main`        | only `dev` may be merged into `main`           |
-| `release-preview.yml` | push to `dev`, release PR events | opens/updates the draft release PR             |
-| `release.yml`         | push to `main`                   | version, tag, GitHub release and website zip   |
+| File                  | Trigger                          | Purpose                                                    |
+| --------------------- | -------------------------------- | ---------------------------------------------------------- |
+| `ci.yml`              | every push, pull requests        | type check, formatting, build for `main`/`dev`             |
+| `pr-title.yml`        | pull requests                    | conventional commit check for the PR title                 |
+| `source-branch.yml`   | pull requests into `main`        | only `dev` may be merged into `main`                       |
+| `release-preview.yml` | push to `dev`, release PR events | opens/updates the draft release PR                         |
+| `release.yml`         | push to `main`                   | version, tag, GitHub release, website zip and desktop apps |
 
 When changing the release logic, `scripts/release.mjs` can be run locally:
 `node scripts/release.mjs --ref origin/dev --preview` prints the next version and the notes without changing anything.
