@@ -149,7 +149,9 @@ function main() {
 	const release = Boolean(version)
 	let notes = renderNotes(commits)
 	if (release && process.env.GITHUB_REPOSITORY) {
-		notes += `\n**Full changelog:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/${tag}...v${version}\n`
+		// the new tag doesn't exist before the release, so the preview compares with the branch
+		const compareTo = preview ? ref.replace(/^(origin|upstream)\//, "") : `v${version}`
+		notes += `\n**Full changelog:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/${tag}...${compareTo}\n`
 	}
 	if (preview) {
 		const head =
