@@ -45,6 +45,7 @@
 		"electron-squirrel-startup": "^1.0.1",
 		"file-saver": "^2.0.5",
 		"hotkeys-js": "^3.13.15",
+		"mathjax": "^3.2.2",
 		"prettier": "^3.6.2",
 		"text-to-svg": "^3.1.5"
 	},

@@ -4,6 +4,9 @@ import "../utils/impSVGNumber"
 import { waitForElementLoaded } from "../utils/domWatcher"
 import hotkeys from "hotkeys-js"
 import { version } from "../../../package.json"
+// MathJax is bundled with the app. This is the variant with all TeX extensions included: the synchronous
+// tex2svg() used for the labels can't wait for the lazily loaded extensions of the plain tex-svg.js.
+import mathJaxUrl from "url:mathjax/es5/tex-svg-full.js"
 
 import {
 	CanvasController,
@@ -266,7 +269,7 @@ export class MainController {
 	}
 
 	private async loadMathJax() {
-		var promise = new Promise((resolve) => {
+		var promise = new Promise((resolve, reject) => {
 			if (!("MathJax" in window)) {
 				;(window as any).MathJax = {
 					tex: {
@@ -275,13 +278,20 @@ export class MainController {
 				}
 			}
 			var script = document.createElement("script")
-			script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+			script.src = mathJaxUrl
 			document.head.appendChild(script)
 
 			script.addEventListener(
 				"load",
 				function () {
 					resolve("")
+				},
+				false
+			)
+			script.addEventListener(
+				"error",
+				function () {
+					reject(new Error("MathJax could not be loaded"))
 				},
 				false
 			)
