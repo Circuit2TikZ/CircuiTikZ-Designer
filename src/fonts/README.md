@@ -1,6 +1,6 @@
 # Fonts
 
-Both fonts are bundled with the app and redistributed under their own licenses, which are not the GPL of this project. The fonts are separate data files that the app loads, not part of the program's code. The license texts are in this directory.
+Both fonts are bundled with the app and redistributed under their own licenses, which are not the GPL of this project. The fonts are separate data files that the app loads, not part of the program's code. The license texts are in this directory. They are linked from the About dialog (`src/pages/index.html`), which makes Parcel ship them with every build (website and desktop apps). If a font is added or replaced, update the dialog as well.
 
 ## Canvas font: CMU Serif Roman
 
