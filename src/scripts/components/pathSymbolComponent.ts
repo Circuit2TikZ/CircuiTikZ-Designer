@@ -727,6 +727,9 @@ export class PathSymbolComponent extends (
 		super.buildTikzCommand(command)
 		let options: string[] = [this.referenceSymbol.tikzName]
 		options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+		// pushed onto the symbol's own to[...] options rather than the enclosing \draw command's options,
+		// since the latter would also color the straight wire leads connecting to the symbol
+		options.push(...this.symbolColorTikzOptions())
 		if (this.mirror.value) {
 			options.push("mirror")
 		}

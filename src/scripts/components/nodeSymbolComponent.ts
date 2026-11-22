@@ -328,6 +328,7 @@ export class NodeSymbolComponent extends SymbolColorable(NodeComponent) {
 		if (this.bodyDiodeSolid && this.bodyDiodeOptionProperty?.value) {
 			command.options.push("circuitikz/diode/full")
 		}
+		command.options.push(...this.symbolColorTikzOptions())
 		super.buildTikzCommand(command)
 	}
 

@@ -116,14 +116,22 @@ export function SymbolColorable<TBase extends AbstractConstructor<CircuitCompone
 			}
 		}
 
-		protected buildTikzCommand(command: { options: string[] }): void {
-			super.buildTikzCommand(command)
+		/**
+		 * The tikz options for this component's draw/fill color, e.g. `["draw=red"]`.
+		 *
+		 * Callers must add these to the options of the symbol itself (e.g. a path component's `to[...]`
+		 * bracket), not to an enclosing `\draw`/`\path` command's own options, since for a path component
+		 * the latter would also color the straight wire leads connecting to the symbol.
+		 */
+		protected symbolColorTikzOptions(): string[] {
+			const options: string[] = []
 			if (this.drawColorInfo.color !== "default") {
-				command.options.push("draw=" + new SVG.Color(this.drawColorInfo.color).toTikzString())
+				options.push("draw=" + new SVG.Color(this.drawColorInfo.color).toTikzString())
 			}
 			if (this.fillColorEnabled && this.fillColorInfo.color !== "default") {
-				command.options.push("fill=" + new SVG.Color(this.fillColorInfo.color).toTikzString())
+				options.push("fill=" + new SVG.Color(this.fillColorInfo.color).toTikzString())
 			}
+			return options
 		}
 	}
 	return SymbolColorable
