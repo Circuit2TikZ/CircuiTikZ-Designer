@@ -1,0 +1,24 @@
+name: Source branch
+
+# Pull requests into main may only come from dev of this repository. GitHub can't prevent
+# opening other PRs against main, but with this as a required check they can't be merged.
+on:
+    pull_request:
+        branches: [main]
+
+permissions: {}
+
+jobs:
+    source-branch:
+        name: source-branch
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check head branch
+              env:
+                  HEAD_REF: ${{ github.head_ref }}
+                  HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+              run: |
+                  if [ "$HEAD_REF" != "dev" ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+                    echo "::error::Pull requests into main must come from the dev branch of $GITHUB_REPOSITORY. Please target dev instead."
+                    exit 1
+                  fi

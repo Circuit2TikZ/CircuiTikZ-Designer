@@ -1,0 +1,31 @@
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: /
+      target-branch: dev
+      schedule:
+          interval: monthly
+      groups:
+          npm-dependencies:
+              patterns: ["*"]
+      ignore:
+          # TypeScript 7 has no JS API yet, which Parcel's TypeScript transformer needs.
+          # Bump manually once the setup is migrated.
+          - dependency-name: typescript
+            update-types: ["version-update:semver-major"]
+          # hotkeys-js 4.x ships a "browser" field pointing to a script without exports, which
+          # Parcel 2 picks over the ESM entry, so the import is an empty object at runtime.
+          - dependency-name: hotkeys-js
+            update-types: ["version-update:semver-major"]
+          # Major Electron updates need testing of the desktop build, do them manually.
+          - dependency-name: electron
+            update-types: ["version-update:semver-major"]
+      commit-message:
+          prefix: "chore(deps)"
+    - package-ecosystem: github-actions
+      directory: /
+      target-branch: dev
+      schedule:
+          interval: monthly
+      commit-message:
+          prefix: "ci"

@@ -2,6 +2,11 @@
 /xmlSchema/namespace.xsd
 /xmlSchema/svg.xsd
 /xmlSchema/xlink.xsd
+/xmlSchema/catalog.xml
+/xmlSchema/metadataSchema.xsd
 
 # don't check icons
 /src/icons/
+# generated/vendored data and images
+/src/data/symbols.svg
+/marketing/

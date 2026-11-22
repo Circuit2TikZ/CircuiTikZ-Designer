@@ -1,0 +1,77 @@
+name: Release
+
+# Every push to main is a merge of the dev -> main release PR (direct pushes are blocked by the
+# ruleset). The version and the notes are derived from the conventional commit titles since the
+# last release, see scripts/release.mjs. If nothing releasable is in there, no release is made.
+on:
+    push:
+        branches: [main]
+
+permissions:
+    contents: write
+    pull-requests: read
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0 # full history and tags are needed to find the changes since the last release
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            # A "release-as:X.Y.Z" label on the release PR overrides the computed version,
+            # e.g. to go from 0.x to 1.0.0
+            - name: Look up release-as label
+              id: label
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  LABEL=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+                    --jq '[.[].labels[].name | select(startswith("release-as:"))][0] // ""')
+                  echo "release_as=${LABEL#release-as:}" >> "$GITHUB_OUTPUT"
+
+            - name: Compute version and notes
+              id: release
+              env:
+                  RELEASE_AS: ${{ steps.label.outputs.release_as }}
+              run: node scripts/release.mjs --release-as "$RELEASE_AS" --notes-file release-notes.md
+
+            - name: Nothing to release
+              if: steps.release.outputs.release != 'true'
+              run: echo "::notice::No feat/fix/perf/breaking change since ${{ steps.release.outputs.since }}, no release created."
+
+            - name: Install dependencies
+              if: steps.release.outputs.release == 'true'
+              run: npm ci
+
+            # package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
+            # for a release), the tag is the source of truth. The app embeds the version from
+            # package.json, so set it for this build only.
+            - name: Build
+              if: steps.release.outputs.release == 'true'
+              run: |
+                  npm version "${{ steps.release.outputs.version }}" --no-git-tag-version
+                  npm run build
+
+            - name: Package website
+              if: steps.release.outputs.release == 'true'
+              run: (cd dist && zip -r "../circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" .)
+
+            - name: Create GitHub release
+              if: steps.release.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release create "${{ steps.release.outputs.tag }}" \
+                    "circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" \
+                    --target "$GITHUB_SHA" --title "${{ steps.release.outputs.tag }}" \
+                    --notes-file release-notes.md
