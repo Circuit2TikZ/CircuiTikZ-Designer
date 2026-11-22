@@ -13,9 +13,17 @@ name: Release
 # package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
 # for a release), the tag is the source of truth. The app embeds the version from package.json,
 # so the build jobs set it with `npm version` for their build only.
+#
+# Manual dry run (Actions tab -> Release -> Run workflow): runs the web and desktop builds with a
+# dummy version and keeps the files as workflow artifacts for 3 days. No tag, no release.
 on:
     push:
         branches: [main]
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Dummy version for the dry run (MAJOR.MINOR.PATCH, no suffix: rpm doesn't allow one)"
+                default: "0.0.1"
 
 permissions:
     contents: read
@@ -31,10 +39,26 @@ jobs:
             contents: read
             pull-requests: read
         outputs:
-            release: ${{ steps.release.outputs.release }}
-            version: ${{ steps.release.outputs.version }}
-            tag: ${{ steps.release.outputs.tag }}
+            release: ${{ steps.release.outputs.release || steps.dry-run.outputs.release }}
+            version: ${{ steps.release.outputs.version || steps.dry-run.outputs.version }}
+            tag: ${{ steps.release.outputs.tag || steps.dry-run.outputs.tag }}
         steps:
+            - name: Dry run
+              id: dry-run
+              if: github.event_name == 'workflow_dispatch'
+              env:
+                  INPUT_VERSION: ${{ inputs.version }}
+              run: |
+                  if ! echo "$INPUT_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+                    echo "::error::The version must look like 1.2.3"
+                    exit 1
+                  fi
+                  {
+                    echo "release=true"
+                    echo "version=$INPUT_VERSION"
+                    echo "tag=v$INPUT_VERSION"
+                  } >> "$GITHUB_OUTPUT"
+
             - uses: actions/checkout@v7
               with:
                   fetch-depth: 0 # full history and tags are needed to find the changes since the last release
@@ -47,6 +71,7 @@ jobs:
             # e.g. to go from 0.x to 1.0.0
             - name: Look up release-as label
               id: label
+              if: github.event_name == 'push'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
@@ -56,21 +81,22 @@ jobs:
 
             - name: Compute version and notes
               id: release
+              if: github.event_name == 'push'
               env:
                   RELEASE_AS: ${{ steps.label.outputs.release_as }}
               run: node scripts/release.mjs --release-as "$RELEASE_AS" --notes-file release-notes.md
 
             - name: Nothing to release
-              if: steps.release.outputs.release != 'true'
+              if: github.event_name == 'push' && steps.release.outputs.release != 'true'
               run: echo "::notice::No feat/fix/perf/breaking change since ${{ steps.release.outputs.since }}, no release created."
 
             - name: Keep the release notes
-              if: steps.release.outputs.release == 'true'
+              if: github.event_name == 'push' && steps.release.outputs.release == 'true'
               uses: actions/upload-artifact@v7
               with:
                   name: release-notes
                   path: release-notes.md
-                  retention-days: 1
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
 
     web:
         needs: prepare
@@ -96,7 +122,7 @@ jobs:
                   name: web
                   path: circuitikz-designer-web-v*.zip
                   if-no-files-found: error
-                  retention-days: 1
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
 
     desktop:
         needs: prepare
@@ -135,11 +161,12 @@ jobs:
                       out/make/**/*.rpm
                       out/make/**/*-setup.exe
                   if-no-files-found: error
-                  retention-days: 1
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
 
     release:
         needs: [prepare, web, desktop]
-        if: needs.prepare.outputs.release == 'true'
+        # the manual dry run stops before this job
+        if: github.event_name == 'push' && needs.prepare.outputs.release == 'true'
         runs-on: ubuntu-latest
         permissions:
             contents: write
