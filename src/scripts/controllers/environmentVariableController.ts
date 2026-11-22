@@ -296,11 +296,13 @@ export class EnvironmentVariableController {
 		Object.assign(this.globalSettings, saveSettings)
 		for (const key of Object.keys(this.globalSettings)) {
 			let property = this.propertyMap.get(key as OptionsChoice)
-			property.updateValue(
-				property.entries.find((entry) => entry.key === this.globalSettings[key as OptionsChoice]),
-				true,
-				false
-			)
+			if (property) {
+				property.updateValue(
+					property.entries.find((entry) => entry.key === this.globalSettings[key as OptionsChoice]),
+					true,
+					false
+				)
+			}
 		}
 	}
 }
