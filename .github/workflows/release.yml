@@ -3,21 +3,37 @@ name: Release
 # Every push to main is a merge of the dev -> main release PR (direct pushes are blocked by the
 # ruleset). The version and the notes are derived from the conventional commit titles since the
 # last release, see scripts/release.mjs. If nothing releasable is in there, no release is made.
+#
+# prepare:  computes the version and the notes
+# web:      builds the website zip
+# desktop:  builds the desktop app on Linux (deb, rpm, zip), Windows (installer, zip) and macOS (zip)
+# release:  creates the tag and the GitHub release with all files, only if every build succeeded
+#           (a failed build can be re-run from the Actions tab, then the release follows)
+#
+# package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
+# for a release), the tag is the source of truth. The app embeds the version from package.json,
+# so the build jobs set it with `npm version` for their build only.
 on:
     push:
         branches: [main]
 
 permissions:
-    contents: write
-    pull-requests: read
+    contents: read
 
 concurrency:
     group: release
     cancel-in-progress: false
 
 jobs:
-    release:
+    prepare:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: read
+        outputs:
+            release: ${{ steps.release.outputs.release }}
+            version: ${{ steps.release.outputs.version }}
+            tag: ${{ steps.release.outputs.tag }}
         steps:
             - uses: actions/checkout@v7
               with:
@@ -26,7 +42,6 @@ jobs:
             - uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
-                  cache: npm
 
             # A "release-as:X.Y.Z" label on the release PR overrides the computed version,
             # e.g. to go from 0.x to 1.0.0
@@ -49,29 +64,99 @@ jobs:
               if: steps.release.outputs.release != 'true'
               run: echo "::notice::No feat/fix/perf/breaking change since ${{ steps.release.outputs.since }}, no release created."
 
-            - name: Install dependencies
+            - name: Keep the release notes
               if: steps.release.outputs.release == 'true'
-              run: npm ci
+              uses: actions/upload-artifact@v7
+              with:
+                  name: release-notes
+                  path: release-notes.md
+                  retention-days: 1
 
-            # package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
-            # for a release), the tag is the source of truth. The app embeds the version from
-            # package.json, so set it for this build only.
+    web:
+        needs: prepare
+        if: needs.prepare.outputs.release == 'true'
+        runs-on: ubuntu-latest
+        env:
+            VERSION: ${{ needs.prepare.outputs.version }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - name: Set version
+              run: npm version "$VERSION" --no-git-tag-version
             - name: Build
-              if: steps.release.outputs.release == 'true'
-              run: |
-                  npm version "${{ steps.release.outputs.version }}" --no-git-tag-version
-                  npm run build
-
+              run: npm run build
             - name: Package website
-              if: steps.release.outputs.release == 'true'
-              run: (cd dist && zip -r "../circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" .)
+              run: (cd dist && zip -r "../circuitikz-designer-web-v$VERSION.zip" .)
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: web
+                  path: circuitikz-designer-web-v*.zip
+                  if-no-files-found: error
+                  retention-days: 1
 
+    desktop:
+        needs: prepare
+        if: needs.prepare.outputs.release == 'true'
+        strategy:
+            fail-fast: false # let the other platforms finish, so one run shows all problems
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                shell: bash
+        env:
+            VERSION: ${{ needs.prepare.outputs.version }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - name: Install the Linux packaging tools
+              if: runner.os == 'Linux'
+              run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+            - run: npm ci
+            - name: Set version
+              run: npm version "$VERSION" --no-git-tag-version
+            # builds the web app first, then packages it and creates the installers for this OS
+            - name: Build desktop app
+              run: npm run make
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: desktop-${{ runner.os }}
+                  path: |
+                      out/make/**/*.zip
+                      out/make/**/*.deb
+                      out/make/**/*.rpm
+                      out/make/**/*-setup.exe
+                  if-no-files-found: error
+                  retention-days: 1
+
+    release:
+        needs: [prepare, web, desktop]
+        if: needs.prepare.outputs.release == 'true'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_REPO: ${{ github.repository }}
+            TAG: ${{ needs.prepare.outputs.tag }}
+        steps:
+            - uses: actions/download-artifact@v8
+              with:
+                  path: artifacts
             - name: Create GitHub release
-              if: steps.release.outputs.release == 'true'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  gh release create "${{ steps.release.outputs.tag }}" \
-                    "circuitikz-designer-web-${{ steps.release.outputs.tag }}.zip" \
-                    --target "$GITHUB_SHA" --title "${{ steps.release.outputs.tag }}" \
-                    --notes-file release-notes.md
+                  mkdir release-files
+                  find artifacts -type f \( -name '*.zip' -o -name '*.deb' -o -name '*.rpm' -o -name '*.exe' \) -exec cp {} release-files/ \;
+                  (cd release-files && sha256sum -- * > SHA256SUMS.txt)
+                  ls -l release-files
+                  gh release create "$TAG" release-files/* \
+                    --target "$GITHUB_SHA" --title "$TAG" \
+                    --notes-file artifacts/release-notes/release-notes.md
