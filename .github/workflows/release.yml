@@ -130,7 +130,9 @@ jobs:
         strategy:
             fail-fast: false # let the other platforms finish, so one run shows all problems
             matrix:
-                os: [ubuntu-latest, windows-latest, macos-latest]
+                # Linux is pinned: electron-installer-redhat (rpm maker) doesn't work with rpm 4.20+,
+                # which newer Ubuntu images ship ("cp: cannot stat 'usr/*'"). Ubuntu 24.04 has rpm 4.18.
+                os: [ubuntu-24.04, windows-latest, macos-latest]
         runs-on: ${{ matrix.os }}
         defaults:
             run:
@@ -145,7 +147,9 @@ jobs:
                   cache: npm
             - name: Install the Linux packaging tools
               if: runner.os == 'Linux'
-              run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+              run: |
+                  sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+                  rpmbuild --version
             - run: npm ci
             - name: Set version
               run: npm version "$VERSION" --no-git-tag-version
