@@ -1,15 +1,21 @@
 <!doctype html>
 <html lang="en-US" data-bs-theme="dark">
 	<head>
-		<!-- Google tag (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-SN05E6G25Q"></script>
+		<!-- Google tag (gtag.js), only on the website: the desktop apps are loaded from file:// and send nothing -->
 		<script>
-			window.dataLayer = window.dataLayer || []
-			function gtag() {
-				dataLayer.push(arguments)
+			if (location.protocol === "https:" || location.protocol === "http:") {
+				var gtagScript = document.createElement("script")
+				gtagScript.async = true
+				gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-SN05E6G25Q"
+				document.head.appendChild(gtagScript)
+
+				window.dataLayer = window.dataLayer || []
+				window.gtag = function () {
+					window.dataLayer.push(arguments)
+				}
+				window.gtag("js", new Date())
+				window.gtag("config", "G-SN05E6G25Q", { cookie_flags: "max-age=7200;secure;samesite=strict" })
 			}
-			gtag("js", new Date())
-			gtag("config", "G-SN05E6G25Q", { cookie_flags: "max-age=7200;secure;samesite=strict" })
 		</script>
 		<title>CircuiTikZ Designer</title>
 		<meta name="title" property="og:title" content="CircuiTikZ Designer" />
