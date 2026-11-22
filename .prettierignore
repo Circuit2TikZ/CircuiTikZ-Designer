@@ -10,3 +10,6 @@
 # generated/vendored data and images
 /src/data/symbols.svg
 /marketing/
+
+# legal text, kept byte-identical to main
+CLA.md
