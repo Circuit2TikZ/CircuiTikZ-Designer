@@ -47,6 +47,9 @@ jobs:
             - run: npm ci
             - name: Build
               run: npm run build
+            # every package in the bundles has to be in src/licenses/THIRD-PARTY-NOTICES.txt
+            - name: Check third-party notices
+              run: npm run notices:check
             # catches desktop packaging problems before a release; the installers themselves
             # are only built by the release workflow
             - name: Package desktop app (smoke test)
