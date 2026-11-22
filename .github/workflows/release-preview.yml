@@ -6,9 +6,11 @@ name: Release preview
 # The PR is the "unreleased" view. Mark it ready for review and merge it (merge commit) to release.
 #
 # PRs opened with the default GITHUB_TOKEN don't trigger the pull_request workflows (pr-title,
-# source-branch), so they could never be merged. Add a repository secret RELEASE_BOT_TOKEN
-# (fine-grained PAT or GitHub App token with "Pull requests: write") to avoid that. Without it
-# the PR is still opened, but it has to be closed and reopened once to run the required checks.
+# source-branch), so they could never be merged. Therefore the PR is opened with a short-lived
+# token of a GitHub App (see MAINTAINING.md): set the repository variable RELEASE_APP_CLIENT_ID
+# and the secret RELEASE_APP_PRIVATE_KEY. The PR is then authored by the app, not by a person.
+# Without them the default token is used: the PR is still opened and updated, but it has to be
+# closed and reopened once to run the required checks.
 on:
     push:
         branches: [dev]
@@ -25,9 +27,6 @@ concurrency:
     group: release-preview
     cancel-in-progress: true
 
-env:
-    GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-
 jobs:
     preview:
         runs-on: ubuntu-latest
@@ -43,8 +42,20 @@ jobs:
               with:
                   node-version-file: .nvmrc
 
+            - name: Create GitHub App token
+              id: app-token
+              if: vars.RELEASE_APP_CLIENT_ID != ''
+              uses: actions/create-github-app-token@v3
+              with:
+                  client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+                  private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+                  permission-pull-requests: write
+                  permission-contents: read
+
             - name: Find the release PR
               id: pr
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
               run: |
                   NUMBER=$(gh pr list --head dev --base main --state open --json number --jq '.[0].number // empty')
                   RELEASE_AS=""
@@ -72,10 +83,14 @@ jobs:
 
             - name: Update PR description
               if: steps.pr.outputs.number
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
               run: gh pr edit "${{ steps.pr.outputs.number }}" --body-file body.md
 
             - name: Open release PR
               if: steps.pr.outputs.number == '' && steps.release.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
               run: |
                   gh pr create --draft --base main --head dev \
                     --title "chore(release): next release" --body-file body.md

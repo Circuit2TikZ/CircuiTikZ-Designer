@@ -68,7 +68,12 @@ Add a label named `release-as:X.Y.Z` (for example `release-as:1.0.0`) to the rel
 
 ## Secrets and settings
 
-- **`RELEASE_BOT_TOKEN`** (repository secret): a fine-grained personal access token or GitHub App token, limited to this repository, with _Pull requests: read and write_ and _Contents: read_. The bot opens the release PR with it. PRs opened with the default `GITHUB_TOKEN` don't run the pull request workflows, so the required checks would never report. Without the secret the workflow falls back to `GITHUB_TOKEN`, and you have to close and reopen the PR once to run the checks. **Fine-grained tokens expire (at most after one year), renew it before.**
+- **GitHub App for the release PR:** the `Release preview` workflow opens and updates the release PR with a short-lived token of a GitHub App owned by the organization, so the PR is authored by the app (`<app name>[bot]`), not by a person. PRs opened with the default `GITHUB_TOKEN` don't run the pull request workflows, so the required checks would never report; that's why an app token is used. It needs:
+    - the repository **variable** `RELEASE_APP_CLIENT_ID` (the app's client ID) and the repository **secret** `RELEASE_APP_PRIVATE_KEY` (the full content of a private key generated for the app),
+    - an app with the repository permissions _Pull requests: read and write_ and _Contents: read_ (nothing else), installed on this repository only.
+
+    Without the variable the workflow falls back to `GITHUB_TOKEN`: the PR is still opened and updated, but it has to be closed and reopened once to run the required checks. The token is created per run and expires after an hour, so there is nothing to renew. To rotate the key, generate a new private key in the app's settings, update the secret and delete the old key. Because the app authors the release PR, a maintainer can approve it themselves if approvals are required.
+
 - **Default branch** is `dev`, so new pull requests target it by default.
 - **Merge settings:** allow squash merging (default message: the PR title) and merge commits. Rebase merging can stay disabled.
 - **Dependabot** (`.github/dependabot.yml`) opens grouped monthly dependency updates against `dev`. Major updates of `typescript`, `hotkeys-js` and `electron` are ignored and have to be done manually; the reasons are in the file.
