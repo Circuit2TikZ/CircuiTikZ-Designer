@@ -20,10 +20,11 @@ function createWindow() {
 		// title: config.productName,
 		show: true,
 		webPreferences: {
-			nodeIntegration: true,
 			defaultEncoding: "UTF-8",
-			worldSafeExecuteJavaScript: true,
-			enableRemoteModule: true,
+			// the app is a plain web app and needs no Node.js APIs in the renderer
+			nodeIntegration: false,
+			contextIsolation: true,
+			sandbox: true,
 		},
 	})
 	if (pkg.devMode) win.loadURL("http://localhost:1234/")
