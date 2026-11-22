@@ -27,6 +27,8 @@
 	"scripts": {
 		"build": "parcel build --public-url ./",
 		"update": "npx npm-check-updates -u",
+		"notices": "node scripts/generateNotices.mjs",
+		"notices:check": "node scripts/generateNotices.mjs --check",
 		"prepack": "npm run build",
 		"start": "parcel serve --lazy",
 		"standalone": "electron-forge start",
