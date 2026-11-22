@@ -11,7 +11,7 @@ const include = ["/package.json", "/src/scripts/main.js", "/dist", "/node_module
 const linuxOptions = {
 	name: "circuitikz-designer",
 	// the makers look for an executable named like package.json's name by default,
-	// which differs from packagerConfig.executableName
+	// keep it explicit so it can't get out of sync with packagerConfig.executableName
 	bin: "circuitikz-designer",
 	productName: "CircuiTikZ Designer",
 	genericName: "Circuit diagram editor",
