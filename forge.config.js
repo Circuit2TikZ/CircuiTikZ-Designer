@@ -26,6 +26,11 @@ module.exports = {
 		appBundleId: "io.github.circuit2tikz.circuitikz-designer",
 		// without file extension, the right format (.ico / .icns) is picked per platform
 		icon: "./src/icons/app",
+		// shown in the Windows file properties and the task manager (defaults to the name above)
+		win32metadata: {
+			ProductName: "CircuiTikZ Designer",
+			FileDescription: "CircuiTikZ Designer",
+		},
 		asar: true,
 		ignore: (file) => {
 			if (!file || file === "/") return false
