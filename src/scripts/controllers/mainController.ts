@@ -1489,36 +1489,41 @@ export class MainController {
 	 * @param {Element} node
 	 */
 	private preprocessSymbolColors(node: Element) {
-		//exchange all explicit blacks with defaultStroke and all explicit whites with defaultFill
+		// exchange all explicit blacks with currentColor (so each placed component instance can be recolored
+		// individually via the "color" CSS property on its own <use> element, see SymbolColorable) and all
+		// explicit whites with defaultFill (these are canvas-background-colored gaps, not part of the component's
+		// own color)
 		node.querySelectorAll("[fill]").forEach((elem) => {
 			if (elem.getAttribute("fill") == "#000") {
-				elem.setAttribute("fill", defaultStroke)
+				elem.setAttribute("fill", "currentColor")
 			} else if (elem.getAttribute("fill") == "#fff") {
 				elem.setAttribute("fill", defaultFill)
 			}
 		})
 		node.querySelectorAll("[stroke]").forEach((elem) => {
 			if (elem.getAttribute("stroke") == "#000") {
-				elem.setAttribute("stroke", defaultStroke)
+				elem.setAttribute("stroke", "currentColor")
 			} else if (elem.getAttribute("stroke") == "#fff") {
 				elem.setAttribute("stroke", defaultFill)
 			}
 		})
 
+		// elements marked as fillable (e.g. the body of a European resistor) reference a custom property instead,
+		// since they need to be colored independently of the stroke/outline color
 		node.querySelectorAll(".fillable").forEach((elem) => {
 			if (elem.getAttribute("fill") == "none") {
-				elem.setAttribute("fill", "currentFill")
+				elem.setAttribute("fill", "var(--component-fill-color, none)")
 			}
 		})
 
 		if (node.getAttribute("fill") == "#000") {
-			node.setAttribute("fill", defaultStroke)
+			node.setAttribute("fill", "currentColor")
 		} else if (node.getAttribute("fill") == "#fff") {
 			node.setAttribute("fill", defaultFill)
 		}
 
 		if (node.getAttribute("stroke") == "#000") {
-			node.setAttribute("stroke", defaultStroke)
+			node.setAttribute("stroke", "currentColor")
 		} else if (node.getAttribute("stroke") == "#fff") {
 			node.setAttribute("stroke", defaultFill)
 		}
