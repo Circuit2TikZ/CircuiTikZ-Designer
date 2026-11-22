@@ -122,11 +122,16 @@ export function SymbolColorable<TBase extends AbstractConstructor<CircuitCompone
 		 * Callers must add these to the options of the symbol itself (e.g. a path component's `to[...]`
 		 * bracket), not to an enclosing `\draw`/`\path` command's own options, since for a path component
 		 * the latter would also color the straight wire leads connecting to the symbol.
+		 *
+		 * @param strokeKey the key used for the outline color. A plain node's own options (e.g.
+		 *   `\node[draw=red]`) take the standard tikz `draw` key, but inside a bipole's `to[...]` options
+		 *   `draw` is consumed internally by circuitikz and has no visible effect there — `color` is the
+		 *   key that actually colors just the bipole's own symbol in that scope. Defaults to `"draw"`.
 		 */
-		protected symbolColorTikzOptions(): string[] {
+		protected symbolColorTikzOptions(strokeKey: "draw" | "color" = "draw"): string[] {
 			const options: string[] = []
 			if (this.drawColorInfo.color !== "default") {
-				options.push("draw=" + new SVG.Color(this.drawColorInfo.color).toTikzString())
+				options.push(strokeKey + "=" + new SVG.Color(this.drawColorInfo.color).toTikzString())
 			}
 			if (this.fillColorEnabled && this.fillColorInfo.color !== "default") {
 				options.push("fill=" + new SVG.Color(this.fillColorInfo.color).toTikzString())

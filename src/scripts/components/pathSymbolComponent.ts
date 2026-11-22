@@ -728,8 +728,9 @@ export class PathSymbolComponent extends (
 		let options: string[] = [this.referenceSymbol.tikzName]
 		options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
 		// pushed onto the symbol's own to[...] options rather than the enclosing \draw command's options,
-		// since the latter would also color the straight wire leads connecting to the symbol
-		options.push(...this.symbolColorTikzOptions())
+		// since the latter would also color the straight wire leads connecting to the symbol; "color" (not
+		// "draw") is the key that actually colors the symbol's outline in this scope, see symbolColorTikzOptions
+		options.push(...this.symbolColorTikzOptions("color"))
 		if (this.mirror.value) {
 			options.push("mirror")
 		}
