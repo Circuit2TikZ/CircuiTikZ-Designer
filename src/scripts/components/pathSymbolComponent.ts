@@ -58,8 +58,8 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	poles?: Pole
 }
 
-export class PathSymbolComponent extends (
-	Currentable(Voltageable(PathLabelable(Nameable(SymbolColorable(PathComponent)))))
+export class PathSymbolComponent extends Currentable(
+	Voltageable(PathLabelable(Nameable(SymbolColorable(PathComponent))))
 ) {
 	private static jsonID = "path"
 	static {
