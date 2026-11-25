@@ -34,6 +34,9 @@ module.exports = {
 		asar: true,
 		ignore: (file) => {
 			if (!file || file === "/") return false
+			// the source maps are only left out of the package: the build has to create them,
+			// scripts/generateNotices.mjs reads the bundled packages from them
+			if (file.startsWith("/dist/") && file.endsWith(".map")) return true
 			return !include.some((p) => file === p || file.startsWith(p + "/") || p.startsWith(file + "/"))
 		},
 	},
