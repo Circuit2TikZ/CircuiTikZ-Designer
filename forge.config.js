@@ -6,7 +6,14 @@ const { version } = require("./package.json")
 // Only what the desktop app needs goes into the package, not the whole source tree. The
 // dependencies of the web app are already bundled in dist/, main.js only requires
 // electron-squirrel-startup (which brings its own dependencies in its node_modules).
-const include = ["/package.json", "/src/scripts/main.js", "/dist", "/node_modules/electron-squirrel-startup"]
+const include = [
+	"/package.json",
+	"/src/scripts/main.js",
+	// the window icon on Linux, set in main.js
+	"/src/icons/android-icon-512x512.png",
+	"/dist",
+	"/node_modules/electron-squirrel-startup",
+]
 
 const linuxOptions = {
 	name: "circuitikz-designer",
