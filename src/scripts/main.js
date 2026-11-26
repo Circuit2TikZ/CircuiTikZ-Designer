@@ -14,6 +14,9 @@ if (started) app.quit()
 
 function createWindow() {
 	win = new BrowserWindow({
+		// Linux only, Windows and macOS use the packaged app icon. Wayland desktops without the xdg-toplevel-icon
+		// protocol ignore it and take the icon from the installed .desktop file (deb and rpm).
+		...(process.platform === "linux" && { icon: path.join(__dirname, "../icons/android-icon-512x512.png") }),
 		autoHideMenuBar: true,
 		maximizable: true,
 		backgroundColor: "lightgray",
