@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "jsonc-parser>=1.1.5",
+    "jsonschema>=4",
     "svgelements>=1.9.6",
     "tqdm>=4.70.1",
 ]

@@ -3,29 +3,13 @@ from jsonc_parser.parser import JsoncParser
 import re
 import os
 import pathlib
-import shutil
 from svgelements import Color, Point
+from toolchain import REPO_ROOT
 
 NODES_AND_PATHS = JsoncParser.parse_file("nodes.jsonc")
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
-
-# npm installs the project's tools (svgo) here
-NODE_BIN_DIR = REPO_ROOT / "node_modules" / ".bin"
-
 # the symbol database of CircuiTikZ-Designer
 OUTPUT_FILE = REPO_ROOT / "src" / "data" / "symbols.svg"
-
-
-def find_tool(name: str) -> str:
-	"""
-	Returns the full path of an external tool, preferring the project's local npm installation.
-	Resolving the path is required on Windows, where npm installs tools as .cmd files.
-	"""
-	tool = shutil.which(name, path=str(NODE_BIN_DIR)) or shutil.which(name)
-	if tool is None:
-		raise FileNotFoundError(f"Required tool '{name}' not found in {NODE_BIN_DIR} or on PATH")
-	return tool
 
 
 # Generates a component name based on the index, id, and options.
@@ -40,6 +24,14 @@ def component_name_from_info(index: int, id: str, isnode=True, options=[]):
 		basename_array.append("_".join(options))
 	basename_array = [re.sub(r"\W", "-", part) for part in basename_array]  # Remove spaces from each part
 	return "_".join(basename_array)
+
+
+# Names the component of a file in build/ and where it is defined, for error messages
+def describe_component(filename):
+	index, is_node = parse_filename(filename)
+	section, name_key = ("nodes", "name") if is_node else ("path", "drawName")
+	name = NODES_AND_PATHS[section][index][name_key]
+	return f'{filename}: "{name}", defined in {section}[{index}] of nodes.jsonc'
 
 
 # Parses a filename in the format "node_001_id_option1-option2" or "path_001_id_option1-option2"

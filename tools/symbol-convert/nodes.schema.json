@@ -24,7 +24,8 @@
 					"items": { "type": "string" }
 				}
 			},
-			"required": ["name"]
+			"required": ["name"],
+			"propertyNames": { "enum": ["name", "displayName", "addPins", "subPins"] }
 		},
 		"symbolBase": {
 			"type": "object",
@@ -76,7 +77,8 @@
 										"title": "The name to show in the UI for this enum option"
 									}
 								},
-								"required": ["enumOptions", "displayName"]
+								"required": ["enumOptions", "displayName"],
+								"propertyNames": { "enum": ["enumOptions", "displayName", "selectNone"] }
 							}
 						]
 					},
@@ -91,7 +93,8 @@
 					},
 					"uniqueItems": true
 				}
-			}
+			},
+			"required": ["displayName", "groupName"]
 		}
 	},
 	"properties": {
@@ -108,7 +111,10 @@
 						"minLength": 1
 					}
 				},
-				"required": ["name"]
+				"required": ["name"],
+				"propertyNames": {
+					"enum": ["name", "displayName", "groupName", "class", "fillable", "options", "pins"]
+				}
 			}
 		},
 
@@ -146,10 +152,28 @@
 					"start": { "type": "string", "default": "b" },
 					"end": { "type": "string", "default": "a" }
 				},
-				"required": ["drawName"]
+				"required": ["drawName"],
+				"propertyNames": {
+					"enum": [
+						"drawName",
+						"displayName",
+						"groupName",
+						"class",
+						"fillable",
+						"options",
+						"pins",
+						"aliases",
+						"shapeName",
+						"stroke",
+						"source",
+						"start",
+						"end"
+					]
+				}
 			}
 		}
 	},
 
-	"required": ["nodes", "path"]
+	"required": ["nodes", "path"],
+	"propertyNames": { "enum": ["$schema", "nodes", "path"] }
 }

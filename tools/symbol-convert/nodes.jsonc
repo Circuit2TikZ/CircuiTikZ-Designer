@@ -2679,14 +2679,6 @@
 			"drawName": "oosourcetrans"
 		},
 		{
-			"displayName": "Transformer source",
-			"groupName": "Sources and generators",
-			"class": "sources",
-			"fillable": true,
-			"source": "isVoltage",
-			"drawName": "oosourcetrans"
-		},
-		{
 			"displayName": "Transformer with three windings",
 			"groupName": "Sources and generators",
 			"class": "sources",

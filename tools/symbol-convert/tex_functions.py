@@ -1,22 +1,39 @@
 from tqdm.contrib.concurrent import thread_map
 import functools
 import glob
+import itertools
 import os
 import pathlib
 import subprocess
+import traceback
+from errors import Failure, raise_failures
+from toolchain import find_tool, tex_environment
 from utils import (
 	NODES_AND_PATHS,
 	component_name_from_info,
+	describe_component,
 	filter_newer,
-	find_tool,
 	index_to_color,
 	options_object_to_array,
 )
 
 
-def _compile_worker(path: pathlib.Path, lualatex: str):
+def _tex_error_excerpt(log: str) -> str:
 	"""
-	Worker function to compile a single .tex file to .dvi.
+	The first error of a TeX log with the lines which follow it.
+	"""
+	lines = [line for line in log.splitlines() if line.strip()]
+	start = next((i for i, line in enumerate(lines) if line.startswith("!")), None)
+	if start is None:
+		return "\n".join(lines[-10:])
+	# the memory statistics after an error are of no interest
+	excerpt = itertools.takewhile(lambda line: not line.startswith("Here is how much"), lines[start : start + 8])
+	return "\n".join(excerpt)
+
+
+def _compile_worker(path: pathlib.Path, lualatex: str, environment: dict[str, str]) -> Failure | None:
+	"""
+	Worker function to compile a single .tex file to .dvi. Returns the failure, if there is one.
 	"""
 	command = [
 		lualatex,
@@ -26,19 +43,26 @@ def _compile_worker(path: pathlib.Path, lualatex: str):
 		f"-jobname={path.stem}",
 		path.absolute(),
 	]
-	p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path.parent)
-	out, err = p.communicate()
+	try:
+		p = subprocess.run(command, capture_output=True, cwd=path.parent, env=environment, check=False)
+	except Exception as error:
+		return Failure(describe_component(path.stem), f"lualatex could not be run: {error}", traceback.format_exc())
 
-	# remove auxiliary files
+	# remove auxiliary files, the log is kept if the compilation failed
 	# don't list the directory here: on some filesystems (observed with ntfs3) a listing can contain
 	# the same file several times while other workers create and delete files
-	for extension in [".aux", ".log", ".tmp", ".toc"]:
+	extensions = [".aux", ".tmp", ".toc", *([".log"] if p.returncode == 0 else [])]
+	for extension in extensions:
 		path.with_suffix(extension).unlink(missing_ok=True)
-	if p.returncode != 0:
-		print(f"Error compiling {path.stem}:")
-		print(out.decode())
-		print(err.decode())
-	return p.returncode
+	if p.returncode == 0:
+		return None
+
+	log_file = path.with_suffix(".log")
+	log = log_file.read_text(errors="replace") if log_file.is_file() else (p.stdout + p.stderr).decode(errors="replace")
+	return Failure(
+		describe_component(path.stem),
+		f"{_tex_error_excerpt(log)}\nTeX source: {path.resolve()}\nTeX log: {log_file.resolve()}",
+	)
 
 
 def compile_tex_files():
@@ -47,16 +71,16 @@ def compile_tex_files():
 	all_files = filter_newer(all_files, ".dvi")
 
 	results = thread_map(
-		functools.partial(_compile_worker, lualatex=lualatex),
+		functools.partial(_compile_worker, lualatex=lualatex, environment=tex_environment()),
 		all_files,
 		desc="Compiling .tex files",
 		unit="file",
 		smoothing=0.1,
 	)
-	error_rs = [r for r in results if r != 0]
-	if len(error_rs) > 0:
-		raise RuntimeError(f"A total of {len(error_rs)} errors occurred during compilation")
-	print("Sucessfully compiled all .tex files!")
+	failures = [r for r in results if r is not None]
+	if failures:
+		raise_failures("compiling with lualatex", failures, len(all_files), pathlib.Path("build/errors.log"))
+	print("Successfully compiled all .tex files!")
 
 
 def create_tex_files_from_json(output_dir="build"):

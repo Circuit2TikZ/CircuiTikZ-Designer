@@ -16622,15 +16622,6 @@
 				</g>
 			</g>
 		</symbol>
-		<symbol>
-			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
-				<g fill="none" stroke-width=".79999" class="fillable">
-					<path d="M19.58008 10.0557c0-5.2602-4.26414-9.52434-9.52436-9.52434s-9.52436 4.26413-9.52436 9.52434 4.26414 9.52437 9.52436 9.52437 9.52436-4.26414 9.52436-9.52437m-9.52436 0" stroke="none"/>
-					<path stroke-width="1.06267" d="M32.27952 10.0557c0-5.2602-4.26414-9.52434-9.52436-9.52434s-9.52436 4.26413-9.52436 9.52434 4.26414 9.52437 9.52436 9.52437 9.52436-4.26414 9.52436-9.52437Zm-9.52436 0"/>
-					<path fill="none" stroke-width="1.06267" d="M19.58008 10.0557c0-5.2602-4.26414-9.52434-9.52436-9.52434s-9.52436 4.26413-9.52436 9.52434 4.26414 9.52437 9.52436 9.52437 9.52436-4.26414 9.52436-9.52437Zm-9.52436 0"/>
-				</g>
-			</g>
-		</symbol>
 		<symbol id="path_ooosource">
 			<g stroke="#000" stroke-miterlimit="10" stroke-width=".4">
 				<g stroke-width=".79999">
@@ -31280,10 +31271,6 @@
 			</variant>
 		</component>
 		<component type="path" display="Auto-transformer source" tikz="oosourcetrans" group="Sources and generators" shape="oosourcetransshape" class="sources" fillable="True" source="isVoltage">
-			<variant x="16.40544" y="10.0557" viewBox="0 0 32.81084 20.11138" for="path_oosourcetrans">
-				<pin name="START" x="-15.87408"/>
-				<pin name="END" x="15.87408"/>
-			</variant>
 			<variant x="16.40544" y="10.0557" viewBox="0 0 32.81084 20.11138" for="path_oosourcetrans">
 				<pin name="START" x="-15.87408"/>
 				<pin name="END" x="15.87408"/>
