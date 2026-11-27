@@ -17,6 +17,8 @@ By submitting a contribution you agree to the [Contributor License Agreement](CL
 
 Pull requests into `main` are rejected: `main` only receives the release pull request from `dev`, which is opened by a bot and merged by the maintainers. Direct pushes to `main` and `dev` are not possible.
 
+To add or change circuit symbols, see [tools/symbol-convert](tools/symbol-convert/README.md). `src/data/symbols.svg` is generated and not edited by hand.
+
 ### One pull request, one change
 
 Each pull request should contain **a single feature or a single bug fix**. Please do not bundle unrelated changes. If you notice something else while working, open a separate pull request for it.

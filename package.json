@@ -29,6 +29,7 @@
 		"update": "npx npm-check-updates -u",
 		"notices": "node scripts/generateNotices.mjs",
 		"notices:check": "node scripts/generateNotices.mjs --check",
+		"symbols": "uv run --locked --directory tools/symbol-convert convert.py",
 		"prepack": "npm run build",
 		"start": "parcel serve --lazy",
 		"standalone": "electron-forge start",
@@ -82,6 +83,7 @@
 		"posthtml-include": "^2.0.1",
 		"process": "^0.11.10",
 		"sass": "^1.89.2",
+		"svgo": "4.0.1",
 		"typescript": "^5.9.2"
 	}
 }

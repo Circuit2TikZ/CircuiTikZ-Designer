@@ -1,0 +1,11 @@
+\documentclass[tikz,dvisvgm]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usepackage[european]{circuitikz}
+\begin{document}
+    \begin{tikzpicture}
+        \node[<pathname>] (P) at (0,0) {};
+        \draw[draw={rgb,255:red,255;green,255;blue,0}] (-.001,.001) -- (0,0);
+        \draw[draw={rgb,255:red,0;green,255;blue,255}] (0,0) -- (.001,.001);
+<anchorLines>
+    \end{tikzpicture}
+\end{document}

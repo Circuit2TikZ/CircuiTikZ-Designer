@@ -13,5 +13,11 @@
 	"xmlQuoteAttributes": "double",
 	"xmlSelfClosingSpace": true,
 	"xmlSortAttributesByKey": false,
-	"xmlWhitespaceSensitivity": "strict"
+	"xmlWhitespaceSensitivity": "strict",
+	"overrides": [
+		{
+			"files": "tools/symbol-convert/nodes.jsonc",
+			"options": { "trailingComma": "none" }
+		}
+	]
 }
