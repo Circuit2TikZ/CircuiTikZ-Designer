@@ -29,6 +29,7 @@
 		"update": "npx npm-check-updates -u",
 		"notices": "node scripts/generateNotices.mjs",
 		"notices:check": "node scripts/generateNotices.mjs --check",
+		"symbols": "uv run --locked --directory tools/symbol-convert convert.py",
 		"prepack": "npm run build",
 		"start": "parcel serve --lazy",
 		"standalone": "electron-forge start",

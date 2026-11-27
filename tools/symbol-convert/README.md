@@ -26,9 +26,9 @@ You need [uv](https://docs.astral.sh/uv/) and Node.js with npm. In the repositor
 
 ```bash
 npm ci
-cd tools/symbol-convert
-uv sync
 ```
+
+There is no separate setup step for Python: the first run of the converter creates the environment in `tools/symbol-convert/.venv/` (and downloads Python if needed).
 
 The converter finds the local svgo installation itself, you don't need to add it to your `PATH`.
 
@@ -57,6 +57,12 @@ grep 'def\\pgfcircversion{' "$(kpsewhich -progname=lualatex circuitikz.sty)"
 
 ## Usage
 
-Open `converter.ipynb` (e.g. in VS Code), select the kernel from `.venv` and run all cells. The notebook has to run with `tools/symbol-convert/` as its working directory (the default in VS Code and Jupyter). The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or `nodes.jsonc`.
+In the repository root, run:
 
-Files in `build/` are not created again if they already exist, even if the code or the tools changed. Remove `build/` for a full rebuild, and also after a failed run.
+```bash
+npm run symbols
+```
+
+The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or `nodes.jsonc`.
+
+Every run starts by deleting `build/` and creates all symbols again. The intermediate files of the last run stay in `build/`, e.g. to debug a failed one.
