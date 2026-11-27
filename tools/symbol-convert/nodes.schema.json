@@ -1,109 +1,14 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "urn:uuid:feee8b93-7192-4034-b404-a7fd1b9b5a12",
-	"title": "Schema for declaring CircuiTikZ node- and path-style components",
+	"title": "Schema for declaring CircuiTikZ node-style components",
 	"type": "object",
-	"definitions": {
-		"optionDef": {
-			"type": "object",
-			"properties": {
-				"name": { "title": "Name of the option", "type": "string", "minLength": 1 },
-				"displayName": {
-					"title": "What should be displayed for this option",
-					"type": "string",
-					"minLength": 1
-				},
-				"addPins": {
-					"title": "Which pins this option adds to the component",
-					"type": "array",
-					"items": { "type": "string" }
-				},
-				"subPins": {
-					"title": "Which pins this option removes from the component",
-					"type": "array",
-					"items": { "type": "string" }
-				}
-			},
-			"required": ["name"],
-			"propertyNames": { "enum": ["name", "displayName", "addPins", "subPins"] }
-		},
-		"symbolBase": {
-			"type": "object",
-			"properties": {
-				"displayName": {
-					"title": "The name to show in the UI",
-					"type": "string",
-					"minLength": 1
-				},
-				"groupName": {
-					"title": "The name of the group, e.g. Transistors",
-					"type": "string",
-					"minLength": 1
-				},
-				"class": {
-					"title": "which ctikz class this component belongs to",
-					"type": "string",
-					"minLength": 1
-				},
-				"fillable": {
-					"title": "if the component is fillable",
-					"type": "boolean",
-					"default": false
-				},
-				"options": {
-					"title": "A list of options to set in CircuiTikZ",
-					"type": "array",
-					"minItems": 1,
-					"items": {
-						"oneOf": [
-							{
-								"$ref": "#/definitions/optionDef"
-							},
-							{
-								"type": "object",
-								"$comment": "An enum option consisting of mutually exclusive options, i.e. no more than one can be active at the same time",
-								"properties": {
-									"enumOptions": {
-										"type": "array",
-										"minItems": 1,
-										"items": {
-											"$ref": "#/definitions/optionDef"
-										}
-									},
-									"selectNone": { "type": "boolean", "default": true },
-									"displayName": {
-										"type": "string",
-										"minLength": 1,
-										"title": "The name to show in the UI for this enum option"
-									}
-								},
-								"required": ["enumOptions", "displayName"],
-								"propertyNames": { "enum": ["enumOptions", "displayName", "selectNone"] }
-							}
-						]
-					},
-					"uniqueItems": true
-				},
-				"pins": {
-					"title": "A list of CircuiTikZ pin (anchor) names",
-					"type": "array",
-					"items": {
-						"type": "string",
-						"minLength": 1
-					},
-					"uniqueItems": true
-				}
-			},
-			"required": ["displayName", "groupName"]
-		}
-	},
 	"properties": {
 		"nodes": {
 			"title": "Definitions of node-style components",
 			"type": "array",
 			"items": {
 				"type": "object",
-				"allOf": [{ "$ref": "#/definitions/symbolBase" }],
+				"allOf": [{ "$ref": "common.schema.json#/definitions/symbolBase" }],
 				"properties": {
 					"name": {
 						"title": "The CircuiTikZ node name, e.g. nigfete for a n channel MOSFET",
@@ -116,64 +21,8 @@
 					"enum": ["name", "displayName", "groupName", "class", "fillable", "options", "pins"]
 				}
 			}
-		},
-
-		"path": {
-			"title": "Definitions of path-style components",
-			"type": "array",
-			"items": {
-				"type": "object",
-				"allOf": [{ "$ref": "#/definitions/symbolBase" }],
-				"properties": {
-					"drawName": {
-						"title": "The unique (!) CircuiTikZ name used in to[...], e.g. american resistor (not R) for an resistor",
-						"type": "string",
-						"minLength": 1
-					},
-					"aliases": {
-						"title": "Additional names which can be used in to[...]",
-						"type": "array",
-						"items": {
-							"type": "string",
-							"minLength": 1
-						}
-					},
-					"shapeName": {
-						"title": "The shape name used internally by CircuiTikZ; can be used to create a node",
-						"type": "string",
-						"minLength": 1
-					},
-					"stroke": {
-						"title": "Draw a line through the component",
-						"type": "boolean",
-						"default": false
-					},
-					"source": { "enum": ["isVoltage", "isCurrent"] },
-					"start": { "type": "string", "default": "b" },
-					"end": { "type": "string", "default": "a" }
-				},
-				"required": ["drawName"],
-				"propertyNames": {
-					"enum": [
-						"drawName",
-						"displayName",
-						"groupName",
-						"class",
-						"fillable",
-						"options",
-						"pins",
-						"aliases",
-						"shapeName",
-						"stroke",
-						"source",
-						"start",
-						"end"
-					]
-				}
-			}
 		}
 	},
-
-	"required": ["nodes", "path"],
-	"propertyNames": { "enum": ["$schema", "nodes", "path"] }
+	"required": ["nodes"],
+	"propertyNames": { "enum": ["$schema", "nodes"] }
 }

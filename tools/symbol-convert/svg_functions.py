@@ -378,7 +378,7 @@ def _convert_DVI_to_symbol(path: pathlib.Path):
 	if is_node:
 		node_description: dict = NODES_AND_PATHS["nodes"][index]
 	else:
-		node_description: dict = NODES_AND_PATHS["path"][index]
+		node_description: dict = NODES_AND_PATHS["paths"][index]
 
 	option_possibilities = options_object_to_array(node_description["options"] if "options" in node_description else [])
 

@@ -138,7 +138,7 @@ def create_tex_files_from_json(output_dir="build"):
 		path_stencil = f.read()
 
 	# Iterate through each path in the JSON data
-	for index, path in enumerate(NODES_AND_PATHS["path"]):
+	for index, path in enumerate(NODES_AND_PATHS["paths"]):
 		fillable = path.get("fillable", False)
 		option_possibilities = options_object_to_array(path["options"] if "options" in path else [])
 		for tmp, option_possibility in enumerate(option_possibilities):
