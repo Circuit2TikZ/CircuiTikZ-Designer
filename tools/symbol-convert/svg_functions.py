@@ -8,16 +8,19 @@ import xml.etree.ElementTree as ET
 import svgelements as svg
 import json
 import copy
+import traceback
 
 from dataclasses import dataclass
 from svgelements import Color, Path, Point
+from errors import ConverterError, Failure, raise_failures
+from toolchain import find_tool
 from utils import (
 	OUTPUT_FILE,
 	are_two_points_close,
 	color_to_index,
 	component_name_from_info,
+	describe_component,
 	filter_newer,
-	find_tool,
 	options_object_to_array,
 	parse_filename,
 )
@@ -50,7 +53,7 @@ def _compile_DVI_to_SVG_worker(path: pathlib.Path, translateX=0, translateY=0, s
 	p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path.parent)
 	out, err = p.communicate()
 	if p.returncode != 0:
-		raise RuntimeError(f"dvisvgm failed for {path.stem}:\n{err.decode()}")
+		raise ConverterError(f"dvisvgm failed:\n{err.decode().strip()}")
 	return out.decode()
 
 
@@ -153,12 +156,11 @@ def _convert_SVG_to_symbol_worker(svg_content: str, index, is_node, node_descrip
 
 	tikz_name = node_description["name"] if is_node else node_description["drawName"]
 
-	errorcode = 0
+	problems = []
 
 	expected_body_diodes = 1 if is_option_active("bodydiode", option_possibility) else 0
 	if len(body_diodes) != expected_body_diodes:
-		print(f"Error parsing {ID}: found {len(body_diodes)} body diode paths, expected {expected_body_diodes}")
-		errorcode = 1
+		problems.append(f"found {len(body_diodes)} body diode paths, expected {expected_body_diodes}")
 
 	# the line corresponding to the text anchor point
 	text_line_colors = [svg.Color("#f00"), svg.Color("rgb(255,0,155)")]
@@ -186,6 +188,7 @@ def _convert_SVG_to_symbol_worker(svg_content: str, index, is_node, node_descrip
 	pin_anchors = [anchor_name for anchor_name in pin_anchors if anchor_name != "center"]
 	pin_anchors = [Pin_Anchor(anchor_name, None, False) for anchor_name in pin_anchors]
 
+	pin_names = [anchor.anchor_name for anchor in pin_anchors]
 	for line in pin_lines:
 		# sort line start/end; end=relevant point
 		if not are_two_points_close(line["start"], ref_point):
@@ -194,16 +197,25 @@ def _convert_SVG_to_symbol_worker(svg_content: str, index, is_node, node_descrip
 				line["end"] = line["start"]
 				line["start"] = ref_point
 			else:
-				print(f"Error parsing line ({tikz_name}): {line['start']}; {line['end']}; {line['color']}")
-				errorcode = 1
+				problems.append(
+					f"a pin marker line doesn't start at the reference point: from {line['start']} to {line['end']}, "
+					f"color {line['color']}"
+				)
+				continue
 
-		index = color_to_index(line["color"])
-		pin_anchor = pin_anchors[index]
+		# the color of a marker line encodes the index of its pin, see index_to_color
+		try:
+			index = color_to_index(line["color"])
+		except ValueError:
+			problems.append(f"a line with the color {line['color']} is neither a pin marker nor part of the symbol")
+			continue
+		if index >= len(pin_anchors):
+			problems.append(f"found a marker for pin number {index + 1}, but there are only these pins: {pin_names}")
+			continue
+		pin_anchors[index].point = line["end"] - ref_point
 
-		if pin_anchor is not None:
-			pin_anchor.point = line["end"] - ref_point
-		else:
-			raise ("No matching pin description found for line color: " + line["color"])
+	if problems:
+		raise ConverterError("\n".join(problems))
 
 	# add center anchor back as pin, if indicated by nodeDescription
 	if "pins" in node_description and "center" in node_description["pins"]:
@@ -315,10 +327,7 @@ def _convert_SVG_to_symbol_worker(svg_content: str, index, is_node, node_descrip
 	for child in svg_doc:
 		svg_symbol.append(child)
 
-	return (
-		errorcode,
-		ET.tostring(svg_symbol, encoding="unicode"),
-	)
+	return ET.tostring(svg_symbol, encoding="unicode")
 
 
 def _convert_option(option: dict, active: bool, doc: ET.Element) -> ET.Element:
@@ -334,7 +343,20 @@ def _convert_option(option: dict, active: bool, doc: ET.Element) -> ET.Element:
 	return option_element
 
 
-def _convert_DVI_to_symbol_worker(path: pathlib.Path):
+def _convert_DVI_to_symbol_worker(path: pathlib.Path) -> Failure | None:
+	"""
+	Worker function to convert a single .dvi file to a symbol. Returns the failure, if there is one.
+	"""
+	try:
+		_convert_DVI_to_symbol(path)
+	except ConverterError as error:
+		return Failure(describe_component(path.stem), str(error))
+	except Exception as error:
+		return Failure(describe_component(path.stem), f"{type(error).__name__}: {error}", traceback.format_exc())
+	return None
+
+
+def _convert_DVI_to_symbol(path: pathlib.Path):
 	# convert from dvi to svg
 	# then convert the svg to a symbol
 	svg_content = _compile_DVI_to_SVG_worker(path)
@@ -408,25 +430,18 @@ def _convert_DVI_to_symbol_worker(path: pathlib.Path):
 		f.write("module.exports=" + json.dumps(svgo_config, indent=4))
 
 	command = [find_tool("svgo"), "--config", config_name, "-i", "-", "-o", "-"]
-	p = subprocess.Popen(
-		command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path.parent
+	try:
+		p = subprocess.run(command, input=svg_content.encode(), capture_output=True, cwd=path.parent, check=False)
+	finally:
+		(path.parent / config_name).unlink()
+	if p.returncode != 0:
+		raise ConverterError(f"svgo failed:\n{(p.stderr or p.stdout).decode().strip()}")
+
+	svg_content = _convert_SVG_to_symbol_worker(
+		p.stdout.decode(), index, is_node, node_description_copy, ID, option_possibility
 	)
-	out, err = p.communicate(input=svg_content.encode())
-	svg_content = out.decode()
-	(path.parent / config_name).unlink()
-	returncode = p.returncode
-	if p.returncode == 0:
-		returncode, svg_content = _convert_SVG_to_symbol_worker(
-			svg_content, index, is_node, node_description_copy, ID, option_possibility
-		)
-
-		if svg_content:
-			with open(path.parent / (path.stem + ".svg"), "w") as f:
-				f.write(svg_content)
-	else:
-		print(f"Error while svg optimizing {path.stem}:", err.decode())
-
-	return returncode
+	with open(path.parent / (path.stem + ".svg"), "w") as f:
+		f.write(svg_content)
 
 
 def convert_DVI_to_SVGs():
@@ -440,10 +455,10 @@ def convert_DVI_to_SVGs():
 	results = thread_map(
 		_convert_DVI_to_symbol_worker, all_files, desc="Converting .dvi files", unit="file", smoothing=0.1
 	)
-	errors = [r for r in results if r != 0]
-	if len(errors) > 0:
-		raise RuntimeError(f"A total of {len(errors)} errors occurred during conversion")
-	print("Sucessfully converted all .dvi files to .svg files!")
+	failures = [r for r in results if r is not None]
+	if failures:
+		raise_failures("converting to SVG", failures, len(all_files), pathlib.Path("build/errors.log"))
+	print("Successfully converted all .dvi files to .svg files!")
 
 
 def combine_SVGs_to_symbol():
@@ -547,7 +562,7 @@ def combine_SVGs_to_symbol():
 	out, err = p.communicate(input=doc.toxml().encode())
 	svg_content = out.decode()
 	if p.returncode != 0:
-		raise RuntimeError(f"Error combining symbols to SVG:\n{err.decode()}")
+		raise ConverterError(f"svgo failed while combining the symbols:\n{err.decode().strip()}")
 
 	with open(OUTPUT_FILE, "w", newline="\n") as f:
 		f.write(svg_content)

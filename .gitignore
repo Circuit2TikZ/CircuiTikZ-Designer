@@ -110,6 +110,7 @@
 # Symbol converter, see tools/symbol-convert/README.md (here and not in a nested .gitignore, Prettier only reads this one)
 /tools/symbol-convert/build/
 /tools/symbol-convert/.venv/
+/tools/symbol-convert/.circuitikz/
 __pycache__/
 # temporary svgo configs, left over if a conversion fails
 /tools/symbol-convert/**/*.config.js

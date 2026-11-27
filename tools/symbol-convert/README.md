@@ -10,15 +10,15 @@ You only need it to add or change symbols, not to build or run the app.
 
 The output depends on the tool versions. These are the versions in use on Linux:
 
-| Tool                  | Version                | Pinned by                             |
-| --------------------- | ---------------------- | ------------------------------------- |
-| CircuiTikZ            | 1.8.5                  | manual installation, see below        |
-| TeX Live (`lualatex`) | 2026 (LuaHBTeX 1.24.0) | not pinned                            |
-| `dvisvgm`             | 3.6 (from TeX Live)    | not pinned                            |
-| svgo                  | 4.0.1                  | `package.json` in the repository root |
-| Node.js               | 26.13.1                | not pinned                            |
-| Python                | 3.12                   | `.python-version`                     |
-| Python packages       | see `uv.lock`          | `uv.lock`                             |
+| Tool                  | Version                | Pinned by                                            |
+| --------------------- | ---------------------- | ---------------------------------------------------- |
+| CircuiTikZ            | 1.8.5                  | `toolchain.py`, installed by `npm run symbols:setup` |
+| TeX Live (`lualatex`) | 2026 (LuaHBTeX 1.24.0) | not pinned, other versions give a warning            |
+| `dvisvgm`             | 3.6 (from TeX Live)    | not pinned, other versions give a warning            |
+| svgo                  | 4.0.1                  | `package.json` in the repository root                |
+| Node.js               | 26.13.1                | not pinned                                           |
+| Python                | 3.12                   | `.python-version`                                    |
+| Python packages       | see `uv.lock`          | `uv.lock`                                            |
 
 ### Python and svgo
 
@@ -34,26 +34,17 @@ The converter finds the local svgo installation itself, you don't need to add it
 
 ### TeX Live
 
-Install [TeX Live](https://tug.org/texlive/) and make sure that `lualatex` and `dvisvgm` are on your `PATH`.
+Install [TeX Live](https://tug.org/texlive/) and make sure that `lualatex`, `kpsewhich` and `dvisvgm` are on your `PATH`.
 
-### CircuiTikZ 1.8.5
+### CircuiTikZ
 
-TeX Live may contain another CircuiTikZ version. Newer versions change how some symbols are drawn. To use 1.8.5, install it into your personal TeX folder (`TEXMFHOME`). It then takes priority for **all** documents you compile. This overwrites any CircuiTikZ files already in that folder.
-
-```bash
-src="$(mktemp -d)"
-git clone --depth 1 --branch v1.8.5 https://github.com/circuitikz/circuitikz.git "$src"
-dest="$(kpsewhich -var-value=TEXMFHOME)/tex"
-mkdir -p "$dest/latex/circuitikz" "$dest/generic/circuitikz"
-cp "$src"/tex/*.sty "$src"/tex/circuitikz-*-body.tex "$dest/latex/circuitikz/"
-cp "$src"/tex/pgfcirc*.tex "$src"/tex/ctikzstyle-*.tex "$dest/generic/circuitikz/"
-```
-
-These are bash commands. Check the result, it should show `1.8.5`:
+Newer CircuiTikZ versions change how some symbols are drawn, so the converter uses its own copy of the version listed above. Install it once, in the repository root:
 
 ```bash
-grep 'def\\pgfcircversion{' "$(kpsewhich -progname=lualatex circuitikz.sty)"
+npm run symbols:setup
 ```
+
+This downloads the release, verifies its files with a checksum and puts them into `tools/symbol-convert/.circuitikz/`. Only the converter uses this copy, it doesn't change your TeX installation or other documents. It takes priority over the CircuiTikZ of TeX Live and of your personal TeX folder.
 
 ## Usage
 
@@ -66,3 +57,9 @@ npm run symbols
 The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or `nodes.jsonc`.
 
 Every run starts by deleting `build/` and creates all symbols again. The intermediate files of the last run stay in `build/`, e.g. to debug a failed one.
+
+### Checks and errors
+
+Before `build/` is deleted, the converter checks the tools and their versions, that TeX uses its CircuiTikZ copy, and `nodes.jsonc` against [`nodes.schema.json`](nodes.schema.json). Unknown keys and components or options which result in the same symbol ID are errors. All problems are listed at once.
+
+If symbols fail during the conversion, the first ones are printed with their component and its position in `nodes.jsonc`, for LaTeX errors with the relevant part of the log. All of them are in `build/errors.log`, the full TeX logs of failed symbols stay in `build/`. `symbols.svg` is only written if every symbol was converted.
