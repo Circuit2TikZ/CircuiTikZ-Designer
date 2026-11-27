@@ -16,7 +16,7 @@
 	"xmlWhitespaceSensitivity": "strict",
 	"overrides": [
 		{
-			"files": "tools/symbol-convert/nodes.jsonc",
+			"files": ["tools/symbol-convert/nodes.jsonc", "tools/symbol-convert/paths.jsonc"],
 			"options": { "trailingComma": "none" }
 		}
 	]

@@ -1,6 +1,6 @@
 # Symbol Convert
 
-Generates the symbol database of CircuiTikZ-Designer, [`src/data/symbols.svg`](../../src/data/symbols.svg), from CircuiTikZ. The components and their options are defined in [`nodes.jsonc`](nodes.jsonc). Don't edit `symbols.svg` by hand, the next run overwrites it.
+Generates the symbol database of CircuiTikZ-Designer, [`src/data/symbols.svg`](../../src/data/symbols.svg), from CircuiTikZ. The components and their options are defined in [`nodes.jsonc`](nodes.jsonc) (node-style components) and [`paths.jsonc`](paths.jsonc) (path-style components). Don't edit `symbols.svg` by hand, the next run overwrites it.
 
 This tool was previously maintained in the [SymbolConvert](https://github.com/Circuit2TikZ/SymbolConvert) repository, which has the older history.
 
@@ -54,12 +54,12 @@ In the repository root, run:
 npm run symbols
 ```
 
-The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or `nodes.jsonc`.
+The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or the component files.
 
 Every run starts by deleting `build/` and creates all symbols again. The intermediate files of the last run stay in `build/`, e.g. to debug a failed one.
 
 ### Checks and errors
 
-Before `build/` is deleted, the converter checks the tools and their versions, that TeX uses its CircuiTikZ copy, and `nodes.jsonc` against [`nodes.schema.json`](nodes.schema.json). Unknown keys and components or options which result in the same symbol ID are errors. All problems are listed at once.
+Before `build/` is deleted, the converter checks the tools and their versions, that TeX uses its CircuiTikZ copy, and the component files against their schemas ([`nodes.schema.json`](nodes.schema.json) and [`paths.schema.json`](paths.schema.json), with shared definitions in [`common.schema.json`](common.schema.json)). Unknown keys and components or options which result in the same symbol ID are errors. All problems are listed at once.
 
-If symbols fail during the conversion, the first ones are printed with their component and its position in `nodes.jsonc`, for LaTeX errors with the relevant part of the log. All of them are in `build/errors.log`, the full TeX logs of failed symbols stay in `build/`. `symbols.svg` is only written if every symbol was converted.
+If symbols fail during the conversion, the first ones are printed with their component and its position in `nodes.jsonc` or `paths.jsonc`, for LaTeX errors with the relevant part of the log. All of them are in `build/errors.log`, the full TeX logs of failed symbols stay in `build/`. `symbols.svg` is only written if every symbol was converted.

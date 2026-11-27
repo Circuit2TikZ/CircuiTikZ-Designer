@@ -219,6 +219,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "jsonc-parser" },
     { name = "jsonschema" },
+    { name = "referencing" },
     { name = "svgelements" },
     { name = "tqdm" },
 ]
@@ -232,6 +233,7 @@ dev = [
 requires-dist = [
     { name = "jsonc-parser", specifier = ">=1.1.5" },
     { name = "jsonschema", specifier = ">=4" },
+    { name = "referencing", specifier = ">=0.37.0" },
     { name = "svgelements", specifier = ">=1.9.6" },
     { name = "tqdm", specifier = ">=4.70.1" },
 ]

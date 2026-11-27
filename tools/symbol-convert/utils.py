@@ -1,12 +1,12 @@
 # Utility functions
-from jsonc_parser.parser import JsoncParser
 import re
 import os
 import pathlib
 from svgelements import Color, Point
 from toolchain import REPO_ROOT
+from validation import load_components
 
-NODES_AND_PATHS = JsoncParser.parse_file("nodes.jsonc")
+NODES_AND_PATHS = load_components()
 
 # the symbol database of CircuiTikZ-Designer
 OUTPUT_FILE = REPO_ROOT / "src" / "data" / "symbols.svg"
@@ -29,9 +29,9 @@ def component_name_from_info(index: int, id: str, isnode=True, options=[]):
 # Names the component of a file in build/ and where it is defined, for error messages
 def describe_component(filename):
 	index, is_node = parse_filename(filename)
-	section, name_key = ("nodes", "name") if is_node else ("path", "drawName")
+	section, name_key = ("nodes", "name") if is_node else ("paths", "drawName")
 	name = NODES_AND_PATHS[section][index][name_key]
-	return f'{filename}: "{name}", defined in {section}[{index}] of nodes.jsonc'
+	return f'{filename}: "{name}", defined in {section}[{index}] of {section}.jsonc'
 
 
 # Parses a filename in the format "node_001_id_option1-option2" or "path_001_id_option1-option2"

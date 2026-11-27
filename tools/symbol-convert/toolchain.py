@@ -1,6 +1,6 @@
 """
 The external tools of the converter and their versions. The generated symbols depend on them.
-This module must only use the standard library and must not read nodes.jsonc, it is used before the checks.
+This module must only use the standard library and must not read the component files, it is used before the checks.
 """
 
 import hashlib

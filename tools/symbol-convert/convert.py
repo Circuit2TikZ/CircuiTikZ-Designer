@@ -1,5 +1,5 @@
 """
-Generates src/data/symbols.svg from the components in nodes.jsonc. See README.md for the required tools.
+Generates src/data/symbols.svg from the components in nodes.jsonc and paths.jsonc. See README.md for the required tools.
 """
 
 import os
@@ -34,7 +34,7 @@ def convert():
 	if build_dir.exists():
 		shutil.rmtree(build_dir)
 
-	# imported after the checks, because they read nodes.jsonc when they are imported
+	# imported after the checks, because they read the component files when they are imported
 	from svg_functions import combine_SVGs_to_symbol, convert_DVI_to_SVGs
 	from tex_functions import compile_tex_files, create_tex_files_from_json
 
