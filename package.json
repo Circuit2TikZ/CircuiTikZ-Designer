@@ -82,6 +82,7 @@
 		"posthtml-include": "^2.0.1",
 		"process": "^0.11.10",
 		"sass": "^1.89.2",
+		"svgo": "4.0.1",
 		"typescript": "^5.9.2"
 	}
 }

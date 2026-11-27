@@ -17,6 +17,9 @@ updates:
           # Parcel 2 picks over the ESM entry, so the import is an empty object at runtime.
           - dependency-name: hotkeys-js
             update-types: ["version-update:semver-major"]
+          # The svgo version changes the generated src/data/symbols.svg. Update it manually together with
+          # the symbols, see tools/symbol-convert/README.md.
+          - dependency-name: svgo
           # Major Electron updates need testing of the desktop build, do them manually.
           - dependency-name: electron
             update-types: ["version-update:semver-major"]

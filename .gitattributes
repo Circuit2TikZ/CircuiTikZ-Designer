@@ -36,7 +36,12 @@
 #*.onlydata text eol=lf
 #*.php      text eol=lf
 #*.pl       text eol=lf
-#*.py       text eol=lf
+*.py       text eol=lf
+*.toml     text eol=lf
+*.tex      text eol=lf
+*.ipynb    text eol=lf
+uv.lock    text eol=lf
+.python-version text eol=lf
 #*.rb       text eol=lf
 *.sass     text eol=lf
 #*.scm      text eol=lf
