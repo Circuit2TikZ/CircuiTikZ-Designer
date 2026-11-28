@@ -32,15 +32,15 @@ export type FontSize = ChoiceEntry & {
 	size: number
 }
 
-// pt sizes for \tiny .. \Huge, taken from the LaTeX kernel's size10.clo/size11.clo/size12.clo - this is how
+// pt sizes for \tiny .. \Huge, taken from size10.clo/size11.clo/size12.clo of LaTeX's standard classes - this is how
 // the relative size commands resolve for a given document base font size (\documentclass[10pt|11pt|12pt]).
 // exported tikz code uses the relative commands (e.g. \footnotesize) instead of absolute sizes, so text only
 // comes out at the intended size if the including document's base font size matches what the diagram was
 // designed for. see setBaseFontSize/getBaseFontSize below.
 const fontSizeTablePt: Record<DocumentBaseFontSize, number[]> = {
-	10: [5, 7, 8, 9, 10, 12, 14, 17, 20, 25],
-	11: [6, 8, 9, 10, 11, 12, 14, 17, 20, 25],
-	12: [6, 8, 10, 11, 12, 14, 17, 20, 25, 25],
+	10: [5, 7, 8, 9, 10, 12, 14.4, 17.28, 20.74, 24.88],
+	11: [6, 8, 9, 10, 10.95, 12, 14.4, 17.28, 20.74, 24.88],
+	12: [6, 8, 10, 10.95, 12, 14.4, 17.28, 20.74, 24.88, 24.88],
 }
 const fontSizeKeys = [
 	"tiny",
