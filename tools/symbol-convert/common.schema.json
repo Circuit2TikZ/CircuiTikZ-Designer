@@ -1,0 +1,98 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Definitions shared by the schemas of the node- and path-style components",
+	"definitions": {
+		"optionDef": {
+			"type": "object",
+			"properties": {
+				"name": { "title": "Name of the option", "type": "string", "minLength": 1 },
+				"displayName": {
+					"title": "What should be displayed for this option",
+					"type": "string",
+					"minLength": 1
+				},
+				"addPins": {
+					"title": "Which pins this option adds to the component",
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"subPins": {
+					"title": "Which pins this option removes from the component",
+					"type": "array",
+					"items": { "type": "string" }
+				}
+			},
+			"required": ["name"],
+			"propertyNames": { "enum": ["name", "displayName", "addPins", "subPins"] }
+		},
+		"symbolBase": {
+			"type": "object",
+			"properties": {
+				"displayName": {
+					"title": "The name to show in the UI",
+					"type": "string",
+					"minLength": 1
+				},
+				"groupName": {
+					"title": "The name of the group, e.g. Transistors",
+					"type": "string",
+					"minLength": 1
+				},
+				"class": {
+					"title": "which ctikz class this component belongs to",
+					"type": "string",
+					"minLength": 1
+				},
+				"fillable": {
+					"title": "if the component is fillable",
+					"type": "boolean",
+					"default": false
+				},
+				"options": {
+					"title": "A list of options to set in CircuiTikZ",
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"oneOf": [
+							{
+								"$ref": "#/definitions/optionDef"
+							},
+							{
+								"type": "object",
+								"$comment": "An enum option consisting of mutually exclusive options, i.e. no more than one can be active at the same time",
+								"properties": {
+									"enumOptions": {
+										"type": "array",
+										"minItems": 1,
+										"items": {
+											"$ref": "#/definitions/optionDef"
+										}
+									},
+									"selectNone": { "type": "boolean", "default": true },
+									"displayName": {
+										"type": "string",
+										"minLength": 1,
+										"title": "The name to show in the UI for this enum option"
+									}
+								},
+								"required": ["enumOptions", "displayName"],
+								"propertyNames": { "enum": ["enumOptions", "displayName", "selectNone"] }
+							}
+						]
+					},
+					"uniqueItems": true
+				},
+				"pins": {
+					"title": "A list of CircuiTikZ pin (anchor) names",
+					"type": "array",
+					"items": {
+						"type": "string",
+						"minLength": 1
+					},
+					"uniqueItems": true
+				}
+			},
+			"required": ["displayName", "groupName"]
+		}
+	}
+}

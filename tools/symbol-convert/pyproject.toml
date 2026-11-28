@@ -1,0 +1,24 @@
+[project]
+name = "symbol-convert"
+version = "0.1.0"
+description = "Converts CircuiTikZ symbols to SVG for CircuiTikZ-Designer"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "jsonc-parser>=1.1.5",
+    "jsonschema>=4",
+    "referencing>=0.37.0",
+    "svgelements>=1.9.6",
+    "tqdm>=4.70.1",
+]
+
+[tool.ruff]
+line-length=120
+
+[tool.ruff.format]
+indent-style = "tab"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.6",
+]

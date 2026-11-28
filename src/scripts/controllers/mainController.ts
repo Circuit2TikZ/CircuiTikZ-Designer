@@ -4,6 +4,9 @@ import "../utils/impSVGNumber"
 import { waitForElementLoaded } from "../utils/domWatcher"
 import hotkeys from "hotkeys-js"
 import { version } from "../../../package.json"
+// MathJax is bundled with the app. This is the variant with all TeX extensions included: the synchronous
+// tex2svg() used for the labels can't wait for the lazily loaded extensions of the plain tex-svg.js.
+import mathJaxUrl from "url:mathjax/es5/tex-svg-full.js"
 
 import {
 	CanvasController,
@@ -266,7 +269,7 @@ export class MainController {
 	}
 
 	private async loadMathJax() {
-		var promise = new Promise((resolve) => {
+		var promise = new Promise((resolve, reject) => {
 			if (!("MathJax" in window)) {
 				;(window as any).MathJax = {
 					tex: {
@@ -275,13 +278,20 @@ export class MainController {
 				}
 			}
 			var script = document.createElement("script")
-			script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+			script.src = mathJaxUrl
 			document.head.appendChild(script)
 
 			script.addEventListener(
 				"load",
 				function () {
 					resolve("")
+				},
+				false
+			)
+			script.addEventListener(
+				"error",
+				function () {
+					reject(new Error("MathJax could not be loaded"))
 				},
 				false
 			)
@@ -1489,36 +1499,41 @@ export class MainController {
 	 * @param {Element} node
 	 */
 	private preprocessSymbolColors(node: Element) {
-		//exchange all explicit blacks with defaultStroke and all explicit whites with defaultFill
+		// exchange all explicit blacks with currentColor (so each placed component instance can be recolored
+		// individually via the "color" CSS property on its own <use> element, see SymbolColorable) and all
+		// explicit whites with defaultFill (these are canvas-background-colored gaps, not part of the component's
+		// own color)
 		node.querySelectorAll("[fill]").forEach((elem) => {
 			if (elem.getAttribute("fill") == "#000") {
-				elem.setAttribute("fill", defaultStroke)
+				elem.setAttribute("fill", "currentColor")
 			} else if (elem.getAttribute("fill") == "#fff") {
 				elem.setAttribute("fill", defaultFill)
 			}
 		})
 		node.querySelectorAll("[stroke]").forEach((elem) => {
 			if (elem.getAttribute("stroke") == "#000") {
-				elem.setAttribute("stroke", defaultStroke)
+				elem.setAttribute("stroke", "currentColor")
 			} else if (elem.getAttribute("stroke") == "#fff") {
 				elem.setAttribute("stroke", defaultFill)
 			}
 		})
 
+		// elements marked as fillable (e.g. the body of a European resistor) reference a custom property instead,
+		// since they need to be colored independently of the stroke/outline color
 		node.querySelectorAll(".fillable").forEach((elem) => {
 			if (elem.getAttribute("fill") == "none") {
-				elem.setAttribute("fill", "currentFill")
+				elem.setAttribute("fill", "var(--component-fill-color, none)")
 			}
 		})
 
 		if (node.getAttribute("fill") == "#000") {
-			node.setAttribute("fill", defaultStroke)
+			node.setAttribute("fill", "currentColor")
 		} else if (node.getAttribute("fill") == "#fff") {
 			node.setAttribute("fill", defaultFill)
 		}
 
 		if (node.getAttribute("stroke") == "#000") {
-			node.setAttribute("stroke", defaultStroke)
+			node.setAttribute("stroke", "currentColor")
 		} else if (node.getAttribute("stroke") == "#fff") {
 			node.setAttribute("stroke", defaultFill)
 		}

@@ -1,15 +1,21 @@
 <!doctype html>
 <html lang="en-US" data-bs-theme="dark">
 	<head>
-		<!-- Google tag (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-SN05E6G25Q"></script>
+		<!-- Google tag (gtag.js), only on the website: the desktop apps are loaded from file:// and send nothing -->
 		<script>
-			window.dataLayer = window.dataLayer || []
-			function gtag() {
-				dataLayer.push(arguments)
+			if (location.protocol === "https:" || location.protocol === "http:") {
+				var gtagScript = document.createElement("script")
+				gtagScript.async = true
+				gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-SN05E6G25Q"
+				document.head.appendChild(gtagScript)
+
+				window.dataLayer = window.dataLayer || []
+				window.gtag = function () {
+					window.dataLayer.push(arguments)
+				}
+				window.gtag("js", new Date())
+				window.gtag("config", "G-SN05E6G25Q", { cookie_flags: "max-age=7200;secure;samesite=strict" })
 			}
-			gtag("js", new Date())
-			gtag("config", "G-SN05E6G25Q", { cookie_flags: "max-age=7200;secure;samesite=strict" })
 		</script>
 		<title>CircuiTikZ Designer</title>
 		<meta name="title" property="og:title" content="CircuiTikZ Designer" />
@@ -34,9 +40,6 @@
 		<meta charset="UTF-8" />
 
 		<link rel="stylesheet" href="../styles/styles.scss" />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 		<link
 			rel="preload"
 			href="../data/symbols.svg"
@@ -348,14 +351,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="fixed-action-btn" id="floatingActionButtonContainer" style="display: none">
-			<a class="btn btn-floating" id="mainFAB">
-				<span class="material-symbols-outlined">done</span>
-			</a>
-
-			<ul class="list-unstyled" id="subFloatingActionButtonContainer"></ul>
-		</div>
-
 		<!-- Left offcanvas (symbol DB) -->
 		<div id="leftOffcanvas" class="offcanvas offcanvas-start" tabindex="-1">
 			<div class="offcanvas-header flex-column gap-3">
@@ -523,7 +518,30 @@
 							If you find bugs or have suggestions, please feel free to contact us, preferably on
 							<a href="https://github.com/Circuit2TikZ/CircuiTikZ-Designer" target="_blank">Github</a>.
 						</p>
-						<p>&copy; 2025 Philipp Wiedemann, Manuel Kirzinger, Christof Pfannenm&uuml;ller</p>
+						<p>
+							Fonts: the text on the canvas uses CMU Serif (<a
+								href="../fonts/LICENSE-cmu-serif.txt"
+								target="_blank"
+								>SIL Open Font License 1.1</a
+							>), the icons are Material Symbols by Google (<a
+								href="../fonts/LICENSE-material-symbols.txt"
+								target="_blank"
+								>Apache License 2.0</a
+							>).
+						</p>
+						<p>
+							Formulas are rendered with
+							<a href="https://www.mathjax.org/" target="_blank">MathJax</a> (<a
+								href="../licenses/LICENSE-mathjax.txt"
+								target="_blank"
+								>Apache License 2.0</a
+							>).
+						</p>
+						<p>
+							The licenses of all third-party components are listed in the
+							<a href="../licenses/THIRD-PARTY-NOTICES.txt" target="_blank">third-party notices</a>.
+						</p>
+						<p>&copy; 2023-2026 Philipp Wiedemann, Manuel Kirzinger, Christof Pfannenm&uuml;ller</p>
 					</div>
 					<div class="modal-footer justify-content-between align-items-baseline">
 						<div class="col-sm-4 w-auto">
@@ -546,7 +564,10 @@
 							</a>
 						</div>
 						<div class="col-sm-4 w-auto">
-							<a class="icon-link" href="https://github.com/Circuit2TikZ/SymbolConvert" target="_blank">
+							<a
+								class="icon-link"
+								href="https://github.com/Circuit2TikZ/CircuiTikZ-Designer/tree/main/tools/symbol-convert"
+								target="_blank">
 								<svg class="bi" width="40" height="40" fill="currentColor">
 									<use xlink:href="../icons/bootstrap-icons.svg#github" />
 								</svg>

@@ -1,0 +1,20 @@
+name: PR title
+
+# Plain pull_request: the workflow file comes from the PR itself, so it also runs for
+# PRs from forks and doesn't depend on the base or default branch. Reading the PR
+# title only needs a read-only token.
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+
+permissions:
+    pull-requests: read
+
+jobs:
+    pr-title:
+        name: pr-title
+        runs-on: ubuntu-latest
+        steps:
+            - uses: amannn/action-semantic-pull-request@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

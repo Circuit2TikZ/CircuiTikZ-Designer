@@ -3,10 +3,11 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"module": "NodeNext",
-		"target": "ESNext", 
+		"target": "ESNext",
 		"noEmit": true,
 		"strictNullChecks": false,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"skipLibCheck": true
 	},
 	"exclude": [],
 	"include": ["src/**/*"]

@@ -1,0 +1,28 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Schema for declaring CircuiTikZ node-style components",
+	"type": "object",
+	"properties": {
+		"nodes": {
+			"title": "Definitions of node-style components",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"allOf": [{ "$ref": "common.schema.json#/definitions/symbolBase" }],
+				"properties": {
+					"name": {
+						"title": "The CircuiTikZ node name, e.g. nigfete for a n channel MOSFET",
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"required": ["name"],
+				"propertyNames": {
+					"enum": ["name", "displayName", "groupName", "class", "fillable", "options", "pins"]
+				}
+			}
+		}
+	},
+	"required": ["nodes"],
+	"propertyNames": { "enum": ["$schema", "nodes"] }
+}

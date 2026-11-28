@@ -38,7 +38,7 @@ Stop wrestling with code syntax — focus on your circuit design, and let Circui
 
 ## Use locally
 
-1. Have [Node.js](https://nodejs.org/) installed
+1. Have [Node.js](https://nodejs.org/) 22.13 or newer installed
 2. Clone the repository
 3. Run "npm install" in terminal in project directory
 4. Run "npm start" in terminal in project directory
@@ -62,4 +62,4 @@ You can post feature requests and discuss them on the [discussions](https://gith
 
 ### Contribute code/component implementations
 
-Fork the repo, and create a pull request. Please always test your code thoroughly!
+Fork the repo, create a branch from `dev` and open a pull request against `dev`. Each pull request should contain a single feature or bug fix, and its title has to follow the [Conventional Commits](https://www.conventionalcommits.org/) format (e.g. `fix(ui): label position shift in Firefox`). Please always test your code thoroughly! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.

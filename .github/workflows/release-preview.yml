@@ -1,0 +1,96 @@
+name: Release preview
+
+# Maintains the dev -> main release pull request:
+#  - opens it as a draft as soon as dev contains something releasable (feat/fix/perf/breaking)
+#  - keeps its description up to date with the next version and the notes merging it would release
+# The PR is the "unreleased" view. Mark it ready for review and merge it (merge commit) to release.
+#
+# PRs opened with the default GITHUB_TOKEN don't trigger the pull_request workflows (pr-title,
+# source-branch), so they could never be merged. Therefore the PR is opened with a short-lived
+# token of a GitHub App (see MAINTAINING.md): set the repository variable RELEASE_APP_CLIENT_ID
+# and the secret RELEASE_APP_PRIVATE_KEY. The PR is then authored by the app, not by a person.
+# Without them the default token is used: the PR is still opened and updated, but it has to be
+# closed and reopened once to run the required checks.
+on:
+    push:
+        branches: [dev]
+    pull_request:
+        branches: [main]
+        types: [opened, reopened, labeled, unlabeled]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
+
+concurrency:
+    group: release-preview
+    cancel-in-progress: true
+
+jobs:
+    preview:
+        runs-on: ubuntu-latest
+        # for pull_request events only handle the dev -> main PR of this repository
+        if: github.event_name != 'pull_request' || (github.head_ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository)
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  ref: dev
+                  fetch-depth: 0
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+
+            - name: Create GitHub App token
+              id: app-token
+              if: vars.RELEASE_APP_CLIENT_ID != ''
+              uses: actions/create-github-app-token@v3
+              with:
+                  client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+                  private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+                  permission-pull-requests: write
+                  permission-contents: read
+
+            - name: Find the release PR
+              id: pr
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+              run: |
+                  NUMBER=$(gh pr list --head dev --base main --state open --json number --jq '.[0].number // empty')
+                  RELEASE_AS=""
+                  if [ -n "$NUMBER" ]; then
+                    echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+                    RELEASE_AS=$(gh pr view "$NUMBER" --json labels \
+                      --jq '[.labels[].name | select(startswith("release-as:"))][0] // "" | ltrimstr("release-as:")')
+                  fi
+                  echo "release_as=$RELEASE_AS" >> "$GITHUB_OUTPUT"
+
+            - name: Compute version and notes
+              id: release
+              env:
+                  RELEASE_AS: ${{ steps.pr.outputs.release_as }}
+              run: node scripts/release.mjs --ref origin/dev --preview --release-as "$RELEASE_AS" --notes-file preview.md
+
+            - name: Write PR description
+              run: |
+                  {
+                    cat preview.md
+                    echo
+                    echo "---"
+                    echo "_Generated from the PR titles on dev. Add a \`release-as:X.Y.Z\` label to override the version (e.g. \`release-as:1.0.0\`)._"
+                  } > body.md
+
+            - name: Update PR description
+              if: steps.pr.outputs.number
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+              run: gh pr edit "${{ steps.pr.outputs.number }}" --body-file body.md
+
+            - name: Open release PR
+              if: steps.pr.outputs.number == '' && steps.release.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+              run: |
+                  gh pr create --draft --base main --head dev \
+                    --title "chore(release): next release" --body-file body.md
