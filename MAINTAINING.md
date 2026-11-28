@@ -16,10 +16,10 @@ Both branches are protected by rulesets: no direct pushes, no force pushes, no d
 | --------------- | ------------------- | ------------- |
 | `check`         | `ci.yml`            | `dev`, `main` |
 | `build`         | `ci.yml`            | `dev`, `main` |
-| `pr-title`      | `pr-title.yml`      | `dev`         |
+| `pr-title`      | `pr-title.yml`      | `dev`, `main` |
 | `source-branch` | `source-branch.yml` | `main`        |
 
-- `check` runs the type check and the formatting check on every push and pull request. `build` runs the production build for `main`, `dev` and pull requests targeting them.
+- `check` runs the type check and the formatting check on every push and pull request. `build` runs the production build, the [third-party notices](#third-party-notices) check and a desktop packaging test for `main`, `dev` and pull requests targeting them.
 - `symbols (informative)` (`ci.yml`) is **not** a required check. It fails if `src/data/symbols.svg` or the symbol converter changed since the last recorded converter run, see [tools/symbol-convert](tools/symbol-convert/README.md#is-symbolssvg-up-to-date). Check its result on `dev` before a release.
 - `pr-title` validates that the PR title is a conventional commit.
 - `source-branch` fails for pull requests into `main` that don't come from `dev` of this repository.
@@ -63,7 +63,7 @@ The desktop apps are **not code signed**. Windows shows a SmartScreen warning ("
 
 The desktop packaging is configured in `forge.config.js`, the icons are in `src/icons/` (`app.ico` and `app.icns` are generated from `android-icon-512x512.png`). Pull requests only run a packaging smoke test on Linux (`electron-forge package` in the `build` check), the installers are built by the release workflow. To try the packaging locally: `npm run package` (`npm run make` also creates the installers, which needs `dpkg`, `fakeroot` and `rpmbuild` on Linux). The source maps in `dist/` are not packaged into the desktop apps. The website zip contains them, so that errors on the deployed website can be debugged.
 
-No commit is made for a release: the version in `package.json` (and the lockfile) is the placeholder `0.0.0` and is intentionally never changed. The tag is the source of truth. The release workflow runs `npm version <version> --no-git-tag-version` in the CI workspace before building, so only the released build contains the real version. Local and development builds show `v0.0.0`. Do not run `npm version` yourself or commit a version bump. Any future build job (for example Electron) needs the same step before it builds.
+No commit is made for a release: the version in `package.json` (and the lockfile) is the placeholder `0.0.0` and is intentionally never changed. The tag is the source of truth. The website and desktop jobs of the release workflow run `npm version <version> --no-git-tag-version` in the CI workspace before building, so only the released builds contain the real version. Local and development builds show `v0.0.0`. Do not run `npm version` yourself or commit a version bump. A new build job in the release workflow needs the same step before it builds.
 
 ### Version rules
 
@@ -74,7 +74,7 @@ The version is calculated by `scripts/release.mjs` from the squashed commit titl
 | 0.x        | minor    | minor  | patch          |
 | 1.0 and up | major    | minor  | patch          |
 
-Other types never release. A release is only created if at least one `feat`, `fix`, `perf` or breaking commit is included. The preview in the PR description shows exactly what would be released. Commits whose title is not a conventional commit are silently ignored, so if something is missing from the preview, check its title.
+Other types never release. A release is only created if at least one `feat`, `fix`, `perf` or breaking commit is included, or if the version is [overridden](#going-to-10-or-overriding-a-version). The preview in the PR description shows exactly what would be released. Commits whose title is not a conventional commit are silently ignored, so if something is missing from the preview, check its title.
 
 ### Going to 1.0 (or overriding a version)
 
@@ -111,13 +111,13 @@ Every build ships `src/licenses/THIRD-PARTY-NOTICES.txt` (linked from the About 
 
 - **Default branch** is `dev`, so new pull requests target it by default.
 - **Merge settings:** allow squash merging (default message: the PR title) and merge commits. Rebase merging can stay disabled.
-- **Dependabot** (`.github/dependabot.yml`) opens grouped monthly dependency updates against `dev`. Major updates of `typescript`, `hotkeys-js`, `electron` and `mathjax` are ignored and have to be done manually; the reasons are in the file.
+- **Dependabot** (`.github/dependabot.yml`) opens monthly updates against `dev`, for npm packages (grouped) and GitHub Actions. All updates of `svgo` and major updates of `typescript`, `hotkeys-js`, `electron` and `mathjax` are ignored and have to be done manually; the reasons are in the file. The Python packages of the symbol converter are not covered.
 
 ## Workflows
 
 | File                  | Trigger                          | Purpose                                                    |
 | --------------------- | -------------------------------- | ---------------------------------------------------------- |
-| `ci.yml`              | every push, pull requests        | type check, formatting, build for `main`/`dev`             |
+| `ci.yml`              | every push, pull requests        | type check, formatting, symbol check, build `main`/`dev`   |
 | `pr-title.yml`        | pull requests                    | conventional commit check for the PR title                 |
 | `source-branch.yml`   | pull requests into `main`        | only `dev` may be merged into `main`                       |
 | `release-preview.yml` | push to `dev`, release PR events | opens/updates the draft release PR                         |
