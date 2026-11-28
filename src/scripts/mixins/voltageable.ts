@@ -168,10 +168,19 @@ export function Voltageable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.properties.add(PropertyCategories.voltage, this.voltageShift)
 		}
 
+		public redrawText(): void {
+			if (this.voltageLabelRendering) {
+				this.generateVoltageRender()
+			}
+			super.redrawText()
+		}
+
 		protected generateVoltageRender(): void {
 			this.voltageLabelRendering = generateLabelRender(this.voltageLabelRendering, this.voltageLabel)
 			this.voltageLabelRendering.fill(defaultStroke)
 
+			// the group of the previous rendering, its label was already removed
+			this.voltageRendering?.remove()
 			this.voltageRendering = new SVG.G()
 			this.voltageRendering.add(this.voltageLabelRendering)
 			this.visualization.add(this.voltageRendering)

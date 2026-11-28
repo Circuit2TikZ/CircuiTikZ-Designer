@@ -124,6 +124,13 @@ export class GroupComponent extends CircuitComponent {
 		}
 		this.update()
 	}
+	public redrawText(): void {
+		// update() of a group doesn't update its components
+		for (const component of this.groupedComponents) {
+			component.redrawText()
+		}
+		this.update()
+	}
 	public update(): void {
 		this._bbox = undefined
 		for (const component of this.groupedComponents) {

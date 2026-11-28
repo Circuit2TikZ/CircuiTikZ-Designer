@@ -6,6 +6,7 @@ import {
 	defaultFill,
 	TextProperty,
 	EnvironmentVariableController,
+	getBaseFontSize,
 } from "../internal"
 import FileSaver from "file-saver"
 import * as prettier from "prettier"
@@ -139,6 +140,15 @@ export class ExportController {
 			]
 			if (libraryStr) {
 				arr = [libraryStr].concat(arr)
+			}
+			// \tiny .. \Huge below resolve against the including document's base font size, so if this diagram
+			// wasn't designed for the LaTeX default (10pt), note which base size it actually needs
+			const baseFontSize = getBaseFontSize()
+			if (baseFontSize !== 10) {
+				arr = [
+					`% This diagram was designed for a ${baseFontSize}pt base document font size.`,
+					`% Text sizes (including \\tiny .. \\Huge below) will only match the design if this code is included in a document using \\documentclass[${baseFontSize}pt]{...} (or an equivalent \\normalsize).`,
+				].concat(arr)
 			}
 			this.exportedContent.rows = arr.length
 			this.exportedContent.value = arr.join("\n")

@@ -18,6 +18,7 @@ export let currentSaveVersion = "0.1"
 export type SaveFileFormat = {
 	version: string
 	tikzSettings: GlobalTikzSettings
+	baseFontSize?: string
 	components: ComponentSaveObject[]
 }
 
@@ -81,6 +82,7 @@ export class SaveController {
 		let data: SaveFileFormat = {
 			version: currentSaveVersion,
 			tikzSettings: settingsData,
+			baseFontSize: EnvironmentVariableController.instance.getBaseFontSizeJson(),
 			components: componentArray,
 		}
 
@@ -149,6 +151,12 @@ export class SaveController {
 		if ((document.getElementById("loadCheckRemove") as HTMLInputElement).checked) {
 			SelectionController.instance.selectAll()
 			SelectionController.instance.removeSelection()
+		}
+
+		// the base font size applies to the whole canvas, so it is only taken from the file if there is nothing on it.
+		// Files without it use the 10pt default.
+		if (MainController.instance.circuitComponents.length == 0) {
+			EnvironmentVariableController.instance.setBaseFontSizeFromJson(saveFile.baseFontSize)
 		}
 
 		let components = []

@@ -31,6 +31,8 @@ export class Undo {
 		let currentState: SaveFileFormat = {
 			version: currentSaveVersion,
 			tikzSettings: EnvironmentVariableController.instance.toJson(),
+			// also needed here, because the browser tabs are saved with this state
+			baseFontSize: EnvironmentVariableController.instance.getBaseFontSizeJson(),
 			components: components,
 		}
 
@@ -84,6 +86,8 @@ export class Undo {
 		let state = Undo.states[Undo.currentIndex].components
 
 		EnvironmentVariableController.instance.fromJson(Undo.states[Undo.currentIndex].tikzSettings)
+		// before the components are created, their text uses it
+		EnvironmentVariableController.instance.setBaseFontSizeFromJson(Undo.states[Undo.currentIndex].baseFontSize)
 		let components = []
 
 		for (const component of state) {

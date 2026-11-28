@@ -352,6 +352,14 @@ export abstract class CircuitComponent {
 	}
 
 	/**
+	 * Redraws all text of this component, needed after the font sizes changed. update() only moves labels, so
+	 * components with labels override this to render them again (remember to call super.redrawText()).
+	 */
+	public redrawText(): void {
+		this.update()
+	}
+
+	/**
 	 * update the visuals to comply with dark/light mode
 	 */
 	public abstract updateTheme()
