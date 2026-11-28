@@ -38,7 +38,7 @@ Stop wrestling with code syntax — focus on your circuit design, and let Circui
 
 ## Use locally
 
-1. Have [Node.js](https://nodejs.org/) installed
+1. Have [Node.js](https://nodejs.org/) 22.13 or newer installed
 2. Clone the repository
 3. Run "npm install" in terminal in project directory
 4. Run "npm start" in terminal in project directory

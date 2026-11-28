@@ -56,14 +56,17 @@ Mark breaking changes with `!` in the title and describe the impact in the PR de
 
 ### Checks
 
-Before pushing, you can run the checks that every pull request has to pass:
+Before pushing, you can run the checks that every pull request has to pass (you need the Node.js version from `engines` in [package.json](package.json) or newer):
 
 ```sh
 npm ci
 npx tsc --noEmit        # type check
 npx prettier --check .  # formatting, fix with: npx prettier --write .
 npm run build           # production build
+npm run notices:check   # after the build: are all bundled packages in the third-party notices?
 ```
+
+If the last one fails, for example after adding a dependency, see [third-party notices](MAINTAINING.md#third-party-notices).
 
 The pull request cannot be merged until the checks `check`, `build` and `pr-title` pass. The check `symbols (informative)` doesn't block merging, it only shows whether [the symbol converter should be run again](tools/symbol-convert/README.md#is-symbolssvg-up-to-date). You don't need to rebase or clean up your commits, because the maintainers squash merge.
 

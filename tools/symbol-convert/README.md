@@ -6,23 +6,24 @@ This tool was previously maintained in the [SymbolConvert](https://github.com/Ci
 
 You only need it to add or change symbols, not to build or run the app.
 
-## Dependencies
+## Setup
 
-The output depends on the tool versions. These are the versions in use on Linux:
+### Requirements
 
-| Tool                  | Version                | Pinned by                                            |
-| --------------------- | ---------------------- | ---------------------------------------------------- |
-| CircuiTikZ            | 1.8.5                  | `toolchain.py`, installed by `npm run symbols:setup` |
-| TeX Live (`lualatex`) | 2026 (LuaHBTeX 1.24.0) | not pinned, other versions give a warning            |
-| `dvisvgm`             | 3.6 (from TeX Live)    | not pinned, other versions give a warning            |
-| svgo                  | 4.0.1                  | `package.json` in the repository root                |
-| Node.js               | 26.13.1                | not pinned                                           |
-| Python                | 3.12                   | `.python-version`                                    |
-| Python packages       | see `uv.lock`          | `uv.lock`                                            |
+| What                                     | Required version                                                              |
+| ---------------------------------------- | ----------------------------------------------------------------------------- |
+| CircuiTikZ                               | set in [`toolchain.py`](toolchain.py), installed by `npm run symbols:setup`   |
+| svgo                                     | set in [`package.json`](../../package.json), installed by `npm ci`            |
+| Python and its packages                  | set in [`.python-version`](.python-version) and `uv.lock`, installed by uv    |
+| [Node.js](https://nodejs.org/) with npm  | the minimum of the app, see `engines` in [`package.json`](../../package.json) |
+| [uv](https://docs.astral.sh/uv/) and Git | no specific version                                                           |
+| A TeX distribution                       | any which provides `lualatex`, `kpsewhich` and `dvisvgm`, see [below](#tex)   |
+
+The converter has to run in a Git clone of the repository, it uses Git to list its files for the [checksums](#is-symbolssvg-up-to-date).
 
 ### Python and svgo
 
-You need [uv](https://docs.astral.sh/uv/) and Node.js with npm. In the repository root, run:
+In the repository root, run:
 
 ```bash
 npm ci
@@ -32,19 +33,29 @@ There is no separate setup step for Python: the first run of the converter creat
 
 The converter finds the local svgo installation itself, you don't need to add it to your `PATH`.
 
-### TeX Live
+### TeX
 
-Install [TeX Live](https://tug.org/texlive/) and make sure that `lualatex`, `kpsewhich` and `dvisvgm` are on your `PATH`.
+Install a TeX distribution and make sure that `lualatex`, `kpsewhich` and `dvisvgm` are on your `PATH`.
+
+The generated symbols can depend on the versions of TeX, its packages (e.g. PGF) and `dvisvgm`. This setup is **known to reproduce `symbols.svg`**, on Linux:
+
+| TeX distribution | LuaHBTeX | PGF    | `dvisvgm` |
+| ---------------- | -------- | ------ | --------- |
+| TeX Live 2026    | 1.24.0   | 3.1.12 | 3.6       |
+
+Other versions, distributions and operating systems are not ruled out, but untested. The converter prints a warning if `lualatex` isn't from TeX Live 2026 or `dvisvgm` has another version. It doesn't check the versions of TeX packages other than CircuiTikZ.
+
+To test your setup, run the converter before you change anything. If Git shows no change of `symbols.svg`, your setup reproduces it.
 
 ### CircuiTikZ
 
-Newer CircuiTikZ versions change how some symbols are drawn, so the converter uses its own copy of the version listed above. Install it once, in the repository root:
+Newer CircuiTikZ versions change how some symbols are drawn, so the converter uses its own copy of one version. Install it once, in the repository root:
 
 ```bash
 npm run symbols:setup
 ```
 
-This downloads the release, verifies its files with a checksum and puts them into `tools/symbol-convert/.circuitikz/`. Only the converter uses this copy, it doesn't change your TeX installation or other documents. It takes priority over the CircuiTikZ of TeX Live and of your personal TeX folder.
+This downloads the release, verifies its files with a checksum and puts them into `tools/symbol-convert/.circuitikz/`. Only the converter uses this copy, it doesn't change your TeX installation or other documents. It takes priority over the CircuiTikZ of your TeX distribution and of your personal TeX folder. The converter stops before the conversion if TeX doesn't use this copy.
 
 ## Usage
 
