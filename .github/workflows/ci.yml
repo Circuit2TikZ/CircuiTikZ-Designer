@@ -15,6 +15,17 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    # Only informative: fails if symbols.svg or the symbol converter changed since the last recorded converter run
+    # (tools/symbol-convert/checksums.py). Don't add it to the required checks of the branch rulesets.
+    symbols:
+        name: symbols (informative)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            # only needs Python's standard library and Git
+            - name: Compare the checksums of the symbol converter
+              run: python3 tools/symbol-convert/checksums.py
+
     check:
         name: check
         runs-on: ubuntu-latest

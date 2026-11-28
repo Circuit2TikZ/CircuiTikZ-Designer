@@ -54,9 +54,30 @@ In the repository root, run:
 npm run symbols
 ```
 
-The result overwrites `src/data/symbols.svg`. Commit it together with your changes to the converter or the component files.
+The result overwrites `src/data/symbols.svg`, and its checksums are saved in `checksums.txt`. Commit both together with your changes to the converter or the component files, also if `symbols.svg` didn't change.
 
 Every run starts by deleting `build/` and creates all symbols again. The intermediate files of the last run stay in `build/`, e.g. to debug a failed one.
+
+### Is `symbols.svg` up to date?
+
+```bash
+npm run symbols:check
+```
+
+This check is **only informative**. It compares the current files with the checksums which the last successful run saved in [`checksums.txt`](checksums.txt). It doesn't run the converter and doesn't need TeX. It answers two questions:
+
+- **Is `symbols.svg` the file which the converter wrote?** A manual edit shows a mismatch.
+- **Do you need to run the converter again?** Changes since the last run are listed: the files of this folder which can affect the output (component files, code, TeX templates, `uv.lock`, ...) and the svgo version in `package.json`. Not every change affects the output, e.g. a new comment. After a run the check passes again, even if `symbols.svg` stays the same.
+
+A passing check doesn't prove that the symbols are correct, and it can't detect:
+
+- someone editing `checksums.txt` by hand,
+- other tools on your computer, e.g. another version of TeX, its packages or `dvisvgm`,
+- updates of the packages which svgo depends on.
+
+CI runs the check as `symbols (informative)`. If it fails, you can still merge. If two branches both changed `symbols.svg`, `checksums.txt` has a merge conflict: combine the other changes, then run the converter again, which rewrites the file.
+
+Which files are left out is listed in [`checksums.py`](checksums.py), new files in this folder are included automatically.
 
 ### Checks and errors
 
