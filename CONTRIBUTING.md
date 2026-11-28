@@ -65,7 +65,7 @@ npx prettier --check .  # formatting, fix with: npx prettier --write .
 npm run build           # production build
 ```
 
-The pull request cannot be merged until the checks `check`, `build` and `pr-title` pass. You don't need to rebase or clean up your commits, because the maintainers squash merge.
+The pull request cannot be merged until the checks `check`, `build` and `pr-title` pass. The check `symbols (informative)` doesn't block merging, it only shows whether [the symbol converter should be run again](tools/symbol-convert/README.md#is-symbolssvg-up-to-date). You don't need to rebase or clean up your commits, because the maintainers squash merge.
 
 ## How releases work
 

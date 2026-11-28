@@ -7,6 +7,7 @@ import pathlib
 import shutil
 import sys
 
+from checksums import input_checksums, save_checksums
 from errors import ConverterError
 from toolchain import check_tools
 from validation import check_components
@@ -28,6 +29,8 @@ def preflight():
 
 def convert():
 	preflight()
+	# taken before the conversion, which takes minutes, see save_checksums
+	inputs = input_checksums()
 
 	# the steps skip files which already exist, so old ones would hide changes
 	build_dir = CONVERTER_DIR / "build"
@@ -42,6 +45,12 @@ def convert():
 	compile_tex_files()
 	convert_DVI_to_SVGs()
 	combine_SVGs_to_symbol()
+
+	if not save_checksums(inputs):
+		print(
+			"Warning: files of the converter changed during the run, so the checksums were not saved. "
+			"Run the converter again."
+		)
 
 
 def main():

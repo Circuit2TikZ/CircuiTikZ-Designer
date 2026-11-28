@@ -20,6 +20,7 @@ Both branches are protected by rulesets: no direct pushes, no force pushes, no d
 | `source-branch` | `source-branch.yml` | `main`        |
 
 - `check` runs the type check and the formatting check on every push and pull request. `build` runs the production build for `main`, `dev` and pull requests targeting them.
+- `symbols (informative)` (`ci.yml`) is **not** a required check. It fails if `src/data/symbols.svg` or the symbol converter changed since the last recorded converter run, see [tools/symbol-convert](tools/symbol-convert/README.md#is-symbolssvg-up-to-date). Check its result on `dev` before a release.
 - `pr-title` validates that the PR title is a conventional commit.
 - `source-branch` fails for pull requests into `main` that don't come from `dev` of this repository.
 - Require the `(pull_request)` runs, not the `(push)` runs, where a check exists for both.
