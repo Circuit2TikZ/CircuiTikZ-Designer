@@ -30,6 +30,7 @@ import {
 	Voltageable,
 	Currentable,
 	EnvironmentVariableController,
+	SymbolColorable,
 } from "../internal"
 import { lineRectIntersection, pointInsideRect, selectedBoxWidth, selectionSize } from "../utils/selectionHelper"
 
@@ -57,7 +58,9 @@ export type PathSymbolSaveObject = PathSaveObject & {
 	poles?: Pole
 }
 
-export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(Nameable(PathComponent)))) {
+export class PathSymbolComponent extends Currentable(
+	Voltageable(PathLabelable(Nameable(SymbolColorable(PathComponent))))
+) {
 	private static jsonID = "path"
 	static {
 		CircuitComponent.jsonSaveMap.set(PathSymbolComponent.jsonID, PathSymbolComponent)
@@ -200,8 +203,10 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		this.componentVisualization = CanvasController.instance.canvas.use(this.componentVariant.symbol)
 		this.componentVisualization.fill("none")
-		this.componentVisualization.stroke(defaultStroke)
-		this.componentVisualization.node.style.color = defaultStroke
+		if (symbol.fillable) {
+			this.enableFillColor()
+		}
+		this.updateSymbolColors()
 
 		this.displayName = symbol.displayName
 		this.referenceSymbol = symbol
@@ -624,6 +629,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 			labelColor = this.labelColor.value.toString()
 		}
 		this.labelRendering?.fill(labelColor)
+		this.updateSymbolColors()
 	}
 
 	public isInsideSelectionRectangle(selectionRectangle: SVG.Box): boolean {
@@ -721,6 +727,10 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		super.buildTikzCommand(command)
 		let options: string[] = [this.referenceSymbol.tikzName]
 		options.push(...this.referenceSymbol.optionsToStringArray(this.optionsFromProperties()))
+		// pushed onto the symbol's own to[...] options rather than the enclosing \draw command's options,
+		// since the latter would also color the straight wire leads connecting to the symbol; "color" (not
+		// "draw") is the key that actually colors the symbol's outline in this scope, see symbolColorTikzOptions
+		options.push(...this.symbolColorTikzOptions("color"))
 		if (this.mirror.value) {
 			options.push("mirror")
 		}
@@ -790,6 +800,7 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 		this.update()
 		this.visualization.show()
 		this.updatePoles()
+		this.updateTheme()
 	}
 
 	public static fromJson(saveObject: PathSymbolSaveObject): PathSymbolComponent {
@@ -830,6 +841,16 @@ export class PathSymbolComponent extends Currentable(Voltageable(PathLabelable(N
 
 		// the bounding boxes for the label and the symbol
 		let labelBBox = labelSVG.bbox()
+
+		if (labelBBox.w === 0 && labelBBox.h === 0) {
+			// In Firefox, a freshly inserted label (glyphs referenced via <use> from shared
+			// <defs>) can briefly report a zero bbox before layout catches up, e.g. right after
+			// bulk component recreation on undo/redo or loading a save file. Retry once the
+			// browser has settled rather than positioning the label from bogus geometry.
+			requestAnimationFrame(() => this.updatePathLabel())
+			return
+		}
+
 		let labelHalfSize = new SVG.Point(labelBBox.w, labelBBox.h).div(2)
 		let symbolBBox = this.componentVisualization.bbox()
 		let symbolHalfSize = new SVG.Point(symbolBBox.w, symbolBBox.h).div(2)

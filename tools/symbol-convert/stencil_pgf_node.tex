@@ -1,0 +1,17 @@
+\documentclass[tikz,dvisvgm]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usepackage[european]{circuitikz}
+\usepackage{etoolbox}
+% draw the body diode of transistors in a marker color, so the converter can find it and make it fillable
+\definecolor{bodydiodemarker}{RGB}{255,0,255}
+\patchcmd{\drawbodydiode}{\pgfnode{emptydiodeshape}}{\pgfsetstrokecolor{bodydiodemarker}\pgfnode{emptydiodeshape}}
+	{}{\errmessage{Could not mark the body diode, check \string\drawbodydiode\space in CircuiTikZ}}
+\begin{document}
+    \begin{tikzpicture}
+        \node[<nodename>] (N) at (0,0) {};
+        \draw[draw={rgb,255:red,255;green,255;blue,0}] (-.001,.001) -- (0,0);
+        \draw[draw={rgb,255:red,0;green,255;blue,255}] (0,0) -- (.001,.001);
+        \draw[draw={rgb,255:red,255;green,0;blue,0}] (0,0) -- (N.text);
+<anchorLines>
+    \end{tikzpicture}
+\end{document}

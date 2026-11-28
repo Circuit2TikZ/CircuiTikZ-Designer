@@ -1,0 +1,67 @@
+name: CI
+
+on:
+    # every branch push (but not tags, the release workflow handles those)
+    push:
+        branches: ["**"]
+    # PRs from forks don't trigger a push run in this repo
+    pull_request:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    # Only informative: fails if symbols.svg or the symbol converter changed since the last recorded converter run
+    # (tools/symbol-convert/checksums.py). Don't add it to the required checks of the branch rulesets.
+    symbols:
+        name: symbols (informative)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            # only needs Python's standard library and Git
+            - name: Compare the checksums of the symbol converter
+              run: python3 tools/symbol-convert/checksums.py
+
+    check:
+        name: check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - name: Type check
+              run: npx tsc --noEmit
+            - name: Check formatting
+              run: npx prettier --check .
+
+    build:
+        name: build
+        # only build for main and dev: on pushes to them and on pull requests targeting them
+        if: >-
+            (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')) ||
+            (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'dev'))
+        needs: check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - name: Build
+              run: npm run build
+            # every package in the bundles has to be in src/licenses/THIRD-PARTY-NOTICES.txt
+            - name: Check third-party notices
+              run: npm run notices:check
+            # catches desktop packaging problems before a release; the installers themselves
+            # are only built by the release workflow
+            - name: Package desktop app (smoke test)
+              run: npx electron-forge package

@@ -1,0 +1,63 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Schema for declaring CircuiTikZ path-style components",
+	"type": "object",
+	"properties": {
+		"paths": {
+			"title": "Definitions of path-style components",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"allOf": [{ "$ref": "common.schema.json#/definitions/symbolBase" }],
+				"properties": {
+					"drawName": {
+						"title": "The unique (!) CircuiTikZ name used in to[...], e.g. american resistor (not R) for an resistor",
+						"type": "string",
+						"minLength": 1
+					},
+					"aliases": {
+						"title": "Additional names which can be used in to[...]",
+						"type": "array",
+						"items": {
+							"type": "string",
+							"minLength": 1
+						}
+					},
+					"shapeName": {
+						"title": "The shape name used internally by CircuiTikZ; can be used to create a node",
+						"type": "string",
+						"minLength": 1
+					},
+					"stroke": {
+						"title": "Draw a line through the component",
+						"type": "boolean",
+						"default": false
+					},
+					"source": { "enum": ["isVoltage", "isCurrent"] },
+					"start": { "type": "string", "default": "b" },
+					"end": { "type": "string", "default": "a" }
+				},
+				"required": ["drawName"],
+				"propertyNames": {
+					"enum": [
+						"drawName",
+						"displayName",
+						"groupName",
+						"class",
+						"fillable",
+						"options",
+						"pins",
+						"aliases",
+						"shapeName",
+						"stroke",
+						"source",
+						"start",
+						"end"
+					]
+				}
+			}
+		}
+	},
+	"required": ["paths"],
+	"propertyNames": { "enum": ["$schema", "paths"] }
+}

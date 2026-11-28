@@ -1,6 +1,8 @@
 import * as SVG from "@svgdotjs/svg.js"
 import TextToSVG from "text-to-svg"
 import { CanvasController, fontSizes, Text, TextAlign } from "../internal"
+// Parcel bundles the font and returns its URL (see src/fonts/README.md)
+import fontUrl from "url:../../fonts/cmunrm.woff"
 
 // the information of a single line
 // this contains the information of all elements in the line
@@ -31,13 +33,10 @@ export let textToSVG: TextToSVG
 
 export function loadTextConverter() {
 	return new Promise<void>((resolve) => {
-		TextToSVG.load(
-			"https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/font/Serif/cmunrm.woff",
-			(err, tTSVG) => {
-				textToSVG = tTSVG
-				resolve()
-			}
-		)
+		TextToSVG.load(fontUrl, (err, tTSVG) => {
+			textToSVG = tTSVG
+			resolve()
+		})
 	})
 }
 

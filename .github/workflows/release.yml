@@ -1,0 +1,193 @@
+name: Release
+
+# Every push to main is a merge of the dev -> main release PR (direct pushes are blocked by the
+# ruleset). The version and the notes are derived from the conventional commit titles since the
+# last release, see scripts/release.mjs. If nothing releasable is in there, no release is made.
+#
+# prepare:  computes the version and the notes
+# web:      builds the website zip
+# desktop:  builds the desktop app on Linux (deb, rpm, zip), Windows (installer, zip) and macOS (zip)
+# release:  creates the tag and the GitHub release with all files, only if every build succeeded
+#           (a failed build can be re-run from the Actions tab, then the release follows)
+#
+# package.json only holds the placeholder version 0.0.0 (main is protected, nothing is committed
+# for a release), the tag is the source of truth. The app embeds the version from package.json,
+# so the build jobs set it with `npm version` for their build only.
+#
+# Manual dry run (Actions tab -> Release -> Run workflow): runs the web and desktop builds with a
+# dummy version and keeps the files as workflow artifacts for 3 days. No tag, no release.
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Dummy version for the dry run (MAJOR.MINOR.PATCH, no suffix: rpm doesn't allow one)"
+                default: "0.0.1"
+
+permissions:
+    contents: read
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+jobs:
+    prepare:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: read
+        outputs:
+            release: ${{ steps.release.outputs.release || steps.dry-run.outputs.release }}
+            version: ${{ steps.release.outputs.version || steps.dry-run.outputs.version }}
+            tag: ${{ steps.release.outputs.tag || steps.dry-run.outputs.tag }}
+        steps:
+            - name: Dry run
+              id: dry-run
+              if: github.event_name == 'workflow_dispatch'
+              env:
+                  INPUT_VERSION: ${{ inputs.version }}
+              run: |
+                  if ! echo "$INPUT_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+                    echo "::error::The version must look like 1.2.3"
+                    exit 1
+                  fi
+                  {
+                    echo "release=true"
+                    echo "version=$INPUT_VERSION"
+                    echo "tag=v$INPUT_VERSION"
+                  } >> "$GITHUB_OUTPUT"
+
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0 # full history and tags are needed to find the changes since the last release
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+
+            # A "release-as:X.Y.Z" label on the release PR overrides the computed version,
+            # e.g. to go from 0.x to 1.0.0
+            - name: Look up release-as label
+              id: label
+              if: github.event_name == 'push'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  LABEL=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+                    --jq '[.[].labels[].name | select(startswith("release-as:"))][0] // ""')
+                  echo "release_as=${LABEL#release-as:}" >> "$GITHUB_OUTPUT"
+
+            - name: Compute version and notes
+              id: release
+              if: github.event_name == 'push'
+              env:
+                  RELEASE_AS: ${{ steps.label.outputs.release_as }}
+              run: node scripts/release.mjs --release-as "$RELEASE_AS" --notes-file release-notes.md
+
+            - name: Nothing to release
+              if: github.event_name == 'push' && steps.release.outputs.release != 'true'
+              run: echo "::notice::No feat/fix/perf/breaking change since ${{ steps.release.outputs.since }}, no release created."
+
+            - name: Keep the release notes
+              if: github.event_name == 'push' && steps.release.outputs.release == 'true'
+              uses: actions/upload-artifact@v7
+              with:
+                  name: release-notes
+                  path: release-notes.md
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
+
+    web:
+        needs: prepare
+        if: needs.prepare.outputs.release == 'true'
+        runs-on: ubuntu-latest
+        env:
+            VERSION: ${{ needs.prepare.outputs.version }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - name: Set version
+              run: npm version "$VERSION" --no-git-tag-version
+            - name: Build
+              run: npm run build
+            - name: Package website
+              run: (cd dist && zip -r "../circuitikz-designer-web-v$VERSION.zip" .)
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: web
+                  path: circuitikz-designer-web-v*.zip
+                  if-no-files-found: error
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
+
+    desktop:
+        needs: prepare
+        if: needs.prepare.outputs.release == 'true'
+        strategy:
+            fail-fast: false # let the other platforms finish, so one run shows all problems
+            matrix:
+                # Linux is pinned: electron-installer-redhat (rpm maker) doesn't work with rpm 4.20+,
+                # which newer Ubuntu images ship ("cp: cannot stat 'usr/*'"). Ubuntu 24.04 has rpm 4.18.
+                os: [ubuntu-24.04, windows-latest, macos-latest]
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                shell: bash
+        env:
+            VERSION: ${{ needs.prepare.outputs.version }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - name: Install the Linux packaging tools
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+                  rpmbuild --version
+            - run: npm ci
+            - name: Set version
+              run: npm version "$VERSION" --no-git-tag-version
+            # builds the web app first, then packages it and creates the installers for this OS
+            - name: Build desktop app
+              run: npm run make
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: desktop-${{ runner.os }}
+                  path: |
+                      out/make/**/*.zip
+                      out/make/**/*.deb
+                      out/make/**/*.rpm
+                      out/make/**/*-setup.exe
+                  if-no-files-found: error
+                  retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 1 }}
+
+    release:
+        needs: [prepare, web, desktop]
+        # the manual dry run stops before this job
+        if: github.event_name == 'push' && needs.prepare.outputs.release == 'true'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_REPO: ${{ github.repository }}
+            TAG: ${{ needs.prepare.outputs.tag }}
+        steps:
+            - uses: actions/download-artifact@v8
+              with:
+                  path: artifacts
+            - name: Create GitHub release
+              run: |
+                  mkdir release-files
+                  find artifacts -type f \( -name '*.zip' -o -name '*.deb' -o -name '*.rpm' -o -name '*.exe' \) -exec cp {} release-files/ \;
+                  (cd release-files && sha256sum -- * > SHA256SUMS.txt)
+                  ls -l release-files
+                  gh release create "$TAG" release-files/* \
+                    --target "$GITHUB_SHA" --title "$TAG" \
+                    --notes-file artifacts/release-notes/release-notes.md

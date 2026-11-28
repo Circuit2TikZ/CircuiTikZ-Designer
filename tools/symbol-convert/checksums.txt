@@ -1,0 +1,17 @@
+# Written by every successful run of `npm run symbols`, don't edit. Commit it together with symbols.svg.
+# Only informative, see `npm run symbols:check` and README.md.
+ab0b086bd630b5d74ee3bc0d3a91530ea936db8a605c7ae5aef5c37e8be9dc9b  src/data/symbols.svg
+4.0.1  svgo
+7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d  tools/symbol-convert/.python-version
+0269f1da98870a022ce38cdcc9e055348f28f3acaae897bb1e871170867df0c3  tools/symbol-convert/convert.py
+70de26846862ea80e98cfe6852fd15b157cbe2738200fbc9d062c59673acf616  tools/symbol-convert/nodes.jsonc
+22d20d2909cb3d1454e3b88b6ddc5fe2b2b996c932d61d1eaa8671645f0f31bc  tools/symbol-convert/paths.jsonc
+1e8d4fd7f8a279b7b3a4abafc7bb9807c52a38d08139fbec0eabc8f73a7c7536  tools/symbol-convert/settings.py
+ba69472e6839c01bc3db9a6ac0cf1f66b7ddcf72d76cbb865172e8d1e62298a6  tools/symbol-convert/stencil_pgf_node.tex
+00f30560586374ef647b922ad776bd5d2812dad253607d7e7bbb4a490105cad5  tools/symbol-convert/stencil_pgf_path.tex
+6b6a424db4779636f06672716526ac2fc9fa2614a4a104ce313e98bc316f5f87  tools/symbol-convert/svg_functions.py
+e15cf3fd00c790bc80b99ffe677fc61c12c021b208d2924745288cf7f9554728  tools/symbol-convert/tex_functions.py
+208bd851d48d4a3a2f154aba390b44095cedada27bf55cfdc24ebe7b23dbcbf4  tools/symbol-convert/toolchain.py
+2c0288ec48cf01752bbd6ac044f1d3114f30c97c1d531e9b21b6e5f144aa267d  tools/symbol-convert/utils.py
+1563aee7a67b6d44c26f54fc0dc3e66bf02a3bcb87d5446c8c9433f3e3f3c135  tools/symbol-convert/uv.lock
+42b25c651e745c91a6c81177d21a8209b1b087560008245d8f89a475620bc487  tools/symbol-convert/validation.py

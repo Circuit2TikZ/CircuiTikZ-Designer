@@ -14,16 +14,20 @@ if (started) app.quit()
 
 function createWindow() {
 	win = new BrowserWindow({
+		// Linux only, Windows and macOS use the packaged app icon. Wayland desktops without the xdg-toplevel-icon
+		// protocol ignore it and take the icon from the installed .desktop file (deb and rpm).
+		...(process.platform === "linux" && { icon: path.join(__dirname, "../icons/android-icon-512x512.png") }),
 		autoHideMenuBar: true,
 		maximizable: true,
 		backgroundColor: "lightgray",
 		// title: config.productName,
 		show: true,
 		webPreferences: {
-			nodeIntegration: true,
 			defaultEncoding: "UTF-8",
-			worldSafeExecuteJavaScript: true,
-			enableRemoteModule: true,
+			// the app is a plain web app and needs no Node.js APIs in the renderer
+			nodeIntegration: false,
+			contextIsolation: true,
+			sandbox: true,
 		},
 	})
 	if (pkg.devMode) win.loadURL("http://localhost:1234/")
