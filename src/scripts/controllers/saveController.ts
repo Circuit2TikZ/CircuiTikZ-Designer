@@ -153,6 +153,12 @@ export class SaveController {
 			SelectionController.instance.removeSelection()
 		}
 
+		// the base font size applies to the whole canvas, so it is only taken from the file if there is nothing on it.
+		// Files without it use the 10pt default.
+		if (MainController.instance.circuitComponents.length == 0) {
+			EnvironmentVariableController.instance.setBaseFontSizeFromJson(saveFile.baseFontSize)
+		}
+
 		let components = []
 
 		if (!("version" in saveFile)) {
@@ -172,8 +178,6 @@ export class SaveController {
 				// check if tikzSettings are present and load them
 				EnvironmentVariableController.instance.fromJson(saveFile.tikzSettings)
 			}
-			// falls back to the 10pt default if the save file doesn't specify a base font size
-			EnvironmentVariableController.instance.setBaseFontSizeFromJson(saveFile.baseFontSize)
 
 			for (const component of saveFile.components) {
 				let c = SaveController.fromJson(component)
