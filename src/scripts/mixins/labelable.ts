@@ -7,6 +7,7 @@ import {
 	ChoiceEntry,
 	ChoiceProperty,
 	CircuitComponent,
+	defaultFontSize,
 	CircuitikzTo,
 	ColorProperty,
 	ComponentSaveObject,
@@ -222,6 +223,13 @@ export function PositionLabelable<TBase extends AbstractConstructor<CircuitCompo
 			return null
 		}
 
+		public redrawText(): void {
+			if (this.labelRendering) {
+				this.generateLabelRender()
+			}
+			super.redrawText()
+		}
+
 		/**
 		 * Generate a label visualization via mathjax
 		 */
@@ -325,6 +333,13 @@ export function PathLabelable<TBase extends AbstractConstructor<CircuitComponent
 			}
 		}
 
+		public redrawText(): void {
+			if (this.labelRendering) {
+				this.generateLabelRender()
+			}
+			super.redrawText()
+		}
+
 		/**
 		 * Generate a label visualization via mathjax
 		 */
@@ -373,7 +388,8 @@ export function generateLabelRender(labelRendering: SVG.Element, mathJaxLabel: M
 		}
 		labelRendering.remove()
 	}
-	const transformGroup = renderMathJax(mathJaxLabel.value)
+	// CircuiTikZ sets labels in the font size of the document, i.e. \normalsize
+	const transformGroup = renderMathJax(mathJaxLabel.value, defaultFontSize.size)
 	// remove the current label and substitute with a new group element
 	labelRendering = new SVG.G()
 	labelRendering.addClass("pointerNone")

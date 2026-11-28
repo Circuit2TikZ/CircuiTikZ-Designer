@@ -222,7 +222,7 @@ export class EnvironmentVariableController {
 		)
 		this.baseFontSizeProperty.addChangeListener((ev) => {
 			setBaseFontSize(ev.value.pt)
-			this.updateComponents()
+			MainController.instance.circuitComponents.forEach((component) => component.redrawText())
 		})
 	}
 

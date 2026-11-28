@@ -103,10 +103,19 @@ export function Currentable<TBase extends AbstractConstructor<PathComponent>>(Ba
 			this.properties.add(PropertyCategories.current, this.currentDistance)
 		}
 
+		public redrawText(): void {
+			if (this.currentLabelRendering) {
+				this.generateCurrentRender()
+			}
+			super.redrawText()
+		}
+
 		protected generateCurrentRender(): void {
 			this.currentLabelRendering = generateLabelRender(this.currentLabelRendering, this.currentLabel)
 			this.currentLabelRendering.fill(defaultStroke)
 
+			// the group of the previous rendering, its label was already removed
+			this.currentRendering?.remove()
 			this.currentRendering = new SVG.G()
 			this.currentRendering.add(this.currentLabelRendering)
 			this.visualization.add(this.currentRendering)
